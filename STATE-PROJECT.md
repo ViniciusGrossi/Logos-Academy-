@@ -4,7 +4,7 @@ date: 2026-09-08
 fase_atual: "12"
 etapa_atual: "Deploy"
 produto_tipo: "saas-premium"
-proximo_passo: "Operação pós-lançamento: acompanhar a primeira sessão autenticada e configurar domínio próprio quando disponível"
+proximo_passo: "Fase 12: executar CSO, deploy-check e canary/monitoramento antes do fechamento formal"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -18,10 +18,10 @@ gates:
   fase_9: pass
   fase_10: pass
   fase_11: pass
-  fase_12: pass
+  fase_12: pending
 features: { draft: 0, approved: 11, built: 11, reviewed: 11 }
 overrides: []
-status: "🟢 Concluído"
+status: "🟢 Em andamento"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 
@@ -31,11 +31,11 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] Operação pós-lançamento: acompanhar a primeira sessão autenticada e configurar domínio próprio quando disponível.
+- [ ] Fase 12: executar CSO, deploy-check e canary/monitoramento antes do fechamento formal.
 
 ## Concluído
 
-- [2026-09-08] Fase 12 concluída: produção publicada em `https://logos-academy-mu.vercel.app` (deployment `dpl_6o1dwaqp8tGxWUZrGeKoX65wtZBd`). O preset Next.js foi versionado em `vercel.json`; build remoto, login público e redirecionamento de rota protegida foram validados. Variáveis de produção permanecem configuradas na Vercel, sem modo demo e sem segredos no Git.
+- [2026-09-08] Produção publicada em `https://logos-academy-mu.vercel.app` (deployment `dpl_6o1dwaqp8tGxWUZrGeKoX65wtZBd`). O preset Next.js foi versionado em `vercel.json`; build remoto, login público e redirecionamento de rota protegida foram validados. Variáveis de produção permanecem configuradas na Vercel, sem modo demo e sem segredos no Git. O fechamento formal da Fase 12 permanece aberto até CSO, deploy-check e canary/monitoramento.
 
 - [2026-09-08] Repositório Git independente criado e enviado para `ViniciusGrossi/Logos-Academy-`; commit inicial `bc76e84` em `main`, com `.env.local` e artefatos gerados excluídos pelo `.gitignore`.
 
@@ -131,6 +131,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Bloqueios
 
+- Fase 12 — `npm audit` ainda reporta 2 vulnerabilidades altas em PostCSS transitivo do Next 15 e 1 crítica/4 moderadas no toolchain Vitest/Vite. A correção automática exige `npm audit fix --force` (Next 16 + Vitest 5), uma atualização major que requer aprovação explícita e validação completa antes de novo deploy.
 - Registro vivo de ADRs expõe apenas ADR-030, embora o playbook cite ADR-025–031; não numerar ADR global até o checkpoint corrigir a deriva.
 - Git: o projeto vive dentro do repo do vault (sem `.git` próprio) e ~40 arquivos versionáveis seguem untracked (`docs/`, `specs/`, `supabase/migrations/`, `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`). Commits anteriores só rastrearam `app/` e `src/`. Regularizar antes do deploy (ADR-035: repo GitHub dedicado via `git init` na subpasta).
 
