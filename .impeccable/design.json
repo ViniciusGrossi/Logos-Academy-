@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-03T12:00:00-03:00",
+  "title": "Design System: Logos Academy Platform",
+  "extensions": {
+    "colorMeta": {
+      "ink-workshop": { "role": "neutral", "displayName": "Ink Workshop", "canonical": "#101114", "tonalRamp": ["#101114", "#17191D", "#22252A", "#343941", "#505761", "#8A919A", "#D5D8DC", "#F5F6F7"] },
+      "academy-orange": { "role": "primary", "displayName": "Academy Orange", "canonical": "#FF6B00", "tonalRamp": ["#431900", "#7A2E00", "#B84600", "#E85F00", "#FF6B00", "#FF8126", "#FFF0E5", "#FFF7F1"] },
+      "explorer-purple": { "role": "secondary", "displayName": "Explorer Purple", "canonical": "#7C5CFC", "tonalRamp": ["#211751", "#35257F", "#4B36AE", "#6248D9", "#7C5CFC", "#9D88FF", "#CEC3FF", "#EEE9FF"] },
+      "engineer-blue": { "role": "secondary", "displayName": "Engineer Blue", "canonical": "#2563EB", "tonalRamp": ["#0A1C45", "#102E71", "#17439F", "#1E55CB", "#2563EB", "#5B87F3", "#AAC0FA", "#EAF1FF"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Momento Editorial", "purpose": "Um único título de ambição na tela do aluno." },
+      "body": { "displayName": "Interface Direta", "purpose": "Navegação, instrução e operação." },
+      "label": { "displayName": "Registro Técnico", "purpose": "Versão, prazo, sessão e metadado curto." }
+    },
+    "shadows": [
+      { "name": "soft", "value": "0 4px 16px rgb(16 17 20 / 6%)", "purpose": "Separação discreta de superfície." },
+      { "name": "elevated", "value": "0 12px 40px rgb(16 17 20 / 10%)", "purpose": "Sheet, menu e objeto em hover." }
+    ],
+    "motion": [
+      { "name": "dur-rapida", "value": "150ms", "purpose": "Hover, focus e microestado." },
+      { "name": "dur-padrao", "value": "250ms", "purpose": "Tabs, accordion e sheet." },
+      { "name": "dur-lenta", "value": "500ms", "purpose": "Progresso estrutural." },
+      { "name": "ease-padrao", "value": "cubic-bezier(.2,.8,.2,1)", "purpose": "Transição funcional padrão." },
+      { "name": "ease-entrada", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Resposta enfática sem overshoot." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "375px" },
+      { "name": "tablet", "value": "768px" },
+      { "name": "desktop", "value": "1440px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A ação mais importante da superfície, sempre verbo + objeto.",
+      "html": "<button class=\"ds-btn-primary\">Continuar atividade <span aria-hidden=\"true\">→</span></button>",
+      "css": ".ds-btn-primary{min-height:44px;padding:0 18px;border:1px solid #ff6b00;border-radius:10px;background:#ff6b00;color:#101114;font:700 14px Inter,Arial,sans-serif;cursor:pointer;transition:background 220ms,transform 220ms,box-shadow 220ms}.ds-btn-primary:hover{background:#ff8126;transform:translateY(-1px);box-shadow:0 10px 24px rgb(255 107 0 / 24%)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:3px solid #ff8126;outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação de suporte em papel.",
+      "html": "<button class=\"ds-btn-secondary\">Ver feedback</button>",
+      "css": ".ds-btn-secondary{min-height:44px;padding:0 18px;border:1px solid #d5d8dc;border-radius:10px;background:#fff;color:#101114;font:700 14px Inter,Arial,sans-serif;cursor:pointer;transition:border-color 220ms,transform 220ms,box-shadow 220ms}.ds-btn-secondary:hover{border-color:#ff6b00;transform:translateY(-1px);box-shadow:0 8px 20px rgb(255 107 0 / 10%)}.ds-btn-secondary:active{transform:none}.ds-btn-secondary:focus-visible{outline:3px solid #ff8126;outline-offset:3px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field-default",
+      "description": "Campo de oficina com rótulo persistente.",
+      "html": "<label class=\"ds-field\"><span>Comentário</span><input placeholder=\"Escreva uma orientação objetiva\"></label>",
+      "css": ".ds-field{display:grid;gap:7px;color:#22252a;font:700 12px Inter,Arial,sans-serif}.ds-field input{min-height:44px;padding:0 14px;border:1px solid #d5d8dc;border-radius:10px;background:#fff;color:#101114;font:400 14px Inter,Arial,sans-serif}.ds-field input:hover{border-color:#8a919a}.ds-field input:focus{border-color:#ff6b00;outline:3px solid #fff0e5}"
+    },
+    {
+      "name": "Version Marker",
+      "kind": "chip",
+      "refersTo": "version-marker",
+      "description": "Identifica versão e estado do artefato.",
+      "html": "<span class=\"ds-version\">v03 · em revisão</span>",
+      "css": ".ds-version{min-height:28px;display:inline-flex;align-items:center;padding:0 10px;border:1px solid #ffd5b8;border-radius:999px;background:#fff0e5;color:#22252a;font:700 10px 'JetBrains Mono',Consolas,monospace;letter-spacing:.04em;text-transform:uppercase}"
+    },
+    {
+      "name": "Mission Nav",
+      "kind": "nav",
+      "refersTo": "sidebar-item-active",
+      "description": "Item ativo do Chassi Academy.",
+      "html": "<a class=\"ds-nav\" href=\"#\"><span aria-hidden=\"true\">◈</span> Início <small>01</small></a>",
+      "css": ".ds-nav{min-height:46px;display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:10px;padding:0 12px;border:1px solid transparent;border-radius:10px;background:rgb(255 255 255 / 8%);color:#fff;text-decoration:none;font:650 14px Inter,Arial,sans-serif;transition:background 220ms,border-color 220ms,box-shadow 220ms}.ds-nav small{color:#8a919a;font:500 9px 'JetBrains Mono',monospace}.ds-nav:hover{background:rgb(255 107 0 / 8%);border-color:rgb(255 107 0 / 36%);box-shadow:inset 2px 0 #ff6b00}.ds-nav:focus-visible{outline:3px solid #ff8126;outline-offset:3px}"
+    },
+    {
+      "name": "Evidence Sheet",
+      "kind": "custom",
+      "refersTo": "evidence-sheet",
+      "description": "Artefato, competência e status em uma linha documental.",
+      "html": "<article class=\"ds-evidence\"><b>Meu Assistente</b><span>Prompting · prototipação</span><em>Publicado</em></article>",
+      "css": ".ds-evidence{display:grid;grid-template-columns:1fr 1.2fr auto;gap:16px;align-items:center;padding:16px 8px;border-bottom:1px solid #e9eaec;background:#fff;color:#101114;font:400 13px Inter,Arial,sans-serif;transition:transform 220ms,border-color 220ms,background 220ms,box-shadow 220ms}.ds-evidence b{font-size:15px}.ds-evidence span{color:#505761}.ds-evidence em{padding:5px 9px;border-radius:999px;background:#eaf7ec;color:#166534;font:700 10px 'JetBrains Mono',monospace;font-style:normal;text-transform:uppercase}.ds-evidence:hover{transform:translateY(-1px);border-color:#ff9a52;background:#fffaf7;box-shadow:inset 2px 0 #ff6b00,0 8px 20px rgb(16 17 20 / 6%)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Oficina de Evidências",
+    "overview": "A plataforma parece uma oficina digital séria e acolhedora: estrutura escura e disciplinada ao redor de uma área de trabalho clara. O premium vem da precisão de hierarquia, estados e comportamento — nunca de vidro, gradientes ou ornamentos de luxo.",
+    "keyCharacteristics": ["Ação antes de análise.", "Evidência antes de promessa.", "Cadência guiada para aluno; densidade calma para admin.", "Laranja raro, funcional e reconhecível.", "Motion curto, direcional e sem espetáculo."],
+    "rules": [
+      { "name": "The Rare Signal Rule", "body": "Academy Orange é sinal de ação ou estado; se tudo chama atenção, nada chama atenção.", "section": "colors" },
+      { "name": "The One Editorial Moment Rule", "body": "Serif ocorre no máximo uma vez por viewport; controles e dados ficam em Inter/Mono.", "section": "typography" },
+      { "name": "The Flat-at-Rest Rule", "body": "Não empilhar cards sombreados nem aninhar cartões em cartões.", "section": "elevation" }
+    ],
+    "dos": ["Do revelar a próxima ação em até cinco segundos.", "Do usar 4px como unidade e alvos interativos mínimos de 44px.", "Do preservar WCAG 2.2 AA, teclado e prefers-reduced-motion."],
+    "donts": ["Don't criar um LMS genérico ou grades intermináveis de cards idênticos.", "Don't usar cyberpunk, glow, glassmorphism ou gradientes em superfícies; luz direcional fica restrita ao contorno prioritário.", "Don't infantilizar adolescentes com mascotes, confete ou gamificação rasa.", "Don't usar editorial estático que esconda a ação."]
+  }
+}

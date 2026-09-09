@@ -1,0 +1,103 @@
+{
+  "features": {
+    "platform-security-foundation": {
+      "spec": "docs/specs/platform-security-foundation.md",
+      "status": "approved",
+      "wave": 0,
+      "built": true,
+      "reviewed": true,
+      "dependencies": []
+    },
+    "curriculum-bootstrap": {
+      "spec": "docs/specs/curriculum-bootstrap.md",
+      "status": "approved",
+      "wave": 1,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["platform-security-foundation"]
+    },
+    "admissions-classes-calendar": {
+      "spec": "docs/specs/admissions-classes-calendar.md",
+      "status": "approved",
+      "wave": 1,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["platform-security-foundation", "curriculum-bootstrap"]
+    },
+    "sessions-attendance-release": {
+      "spec": "docs/specs/sessions-attendance-release.md",
+      "status": "approved",
+      "wave": 2,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["admissions-classes-calendar"]
+    },
+    "student-home-journey-concepts": {
+      "spec": "docs/specs/student-home-journey-concepts.md",
+      "status": "approved",
+      "wave": 2,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["curriculum-bootstrap", "sessions-attendance-release"]
+    },
+    "activity-submission-files": {
+      "spec": "docs/specs/activity-submission-files.md",
+      "status": "approved",
+      "wave": 3,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["sessions-attendance-release", "platform-security-foundation"]
+    },
+    "review-feedback-loop": {
+      "spec": "docs/specs/review-feedback-loop.md",
+      "status": "approved",
+      "wave": 4,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["activity-submission-files"]
+    },
+    "projects-portfolio-completion": {
+      "spec": "docs/specs/projects-portfolio-completion.md",
+      "status": "approved",
+      "wave": 5,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["sessions-attendance-release", "review-feedback-loop"]
+    },
+    "admin-dashboard": {
+      "spec": "docs/specs/admin-dashboard.md",
+      "status": "approved",
+      "wave": 5,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["sessions-attendance-release", "review-feedback-loop"]
+    },
+    "frontend-premium-phase8": {
+      "spec": "docs/specs/frontend-premium-phase8.md",
+      "status": "approved",
+      "wave": 1,
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["student-home-journey-concepts", "projects-portfolio-completion", "admin-dashboard"]
+    },
+    "integrations-mvp-phase9": {
+      "spec": "docs/specs/integrations-mvp-phase9.md",
+      "status": "approved",
+      "wave": 0,
+      "scope": "fase-9-integracoes",
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["platform-security-foundation"]
+    },
+    "e2e-acceptance": {
+      "spec": "docs/specs/e2e-acceptance.md",
+      "status": "approved",
+      "wave": 6,
+      "scope": "fase-10-validate",
+      "note": "Endurecimento adversarial + WCAG + E2E + LGPD. Não é feature de backend/frontend — executado na Fase 10, não bloqueia gates das fases 7/8.",
+      "built": false,
+      "reviewed": false,
+      "dependencies": ["student-home-journey-concepts", "projects-portfolio-completion", "admin-dashboard"]
+    }
+  }
+}

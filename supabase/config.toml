@@ -1,0 +1,36 @@
+project_id = "logos-academy-platform"
+
+[api]
+enabled = true
+schemas = ["public", "graphql_public", "logos_academy"]
+extra_search_path = ["public", "extensions", "logos_academy"]
+
+[db]
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://127.0.0.1:3000"]
+
+[storage]
+enabled = true
+file_size_limit = "20MiB"
+
+[storage.buckets.submissions]
+public = false
+file_size_limit = "20MiB"
+allowed_mime_types = [
+  "application/pdf",
+  "text/plain",
+  "text/markdown",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]

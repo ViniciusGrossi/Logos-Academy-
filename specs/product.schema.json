@@ -1,0 +1,650 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://logos.academy/schemas/platform-product-v1.json",
+  "title": "Logos Academy Platform — MVP Explorer",
+  "description": "Schema executável do modelo de produto contratado no PRD v0.1.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tenants",
+    "users",
+    "tenant_memberships",
+    "student_profiles",
+    "guardian_records",
+    "consent_records",
+    "curricula",
+    "cycles",
+    "lesson_templates",
+    "concepts",
+    "lesson_concepts",
+    "activity_templates",
+    "activity_requirements",
+    "activity_criteria",
+    "classes",
+    "enrollments",
+    "sessions",
+    "attendance_records",
+    "makeup_records",
+    "activity_assignments",
+    "submissions",
+    "submission_items",
+    "uploaded_files",
+    "reviews",
+    "criterion_reviews",
+    "feedback_receipts",
+    "project_records",
+    "presentation_records",
+    "completion_records"
+  ],
+  "properties": {
+    "tenants": { "type": "array", "minItems": 1, "maxItems": 1, "items": { "$ref": "#/$defs/Tenant" } },
+    "users": { "type": "array", "items": { "$ref": "#/$defs/User" } },
+    "tenant_memberships": { "type": "array", "items": { "$ref": "#/$defs/TenantMembership" } },
+    "student_profiles": { "type": "array", "items": { "$ref": "#/$defs/StudentProfile" } },
+    "guardian_records": { "type": "array", "items": { "$ref": "#/$defs/GuardianRecord" } },
+    "consent_records": { "type": "array", "items": { "$ref": "#/$defs/ConsentRecord" } },
+    "curricula": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/Curriculum" } },
+    "cycles": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/Cycle" } },
+    "lesson_templates": { "type": "array", "minItems": 16, "maxItems": 16, "items": { "$ref": "#/$defs/LessonTemplate" } },
+    "concepts": { "type": "array", "items": { "$ref": "#/$defs/Concept" } },
+    "lesson_concepts": { "type": "array", "items": { "$ref": "#/$defs/LessonConcept" } },
+    "activity_templates": { "type": "array", "minItems": 16, "maxItems": 16, "items": { "$ref": "#/$defs/ActivityTemplate" } },
+    "activity_requirements": { "type": "array", "items": { "$ref": "#/$defs/ActivityRequirement" } },
+    "activity_criteria": { "type": "array", "items": { "$ref": "#/$defs/ActivityCriterion" } },
+    "classes": { "type": "array", "items": { "$ref": "#/$defs/Class" } },
+    "enrollments": { "type": "array", "items": { "$ref": "#/$defs/Enrollment" } },
+    "sessions": { "type": "array", "items": { "$ref": "#/$defs/Session" } },
+    "attendance_records": { "type": "array", "items": { "$ref": "#/$defs/AttendanceRecord" } },
+    "makeup_records": { "type": "array", "items": { "$ref": "#/$defs/MakeupRecord" } },
+    "activity_assignments": { "type": "array", "items": { "$ref": "#/$defs/ActivityAssignment" } },
+    "submissions": { "type": "array", "items": { "$ref": "#/$defs/Submission" } },
+    "submission_items": { "type": "array", "items": { "$ref": "#/$defs/SubmissionItem" } },
+    "uploaded_files": { "type": "array", "items": { "$ref": "#/$defs/UploadedFile" } },
+    "reviews": { "type": "array", "items": { "$ref": "#/$defs/Review" } },
+    "criterion_reviews": { "type": "array", "items": { "$ref": "#/$defs/CriterionReview" } },
+    "feedback_receipts": { "type": "array", "items": { "$ref": "#/$defs/FeedbackReceipt" } },
+    "project_records": { "type": "array", "items": { "$ref": "#/$defs/ProjectRecord" } },
+    "presentation_records": { "type": "array", "items": { "$ref": "#/$defs/PresentationRecord" } },
+    "completion_records": { "type": "array", "items": { "$ref": "#/$defs/CompletionRecord" } }
+  },
+  "x-product-invariants": [
+    "Toda linha persistida contém tenant_id, timestamps e soft delete.",
+    "RLS restringe alunos ao próprio student_id; admin permanece dentro do tenant.",
+    "Uma turma possui no máximo seis matrículas ativas; constraint relacional no banco.",
+    "Liberação coletiva materializa uma activity_assignment por matrícula ativa.",
+    "is_overdue é derivado de due_at e do estado não terminal; não é estado persistido.",
+    "Uma versão enviada é imutável e única por assignment_id + version.",
+    "Um submission_item do tipo file referencia uploaded_file do mesmo aluno e assignment.",
+    "Um feedback_receipt é único por review_id + student_profile_id e só pode ser criado pelo aluno proprietário da entrega.",
+    "Conclusão exige 16 presenças ou reposições, quatro projetos, reflexão, apresentação e zero correções pendentes."
+  ],
+  "$defs": {
+    "UUID": { "type": "string", "format": "uuid" },
+    "Date": { "type": "string", "format": "date" },
+    "DateTime": { "type": "string", "format": "date-time" },
+    "NullableUUID": { "oneOf": [{ "$ref": "#/$defs/UUID" }, { "type": "null" }] },
+    "NullableDateTime": { "oneOf": [{ "$ref": "#/$defs/DateTime" }, { "type": "null" }] },
+    "NullableString": { "type": ["string", "null"] },
+    "BaseEntity": {
+      "type": "object",
+      "required": ["id", "tenant_id", "created_at", "updated_at", "deleted_at"],
+      "properties": {
+        "id": { "$ref": "#/$defs/UUID" },
+        "tenant_id": { "$ref": "#/$defs/UUID" },
+        "created_at": { "$ref": "#/$defs/DateTime" },
+        "updated_at": { "$ref": "#/$defs/DateTime" },
+        "deleted_at": { "$ref": "#/$defs/NullableDateTime" }
+      }
+    },
+    "Tenant": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["name", "slug"],
+          "properties": {
+            "name": { "const": "Logos Academy" },
+            "slug": { "const": "logos-academy" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "User": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["auth_user_id", "email", "display_name", "access_enabled"],
+          "properties": {
+            "auth_user_id": { "$ref": "#/$defs/UUID" },
+            "email": { "type": "string", "format": "email" },
+            "display_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "access_enabled": { "type": "boolean" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "TenantMembership": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["user_id", "role"],
+          "properties": {
+            "user_id": { "$ref": "#/$defs/UUID" },
+            "role": { "enum": ["admin", "student"] }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "StudentProfile": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["user_id", "birth_date", "github_username"],
+          "properties": {
+            "user_id": { "$ref": "#/$defs/UUID" },
+            "birth_date": { "$ref": "#/$defs/Date" },
+            "github_username": {
+              "oneOf": [
+                { "type": "string", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$" },
+                { "type": "null" }
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "GuardianRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["student_id", "name", "relationship", "email", "phone"],
+          "properties": {
+            "student_id": { "$ref": "#/$defs/UUID" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "relationship": { "type": "string", "minLength": 1, "maxLength": 60 },
+            "email": { "oneOf": [{ "type": "string", "format": "email" }, { "type": "null" }] },
+            "phone": { "oneOf": [{ "type": "string", "minLength": 8, "maxLength": 24 }, { "type": "null" }] }
+          },
+          "anyOf": [
+            { "properties": { "email": { "type": "string", "format": "email" } } },
+            { "properties": { "phone": { "type": "string", "minLength": 8 } } }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ConsentRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["student_id", "guardian_record_id", "status", "term_version", "signed_at", "physical_copy_archived", "verified_by_user_id", "verified_at", "revoked_at", "revocation_reason"],
+          "properties": {
+            "student_id": { "$ref": "#/$defs/UUID" },
+            "guardian_record_id": { "$ref": "#/$defs/UUID" },
+            "status": { "enum": ["pending", "verified", "revoked"] },
+            "term_version": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "signed_at": { "oneOf": [{ "$ref": "#/$defs/Date" }, { "type": "null" }] },
+            "physical_copy_archived": { "type": "boolean" },
+            "verified_by_user_id": { "$ref": "#/$defs/NullableUUID" },
+            "verified_at": { "$ref": "#/$defs/NullableDateTime" },
+            "revoked_at": { "$ref": "#/$defs/NullableDateTime" },
+            "revocation_reason": { "$ref": "#/$defs/NullableString" }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "status": { "const": "verified" } } },
+              "then": {
+                "properties": {
+                  "signed_at": { "$ref": "#/$defs/Date" },
+                  "physical_copy_archived": { "const": true },
+                  "verified_by_user_id": { "$ref": "#/$defs/UUID" },
+                  "verified_at": { "$ref": "#/$defs/DateTime" },
+                  "revoked_at": { "type": "null" },
+                  "revocation_reason": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "status": { "const": "revoked" } } },
+              "then": {
+                "properties": {
+                  "revoked_at": { "$ref": "#/$defs/DateTime" },
+                  "revocation_reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Curriculum": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["name", "version", "status"],
+          "properties": {
+            "name": { "const": "Explorer" },
+            "version": { "type": "string", "minLength": 1 },
+            "status": { "enum": ["draft", "active", "archived"] }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Cycle": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["curriculum_id", "position", "title", "project_title"],
+          "properties": {
+            "curriculum_id": { "$ref": "#/$defs/UUID" },
+            "position": { "type": "integer", "minimum": 1, "maximum": 4 },
+            "title": { "type": "string", "minLength": 1 },
+            "project_title": { "type": "string", "minLength": 1 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "LessonTemplate": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["cycle_id", "position", "title", "objective", "reference_content", "estimated_activity_minutes"],
+          "properties": {
+            "cycle_id": { "$ref": "#/$defs/UUID" },
+            "position": { "type": "integer", "minimum": 1, "maximum": 16 },
+            "title": { "type": "string", "minLength": 1 },
+            "objective": { "type": "string", "minLength": 1 },
+            "reference_content": { "type": "string", "minLength": 1 },
+            "estimated_activity_minutes": { "type": "integer", "minimum": 5, "maximum": 45 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Concept": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["slug", "title", "summary", "body"],
+          "properties": {
+            "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+            "title": { "type": "string", "minLength": 1 },
+            "summary": { "type": "string", "minLength": 1 },
+            "body": { "type": "string", "minLength": 1 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "LessonConcept": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["lesson_template_id", "concept_id"],
+          "properties": {
+            "lesson_template_id": { "$ref": "#/$defs/UUID" },
+            "concept_id": { "$ref": "#/$defs/UUID" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ActivityTemplate": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["lesson_template_id", "title", "objective", "instructions", "continuity_guidance", "estimated_minutes"],
+          "properties": {
+            "lesson_template_id": { "$ref": "#/$defs/UUID" },
+            "title": { "type": "string", "minLength": 1 },
+            "objective": { "type": "string", "minLength": 1 },
+            "instructions": { "type": "string", "minLength": 1 },
+            "continuity_guidance": { "type": "string", "minLength": 1 },
+            "estimated_minutes": { "type": "integer", "minimum": 5, "maximum": 45 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ActivityRequirement": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["activity_template_id", "kind", "label", "is_required", "position"],
+          "properties": {
+            "activity_template_id": { "$ref": "#/$defs/UUID" },
+            "kind": { "enum": ["text", "file", "external_link", "github_repository"] },
+            "label": { "type": "string", "minLength": 1 },
+            "is_required": { "type": "boolean" },
+            "position": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ActivityCriterion": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["activity_template_id", "label", "description", "position"],
+          "properties": {
+            "activity_template_id": { "$ref": "#/$defs/UUID" },
+            "label": { "type": "string", "minLength": 1 },
+            "description": { "type": "string", "minLength": 1 },
+            "position": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Class": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["name", "curriculum_id", "starts_on", "status", "capacity"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "curriculum_id": { "$ref": "#/$defs/UUID" },
+            "starts_on": { "$ref": "#/$defs/Date" },
+            "status": { "enum": ["planned", "active", "completed", "cancelled"] },
+            "capacity": { "const": 6 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Enrollment": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["student_id", "curriculum_id", "kind", "class_id", "status", "invited_at", "activated_at", "completed_at"],
+          "properties": {
+            "student_id": { "$ref": "#/$defs/UUID" },
+            "curriculum_id": { "$ref": "#/$defs/UUID" },
+            "kind": { "enum": ["class", "individual"] },
+            "class_id": { "$ref": "#/$defs/NullableUUID" },
+            "status": { "enum": ["invited", "active", "paused", "completed", "cancelled"] },
+            "invited_at": { "$ref": "#/$defs/DateTime" },
+            "activated_at": { "$ref": "#/$defs/NullableDateTime" },
+            "completed_at": { "$ref": "#/$defs/NullableDateTime" }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "class" } } },
+              "then": { "properties": { "class_id": { "$ref": "#/$defs/UUID" } } },
+              "else": { "properties": { "class_id": { "type": "null" } } }
+            }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Session": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["class_id", "enrollment_id", "lesson_template_id", "starts_at", "ends_at", "status"],
+          "properties": {
+            "class_id": { "$ref": "#/$defs/NullableUUID" },
+            "enrollment_id": { "$ref": "#/$defs/NullableUUID" },
+            "lesson_template_id": { "$ref": "#/$defs/UUID" },
+            "starts_at": { "$ref": "#/$defs/DateTime" },
+            "ends_at": { "$ref": "#/$defs/DateTime" },
+            "status": { "enum": ["scheduled", "completed", "rescheduled", "cancelled"] }
+          },
+          "oneOf": [
+            { "properties": { "class_id": { "$ref": "#/$defs/UUID" }, "enrollment_id": { "type": "null" } } },
+            { "properties": { "class_id": { "type": "null" }, "enrollment_id": { "$ref": "#/$defs/UUID" } } }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "AttendanceRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["session_id", "enrollment_id", "status", "private_note", "recorded_by_user_id"],
+          "properties": {
+            "session_id": { "$ref": "#/$defs/UUID" },
+            "enrollment_id": { "$ref": "#/$defs/UUID" },
+            "status": { "enum": ["present", "absent", "excused_absence"] },
+            "private_note": { "$ref": "#/$defs/NullableString" },
+            "recorded_by_user_id": { "$ref": "#/$defs/UUID" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "MakeupRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["attendance_record_id", "makeup_session_id", "completed_at", "recorded_by_user_id", "note"],
+          "properties": {
+            "attendance_record_id": { "$ref": "#/$defs/UUID" },
+            "makeup_session_id": { "$ref": "#/$defs/NullableUUID" },
+            "completed_at": { "$ref": "#/$defs/DateTime" },
+            "recorded_by_user_id": { "$ref": "#/$defs/UUID" },
+            "note": { "$ref": "#/$defs/NullableString" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ActivityAssignment": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["enrollment_id", "session_id", "activity_template_id", "status", "released_at", "due_at", "supplemental_instructions"],
+          "properties": {
+            "enrollment_id": { "$ref": "#/$defs/UUID" },
+            "session_id": { "$ref": "#/$defs/UUID" },
+            "activity_template_id": { "$ref": "#/$defs/UUID" },
+            "status": { "enum": ["locked", "available", "draft", "submitted", "revision_requested", "approved"] },
+            "released_at": { "$ref": "#/$defs/NullableDateTime" },
+            "due_at": { "$ref": "#/$defs/NullableDateTime" },
+            "supplemental_instructions": { "$ref": "#/$defs/NullableString" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Submission": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["assignment_id", "version", "is_draft", "submitted_at"],
+          "properties": {
+            "assignment_id": { "$ref": "#/$defs/UUID" },
+            "version": { "type": "integer", "minimum": 1 },
+            "is_draft": { "type": "boolean" },
+            "submitted_at": { "$ref": "#/$defs/NullableDateTime" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "SubmissionItem": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["submission_id", "requirement_id", "kind", "text_value", "url_value", "file_id"],
+          "properties": {
+            "submission_id": { "$ref": "#/$defs/UUID" },
+            "requirement_id": { "$ref": "#/$defs/UUID" },
+            "kind": { "enum": ["text", "file", "external_link", "github_repository"] },
+            "text_value": { "$ref": "#/$defs/NullableString" },
+            "url_value": { "oneOf": [{ "type": "string", "format": "uri", "pattern": "^https://" }, { "type": "null" }] },
+            "file_id": { "$ref": "#/$defs/NullableUUID" }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "text" } } },
+              "then": { "properties": { "text_value": { "type": "string", "minLength": 1 }, "url_value": { "type": "null" }, "file_id": { "type": "null" } } }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "file" } } },
+              "then": { "properties": { "text_value": { "type": "null" }, "url_value": { "type": "null" }, "file_id": { "$ref": "#/$defs/UUID" } } }
+            },
+            {
+              "if": { "properties": { "kind": { "enum": ["external_link", "github_repository"] } } },
+              "then": { "properties": { "text_value": { "type": "null" }, "url_value": { "type": "string", "format": "uri", "pattern": "^https://" }, "file_id": { "type": "null" } } }
+            }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "UploadedFile": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["student_id", "assignment_id", "uploaded_by_user_id", "storage_path", "filename", "content_type", "size_bytes", "status"],
+          "properties": {
+            "student_id": { "$ref": "#/$defs/UUID" },
+            "assignment_id": { "$ref": "#/$defs/UUID" },
+            "uploaded_by_user_id": { "$ref": "#/$defs/UUID" },
+            "storage_path": { "type": "string", "minLength": 1 },
+            "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+            "content_type": { "enum": ["application/pdf", "text/plain", "text/markdown", "image/png", "image/jpeg", "image/webp", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.openxmlformats-officedocument.presentationml.presentation"] },
+            "size_bytes": { "type": "integer", "minimum": 1, "maximum": 20971520 },
+            "status": { "enum": ["pending", "ready", "rejected"] }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Review": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["submission_id", "reviewer_user_id", "decision", "feedback", "reviewed_at"],
+          "properties": {
+            "submission_id": { "$ref": "#/$defs/UUID" },
+            "reviewer_user_id": { "$ref": "#/$defs/UUID" },
+            "decision": { "enum": ["approved", "revision_requested"] },
+            "feedback": { "type": "string", "minLength": 1 },
+            "reviewed_at": { "$ref": "#/$defs/DateTime" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "CriterionReview": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["review_id", "criterion_id", "result", "comment"],
+          "properties": {
+            "review_id": { "$ref": "#/$defs/UUID" },
+            "criterion_id": { "$ref": "#/$defs/UUID" },
+            "result": { "enum": ["met", "needs_adjustment"] },
+            "comment": { "$ref": "#/$defs/NullableString" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "FeedbackReceipt": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["review_id", "student_profile_id", "seen_at"],
+          "properties": {
+            "review_id": { "$ref": "#/$defs/UUID" },
+            "student_profile_id": { "$ref": "#/$defs/UUID" },
+            "seen_at": { "$ref": "#/$defs/DateTime" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ProjectRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["enrollment_id", "cycle_id", "status", "approved_submission_id", "approved_at"],
+          "properties": {
+            "enrollment_id": { "$ref": "#/$defs/UUID" },
+            "cycle_id": { "$ref": "#/$defs/UUID" },
+            "status": { "enum": ["locked", "in_progress", "approved"] },
+            "approved_submission_id": { "$ref": "#/$defs/NullableUUID" },
+            "approved_at": { "$ref": "#/$defs/NullableDateTime" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "PresentationRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["enrollment_id", "kind", "performed_at", "contextual_note", "recorded_by_user_id"],
+          "properties": {
+            "enrollment_id": { "$ref": "#/$defs/UUID" },
+            "kind": { "enum": ["demo_day", "substitute"] },
+            "performed_at": { "$ref": "#/$defs/DateTime" },
+            "contextual_note": { "$ref": "#/$defs/NullableString" },
+            "recorded_by_user_id": { "$ref": "#/$defs/UUID" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "CompletionRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEntity" },
+        {
+          "type": "object",
+          "required": ["enrollment_id", "status", "attendance_complete", "projects_complete", "reflection_complete", "presentation_complete", "no_pending_revisions", "completed_at"],
+          "properties": {
+            "enrollment_id": { "$ref": "#/$defs/UUID" },
+            "status": { "enum": ["in_progress", "eligible", "completed"] },
+            "attendance_complete": { "type": "boolean" },
+            "projects_complete": { "type": "boolean" },
+            "reflection_complete": { "type": "boolean" },
+            "presentation_complete": { "type": "boolean" },
+            "no_pending_revisions": { "type": "boolean" },
+            "completed_at": { "$ref": "#/$defs/NullableDateTime" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

@@ -1,0 +1,2 @@
+import { activityController } from "@/src/modules/activity-submission-files/controller";
+export async function PUT(request: Request, { params }: { params: Promise<{ assignmentId: string }> }) { const { assignmentId } = await params; return activityController(request, (service, actor, requestId) => request.json().then((body: unknown) => service.saveDraft(actor, { ...(typeof body === "object" && body !== null ? body : {}), assignmentId }, requestId))); }

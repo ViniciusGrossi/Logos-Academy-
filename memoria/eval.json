@@ -1,0 +1,19 @@
+{
+  "descricao": "Avaliação ponderada da Fase 10. Score = requisitos×0.40 + testes×0.30 + security×0.20 + performance×0.10.",
+  "entradas": [
+    {
+      "data": "2026-09-07",
+      "fase": 10,
+      "ciclo": 1,
+      "dimensoes": {
+        "requisitos": { "peso": 0.4, "valor": 0.9, "evidencia": "11 features concluídas; UI e rotas protegidas revalidadas. E2E autenticado remoto fica para staging controlado, sem credencial local persistida." },
+        "testes": { "peso": 0.3, "valor": 1, "evidencia": "Vitest: 57/57; lint e build Next.js passaram após o ciclo de correções." },
+        "security": { "peso": 0.2, "valor": 1, "evidencia": "Code review e security audit sem críticas/altas; RLS forced em 32/32 tabelas; RPCs legadas revogadas para authenticated." },
+        "performance": { "peso": 0.1, "valor": 0.85, "evidencia": "Build limpo e revisão sem N+1. LCP de produção será medido no staging/deploy da Fase 12." }
+      },
+      "score": 0.945,
+      "veredito": "deploy",
+      "findings_abertos": ["Antes do deploy, executar E2E autenticado com contas de teste e medir LCP em staging; não há credenciais locais persistidas por segurança."]
+    }
+  ]
+}

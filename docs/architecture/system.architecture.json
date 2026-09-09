@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Logos Academy Platform — Arquitetura do MVP",
+    "subtitle": "Monólito modular: interface, regras e dados privados sem serviços especulativos",
+    "output": "system.html",
+    "animation": "trace",
+    "viewBox": [1240, 800]
+  },
+  "components": [
+    { "id": "admin", "type": "external", "label": "Admin", "sublabel": "operação pedagógica", "pos": [40, 210], "size": [130, 64] },
+    { "id": "student", "type": "external", "label": "Aluno", "sublabel": "jornada individual", "pos": [40, 390], "size": [130, 64] },
+    { "id": "next", "type": "frontend", "label": "Next.js 15", "sublabel": "App Router + UI", "pos": [260, 300], "size": [150, 72], "tag": "Vercel / Node" },
+    { "id": "controllers", "type": "backend", "label": "Controllers", "sublabel": "Actions + Route Handlers", "pos": [500, 300], "size": [165, 72], "tag": "Zod" },
+    { "id": "services", "type": "backend", "label": "Services", "sublabel": "regras + transações", "pos": [755, 300], "size": [150, 72], "tag": "domínios" },
+    { "id": "repositories", "type": "backend", "label": "Repositories", "sublabel": "único acesso a dados", "pos": [995, 300], "size": [160, 72], "tag": "tenantId" },
+    { "id": "auth", "type": "security", "label": "Supabase Auth", "sublabel": "convite + sessão", "pos": [500, 115], "size": [165, 68], "tag": "JWT" },
+    { "id": "postgres", "type": "database", "label": "PostgreSQL 15", "sublabel": "RLS + pgcrypto", "pos": [995, 500], "size": [160, 72], "tag": "privado" },
+    { "id": "storage", "type": "cloud", "label": "Storage privado", "sublabel": "URLs assinadas", "pos": [755, 500], "size": [150, 72], "tag": "fileId" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Aplicação Vercel", "wraps": ["next", "controllers", "services", "repositories"], "pad": 28 },
+    { "kind": "security-group", "label": "Supabase — dados protegidos", "wraps": ["auth", "postgres", "storage"], "pad": 24 }
+  ],
+  "connections": [
+    { "from": "admin", "to": "next", "label": "HTTPS", "variant": "emphasis" },
+    { "from": "student", "to": "next", "label": "HTTPS", "variant": "emphasis" },
+    { "from": "next", "to": "controllers", "label": "ação validada", "variant": "emphasis" },
+    { "from": "auth", "to": "controllers", "label": "sessão", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [583, 197] },
+    { "from": "controllers", "to": "services", "label": "DTO", "variant": "emphasis" },
+    { "from": "services", "to": "repositories", "label": "comando / consulta", "variant": "emphasis", "labelAt": [950, 286] },
+    { "from": "repositories", "to": "postgres", "label": "SQL / RPC", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [1075, 390] },
+    { "from": "repositories", "to": "storage", "label": "arquivo privado", "variant": "security", "fromSide": "bottom", "toSide": "right" }
+  ],
+  "cards": [
+    { "dot": "orange", "title": "MVP enxuto", "items": ["Sem FastAPI, fila, cache distribuído ou IA", "Uma aplicação e um backend gerenciado"] },
+    { "dot": "emerald", "title": "Regras", "items": ["Services concentram transições pedagógicas", "RPC apenas quando a escrita precisa ser atômica"] },
+    { "dot": "rose", "title": "Proteção", "items": ["RLS em todas as tabelas", "Arquivos privados e PII mínima cifrada"] }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "files": ["docs/style-directions/*.html"],
+  "exclude": [],
+  "insertBefore": "</body>",
+  "commentSyntax": "html",
+  "cspChecked": true
+}

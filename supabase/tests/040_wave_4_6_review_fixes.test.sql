@@ -1,0 +1,10 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(5);
+select ok(pg_get_functiondef('logos_academy.admin_reviews_page(uuid,uuid,text,uuid,boolean,text,integer)'::regprocedure) like '%page_tail%', 'cursor points to the final returned review');
+select ok(pg_get_functiondef('private.project_summary_json(uuid,uuid,uuid)'::regprocedure) like '%then ''in_progress''%', 'released work derives project progress');
+select ok(pg_get_functiondef('logos_academy.admin_dashboard(uuid,uuid,text,uuid)'::regprocedure) like '%join scope s on s.id=aa.enrollment_id%', 'dashboard aggregates only scoped enrollments');
+select ok(pg_get_functiondef('logos_academy.admin_record_presentation(uuid,uuid,uuid,text,timestamptz,text,text,uuid)'::regprocedure) like '%contextualNote%', 'presentation returns its authorized contextual note');
+select ok(not has_function_privilege('authenticated','logos_academy.admin_dashboard(uuid,uuid,text,uuid)','execute'),'dashboard RPC remains backend-only');
+select * from finish();
+rollback;

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Logos Academy — Fluxo de evidências pedagógicas",
+    "subtitle": "Da liberação gradual à conclusão derivada, com isolamento do aluno",
+    "output": "data.html",
+    "animation": "trace",
+    "viewBox": [1120, 800]
+  },
+  "stages": [
+    { "label": "Atores" },
+    { "label": "Entrada" },
+    { "label": "Regras" },
+    { "label": "Persistência" },
+    { "label": "Resultado" }
+  ],
+  "nodes": [
+    { "id": "admin", "type": "external", "label": "Admin", "sublabel": "libera e revisa", "stage": 0, "row": 0 },
+    { "id": "student", "type": "external", "label": "Aluno", "sublabel": "consulta e entrega", "stage": 0, "row": 3 },
+    { "id": "controller", "type": "frontend", "label": "Controllers", "sublabel": "sessão + Zod", "stage": 1, "row": 1, "tag": "HTTPS" },
+    { "id": "filegate", "type": "security", "label": "File Gate", "sublabel": "ownership + MIME", "stage": 1, "row": 4, "tag": "privado" },
+    { "id": "release", "type": "backend", "label": "Release Service", "sublabel": "progressão gradual", "stage": 2, "row": 0 },
+    { "id": "learning", "type": "backend", "label": "Learning Service", "sublabel": "versões + feedback", "stage": 2, "row": 2 },
+    { "id": "completion", "type": "backend", "label": "Completion", "sublabel": "recalcula evidências", "stage": 2, "row": 4 },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "RLS + transações", "stage": 3, "row": 1, "tag": "tenant" },
+    { "id": "storage", "type": "cloud", "label": "Storage", "sublabel": "objetos privados", "stage": 3, "row": 4, "tag": "fileId" },
+    { "id": "home", "type": "frontend", "label": "Início do aluno", "sublabel": "próxima ação", "stage": 4, "row": 1 },
+    { "id": "dashboard", "type": "frontend", "label": "Painel admin", "sublabel": "fila e risco", "stage": 4, "row": 3 },
+    { "id": "portfolio", "type": "frontend", "label": "Portfólio", "sublabel": "4 projetos", "stage": 4, "row": 4 }
+  ],
+  "flows": [
+    { "from": "admin", "to": "controller", "label": "liberação + feedback", "classification": "ação admin", "variant": "emphasis" },
+    { "from": "student", "to": "controller", "label": "rascunho + envio", "classification": "dado do aluno", "variant": "emphasis" },
+    { "from": "student", "to": "filegate", "label": "arquivo", "classification": "conteúdo privado", "variant": "security" },
+    { "from": "controller", "to": "release", "label": "comando de liberação", "classification": "autorizado", "variant": "emphasis" },
+    { "from": "controller", "to": "learning", "label": "entrega ou revisão", "classification": "evidência", "variant": "emphasis" },
+    { "from": "learning", "to": "completion", "label": "estado aprovado", "classification": "derivado", "variant": "dashed", "fromSide": "bottom", "toSide": "top" },
+    { "from": "release", "to": "db", "label": "atividades atribuídas", "classification": "transacional", "variant": "emphasis" },
+    { "from": "learning", "to": "db", "label": "versões + critérios", "classification": "append-only", "variant": "emphasis" },
+    { "from": "completion", "to": "db", "label": "snapshot de conclusão", "classification": "recalculado", "variant": "security" },
+    { "from": "filegate", "to": "storage", "label": "objeto finalizado", "classification": "privado", "variant": "security", "route": "bottom-channel", "channelY": 680, "labelAt": [420, 680] },
+    { "from": "db", "to": "home", "label": "próxima ação", "classification": "somente próprio", "variant": "security" },
+    { "from": "db", "to": "dashboard", "label": "fila operacional", "classification": "admin", "variant": "default" },
+    { "from": "db", "to": "portfolio", "label": "projetos aprovados", "classification": "somente próprio", "variant": "security", "fromSide": "right", "toSide": "left" },
+    { "from": "storage", "to": "portfolio", "label": "URLs assinadas", "classification": "curta duração", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "orange", "title": "Progressão", "items": ["O admin libera; o aluno não antecipa o curso", "A Home mostra uma próxima ação clara"] },
+    { "dot": "emerald", "title": "Evidência", "items": ["Submissões e feedback preservam histórico", "Conclusão é recalculada, nunca declarada pelo cliente"] },
+    { "dot": "rose", "title": "Privacidade", "items": ["RLS separa cada aluno", "Arquivo exige autorização antes e depois do upload"] }
+  ]
+}
