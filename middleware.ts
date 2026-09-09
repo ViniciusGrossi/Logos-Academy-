@@ -1,4 +1,3 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const publicPages = new Set(["/login", "/ativar", "/recuperar-senha"]);
@@ -34,6 +33,34 @@ async function hasDemoSession(value: string | undefined): Promise<boolean> {
   return value === signature;
 }
 
+function readAccessToken(request: NextRequest, supabaseUrl: string): string | null {
+  const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
+  const cookieName = `sb-${projectRef}-auth-token`;
+  const session = request.cookies.getAll()
+    .filter(({ name }) => name === cookieName || name.startsWith(`${cookieName}.`))
+    .sort((left, right) => left.name.localeCompare(right.name, undefined, { numeric: true }))
+    .map(({ value }) => value)
+    .join("");
+  if (!session) return null;
+  try {
+    const encoded = session.startsWith("base64-") ? session.slice("base64-".length) : session;
+    const json = atob(encoded.replace(/-/g, "+").replace(/_/g, "/"));
+    const parsed = JSON.parse(json) as { access_token?: unknown };
+    return typeof parsed.access_token === "string" ? parsed.access_token : null;
+  } catch {
+    return null;
+  }
+}
+
+async function hasAuthenticatedUser(request: NextRequest, url: string, key: string): Promise<boolean> {
+  const accessToken = readAccessToken(request, url);
+  if (!accessToken) return false;
+  const response = await fetch(`${url}/auth/v1/user`, {
+    headers: { apikey: key, authorization: `Bearer ${accessToken}` },
+  });
+  return response.ok;
+}
+
 function finish(response: NextResponse): NextResponse {
   applySecurityHeaders(response.headers, process.env.NODE_ENV === "production");
   return response;
@@ -62,29 +89,15 @@ export async function middleware(request: NextRequest) {
     login.search = "";
     return finish(NextResponse.redirect(login));
   }
-  const client = createServerClient(
-    url,
-    key,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookies) => {
-          cookies.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          cookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-        },
-      },
-    },
-  );
-  const { data: { user } } = await client.auth.getUser();
-  if (!user && !isPublic) {
+  const authenticated = await hasAuthenticatedUser(request, url, key);
+  if (!authenticated && !isPublic) {
     const login = request.nextUrl.clone();
     login.pathname = "/login";
     login.search = "";
     login.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
     return finish(NextResponse.redirect(login));
   }
-  if (user && request.nextUrl.pathname === "/login") {
+  if (authenticated && request.nextUrl.pathname === "/login") {
     const destination = request.nextUrl.clone();
     destination.pathname = "/";
     destination.search = "";
