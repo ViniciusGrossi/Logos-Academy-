@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-07
+date: 2026-09-08
 fase_atual: "12"
 etapa_atual: "Deploy"
 produto_tipo: "saas-premium"
-proximo_passo: "Gate humano de deploy: definir destino, URL e aprovação explícita para publicação"
+proximo_passo: "Operação pós-lançamento: acompanhar a primeira sessão autenticada e configurar domínio próprio quando disponível"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -18,9 +18,10 @@ gates:
   fase_9: pass
   fase_10: pass
   fase_11: pass
+  fase_12: pass
 features: { draft: 0, approved: 11, built: 11, reviewed: 11 }
 overrides: []
-status: "🟢 Em andamento"
+status: "🟢 Concluído"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 
@@ -30,9 +31,11 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] Fase 12: aguardando aprovação humana para definir e executar o deploy.
+- [ ] Operação pós-lançamento: acompanhar a primeira sessão autenticada e configurar domínio próprio quando disponível.
 
 ## Concluído
+
+- [2026-09-08] Fase 12 concluída: produção publicada em `https://logos-academy-mu.vercel.app` (deployment `dpl_6o1dwaqp8tGxWUZrGeKoX65wtZBd`). O preset Next.js foi versionado em `vercel.json`; build remoto, login público e redirecionamento de rota protegida foram validados. Variáveis de produção permanecem configuradas na Vercel, sem modo demo e sem segredos no Git.
 
 - [2026-09-08] Repositório Git independente criado e enviado para `ViniciusGrossi/Logos-Academy-`; commit inicial `bc76e84` em `main`, com `.env.local` e artefatos gerados excluídos pelo `.gitignore`.
 
@@ -147,3 +150,4 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [2026-09-05] Em triggers reutilizados, ramificar por `tg_table_name` antes de referenciar campos de `new`; booleanos SQL não protegem campos ausentes em todos os tipos de registro.
 - [2026-09-05] Grants amplos para schema customizado não podem reabrir escritas operacionais: reaplicar revogações backend-only após o grant e cobrir o limite com pgTAP.
 - [2026-09-07] Regex de data não valida o calendário: datas impossíveis precisam de round-trip UTC antes de alcançar uma RPC, para retornarem 400 em vez de erro interno.
+- [2026-09-08] Um projeto Vercel legado marcado como `Other` pode construir Next.js, mas empacotar middleware de forma incompatível; `vercel.json` com `framework: "nextjs"` versiona e aplica o override por deploy.
