@@ -34,6 +34,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-09-08] Repositório Git independente criado e enviado para `ViniciusGrossi/Logos-Academy-`; commit inicial `bc76e84` em `main`, com `.env.local` e artefatos gerados excluídos pelo `.gitignore`.
+
 - [2026-09-08] Fase 11 concluída: `docs/features.md` e `docs/flows.md` documentam a experiência de aluno, administrador e demo local; bugs e pattern do ciclo foram consolidados no Knowledge e o checkpoint registrou o fechamento em `04-Projetos/00-log.md`.
 
 - [2026-09-08] Gate QA Mental da Fase 10 aprovado por Vinicius: apto como protótipo, isolamento entre tenants e RBAC administrativo confirmados. Indisponibilidade do banco deve exibir erro compreensível e orientar contato via WhatsApp; aviso automático fica explicitamente fora do MVP e entra na próxima etapa de integrações.
