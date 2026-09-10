@@ -67,7 +67,7 @@ function finish(response: NextResponse): NextResponse {
 }
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const response = NextResponse.next({ request });
   if (process.env.NODE_ENV === "development" && request.nextUrl.searchParams.get("preview") === "phase8") return finish(response);
   const isPublic = publicPages.has(request.nextUrl.pathname);
   const demoSession = await hasDemoSession(request.cookies.get(demoCookieName)?.value);

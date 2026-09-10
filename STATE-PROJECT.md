@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-08
+date: 2026-09-09
 fase_atual: "12"
-etapa_atual: "Deploy"
+etapa_atual: "Concluído"
 produto_tipo: "saas-premium"
-proximo_passo: "Fase 12: executar CSO, deploy-check e canary/monitoramento antes do fechamento formal"
+proximo_passo: "Ciclo encerrado — /logos status para visão geral ou iniciar novo milestone"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -18,10 +18,13 @@ gates:
   fase_9: pass
   fase_10: pass
   fase_11: pass
-  fase_12: pending
+  fase_12: pass
 features: { draft: 0, approved: 11, built: 11, reviewed: 11 }
-overrides: []
-status: "🟢 Em andamento"
+overrides:
+  - gate: npm-audit
+    data: 2026-09-08
+    motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
+status: "🟢 Produção"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 
@@ -31,9 +34,11 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] Fase 12: executar CSO, deploy-check e canary/monitoramento antes do fechamento formal.
+- [ ] Nenhum gate pendente. Próximo trabalho deve iniciar um novo milestone.
 
 ## Concluído
+
+- [2026-09-09] Fase 12 concluída: deploy-check aprovado, `/cso` diário passou em 9/10 (sem finding reportável), Vercel confirmou o deployment de produção como `Ready`, smoke em produção confirmou `/login` 200 e `/`/`/admin` 307 sem sessão. O teste RLS em produção, numa transação revertida e sob `authenticated`, retornou zero matrículas cross-tenant; as 32 tabelas `logos_academy` têm RLS habilitado e forçado. Canary de 90 segundos realizou 3 checagens estáveis sem alertas e salvou evidências em `.gstack/canary-reports/`. Rollback: promover o deployment anterior na Vercel; se uma migration futura falhar, restaurar o snapshot do Supabase e registrar o incidente. A observação de dependências (`next` moderado e `postcss` transitivo alto no build) continua aceita e registrada para o milestone de upgrade.
 
 - [2026-09-08] Produção publicada em `https://logos-academy-mu.vercel.app` (deployment `dpl_6o1dwaqp8tGxWUZrGeKoX65wtZBd`). O preset Next.js foi versionado em `vercel.json`; build remoto, login público e redirecionamento de rota protegida foram validados. Variáveis de produção permanecem configuradas na Vercel, sem modo demo e sem segredos no Git. O fechamento formal da Fase 12 permanece aberto até CSO, deploy-check e canary/monitoramento.
 
