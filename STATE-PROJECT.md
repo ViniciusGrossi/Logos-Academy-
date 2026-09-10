@@ -4,7 +4,7 @@ date: 2026-09-09
 fase_atual: "12"
 etapa_atual: "Milestone visual concluído"
 produto_tipo: "saas-premium"
-proximo_passo: "Handshake visual do novo Auth; publicar novo deployment somente após aprovação"
+proximo_passo: "Implementar e validar o redesign Visual Product 2026 de Início, Jornada e Projetos"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -34,7 +34,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] Handshake visual do novo Auth com Vinicius; a produção permanece estável na versão anterior.
+- [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada e Projetos; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
 
@@ -127,6 +127,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 | `docs/specs/frontend-premium-phase8.md` | built e reviewed | 2026-09-07 |
 | `docs/specs/integrations-mvp-phase9.md` | built e reviewed — não aplicável ao MVP | 2026-09-07 |
 | `docs/specs/demo-auth-and-data.md` | built e validated — somente ambiente local | 2026-09-08 |
+| `docs/specs/student-experience-elevation.md` | approved — redesign visual em implementação | 2026-09-10 |
 
 ## Workers Ativos
 

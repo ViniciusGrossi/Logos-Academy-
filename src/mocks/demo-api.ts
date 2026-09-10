@@ -14,6 +14,8 @@ const ids = {
   marina: "00000000-0000-4000-8000-000000000003",
   caio: "00000000-0000-4000-8000-000000000004",
   assignment: "00000000-0000-4000-8000-000000000005",
+  assignmentResearch: "00000000-0000-4000-8000-000000000024",
+  assignmentPrototype: "00000000-0000-4000-8000-000000000025",
   submission: "00000000-0000-4000-8000-000000000006",
   project: "00000000-0000-4000-8000-000000000007",
   concept: "00000000-0000-4000-8000-000000000008",
@@ -54,7 +56,9 @@ const review: ReviewDetail = { id: ids.review, decision: "revision_requested", f
 let submissionVersion = 2;
 
 function page<T>(items: readonly T[]): Page<T> { return { items, nextCursor: null }; }
-function activity(): ActivityDetail {
+function activity(assignmentId = ids.assignment): ActivityDetail {
+  if (assignmentId === ids.assignmentResearch) return { id: "00000000-0000-4000-8000-000000000026", assignmentId, lessonPosition: 6, title: "Radar de referências", objective: "Selecionar referências e explicar o que cada uma ensina sobre atenção.", instructions: "Registre três referências e uma decisão que você quer testar no cartaz.", continuityGuidance: "Essa leitura alimenta a primeira versão do projeto.", estimatedMinutes: 20, dueAt: "2026-09-07T20:00:00.000Z", status: "approved", isOverdue: false, supplementalInstructions: null, concepts, requirements: [{ id: "00000000-0000-4000-8000-000000000019", kind: "text", label: "Referências comentadas", required: true, position: 1 }], criteria: [{ id: "00000000-0000-4000-8000-000000000017", label: "Intenção visual", description: "Cada referência possui uma observação objetiva.", position: 1 }], latestSubmission: null, submissionHistory: [] };
+  if (assignmentId === ids.assignmentPrototype) return { id: "00000000-0000-4000-8000-000000000027", assignmentId, lessonPosition: 8, title: "Protótipo que pede uma ação", objective: "Transformar a decisão visual em uma ação clara para quem vê o cartaz.", instructions: "Monte a próxima versão e descreva qual comportamento ela deve provocar.", continuityGuidance: "Esta etapa abre após você enviar a revisão atual.", estimatedMinutes: 30, dueAt: "2026-09-10T20:00:00.000Z", status: "locked", isOverdue: false, supplementalInstructions: null, concepts, requirements: [{ id: "00000000-0000-4000-8000-000000000019", kind: "text", label: "Hipótese de ação", required: true, position: 1 }], criteria: [{ id: "00000000-0000-4000-8000-000000000017", label: "Convite à ação", description: "A próxima ação é clara sem explicação extra.", position: 1 }], latestSubmission: null, submissionHistory: [] };
   const item = { id: "00000000-0000-4000-8000-000000000018", requirementId: "00000000-0000-4000-8000-000000000019", kind: "text" as const, textValue: "A versão 03 aumenta o contraste do título." };
   return { id: "00000000-0000-4000-8000-000000000020", assignmentId: ids.assignment, lessonPosition: 7, title: "Cartaz que orienta uma decisão", objective: "Refinar a hierarquia visual e provar a mensagem principal.", instructions: "Compare a versão anterior com o feedback e envie uma nova decisão.", continuityGuidance: "A próxima atividade só abre após esta evidência.", estimatedMinutes: 25, dueAt: "2026-09-08T20:00:00.000Z", status: "revision_requested", isOverdue: false, supplementalInstructions: null, concepts, requirements: [{ id: item.requirementId, kind: "text", label: "Decisão registrada", required: true, position: 1 }], criteria: [{ id: "00000000-0000-4000-8000-000000000017", label: "Mensagem principal", description: "Uma única mensagem é perceptível à distância.", position: 1 }], latestSubmission: { id: ids.submission, assignmentId: ids.assignment, version: submissionVersion, isDraft: false, submittedAt: now, items: [item], review }, submissionHistory: [] };
 }
@@ -74,7 +78,7 @@ export async function demoApi<T>(url: string, method: Method, body?: JsonObject)
   if (method === "GET" && pathname === "/api/student/attendance") return page(sessions.slice(0, 6).map((session, index) => ({ session, status: index === 3 ? "excused_absence" : "present", makeup: index === 3 ? null : null }))) as T;
   if (method === "GET" && pathname === "/api/student/concepts") return page(concepts) as T;
   if (method === "GET" && pathname.startsWith("/api/student/concepts/")) { const concept = concepts.find((item) => item.id === pathname.split("/").at(-1)) ?? concepts[0]!; return ({ ...concept, body: "Use hierarquia e contraste para tornar uma decisão legível antes de adicionar detalhes.", relatedConcepts: concepts.filter((item) => item.id !== concept.id) }) as T; }
-  if (method === "GET" && pathname.startsWith("/api/student/activities/")) return activity() as T;
+  if (method === "GET" && pathname.startsWith("/api/student/activities/")) return activity(pathname.split("/").at(-1)) as T;
   if (method === "PUT" && pathname.endsWith("/draft")) return ({ ...activity().latestSubmission!, id: ids.submission, isDraft: true, submittedAt: null }) as T;
   if (method === "POST" && pathname.endsWith("/submit")) { submissionVersion += 1; return ({ ...activity().latestSubmission!, version: submissionVersion, isDraft: false, submittedAt: now }) as T; }
   if (method === "GET" && pathname === "/api/student/projects") return projects as T;

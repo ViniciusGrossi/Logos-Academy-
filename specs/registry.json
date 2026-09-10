@@ -107,6 +107,15 @@
       "built": true,
       "reviewed": true,
       "dependencies": ["frontend-premium-phase8"]
+    },
+    "student-experience-elevation": {
+      "spec": "docs/specs/student-experience-elevation.md",
+      "status": "approved",
+      "wave": 8,
+      "scope": "milestone-visual-product-2026",
+      "built": false,
+      "reviewed": false,
+      "dependencies": ["auth-estudio-vivo", "student-home-journey-concepts", "projects-portfolio-completion"]
     }
   }
 }
