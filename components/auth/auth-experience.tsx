@@ -3,8 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Eye, EyeOff, KeyRound, LockKeyhole, Mail } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, KeyRound, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { MissionField } from "./mission-field";
+import { Button } from "@/components/ui/button";
 import { SmoothInput } from "@/components/ui/smooth-input";
 import { createSupabaseBrowserClient } from "@/src/lib/supabase/browser";
 import { safeInternalPath } from "@/src/lib/safe-internal-path";
@@ -49,12 +52,12 @@ function PasswordMeter({ value }: { value: string }) {
   return <><div className={styles.meter} aria-hidden="true">{[0,1,2,3].map((index) => <span key={index} style={{ "--meter-active": index < score ? 1 : 0, "--meter-color": colors[Math.max(0, score - 1)] } as React.CSSProperties} />)}</div><p className={styles.meterText} aria-live="polite">{labels[score]}</p></>;
 }
 
-function PasswordInput({ value, onChange, label = "Senha", helper = "Mínimo de 8 caracteres" }: { value: string; onChange: (value: string) => void; label?: string; helper?: string }) {
+function PasswordInput({ value, onChange, onFocus, label = "Senha", helper = "Mínimo de 8 caracteres" }: { value: string; onChange: (value: string) => void; onFocus?: () => void; label?: string; helper?: string }) {
   const [visible, setVisible] = useState(false);
-  return <div className={styles.passwordRow}><SmoothInput label={label} helper={helper} icon={<LockKeyhole size={18} />} type={visible ? "text" : "password"} value={value} autoComplete={label === "Senha" ? "current-password" : "new-password"} minLength={8} required onChange={(event) => onChange(event.target.value)} /><button type="button" className={styles.reveal} onClick={() => setVisible((current) => !current)} aria-label={visible ? "Ocultar senha" : "Mostrar senha"}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></div>;
+  return <div className={styles.passwordRow}><SmoothInput label={label} helper={helper} icon={<LockKeyhole size={18} />} type={visible ? "text" : "password"} value={value} autoComplete={label === "Senha" ? "current-password" : "new-password"} minLength={8} required onFocus={onFocus} onChange={(event) => onChange(event.target.value)} /><button type="button" className={styles.reveal} onClick={() => setVisible((current) => !current)} aria-label={visible ? "Ocultar senha" : "Mostrar senha"}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></div>;
 }
 
-function MagneticSubmit({ pending, label }: { pending: boolean; label: string }) {
+function MagneticSubmit({ pending, disabled, label, onEngage }: { pending: boolean; disabled: boolean; label: string; onEngage: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
   function move(event: React.PointerEvent<HTMLDivElement>) {
     if (event.pointerType !== "mouse" || !ref.current || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -62,7 +65,7 @@ function MagneticSubmit({ pending, label }: { pending: boolean; label: string })
     ref.current.style.transform = `translate(${(event.clientX - rect.left - rect.width / 2) * .08}px, ${(event.clientY - rect.top - rect.height / 2) * .14}px)`;
   }
   function reset() { if (ref.current) ref.current.style.transform = "translate(0,0)"; }
-  return <div className={styles.magnetic} onPointerMove={move} onPointerLeave={reset}><button ref={ref} className={styles.submit} disabled={pending}>{pending ? "Processando…" : label}<ArrowRight size={19} /></button></div>;
+  return <div className={styles.magnetic} onPointerMove={move} onPointerLeave={reset} onPointerEnter={onEngage}><Button ref={ref} type="submit" size="lg" className={styles.submit} disabled={disabled} aria-busy={pending} onFocus={onEngage}><span>{pending ? "Processando…" : label}</span>{pending ? <LoaderCircle className={styles.spinner} size={19} /> : <ArrowRight size={19} />}</Button></div>;
 }
 
 export function AuthExperience({ mode }: { mode: AuthMode }) {
@@ -78,14 +81,20 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sessionReady, setSessionReady] = useState(mode === "login" || !updateMode);
+  const [activeStage, setActiveStage] = useState(0);
 
   useEffect(() => {
     if (!updateMode) return;
-    const client = createSupabaseBrowserClient();
-    void client.auth.getSession().then(({ data }) => {
-      setSessionReady(Boolean(data.session));
-      if (!data.session) setError("Abra novamente o link seguro enviado pela Logos Academy.");
-    });
+    try {
+      const client = createSupabaseBrowserClient();
+      void client.auth.getSession().then(({ data }) => {
+        setSessionReady(Boolean(data.session));
+        if (!data.session) setError("Abra novamente o link seguro enviado pela Logos Academy.");
+      }).catch((cause: unknown) => setError(authErrorMessage(cause)));
+    } catch (cause) {
+      setSessionReady(false);
+      setError(authErrorMessage(cause));
+    }
   }, [updateMode]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -124,24 +133,38 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
   }
 
   const action = mode === "login" ? "Entrar no estúdio" : updateMode ? "Salvar nova senha" : "Enviar link seguro";
-  return <main className={styles.scene}>
-    <section className={styles.cinema} aria-label="Logos Academy">
+  return <MotionConfig reducedMotion="user"><main className={styles.scene}>
+    <MissionField activeStage={activeStage} />
+    <header className={styles.topbar}>
       <Link href="/login" className={styles.brand}><Image src="/brand/logos-academy-logo.png" width={304} height={92} alt="Logos Academy" priority /></Link>
-      <div className={styles.story}><span className={styles.eyebrow}>Capacidade, não aula.</span><h1>Sua próxima <em>evidência</em> começa aqui.</h1><p>A plataforma acompanha o que acontece presencialmente: conceitos para consultar, missões para executar e projetos que mostram sua evolução.</p></div>
-      <div className={styles.rail} aria-label="Jornada na plataforma"><div><small>01</small><strong>Compreenda</strong></div><div><small>02</small><strong>Construa</strong></div><div><small>03</small><strong>Demonstre</strong></div></div>
+      <span className={styles.doctrine}>Capacidade, não aula.</span>
+    </header>
+    <section className={styles.story} aria-label="Logos Academy">
+      <div className={styles.storyIndex}><span>Estúdio vivo</span><span>Formação 01</span></div>
+      <h1>Sua próxima <em>evidência</em> começa aqui.</h1>
+      <p>A plataforma acompanha o que acontece presencialmente: conceitos para consultar, missões para executar e projetos que mostram sua evolução.</p>
+      <ol className={styles.rail} aria-label="Jornada na plataforma">
+        <li data-active={activeStage >= 1}><small>01</small><strong>Compreenda</strong></li>
+        <li data-active={activeStage >= 2}><small>02</small><strong>Construa</strong></li>
+        <li data-active={activeStage >= 3}><small>03</small><strong>Demonstre</strong></li>
+      </ol>
     </section>
     <section className={styles.workspace}>
-      <div className={styles.formWrap}><div className={styles.step}>{copy[mode].step}</div><h2>{copy[mode].title}</h2><p className={styles.intro}>{copy[mode].intro}</p>
+      <div className={styles.panel}>
+        <div className={styles.panelMeta}><span>Portal de missão</span><span>Ambiente protegido</span></div>
+        <div className={styles.formWrap}><div className={styles.step}>{copy[mode].step}</div><h2>{copy[mode].title}</h2><p className={styles.intro}>{copy[mode].intro}</p>
         <form className={styles.form} onSubmit={submit}>
-          {(mode === "login" || !updateMode) && <SmoothInput label="E-mail" helper="Use o endereço cadastrado na matrícula" icon={<Mail size={18} />} type="email" value={email} autoComplete="email" required onChange={(event) => setEmail(event.target.value)} />}
-          {(mode === "login" || updateMode) && <PasswordInput value={password} onChange={setPassword} label={mode === "login" ? "Senha" : "Nova senha"} />}
+          {(mode === "login" || !updateMode) && <SmoothInput label="E-mail" helper="Use o endereço cadastrado na matrícula" icon={<Mail size={18} />} type="email" value={email} autoComplete="email" required onFocus={() => setActiveStage(1)} onChange={(event) => setEmail(event.target.value)} />}
+          {(mode === "login" || updateMode) && <PasswordInput value={password} onChange={setPassword} onFocus={() => setActiveStage(2)} label={mode === "login" ? "Senha" : "Nova senha"} />}
           {updateMode && <><PasswordMeter value={password} /><PasswordInput value={confirmation} onChange={setConfirmation} label="Confirmar senha" helper="Repita exatamente a senha acima" /></>}
           {error && <div className={styles.status} data-error="true" role="alert">{error}</div>}
           {message && <div className={styles.status} role="status">{message}</div>}
-          <MagneticSubmit pending={pending || !sessionReady} label={action} />
+          <MagneticSubmit pending={pending} disabled={pending || !sessionReady} label={action} onEngage={() => setActiveStage(3)} />
         </form>
         <div className={styles.footer}>{mode === "login" ? <><Link href="/recuperar-senha">Esqueci minha senha</Link><span><KeyRound size={14} aria-hidden="true" /> Convite obrigatório</span></> : <><Link href="/login">Voltar ao login</Link><span>Ambiente protegido</span></>}</div>
       </div>
+      </div>
     </section>
-  </main>;
+    <footer className={styles.sceneFooter}><span>Conhecimento</span><i /> <span>Evidência</span><i /> <span>Impacto real</span></footer>
+  </main></MotionConfig>;
 }

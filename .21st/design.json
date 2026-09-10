@@ -457,6 +457,11 @@
       "date": "2026-09-07",
       "decision": "Cinema de Evidências",
       "rationale": "Combina Estúdio de Missões, Caderno de Construção, a nova referência cinematográfica e padrões 21st sem sacrificar usabilidade diária."
+    },
+    {
+      "date": "2026-09-09",
+      "decision": "Auth — Estúdio Vivo de Evidências",
+      "rationale": "Direção 1 aprovada com profundidade e portal circular da direção 3: mapa topográfico animado, rota responsiva ao foco e bancada escura integrada, preservando Auth reconhecível e acessível. Shadcn login-04 orientou a semântica; referências 21st e React Bits orientaram atmosfera sem importar estética cyberpunk."
     }
   ],
   "evidence": [

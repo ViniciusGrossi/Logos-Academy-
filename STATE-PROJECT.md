@@ -2,9 +2,9 @@
 title: "Logos Academy Platform — State of Project"
 date: 2026-09-09
 fase_atual: "12"
-etapa_atual: "Concluído"
+etapa_atual: "Milestone visual concluído"
 produto_tipo: "saas-premium"
-proximo_passo: "Ciclo encerrado — /logos status para visão geral ou iniciar novo milestone"
+proximo_passo: "Handshake visual do novo Auth; publicar novo deployment somente após aprovação"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -19,12 +19,12 @@ gates:
   fase_10: pass
   fase_11: pass
   fase_12: pass
-features: { draft: 0, approved: 11, built: 11, reviewed: 11 }
+features: { draft: 0, approved: 12, built: 12, reviewed: 12 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08
     motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
-status: "🟢 Produção"
+status: "🟡 Produção estável · redesign local"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 
@@ -34,9 +34,11 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] Nenhum gate pendente. Próximo trabalho deve iniciar um novo milestone.
+- [ ] Handshake visual do novo Auth com Vinicius; a produção permanece estável na versão anterior.
 
 ## Concluído
+
+- [2026-09-09] Milestone visual `auth-estudio-vivo` concluído localmente: login, ativação e recuperação foram remodelados com mapa topográfico SVG, portal circular, rota ligada ao foco, resposta ao ponteiro, hovers, estados de formulário e motion reduzível. O fallback de `/ativar` sem configuração do Supabase deixou de quebrar a página. Inspeção em browser passou em 375/768/1440 sem overflow; `prefers-reduced-motion` desliga rota, sinal, portal e ponteiro. 63 testes, TypeScript, lint e build passaram. Produção ainda não foi alterada.
 
 - [2026-09-09] Fase 12 concluída: deploy-check aprovado, `/cso` diário passou em 9/10 (sem finding reportável), Vercel confirmou o deployment de produção como `Ready`, smoke em produção confirmou `/login` 200 e `/`/`/admin` 307 sem sessão. O teste RLS em produção, numa transação revertida e sob `authenticated`, retornou zero matrículas cross-tenant; as 32 tabelas `logos_academy` têm RLS habilitado e forçado. Canary de 90 segundos realizou 3 checagens estáveis sem alertas e salvou evidências em `.gstack/canary-reports/`. Rollback: promover o deployment anterior na Vercel; se uma migration futura falhar, restaurar o snapshot do Supabase e registrar o incidente. A observação de dependências (`next` moderado e `postcss` transitivo alto no build) continua aceita e registrada para o milestone de upgrade.
 

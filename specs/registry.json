@@ -98,6 +98,15 @@
       "built": false,
       "reviewed": false,
       "dependencies": ["student-home-journey-concepts", "projects-portfolio-completion", "admin-dashboard"]
+    },
+    "auth-estudio-vivo": {
+      "spec": "docs/specs/auth-estudio-vivo.md",
+      "status": "approved",
+      "wave": 7,
+      "scope": "milestone-visual-auth-2026",
+      "built": true,
+      "reviewed": true,
+      "dependencies": ["frontend-premium-phase8"]
     }
   }
 }
