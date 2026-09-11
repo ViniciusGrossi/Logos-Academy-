@@ -29,6 +29,10 @@ const geoNodes = [
   [390, 650], [555, 560], [720, 650], [885, 560], [1050, 650],
 ] as const;
 
+const trajectoryNodes = [
+  [405, 650], [515, 566], [628, 595], [735, 485], [850, 510], [945, 390], [1035, 335],
+] as const;
+
 const sparks = [
   [18, 24, 2], [24, 67, 1], [31, 17, 1], [36, 81, 2], [42, 31, 1],
   [48, 72, 1], [53, 12, 2], [58, 87, 1], [63, 26, 1], [68, 75, 2],
@@ -83,6 +87,11 @@ export function MissionField({ activeStage }: { activeStage: number }) {
           <g className={styles.geoContours}>{geoContours.map((path) => <path d={path} key={path} />)}</g>
           <g className={styles.geoFacets}>{geoFacets.map((path) => <path d={path} key={path} />)}</g>
           <path className={styles.geoSweep} d="M350 520 C510 455 930 455 1090 520" />
+          <g className={styles.trajectory}>
+            <path className={styles.trajectoryGuide} d="M370 684 C438 642 458 572 522 560 C585 548 612 620 680 560 C738 510 736 458 810 480 C874 500 890 427 944 387 C980 361 1018 350 1068 304" />
+            <path className={styles.trajectoryPulse} d="M370 684 C438 642 458 572 522 560 C585 548 612 620 680 560 C738 510 736 458 810 480 C874 500 890 427 944 387 C980 361 1018 350 1068 304" />
+            {trajectoryNodes.map(([cx, cy], index) => <circle cx={cx} cy={cy} r={index % 3 === 0 ? 4 : 2.5} key={`${cx}-${cy}`} style={{ animationDelay: `${-index * .42}s` }} />)}
+          </g>
           <g className={styles.geoNodes}>{geoNodes.map(([cx, cy], index) => <circle cx={cx} cy={cy} r={index % 4 === 0 ? 3 : 1.8} key={`${cx}-${cy}`} style={{ animationDelay: `${-index * .29}s` }} />)}</g>
         </g>
         <g className={styles.lateralBeacons}>

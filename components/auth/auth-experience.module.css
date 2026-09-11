@@ -24,7 +24,7 @@
   overflow: hidden;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 58%, color-mix(in srgb, var(--auth-orange) 7%, transparent), transparent 34%),
+    radial-gradient(circle at 50% 58%, color-mix(in srgb, var(--auth-orange) 11%, transparent), transparent 36%),
     var(--auth-ink);
 }
 
@@ -60,7 +60,7 @@
   aspect-ratio: 1;
   border-radius: 50%;
   opacity: .6;
-  background: radial-gradient(circle, transparent 48%, color-mix(in srgb, var(--auth-orange) 8%, transparent) 57%, transparent 68%);
+  background: radial-gradient(circle, transparent 47%, color-mix(in srgb, var(--auth-orange) 13%, transparent) 57%, transparent 69%);
   filter: blur(1rem);
   animation: portal-breathe 6s ease-in-out infinite;
   will-change: transform, opacity;
@@ -83,6 +83,7 @@
 .geoContours path,
 .geoFacets path,
 .geoSweep,
+.trajectory path,
 .lateralBeacons path,
 .constellations path {
   fill: none;
@@ -91,7 +92,7 @@
 }
 
 .sphereBoundary {
-  stroke: color-mix(in srgb, var(--auth-orange) 34%, transparent);
+  stroke: color-mix(in srgb, var(--auth-orange) 55%, transparent);
   stroke-dasharray: 2 13 44 18;
 }
 
@@ -102,7 +103,7 @@
 }
 
 .geoContours path:nth-child(2n) {
-  stroke: color-mix(in srgb, var(--auth-orange) 18%, transparent);
+  stroke: color-mix(in srgb, var(--auth-orange) 32%, transparent);
   animation-direction: alternate-reverse;
 }
 
@@ -112,12 +113,33 @@
 }
 
 .geoSweep {
-  stroke: color-mix(in srgb, var(--auth-orange) 70%, transparent);
+  stroke: color-mix(in srgb, var(--auth-orange) 94%, transparent);
   stroke-width: 2;
   stroke-dasharray: 76 780;
   stroke-linecap: round;
   filter: url(#auth-glow);
   animation: geo-scan 8s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+
+.trajectoryGuide {
+  stroke: color-mix(in srgb, var(--auth-orange) 55%, transparent);
+  stroke-width: 1.5 !important;
+  stroke-dasharray: 3 7;
+}
+
+.trajectoryPulse {
+  stroke: var(--auth-orange);
+  stroke-width: 2.5 !important;
+  stroke-linecap: round;
+  stroke-dasharray: 48 720;
+  filter: url(#auth-glow);
+  animation: trajectory-travel 7.4s cubic-bezier(.45, 0, .55, 1) infinite;
+}
+
+.trajectory circle {
+  fill: var(--auth-orange);
+  filter: url(#auth-glow);
+  animation: trajectory-node 3.6s ease-in-out infinite;
 }
 
 .geoNodes circle,
@@ -133,7 +155,7 @@
 .constellations path { stroke: color-mix(in srgb, var(--auth-paper) 16%, transparent); }
 .lateralBeacons circle,
 .constellations circle { opacity: .5; }
-.beaconSweep { stroke: color-mix(in srgb, var(--auth-orange) 58%, transparent) !important; stroke-dasharray: 24 114; animation: beacon-scan 5.6s ease-in-out infinite; }
+.beaconSweep { stroke: color-mix(in srgb, var(--auth-orange) 84%, transparent) !important; stroke-dasharray: 24 114; animation: beacon-scan 5.6s ease-in-out infinite; }
 
 .constellations { opacity: .58; }
 .constellations g:first-child { animation: constellation-drift 8s ease-in-out infinite; }
@@ -150,7 +172,7 @@
   border-radius: 50%;
   background: var(--auth-orange);
   box-shadow: 0 0 .7rem color-mix(in srgb, var(--auth-orange) 82%, transparent);
-  opacity: .18;
+  opacity: .28;
   animation: spark-pulse 4.2s ease-in-out infinite;
 }
 
@@ -169,7 +191,7 @@
 }
 
 .brand { display: inline-flex; border-radius: .5rem; }
-.brand img { width: clamp(7rem, 9vw, 9rem); height: 4.6rem; object-fit: contain; object-position: left center; }
+.brand img { width: auto; height: 3.15rem; object-fit: contain; object-position: left center; }
 .brand:focus-visible { outline: 3px solid var(--auth-orange); outline-offset: .4rem; }
 
 .topMeta {
@@ -377,11 +399,11 @@
   font: inherit;
 }
 .form :global(.smooth-caret) {
-  top: 1.3rem;
+  top: 1.825rem;
   left: 2.85rem;
   display: block;
   width: 2px;
-  height: 1.2rem;
+  height: .88rem;
   border-radius: 999px;
   background: var(--auth-orange);
   box-shadow: 0 0 .65rem color-mix(in srgb, var(--auth-orange) 72%, transparent);
@@ -479,6 +501,8 @@
 @keyframes geo-drift { from { stroke-dashoffset: 0; opacity: .42; } to { stroke-dashoffset: -76; opacity: .78; } }
 @keyframes geo-scan { 0% { stroke-dashoffset: 0; opacity: .25; } 45% { opacity: 1; } 100% { stroke-dashoffset: -860; opacity: .25; } }
 @keyframes geo-node-pulse { 0%, 100% { opacity: .18; } 50% { opacity: .68; } }
+@keyframes trajectory-travel { from { stroke-dashoffset: 768; opacity: .35; } 45% { opacity: 1; } to { stroke-dashoffset: 0; opacity: .35; } }
+@keyframes trajectory-node { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
 @keyframes beacon-scan { 0%, 100% { stroke-dashoffset: 0; opacity: .3; } 50% { stroke-dashoffset: -118; opacity: .9; } }
 @keyframes constellation-drift { 0%, 100% { transform: translateY(-4px); opacity: .35; } 50% { transform: translateY(5px); opacity: .72; } }
 @keyframes auth-caret-blink { 50% { opacity: .2; } }
@@ -508,7 +532,7 @@
 @media (max-width: 43rem) {
   .scene { grid-template-rows: auto auto auto auto; padding: 1rem; }
   .doctrine { display: none; }
-  .brand img { width: 6.25rem; height: 3.8rem; }
+  .brand img { width: auto; height: 2.75rem; }
   .topMeta { font-size: .56rem; }
   .portalIntro { padding: .65rem 0 .4rem; }
   .storyIndex span:last-child { display: none; }
@@ -550,7 +574,7 @@
 @media (max-height: 48rem) and (min-width: 43.01rem) {
   .scene { padding-block: .8rem; }
   .topbar { min-height: 2.9rem; }
-  .brand img { width: 6.8rem; height: 3.6rem; }
+  .brand img { width: auto; height: 2.65rem; }
   .portalIntro { padding-block: .3rem; }
   .portalIntro h1 { margin-block: .35rem .15rem; font-size: 2.6rem; }
   .portalIntro p { display: none; }
@@ -568,6 +592,8 @@
   .portalGlow,
   .geoContours path,
   .geoSweep,
+  .trajectoryPulse,
+  .trajectory circle,
   .geoNodes circle,
   .beaconSweep,
   .constellations g,
@@ -611,7 +637,7 @@
   overflow: hidden;
   border-color: color-mix(in srgb, var(--auth-paper) 28%, transparent);
   border-radius: 1.35rem .35rem 1.35rem 1.35rem;
-  background: color-mix(in srgb, var(--auth-raised) 72%, transparent);
+  background: color-mix(in srgb, var(--auth-raised) 20%, transparent);
   box-shadow: 0 2.8rem 8rem rgb(0 0 0 / 55%), 0 0 5rem color-mix(in srgb, var(--auth-orange) 9%, transparent), inset 0 1px color-mix(in srgb, var(--auth-paper) 10%, transparent);
   backdrop-filter: blur(24px) saturate(138%);
   -webkit-backdrop-filter: blur(24px) saturate(138%);

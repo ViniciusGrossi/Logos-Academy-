@@ -37,6 +37,9 @@ async function signInWithDemo(email: string, password: string): Promise<boolean>
     body: JSON.stringify({ email, password }),
   });
   if (response.status === 404) return false;
+  // A demo é opcional: uma credencial que não pertence a ela deve seguir
+  // para a autenticação real do Supabase, em vez de bloquear o acesso.
+  if (response.status === 401) return false;
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
     const message = typeof body === "object" && body && "message" in body && typeof body.message === "string" ? body.message : "Não foi possível entrar.";
@@ -136,7 +139,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
   return <MotionConfig reducedMotion="user"><main className={styles.scene}>
     <MissionField activeStage={activeStage} />
     <header className={styles.topbar}>
-      <Link href="/login" className={styles.brand}><Image src="/brand/logos-academy-logo.png" width={304} height={92} alt="Logos Academy" priority /></Link>
+      <Link href="/login" className={styles.brand}><Image src="/brand/logos-academy-symbol-dark.png" width={283} height={230} alt="Logos Academy" priority /></Link>
       <div className={styles.topMeta}><span>Estúdio de construção</span><span className={styles.doctrine}>Capacidade, não aula.</span></div>
     </header>
     <section className={styles.portalIntro} aria-label="Logos Academy">
