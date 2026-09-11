@@ -103,7 +103,7 @@
       "spec": "docs/specs/auth-estudio-vivo.md",
       "status": "approved",
       "wave": 7,
-      "scope": "milestone-visual-auth-2026",
+      "scope": "milestone-visual-auth-2026-v4",
       "built": true,
       "reviewed": true,
       "dependencies": ["frontend-premium-phase8"]

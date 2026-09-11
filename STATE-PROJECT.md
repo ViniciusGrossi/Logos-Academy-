@@ -1,6 +1,6 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-09
+date: 2026-09-11
 fase_atual: "12"
 etapa_atual: "Milestone visual concluído"
 produto_tipo: "saas-premium"
@@ -37,6 +37,12 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada e Projetos; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-09-11] Iteração `auth-estudio-vivo` v4 — Campo Geodésico — concluída localmente: os anéis externos foram removidos e substituídos por malha interna, nós luminosos, varredura, balizas e constelações laterais. Explorer, Builder e Engineer flutuam verticalmente em cadências diferentes e usam glow pulsante contido; o estágio atual recebe ênfase maior. O Smooth Write existente voltou a aparecer nos campos com cursor laranja animado e sem cursor nativo duplicado. Login, ativação e recuperação foram inspecionados em 375/768/1440 sem overflow; `prefers-reduced-motion` congela cards, glow, campo e cursor. 63 testes e TypeScript passaram; lint e build passaram com apenas o warning preexistente de `isActionable` em `activity-detail.tsx`. Produção não foi alterada.
+
+- [2026-09-11] Iteração `auth-estudio-vivo` v3 — Portal Aberto — concluída localmente: painel central menor em vidro fumê, cenário ampliado, progressão Explorer → Builder → Engineer distribuída nas órbitas e metadados laterais discretos. Spotlight, portal e partículas respondem ao cursor em três profundidades; foco e hover alteram o estágio ativo; `prefers-reduced-motion` entrega a cena estática. Login, ativação e recuperação foram inspecionados em 375/768/1440 sem overflow horizontal. 63 testes e TypeScript passaram; lint e build passaram com apenas o warning preexistente de `isActionable` em `activity-detail.tsx`. Produção não foi alterada.
+
+- [2026-09-11] Iteração `auth-estudio-vivo` v2 concluída localmente após novo handshake: Portal Cinético como protagonista, superfície editorial clara do Caderno Imersivo e progressão Explorer → Builder → Engineer do Campo de Evidências. Login, ativação e recuperação preservam seus contratos; spotlight, arco orbital, partículas, foco dos campos, CTA magnético e progressão contextual respeitam `prefers-reduced-motion`. Browser validado em 375/768/1440 sem overflow horizontal, CTA visível na primeira dobra e sem erros de console. 63 testes, TypeScript, lint e build passaram; permanece apenas o warning preexistente de `isActionable` em `activity-detail.tsx`. Produção não foi alterada.
 
 - [2026-09-09] Milestone visual `auth-estudio-vivo` concluído localmente: login, ativação e recuperação foram remodelados com mapa topográfico SVG, portal circular, rota ligada ao foco, resposta ao ponteiro, hovers, estados de formulário e motion reduzível. O fallback de `/ativar` sem configuração do Supabase deixou de quebrar a página. Inspeção em browser passou em 375/768/1440 sem overflow; `prefers-reduced-motion` desliga rota, sinal, portal e ponteiro. 63 testes, TypeScript, lint e build passaram. Produção ainda não foi alterada.
 
@@ -145,6 +151,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Lições
 
+- [2026-09-11] Executar `next build` enquanto `next dev` usa a mesma pasta `.next` pode deixar o HTML ativo com chunks CSS inválidos, exibindo o SVG bruto. Encerrar o servidor antes do build e reiniciá-lo depois de validar.
 - [2026-08-31] A plataforma não substitui a aula presencial → conceitos são referência; atividades e acompanhamento prolongam o encontro.
 - [2026-08-31] Dados pessoais do aluno não justificam um tenant por aluno → tenant representa a Logos Academy; propriedade individual usa aluno, matrícula e RLS.
 - [2026-08-31] “GitHub conectado” não implica OAuth → no MVP, vincular perfil e enviar URL do repositório.

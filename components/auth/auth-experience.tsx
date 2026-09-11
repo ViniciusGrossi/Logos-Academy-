@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Eye, EyeOff, KeyRound, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
+import { ArrowRight, BookOpen, Box, ChartNoAxesColumnIncreasing, Eye, EyeOff, KeyRound, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 import { MotionConfig } from "framer-motion";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { MissionField } from "./mission-field";
@@ -16,7 +16,7 @@ import styles from "./auth-experience.module.css";
 type AuthMode = "login" | "activate" | "recover";
 
 const copy = {
-  login: { step: "Acesso ao estúdio", title: "Continue de onde parou.", intro: "Entre para retomar sua missão, consultar conceitos e organizar as próximas evidências." },
+  login: { step: "Acesso ao estúdio", title: "Continue sua jornada.", intro: "Entre para retomar sua missão e transformar o próximo conceito em evidência." },
   activate: { step: "Primeiro acesso", title: "Prepare seu espaço.", intro: "Crie uma senha segura para ativar o acesso recebido pela Logos Academy." },
   recover: { step: "Recuperar acesso", title: "Volte à construção.", intro: "Receba um link seguro no seu e-mail ou defina uma nova senha após abrir o link." },
 } satisfies Record<AuthMode, { step: string; title: string; intro: string }>;
@@ -137,22 +137,19 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
     <MissionField activeStage={activeStage} />
     <header className={styles.topbar}>
       <Link href="/login" className={styles.brand}><Image src="/brand/logos-academy-logo.png" width={304} height={92} alt="Logos Academy" priority /></Link>
-      <span className={styles.doctrine}>Capacidade, não aula.</span>
+      <div className={styles.topMeta}><span>Estúdio de construção</span><span className={styles.doctrine}>Capacidade, não aula.</span></div>
     </header>
-    <section className={styles.story} aria-label="Logos Academy">
-      <div className={styles.storyIndex}><span>Estúdio vivo</span><span>Formação 01</span></div>
+    <section className={styles.portalIntro} aria-label="Logos Academy">
+      <div className={styles.storyIndex}><span>Portal cinético</span><span>Formação 01</span></div>
       <h1>Sua próxima <em>evidência</em> começa aqui.</h1>
-      <p>A plataforma acompanha o que acontece presencialmente: conceitos para consultar, missões para executar e projetos que mostram sua evolução.</p>
-      <ol className={styles.rail} aria-label="Jornada na plataforma">
-        <li data-active={activeStage >= 1}><small>01</small><strong>Compreenda</strong></li>
-        <li data-active={activeStage >= 2}><small>02</small><strong>Construa</strong></li>
-        <li data-active={activeStage >= 3}><small>03</small><strong>Demonstre</strong></li>
-      </ol>
+      <p>Entre no estúdio. Continue construindo.</p>
     </section>
-    <section className={styles.workspace}>
-      <div className={styles.panel}>
-        <div className={styles.panelMeta}><span>Portal de missão</span><span>Ambiente protegido</span></div>
-        <div className={styles.formWrap}><div className={styles.step}>{copy[mode].step}</div><h2>{copy[mode].title}</h2><p className={styles.intro}>{copy[mode].intro}</p>
+    <section className={styles.workspace} data-stage={activeStage}>
+      <div className={`${styles.sideSignal} ${styles.sideSignalLeft}`} aria-hidden="true"><span>LA · 01</span><strong>Missão em curso</strong><small>Conceito → evidência</small></div>
+      <div className={styles.panel} data-stage={activeStage}>
+        <div className={styles.formWrap}>
+          <div className={styles.panelMeta}><span>Portal de missão</span><span>Ambiente protegido</span></div>
+          <div className={styles.step}>{copy[mode].step}</div><h2>{copy[mode].title}</h2><p className={styles.intro}>{copy[mode].intro}</p>
         <form className={styles.form} onSubmit={submit}>
           {(mode === "login" || !updateMode) && <SmoothInput label="E-mail" helper="Use o endereço cadastrado na matrícula" icon={<Mail size={18} />} type="email" value={email} autoComplete="email" required onFocus={() => setActiveStage(1)} onChange={(event) => setEmail(event.target.value)} />}
           {(mode === "login" || updateMode) && <PasswordInput value={password} onChange={setPassword} onFocus={() => setActiveStage(2)} label={mode === "login" ? "Senha" : "Nova senha"} />}
@@ -162,9 +159,29 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
           <MagneticSubmit pending={pending} disabled={pending || !sessionReady} label={action} onEngage={() => setActiveStage(3)} />
         </form>
         <div className={styles.footer}>{mode === "login" ? <><Link href="/recuperar-senha">Esqueci minha senha</Link><span><KeyRound size={14} aria-hidden="true" /> Convite obrigatório</span></> : <><Link href="/login">Voltar ao login</Link><span>Ambiente protegido</span></>}</div>
+        </div>
       </div>
-      </div>
+      <aside className={styles.evidencePanel} aria-label="Sua progressão na Logos Academy">
+          <div className={styles.evidenceTop}><span>Trilha de formação</span><span>01—03</span></div>
+          <h3>Ideias ganham forma.</h3>
+          <ol className={styles.journey}>
+            <li data-active={activeStage >= 1} data-current={activeStage === 1}>
+              <span className={styles.journeyIcon}><BookOpen size={18} /></span>
+              <span><small>01 · Explorer</small><strong>Compreenda</strong><em>Curiosidade em movimento</em></span>
+            </li>
+            <li data-active={activeStage >= 2} data-current={activeStage === 2}>
+              <span className={styles.journeyIcon}><Box size={18} /></span>
+              <span><small>02 · Builder</small><strong>Construa</strong><em>Ideias em projetos</em></span>
+            </li>
+            <li data-active={activeStage >= 3} data-current={activeStage >= 3}>
+              <span className={styles.journeyIcon}><ChartNoAxesColumnIncreasing size={18} /></span>
+              <span><small>03 · Engineer</small><strong>Demonstre</strong><em>Evidências no mundo real</em></span>
+            </li>
+          </ol>
+          <p className={styles.evidenceNote}>O presencial desperta. O estúdio registra a evolução.</p>
+      </aside>
+      <div className={`${styles.sideSignal} ${styles.sideSignalRight}`} aria-hidden="true"><span>Sistema ativo</span><strong>Ambiente protegido</strong><small>São Paulo · BR</small></div>
     </section>
-    <footer className={styles.sceneFooter}><span>Conhecimento</span><i /> <span>Evidência</span><i /> <span>Impacto real</span></footer>
+    <footer className={styles.sceneFooter}><span>Compreenda</span><i /> <span>Construa</span><i /> <span>Demonstre</span></footer>
   </main></MotionConfig>;
 }

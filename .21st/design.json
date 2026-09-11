@@ -462,6 +462,21 @@
       "date": "2026-09-09",
       "decision": "Auth — Estúdio Vivo de Evidências",
       "rationale": "Direção 1 aprovada com profundidade e portal circular da direção 3: mapa topográfico animado, rota responsiva ao foco e bancada escura integrada, preservando Auth reconhecível e acessível. Shadcn login-04 orientou a semântica; referências 21st e React Bits orientaram atmosfera sem importar estética cyberpunk."
+    },
+    {
+      "date": "2026-09-11",
+      "decision": "Auth — Portal Cinético Combinado",
+      "rationale": "Portal Cinético aprovado como protagonista, com a clareza editorial do Caderno Imersivo e a progressão Explorer → Builder → Engineer do Campo de Evidências. Kinetics orienta spotlight e feedback físico; React Bits orienta profundidade atmosférica; Shadcn e ReUI orientam semântica e estados, sem dependência visual nova."
+    },
+    {
+      "date": "2026-09-11",
+      "decision": "Auth — Portal Aberto",
+      "rationale": "O formulário foi reduzido e convertido em vidro fumê para revelar mais do cenário. Explorer, Builder e Engineer orbitam fora do painel, enquanto spotlight, portal e partículas respondem ao cursor em profundidades distintas; mobile reorganiza a progressão em faixa compacta."
+    },
+    {
+      "date": "2026-09-11",
+      "decision": "Auth — Campo Geodésico",
+      "rationale": "Os anéis externos foram removidos e substituídos por malha interna, nós, varredura, balizas e constelações laterais. Os cards da formação flutuam em cadências distintas com glow contido; o Smooth Write existente foi revelado sem DialKit ou nova dependência."
     }
   ],
   "evidence": [

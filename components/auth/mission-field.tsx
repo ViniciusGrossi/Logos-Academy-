@@ -1,94 +1,101 @@
 "use client";
 
-import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import { useEffect } from "react";
 import styles from "./auth-experience.module.css";
 
-const contours = [
-  "M-80 190 C100 54 286 74 416 188 S678 330 850 170 S1128 18 1510 214",
-  "M-92 235 C92 102 280 119 405 224 S668 365 842 208 S1120 62 1518 250",
-  "M-104 280 C84 150 271 163 395 260 S658 403 832 249 S1110 108 1526 288",
-  "M-116 326 C78 198 262 207 386 298 S648 441 822 291 S1100 154 1534 326",
-  "M-128 374 C72 246 254 253 378 337 S639 480 812 334 S1092 202 1542 366",
-  "M-140 424 C66 296 246 300 370 378 S630 520 802 379 S1084 252 1550 408",
-  "M-152 476 C61 347 238 349 363 421 S621 561 792 426 S1076 304 1558 452",
-  "M-164 530 C56 400 230 400 356 466 S612 603 782 475 S1068 358 1566 498",
-  "M-176 586 C51 454 222 453 350 513 S603 646 772 526 S1060 414 1574 546",
-  "M-188 644 C46 510 214 507 344 562 S594 691 762 579 S1052 472 1582 596",
-  "M-200 704 C42 568 206 563 338 613 S585 737 752 634 S1044 532 1590 648",
-  "M-212 766 C38 628 198 621 332 666 S576 785 742 691 S1036 594 1598 702",
+const geoContours = [
+  "M365 390 C500 330 940 330 1075 390",
+  "M340 472 C500 424 940 424 1100 472",
+  "M342 560 C505 612 935 612 1098 560",
+  "M390 650 C530 706 910 706 1050 650",
+  "M720 98 C585 250 575 705 720 872",
+  "M720 98 C855 250 865 705 720 872",
+  "M535 148 C650 292 650 675 535 820",
+  "M905 148 C790 292 790 675 905 820",
 ];
 
-const route = "M275 226 C350 250 330 335 410 354 C493 374 455 470 545 500 C644 533 612 635 732 672";
-
-const stages = [
-  { x: 275, y: 226, number: "01", label: "Compreenda" },
-  { x: 545, y: 500, number: "02", label: "Construa" },
-  { x: 732, y: 672, number: "03", label: "Demonstre" },
+const geoFacets = [
+  "M420 300 L575 225 L720 330 L865 225 L1020 300",
+  "M365 472 L535 390 L720 472 L905 390 L1075 472",
+  "M390 650 L555 560 L720 650 L885 560 L1050 650",
+  "M535 225 L535 390 L555 560 L535 730",
+  "M905 225 L905 390 L885 560 L905 730",
 ];
+
+const geoNodes = [
+  [420, 300], [575, 225], [720, 330], [865, 225], [1020, 300],
+  [365, 472], [535, 390], [720, 472], [905, 390], [1075, 472],
+  [390, 650], [555, 560], [720, 650], [885, 560], [1050, 650],
+] as const;
+
+const sparks = [
+  [18, 24, 2], [24, 67, 1], [31, 17, 1], [36, 81, 2], [42, 31, 1],
+  [48, 72, 1], [53, 12, 2], [58, 87, 1], [63, 26, 1], [68, 75, 2],
+  [73, 18, 1], [78, 61, 1], [84, 34, 2], [89, 82, 1], [94, 46, 1],
+  [13, 48, 1], [27, 43, 2], [39, 56, 1], [51, 39, 1], [61, 57, 2],
+  [71, 45, 1], [82, 52, 1], [91, 29, 2], [9, 76, 1],
+] as const;
 
 export function MissionField({ activeStage }: { activeStage: number }) {
   const reducedMotion = useReducedMotion();
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
-  const x = useSpring(pointerX, { stiffness: 70, damping: 24, mass: 0.7 });
-  const y = useSpring(pointerY, { stiffness: 70, damping: 24, mass: 0.7 });
+  const spotlightX = useMotionValue(0);
+  const spotlightY = useMotionValue(0);
+  const x = useSpring(pointerX, { stiffness: 72, damping: 26, mass: 0.82 });
+  const y = useSpring(pointerY, { stiffness: 72, damping: 26, mass: 0.82 });
+  const spotX = useSpring(spotlightX, { stiffness: 120, damping: 30, mass: 0.58 });
+  const spotY = useSpring(spotlightY, { stiffness: 120, damping: 30, mass: 0.58 });
+  const inverseX = useTransform(x, (value) => value * -0.42);
+  const inverseY = useTransform(y, (value) => value * -0.42);
 
   useEffect(() => {
     if (reducedMotion) return;
     function follow(event: PointerEvent) {
-      pointerX.set((event.clientX / window.innerWidth - 0.5) * 18);
-      pointerY.set((event.clientY / window.innerHeight - 0.5) * 14);
+      const normalizedX = event.clientX / window.innerWidth - 0.5;
+      const normalizedY = event.clientY / window.innerHeight - 0.5;
+      pointerX.set(normalizedX * 112);
+      pointerY.set(normalizedY * 76);
+      spotlightX.set(normalizedX * window.innerWidth * 0.62);
+      spotlightY.set(normalizedY * window.innerHeight * 0.58);
     }
     window.addEventListener("pointermove", follow, { passive: true });
     return () => window.removeEventListener("pointermove", follow);
-  }, [pointerX, pointerY, reducedMotion]);
+  }, [pointerX, pointerY, reducedMotion, spotlightX, spotlightY]);
 
   return (
-    <div className={styles.missionField} aria-hidden="true">
-      <div className={styles.grid} />
-      <motion.div className={styles.pointerLight} style={{ x, y }} />
-      <motion.svg
-        className={styles.topography}
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
-        style={{ x, y }}
-      >
-        <g className={styles.contours}>
-          {contours.map((path) => <path d={path} key={path} />)}
+    <div className={styles.missionField} data-stage={activeStage} aria-hidden="true">
+      <motion.div className={styles.grid} style={{ x: inverseX, y: inverseY }} />
+      <motion.div className={styles.pointerLight} style={{ x: spotX, y: spotY }} />
+      <motion.div className={styles.cursorComet} style={{ x: spotX, y: spotY }} />
+      <motion.div className={styles.portalGlow} style={{ x, y }} />
+      <motion.svg className={styles.portalMap} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" style={{ x, y }}>
+        <defs>
+          <clipPath id="auth-sphere-clip"><circle cx="720" cy="485" r="386" /></clipPath>
+          <filter id="auth-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="7" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+        <circle className={styles.sphereBoundary} cx="720" cy="485" r="386" />
+        <g clipPath="url(#auth-sphere-clip)">
+          <g className={styles.geoContours}>{geoContours.map((path) => <path d={path} key={path} />)}</g>
+          <g className={styles.geoFacets}>{geoFacets.map((path) => <path d={path} key={path} />)}</g>
+          <path className={styles.geoSweep} d="M350 520 C510 455 930 455 1090 520" />
+          <g className={styles.geoNodes}>{geoNodes.map(([cx, cy], index) => <circle cx={cx} cy={cy} r={index % 4 === 0 ? 3 : 1.8} key={`${cx}-${cy}`} style={{ animationDelay: `${-index * .29}s` }} />)}</g>
         </g>
-        <g className={styles.portal}>
-          <circle cx="515" cy="458" r="318" />
-          <circle cx="515" cy="458" r="286" />
-          <circle cx="515" cy="458" r="252" />
-          <path d="M238 300 A318 318 0 0 1 714 205" />
-          <path d="M735 692 A318 318 0 0 1 245 630" />
+        <g className={styles.lateralBeacons}>
+          <g transform="translate(82 242)"><path d="M0 0 H116 M0 18 H68 M0 36 H92 M0 54 H38" /><path className={styles.beaconSweep} d="M0 72 H138" /><circle cx="116" cy="0" r="3" /><circle cx="68" cy="18" r="2" /></g>
+          <g transform="translate(1220 590)"><path d="M138 0 H22 M138 18 H70 M138 36 H46 M138 54 H100" /><path className={styles.beaconSweep} d="M138 72 H0" /><circle cx="22" cy="0" r="3" /><circle cx="70" cy="18" r="2" /></g>
         </g>
-        <path
-          className={styles.routeBase}
-          d={route}
-          pathLength="1"
-        />
-        <path
-          className={styles.routeSignal}
-          d={route}
-        />
-        {stages.map((stage, index) => {
-          const active = activeStage >= index + 1;
-          return (
-            <g className={styles.mapStage} key={stage.number} transform={`translate(${stage.x} ${stage.y})`}>
-              <motion.circle
-                className={styles.nodeHalo}
-                r="22"
-                animate={{ opacity: active ? 0.34 : 0.08, scale: active ? 1 : 0.72 }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              />
-              <circle className={active ? styles.nodeActive : styles.node} r="8" />
-            </g>
-          );
-        })}
+        <g className={styles.constellations}>
+          <g transform="translate(188 650)"><path d="M0 30 L35 0 L72 22 L112 4" /><circle cx="0" cy="30" r="2" /><circle cx="35" cy="0" r="3" /><circle cx="72" cy="22" r="2" /><circle cx="112" cy="4" r="2" /></g>
+          <g transform="translate(1160 205)"><path d="M0 8 L34 32 L70 0 L108 26" /><circle cx="0" cy="8" r="2" /><circle cx="34" cy="32" r="2" /><circle cx="70" cy="0" r="3" /><circle cx="108" cy="26" r="2" /></g>
+        </g>
       </motion.svg>
-      <div className={styles.scan} />
+      <motion.div className={styles.sparkField} style={{ x: inverseX, y: inverseY }}>{sparks.map(([left, top, size], index) => <i key={`${left}-${top}`} style={{ left: `${left}%`, top: `${top}%`, width: size, height: size, animationDelay: `${-index * 0.31}s` }} />)}</motion.div>
+      <div className={styles.vignette} />
     </div>
   );
 }
