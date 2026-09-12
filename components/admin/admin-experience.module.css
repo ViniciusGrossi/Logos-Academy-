@@ -79,6 +79,24 @@
 .sessionDate strong { font-size: calc(var(--spacing-unit) * 5); }
 .sessionDate span { color: color-mix(in srgb, var(--color-academy-paper) 66%, transparent); }
 
+/* Signature select (Radix) — replaces native <select> so the open panel carries tokens, not OS chrome. */
+.selectTrigger { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: calc(var(--spacing-unit) * 2); cursor: pointer; text-align: start; transition: border-color var(--duration-fast) var(--ease-standard); }
+.selectTrigger[data-state="open"], .selectTrigger:focus-visible { border-color: var(--color-academy-orange); outline: none; }
+.selectTrigger:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-academy-orange) 22%, transparent); }
+.selectTrigger[data-placeholder] { color: var(--muted-foreground); }
+.selectChevron { width: calc(var(--spacing-unit) * 4); height: calc(var(--spacing-unit) * 4); flex: 0 0 auto; color: var(--muted-foreground); transition: transform var(--duration-standard) var(--ease-entrance), color var(--duration-fast) var(--ease-standard); }
+.selectTrigger[data-state="open"] .selectChevron { color: var(--color-academy-orange); transform: rotate(180deg); }
+.selectContent { z-index: 60; overflow: hidden; min-width: var(--radix-select-trigger-width); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--card); box-shadow: var(--shadow-elevated); transform-origin: var(--radix-select-content-transform-origin); }
+.selectContent[data-state="open"] { animation: selectReveal var(--duration-standard) var(--ease-entrance); }
+.selectContent[data-state="closed"] { animation: selectHide var(--duration-fast) var(--ease-standard); }
+.selectViewport { padding: calc(var(--spacing-unit) * 1.5); }
+.selectItem { position: relative; display: flex; align-items: center; justify-content: space-between; gap: calc(var(--spacing-unit) * 3); min-height: calc(var(--spacing-unit) * 9); padding: 0 calc(var(--spacing-unit) * 3); border-radius: var(--radius-sm); color: var(--foreground); font-weight: 600; line-height: 1.2; cursor: pointer; user-select: none; outline: none; transition: background-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard); }
+.selectItem[data-highlighted] { background: color-mix(in srgb, var(--color-academy-orange) 10%, var(--card)); color: var(--color-academy-orange); }
+.selectItem[data-state="checked"] { color: var(--color-academy-orange); font-weight: 750; }
+.selectItemCheck { width: calc(var(--spacing-unit) * 4); height: calc(var(--spacing-unit) * 4); flex: 0 0 auto; color: var(--color-academy-orange); }
+@keyframes selectReveal { from { opacity: 0; transform: translateY(calc(var(--spacing-unit) * -1.5)) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes selectHide { from { opacity: 1; } to { opacity: 0; } }
+
 @media (max-width: 52rem) {
   .rowLink { grid-template-columns: minmax(0, 1fr) auto; }
   .rowMeta { display: none; }
@@ -100,4 +118,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .toolbarAction:hover, .secondaryAction:hover, .attendanceRow:hover, .backLink:hover, .rowLink:hover .rowArrow { transform: none; }
+  .selectContent[data-state="open"], .selectContent[data-state="closed"] { animation: none; }
+  .selectTrigger[data-state="open"] .selectChevron { transform: none; }
 }
