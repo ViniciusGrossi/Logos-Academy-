@@ -7,6 +7,7 @@ import type { ConsentRecord, EnrollmentSummary, GuardianRecord, ProjectSummary, 
 import { apiMutation } from "@/components/prototype/live-api";
 import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, SpotlightCard, StateScene, StatusBadge } from "@/components/academy";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AcademySelect } from "./academy-select";
 import { useAdminStudent, useAdminStudents } from "./admin-data";
 import { hasStudentRisk, matchesRisk, type RiskFilter } from "./admin-utils";
 import styles from "./admin-experience.module.css";
@@ -45,14 +46,16 @@ export function AdminStudents() {
           <Search className={styles.searchIcon} aria-hidden="true" />
           <input className={styles.field} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nome ou e-mail" />
         </label>
-        <label>
-          <span className="sr-only">Filtrar por atenção necessária</span>
-          <select className={styles.select} value={risk} onChange={(event) => setRisk(event.target.value as RiskFilter)}>
-            <option value="all">Todos os ritmos</option>
-            <option value="attention">Pedem atenção</option>
-            <option value="clear">Sem pendências</option>
-          </select>
-        </label>
+        <AcademySelect
+          ariaLabel="Filtrar por atenção necessária"
+          value={risk}
+          onValueChange={(next) => setRisk(next as RiskFilter)}
+          items={[
+            { value: "all", label: "Todos os ritmos" },
+            { value: "attention", label: "Pedem atenção" },
+            { value: "clear", label: "Sem pendências" },
+          ]}
+        />
       </FilterBar>
       {!students.length ? (
         <StateScene state="empty" title="Nenhum aluno neste recorte" description="Ajuste a busca ou o filtro para reencontrar o percurso desejado." />

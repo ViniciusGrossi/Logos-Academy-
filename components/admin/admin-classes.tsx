@@ -7,6 +7,7 @@ import type { ClassSummary, EnrollmentSummary, SessionSummary } from "@/specs/ap
 import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, SpotlightCard, StateScene, StatusBadge } from "@/components/academy";
 import { apiMutation } from "@/components/prototype/live-api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AcademySelect } from "./academy-select";
 import { useAdminClass, useAdminClasses } from "./admin-data";
 import { classStatusLabels, sessionStatusLabels } from "./admin-utils";
 import styles from "./admin-experience.module.css";
@@ -37,9 +38,9 @@ export function AdminClasses() {
       { id: "seats", label: "Vagas disponíveis", value: String(seats), detail: "limite de seis por turma", emphasis: seats > 0 },
     ]} />
     <FilterBar resultLabel={`${classes.length} turma${classes.length === 1 ? "" : "s"}`}>
-      <label className={styles.formField}><span className="sr-only">Filtrar por status</span><select className={styles.select} value={status} onChange={(event) => setStatus(event.target.value as ClassSummary["status"] | "all")}>
-        <option value="all">Todos os status</option><option value="planned">Planejadas</option><option value="active">Ativas</option><option value="completed">Concluídas</option><option value="cancelled">Canceladas</option>
-      </select></label>
+      <AcademySelect ariaLabel="Filtrar por status" value={status} onValueChange={(next) => setStatus(next as ClassSummary["status"] | "all")} items={[
+        { value: "all", label: "Todos os status" }, { value: "planned", label: "Planejadas" }, { value: "active", label: "Ativas" }, { value: "completed", label: "Concluídas" }, { value: "cancelled", label: "Canceladas" },
+      ]} />
     </FilterBar>
     {!classes.length ? <StateScene state="empty" title="Nenhuma turma neste recorte" description="Altere o status selecionado para consultar outros grupos." /> :
       <SpotlightCard className={styles.paper}>
@@ -95,7 +96,7 @@ function ClassOverview({ classSummary, sessions, reload }: { classSummary: Class
   return <div className={styles.sectionGrid}>
     <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Configuração coletiva</h2><p>O calendário pertence à turma; evidências e feedback continuam individuais.</p></div><PencilLine aria-hidden="true" /></div><div className={styles.paperBody}><form className={styles.form} onSubmit={save}><div className={styles.formGrid}>
       <label className={styles.formField}><span className={styles.label}>Nome da turma</span><input className={styles.field} name="name" defaultValue={classSummary.name} required /></label>
-      <label className={styles.formField}><span className={styles.label}>Status</span><select className={styles.select} name="status" defaultValue={classSummary.status}><option value="planned">Planejada</option><option value="active">Ativa</option><option value="completed">Concluída</option><option value="cancelled">Cancelada</option></select></label>
+      <label className={styles.formField}><span className={styles.label}>Status</span><AcademySelect name="status" ariaLabel="Status da turma" defaultValue={classSummary.status} items={[{ value: "planned", label: "Planejada" }, { value: "active", label: "Ativa" }, { value: "completed", label: "Concluída" }, { value: "cancelled", label: "Cancelada" }]} /></label>
     </div>{notice && <p className={styles.notice} role="status">{notice}</p>}<div className={styles.formActions}><MagneticAction><button className={styles.toolbarAction} disabled={pending}>{pending ? "Salvando…" : "Salvar turma"}</button></MagneticAction></div></form></div></section>
     <SpotlightCard className={styles.paper}><div className={styles.paperHeader}><div><h2>Próxima presença</h2><p>A plataforma apoia o encontro; a aula acontece presencialmente.</p></div><CalendarClock aria-hidden="true" /></div><div className={styles.paperBody}>{next ? <><span className={styles.sessionNumber}>Aula {String(next.lessonPosition).padStart(2, "0")}</span><h3>{next.lessonTitle}</h3><p>{formatDateTime(next.startsAt)}</p><Link className={styles.secondaryAction} href={`/admin/encontros/${next.id}?classId=${classSummary.id}`}>Preparar encontro <ArrowUpRight className={styles.icon} /></Link></> : <p className={styles.emptyInline}>Nenhum encontro futuro agendado.</p>}</div></SpotlightCard>
   </div>;
