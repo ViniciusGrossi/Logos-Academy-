@@ -11,7 +11,13 @@ const AdminEnvSchema = PublicEnvSchema.extend({
 });
 
 export function getPublicSupabaseEnv() {
-  return PublicEnvSchema.parse(process.env);
+  // Client bundles only expose statically referenced NEXT_PUBLIC variables.
+  // Parsing the dynamic process.env object works on the server but appears empty
+  // in the browser, producing a misleading Zod configuration error at login.
+  return PublicEnvSchema.parse({
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  });
 }
 
 export function getAdminSupabaseEnv() {

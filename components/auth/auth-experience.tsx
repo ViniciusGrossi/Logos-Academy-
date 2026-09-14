@@ -15,6 +15,8 @@ import styles from "./auth-experience.module.css";
 
 type AuthMode = "login" | "activate" | "recover";
 
+const isLocalDemo = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
 const copy = {
   login: { step: "Acesso ao estúdio", title: "Continue sua jornada.", intro: "Entre para retomar sua missão e transformar o próximo conceito em evidência." },
   activate: { step: "Primeiro acesso", title: "Prepare seu espaço.", intro: "Crie uma senha segura para ativar o acesso recebido pela Logos Academy." },
@@ -109,6 +111,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
           router.replace(safeNext); router.refresh();
           return;
         }
+        if (isLocalDemo) throw new Error("Este ambiente está em modo demonstração. Use as credenciais locais configuradas para acessar o estúdio.");
         const client = createSupabaseBrowserClient();
         const result = await client.auth.signInWithPassword({ email, password });
         if (result.error) throw result.error;
