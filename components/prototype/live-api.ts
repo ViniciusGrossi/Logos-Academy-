@@ -13,16 +13,20 @@ export function useLiveApi<T>(url: string | null) {
     if (!url) { setLoading(false); return; }
     setLoading(true); setError(null);
     try {
-      if (isDemoMode()) { setData(await demoApi<T>(url, "GET")); return; }
-      const response = await fetch(url, { credentials: "same-origin" });
-      const result: unknown = await response.json();
-      if (!response.ok || !isSuccess<T>(result)) throw new Error(isFailure(result) ? result.error.message : "Não foi possível carregar os dados.");
-      setData(result.data);
+      setData(await apiQuery<T>(url));
     } catch (cause) { setError({ message: cause instanceof Error ? cause.message : "Não foi possível carregar os dados." }); }
     finally { setLoading(false); }
   }, [url]);
   useEffect(() => { void load(); }, [load]);
   return { data, error, loading, reload: load };
+}
+
+export async function apiQuery<T>(url: string): Promise<T> {
+  if (isDemoMode()) return demoApi<T>(url, "GET");
+  const response = await fetch(url, { credentials: "same-origin" });
+  const result: unknown = await response.json();
+  if (!response.ok || !isSuccess<T>(result)) throw new Error(isFailure(result) ? result.error.message : "Não foi possível carregar os dados.");
+  return result.data;
 }
 
 export async function apiMutation<T>(url: string, method: "POST" | "PUT" | "PATCH" | "DELETE", body: unknown): Promise<T> {

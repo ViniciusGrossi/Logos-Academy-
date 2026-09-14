@@ -15,9 +15,11 @@ describe("provider de demonstração", () => {
   });
 
   it("entrega os dados que sustentam as telas de aluno e administração", async () => {
-    const [home, journey, dashboard, students, classes, concepts] = await Promise.all([
+    const [home, journey, project, activity, dashboard, students, classes, concepts] = await Promise.all([
       demoApi<{ primaryAction: { assignmentId?: string } }>("/api/student/home", "GET"),
       demoApi<{ enrollment: { id: string }; projects: readonly unknown[] }>("/api/student/journey", "GET"),
+      demoApi<{ brief: { challenge: string }; activities: readonly { decision: string | null; latestFeedback: unknown }[] }>("/api/student/projects/00000000-0000-4000-8000-000000000007", "GET"),
+      demoApi<{ project: { activities: readonly unknown[] }; requirements: readonly { kind: string }[]; latestSubmission: { isDraft: boolean; items: readonly unknown[] }; submissionHistory: readonly { review: unknown }[] }>("/api/student/activities/00000000-0000-4000-8000-000000000005", "GET"),
       demoApi<{ upcomingSessions: readonly unknown[] }>("/api/admin/dashboard", "GET"),
       demoApi<{ items: readonly unknown[] }>("/api/admin/students?limit=50", "GET"),
       demoApi<{ items: readonly unknown[] }>("/api/admin/classes?limit=50", "GET"),
@@ -26,6 +28,13 @@ describe("provider de demonstração", () => {
     expect(home.primaryAction.assignmentId).toBeTruthy();
     expect(journey.enrollment.id).toBeTruthy();
     expect(journey.projects).not.toHaveLength(0);
+    expect(project.brief.challenge).toContain("campanha visual");
+    expect(project.activities).toHaveLength(4);
+    expect(project.activities.some((activity) => activity.decision && activity.latestFeedback)).toBe(true);
+    expect(activity.project.activities).toHaveLength(4);
+    expect(activity.requirements.map((requirement) => requirement.kind)).toEqual(["text", "file", "external_link", "github_repository"]);
+    expect(activity.latestSubmission).toMatchObject({ isDraft: true, items: [] });
+    expect(activity.submissionHistory[0]?.review).toBeTruthy();
     expect(dashboard.upcomingSessions).not.toHaveLength(0);
     expect(students.items).not.toHaveLength(0);
     expect(classes.items).not.toHaveLength(0);

@@ -12,7 +12,13 @@ export class ActivitySubmissionFilesService {
   async submit(actor: StudentActor, input: unknown, requestId: string): Promise<SubmissionDetail> {
     const parsed = parse(SubmitInputSchema, input, requestId);
     const detail = await this.repository.detail(actor, parsed.assignmentId, requestId);
-    if (detail.requirements.some((requirement) => requirement.kind === "github_repository") && !(await this.repository.getProfile(actor, requestId)).githubUsername) {
+    const draft = detail.latestSubmission?.id === parsed.expectedDraftId && detail.latestSubmission.isDraft ? detail.latestSubmission : null;
+    const presentRequirementIds = new Set(draft?.items.map((item) => item.requirementId) ?? []);
+    const missing = detail.requirements.filter((requirement) => requirement.required && !presentRequirementIds.has(requirement.id));
+    if (draft && missing.length > 0) {
+      throw new AppError("VALIDATION_ERROR", "Preencha todos os entregáveis obrigatórios.", requestId, Object.fromEntries(missing.map((requirement) => [`items.${requirement.label}`, ["Entregável obrigatório ausente."]])));
+    }
+    if (detail.requirements.some((requirement) => requirement.required && requirement.kind === "github_repository") && !(await this.repository.getProfile(actor, requestId)).githubUsername) {
       throw new AppError("VALIDATION_ERROR", "Configure seu GitHub antes de enviar esta atividade.", requestId, { githubUsername: ["GitHub obrigatório para esta atividade."] });
     }
     return this.repository.submit(actor, parsed.assignmentId, parsed.expectedDraftId, requestId);

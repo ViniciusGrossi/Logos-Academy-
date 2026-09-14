@@ -7,6 +7,7 @@ import type { AttendanceEntry, AttendanceStatus, SessionStatus, SessionSummary }
 import { MagneticAction, MetricStrip, SpotlightCard, StateScene, StatusBadge } from "@/components/academy";
 import { apiMutation, useLiveApi } from "@/components/prototype/live-api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AcademySelect } from "./academy-select";
 import { useAdminClass } from "./admin-data";
 import { activeEnrollments, attendanceLabels, sessionStatusLabels, toIsoDateTime, toLocalDateTime } from "./admin-utils";
 import styles from "./admin-experience.module.css";
@@ -79,7 +80,7 @@ function AttendancePanel({ session, enrollments, attendance, setAttendance }: { 
       return <article className={styles.attendanceRow} key={enrollment.id}>
         <div className={styles.attendancePerson}><span className={styles.avatar}>{enrollment.studentName.slice(0, 2).toUpperCase()}</span><span><strong>{enrollment.studentName}</strong><small>{enrollment.curriculumName}</small></span></div>
         <div className={styles.attendanceControls}>
-          <label className={styles.formField}><span className="sr-only">Presença de {enrollment.studentName}</span><select className={styles.select} value={draft.status} onChange={(event) => setAttendance((current) => ({ ...current, [enrollment.id]: { ...draft, status: event.target.value as AttendanceStatus } }))}>{Object.entries(attendanceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label className={styles.formField}><span className="sr-only">Presença de {enrollment.studentName}</span><AcademySelect ariaLabel={`Presença de ${enrollment.studentName}`} value={draft.status} onValueChange={(next) => setAttendance((current) => ({ ...current, [enrollment.id]: { ...draft, status: next as AttendanceStatus } }))} items={Object.entries(attendanceLabels).map(([value, label]) => ({ value, label }))} /></label>
           <label className={styles.formField}><span className="sr-only">Nota privada de {enrollment.studentName}</span><input className={styles.field} value={draft.privateNote} onChange={(event) => setAttendance((current) => ({ ...current, [enrollment.id]: { ...draft, privateNote: event.target.value } }))} placeholder="Nota privada opcional" /></label>
         </div>
       </article>;
@@ -105,7 +106,7 @@ function SchedulePanel({ session, reload }: { session: SessionSummary; reload: (
   return <div className={styles.sectionGrid}><section className={styles.paper}><div className={styles.paperHeader}><div><h2>Horário e estado</h2><p>Remarcações preservam a posição da aula e a exigência de presença.</p></div><CalendarClock aria-hidden="true" /></div><div className={styles.paperBody}><form className={styles.form} onSubmit={save}><div className={styles.formGrid}>
     <label className={styles.formField}><span className={styles.label}>Início</span><input className={styles.field} name="startsAt" type="datetime-local" defaultValue={toLocalDateTime(session.startsAt)} required /></label>
     <label className={styles.formField}><span className={styles.label}>Fim</span><input className={styles.field} name="endsAt" type="datetime-local" defaultValue={toLocalDateTime(session.endsAt)} required /></label>
-    <label className={styles.formField}><span className={styles.label}>Status</span><select className={styles.select} name="status" defaultValue={session.status}><option value="scheduled">Agendada</option><option value="rescheduled">Remarcada</option><option value="completed">Concluída</option><option value="cancelled">Cancelada</option></select></label>
+    <label className={styles.formField}><span className={styles.label}>Status</span><AcademySelect name="status" ariaLabel="Status do encontro" defaultValue={session.status} items={[{ value: "scheduled", label: "Agendada" }, { value: "rescheduled", label: "Remarcada" }, { value: "completed", label: "Concluída" }, { value: "cancelled", label: "Cancelada" }]} /></label>
   </div>{notice && <p className={styles.notice} role="status">{notice}</p>}<div className={styles.formActions}><MagneticAction><button className={styles.toolbarAction} disabled={pending}>{pending ? "Atualizando…" : "Atualizar encontro"}</button></MagneticAction></div></form></div></section>
   <SpotlightCard className={styles.paper}><div className={styles.paperHeader}><div><h2>Regra de conclusão</h2><p>Calendário flexível; presença inegociável.</p></div></div><div className={styles.paperBody}><p className={styles.warning}>Remarcar não remove a aula do percurso. Para concluir qualquer módulo, cada aluno deve participar dos 16 encontros ou cumprir a reposição correspondente.</p></div></SpotlightCard></div>;
 }

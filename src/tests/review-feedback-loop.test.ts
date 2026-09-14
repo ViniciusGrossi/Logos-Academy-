@@ -42,6 +42,12 @@ describe("review-feedback-loop", () => {
     expect(review.criteria).toHaveLength(1);
   });
 
+  it("rejeita decisão incoerente com a rubrica antes da RPC", async () => {
+    const service = new ReviewFeedbackService(new Store());
+    await expect(service.publish(admin, { submissionId, decision: "approved", feedback: "Ok", criteria: [{ criterionId, result: "needs_adjustment" }] }, "request")).rejects.toMatchObject({ code: "VALIDATION_ERROR", fieldErrors: { decision: [expect.any(String)] } });
+    await expect(service.publish(admin, { submissionId, decision: "revision_requested", feedback: "Ok", criteria: [{ criterionId, result: "met" }] }, "request")).rejects.toMatchObject({ code: "VALIDATION_ERROR", fieldErrors: { decision: [expect.any(String)] } });
+  });
+
   it("GWT-05/GWT-07 preserva negação tipada de revisão concorrente ou tenant estranho", async () => {
     const error = new AppError("FORBIDDEN", "Recurso indisponível.", "request");
     expect(error.code).toBe("FORBIDDEN");

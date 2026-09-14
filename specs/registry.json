@@ -116,6 +116,42 @@
       "built": false,
       "reviewed": false,
       "dependencies": ["auth-estudio-vivo", "student-home-journey-concepts", "projects-portfolio-completion"]
+    },
+    "project-living-dossier": {
+      "spec": "docs/specs/project-living-dossier.md",
+      "status": "approved",
+      "wave": 8,
+      "scope": "student-project-detail",
+      "built": true,
+      "reviewed": false,
+      "dependencies": ["student-experience-elevation", "projects-portfolio-completion"]
+    },
+    "student-activity-workbench": {
+      "spec": "docs/specs/student-activity-workbench.md",
+      "status": "approved",
+      "wave": 8,
+      "scope": "student-activity-detail",
+      "built": true,
+      "reviewed": false,
+      "dependencies": ["student-experience-elevation", "activity-submission-files", "project-living-dossier"]
+    },
+    "student-knowledge-atlas": {
+      "spec": "docs/specs/student-knowledge-atlas.md",
+      "status": "approved",
+      "wave": 9,
+      "scope": "student-glossary",
+      "built": false,
+      "reviewed": false,
+      "dependencies": ["student-experience-elevation", "student-home-journey-concepts"]
+    },
+    "explorer-activity-system-v2": {
+      "spec": "docs/specs/explorer-activity-system-v2.md",
+      "status": "approved",
+      "wave": 9,
+      "scope": "curriculum-activity-review-system",
+      "built": false,
+      "reviewed": false,
+      "dependencies": ["student-activity-workbench", "activity-submission-files", "review-feedback-loop"]
     }
   }
 }
