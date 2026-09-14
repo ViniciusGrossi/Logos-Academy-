@@ -85,13 +85,14 @@ function parseActivityCriterion(value: unknown, requestId: string): ActivityCrit
 
 function parseSubmission(value: unknown, requestId: string): SubmissionDetail {
   if (!isRecord(value) || !isUuid(value.id) || !isUuid(value.assignmentId) || !isPositiveInteger(value.version)
-    || typeof value.isDraft !== "boolean" || !(typeof value.submittedAt === "string" || value.submittedAt === null) || !Array.isArray(value.items)) {
+    || typeof value.isDraft !== "boolean" || typeof value.isLate !== "boolean" || !(typeof value.submittedAt === "string" || value.submittedAt === null) || !Array.isArray(value.items) || !Array.isArray(value.reviews)) {
     throw new AppError("INTERNAL_ERROR", "Resposta de entrega inválida.", requestId);
   }
   return {
-    id: value.id, assignmentId: value.assignmentId, version: value.version, isDraft: value.isDraft, submittedAt: value.submittedAt,
+    id: value.id, assignmentId: value.assignmentId, version: value.version, isDraft: value.isDraft, isLate: value.isLate, submittedAt: value.submittedAt,
     items: value.items.map((item) => parseSubmissionItem(item, requestId)),
     review: value.review === null ? null : parseReview(value.review, requestId),
+    reviews: value.reviews.map((review) => parseReview(review, requestId)),
   };
 }
 
@@ -99,7 +100,8 @@ function parseSubmissionItem(value: unknown, requestId: string): SubmissionDetai
   if (!isRecord(value) || !isUuid(value.id) || !isUuid(value.requirementId)
     || !isKind(value.kind) || !(typeof value.textValue === "string" || value.textValue === null || value.textValue === undefined)
     || !(typeof value.urlValue === "string" || value.urlValue === null || value.urlValue === undefined)
-    || !(isUuid(value.fileId) || value.fileId === null || value.fileId === undefined)) {
+    || !(isUuid(value.fileId) || value.fileId === null || value.fileId === undefined)
+    || !(typeof value.fileName === "string" || value.fileName === null || value.fileName === undefined)) {
     throw new AppError("INTERNAL_ERROR", "Item de entrega inválido.", requestId);
   }
   return {
@@ -107,6 +109,7 @@ function parseSubmissionItem(value: unknown, requestId: string): SubmissionDetai
     ...(typeof value.textValue === "string" ? { textValue: value.textValue } : {}),
     ...(typeof value.urlValue === "string" ? { urlValue: value.urlValue } : {}),
     ...(isUuid(value.fileId) ? { fileId: value.fileId } : {}),
+    fileName: typeof value.fileName === "string" ? value.fileName : null,
   };
 }
 

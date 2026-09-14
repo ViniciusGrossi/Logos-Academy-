@@ -54,6 +54,8 @@ export const MakeupSchema = z.object({ makeupSessionId: UuidSchema.optional(), c
 export const StudentAttendanceQuerySchema = z.object({ enrollmentId: UuidSchema.optional(), cursor: z.string().min(1).optional(), limit: z.coerce.number().int().min(1).max(100).default(25) }).strict();
 export const JourneyQuerySchema = z.object({ enrollmentId: UuidSchema.optional() }).strict();
 export const ConceptsQuerySchema = z.object({ search: z.string().trim().min(1).max(120).optional(), cursor: z.string().min(1).optional(), limit: z.coerce.number().int().min(1).max(100).default(25) }).strict();
+export const LibraryQuerySchema = z.object({ kind: z.enum(["prompt", "design_system"]), search: z.string().trim().min(1).max(120).optional(), cursor: z.string().min(1).optional(), limit: z.coerce.number().int().min(1).max(100).default(25) }).strict();
+export const LibraryResourcePathSchema = z.object({ resourceId: UuidSchema }).strict();
 
 export type ScheduleInput = z.infer<typeof ScheduleInputSchema>;
 export type InviteStudentInput = z.infer<typeof InviteStudentSchema>;

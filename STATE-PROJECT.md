@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-11
+date: 2026-09-13
 fase_atual: "12"
-etapa_atual: "Milestone visual concluído"
+etapa_atual: "Gate da spec Explorer Activity System v2"
 produto_tipo: "saas-premium"
-proximo_passo: "Implementar e validar o redesign Visual Product 2026 de Início, Jornada e Projetos"
+proximo_passo: "Aguardar aprovação da spec explorer-activity-system-v2; depois corrigir currículo, fluxo de revisão e Mesa de Atividade"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -19,7 +19,7 @@ gates:
   fase_10: pass
   fase_11: pass
   fase_12: pass
-features: { draft: 0, approved: 12, built: 12, reviewed: 12 }
+features: { draft: 0, approved: 14, built: 14, reviewed: 12 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08
@@ -34,9 +34,27 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada e Projetos; produção permanece estável até validação visual e deploy aprovado.
+- [ ] `explorer-activity-system-v2`: auditoria curricular/técnica concluída; proposta das 16 atividades e spec de implementação aguardam aprovação humana antes de migrations, contratos e UI.
+- [ ] `student-activity-workbench`: candidato desktop v7 com circuito contínuo entre núcleo, percurso e envio; aguarda novo gate visual humano antes da responsividade.
+- [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-09-12] Acabamento v7 da emenda do circuito concluído: as terminações da hero foram recalculadas na altura real da borda, os seis pares agora se prolongam sobre ela e encontram o campo da página com desvio máximo de 0,8 px, sem terminais arredondados visíveis. Auditoria do fluxo confirmou que `/atividade` é orientada pelo `assignmentId`: o endpoint deriva projeto e trilha pelo ciclo da atividade, e a liberação de uma atividade de outro ciclo coloca o respectivo projeto em andamento. Assim, ao entrar pela navegação normal, o novo projeto e suas atividades substituem os anteriores; uma URL antiga com `assignmentId` continua exibindo deliberadamente o histórico antigo. Browser 1440, 64 testes, TypeScript, lint e build passaram.
+
+- [2026-09-12] Refinamento v6 dos circuitos da Atividade concluído: a emenda hero/conteúdo foi alinhada com menos de 1 px de diferença; os seis fios ganharam rotas mais abertas, revestimento reduzido para 5 px, menor opacidade e ficaram sem contorno preto. A convergência foi medida no DOM e termina a 0,6 px do centro superior do botão “Enviar nova versão”, com conector vertical até o CTA. Browser 1440 e movimento reduzido passaram; 64 testes, TypeScript, lint e build passaram.
+
+- [2026-09-12] Circuito visual v5 da Atividade concluído: seis fios Bézier com revestimento de 8 px, condutor e pulso interno saem visivelmente do núcleo “07”, percorrem a oficina em rotas diferentes e convergem no conector da ação “Enviar nova versão”. Opacidade foi calibrada para manter o conteúdo legível; movimento reduzido remove os pulsos. Browser 1440 e página inteira passaram; 64 testes, TypeScript, lint e build passaram.
+
+- [2026-09-12] Desktop v4 de `student-activity-workbench` concluído após feedback visual: hero reconstruído como núcleo energético com Hover Grid e circuito pulsante até a área de envio; feedback ganhou entrada e chamadas finitas; “Pronto significa” virou checkpoint interativo; passos viraram rota conectada; apoios usam disclosures animados; Nova iteração ganhou preparação, pendências e progresso; Qualidade virou seção vertical própria; Histórico virou timeline expansível. Navegação 01–04, tema claro/escuro e movimento reduzido foram validados no browser; 64 testes, TypeScript, lint e build passaram.
+
+- [2026-09-12] Polish desktop v3 de `student-activity-workbench` concluído com `component-scout` e `ui-polisher`: índice sticky com seção ativa e `aria-current`, CTA principal com resposta magnética contida, estado visual do anexo, hovers direcionais, disclosures táteis e motion focal sem loops ornamentais. A inspeção real em 1440 claro/escuro confirmou o índice abaixo do header, navegação correta e `prefers-reduced-motion`; 64 testes, TypeScript, lint focalizado e build passaram. Aguarda gate visual humano.
+
+- [2026-09-12] Candidato desktop v2 de `student-activity-workbench` concluído: a Atividade ganhou orientação pedagógica, “pronto significa”, passos, apoios recolhíveis, múltiplos entregáveis, critérios atômicos, feedback geral e por critério, restauração segura após revisão, indicação de atraso, recibo de rascunho e histórico expansível com abertura de arquivos. A migration 0047 reescreve as 16 atividades a partir do currículo e preserva RLS/imutabilidade em runtime. Browser 1440 claro/escuro passou sem overflow; 64 testes, TypeScript, lint, build e `validate.py` passaram. Aguarda gate visual; migrations 0045–0047 continuam apenas locais.
+
+- [2026-09-11] Candidato desktop de `student-activity-workbench` entregue para gate: `/atividade` virou uma mesa de construção com percurso real do projeto, feedback prioritário, fluxo conceito → decisão → evidência → feedback → revisão, formulário tipado para texto/arquivo/link/GitHub, critérios, conceitos e histórico. O contrato `ActivityDetail`, demo e migration 0046 foram sincronizados sem rota nova; 1440 px passou em tema claro/escuro, sem overflow ou erro de console. 63 testes, TypeScript e lint passaram. Responsividade e build final aguardam aprovação do desktop.
+
+- [2026-09-11] `project-living-dossier` implementado localmente: `/projetos/[projectId]` ganhou Norte do projeto, brief pedagógico, critérios, conceitos e Mapa de decisões com versões, decisões e feedbacks vinculados às atividades. O contrato `ProjectDetail`, o modo demo e a migration 0045 foram sincronizados; migration ainda não aplicada em produção. Inspeção em 375/768/1440 passou sem overflow; 63 testes, TypeScript, lint e build passaram, restando apenas o warning preexistente de `isActionable` em `activity-detail.tsx`. Dev server reiniciado após o build.
 
 - [2026-09-11] Iteração `auth-estudio-vivo` v4 — Campo Geodésico — concluída localmente: os anéis externos foram removidos e substituídos por malha interna, nós luminosos, varredura, balizas e constelações laterais. Explorer, Builder e Engineer flutuam verticalmente em cadências diferentes e usam glow pulsante contido; o estágio atual recebe ênfase maior. O Smooth Write existente voltou a aparecer nos campos com cursor laranja animado e sem cursor nativo duplicado. Login, ativação e recuperação foram inspecionados em 375/768/1440 sem overflow; `prefers-reduced-motion` congela cards, glow, campo e cursor. 63 testes e TypeScript passaram; lint e build passaram com apenas o warning preexistente de `isActionable` em `activity-detail.tsx`. Produção não foi alterada.
 
@@ -145,13 +163,15 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Bloqueios
 
+- Migrations `0045_project_living_dossier.sql` e `0046_activity_workbench_context.sql` estão somente no repositório local; aplicar no Supabase, nesta ordem, antes de publicar o novo frontend.
 - Fase 12 — `npm audit` ainda reporta 2 vulnerabilidades altas em PostCSS transitivo do Next 15 e 1 crítica/4 moderadas no toolchain Vitest/Vite. A correção automática exige `npm audit fix --force` (Next 16 + Vitest 5), uma atualização major que requer aprovação explícita e validação completa antes de novo deploy.
 - Registro vivo de ADRs expõe apenas ADR-030, embora o playbook cite ADR-025–031; não numerar ADR global até o checkpoint corrigir a deriva.
 - Git: o projeto vive dentro do repo do vault (sem `.git` próprio) e ~40 arquivos versionáveis seguem untracked (`docs/`, `specs/`, `supabase/migrations/`, `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`). Commits anteriores só rastrearam `app/` e `src/`. Regularizar antes do deploy (ADR-035: repo GitHub dedicado via `git init` na subpasta).
 
 ## Lições
 
-- [2026-09-11] Executar `next build` enquanto `next dev` usa a mesma pasta `.next` pode deixar o HTML ativo com chunks CSS inválidos, exibindo o SVG bruto. Encerrar o servidor antes do build e reiniciá-lo depois de validar.
+- [2026-09-12] Em polish solicitado como “mais efeitos e componentes”, microinterações isoladas não bastam: a diferença precisa aparecer na composição e na hierarquia do primeiro viewport. Na Atividade, o foco aprovado para nova tentativa foi núcleo energético + circuito funcional, com os demais movimentos subordinados ao fluxo pedagógico.
+- [2026-09-12] Executar `next build` enquanto qualquer `next dev` usa a mesma pasta `.next` deixa HTML e chunks CSS incompatíveis e pode exibir o SVG bruto. Antes de todo build, localizar e encerrar os processos dev deste projeto; depois do build, reiniciar o servidor e validar visualmente o mesmo `localhost` entregue ao usuário.
 - [2026-08-31] A plataforma não substitui a aula presencial → conceitos são referência; atividades e acompanhamento prolongam o encontro.
 - [2026-08-31] Dados pessoais do aluno não justificam um tenant por aluno → tenant representa a Logos Academy; propriedade individual usa aluno, matrícula e RLS.
 - [2026-08-31] “GitHub conectado” não implica OAuth → no MVP, vincular perfil e enviar URL do repositório.

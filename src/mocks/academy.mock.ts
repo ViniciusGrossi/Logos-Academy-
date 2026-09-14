@@ -58,3 +58,162 @@ export const adminDashboard = {
 };
 
 export type DemoState = "content" | "loading" | "empty" | "error";
+
+export type ExplorerActivitySeed = {
+  project: number;
+  title: string;
+  challenge: string;
+  objective: string;
+  steps: readonly string[];
+  requirements: readonly { kind: "text" | "file" | "external_link" | "github_repository"; label: string; required: boolean }[];
+  criteria: readonly string[];
+  planB: string;
+};
+
+/** Conteúdo compacto do currículo Explorer v2 para o modo demo. */
+export const explorerActivitySeeds: readonly ExplorerActivitySeed[] = [
+  {
+    project: 1, title: "Primeiro experimento com IA",
+    challenge: "Descobrir em quatro testes quando uma resposta de IA ajuda, surpreende, parece estranha ou precisa ser verificada.",
+    objective: "Explicar entrada e saída de uma IA generativa e reconhecer pelo menos uma resposta que exige verificação.",
+    steps: ["Faça quatro perguntas com intenções diferentes.", "Classifique cada resposta.", "Escolha uma resposta que precisa ser conferida."],
+    requirements: [{ kind: "text", label: "Registro dos quatro testes", required: true }, { kind: "text", label: "Explicação crítica", required: true }, { kind: "file", label: "Evidência visual", required: false }],
+    criteria: ["Identifica a entrada enviada à IA", "Identifica a saída devolvida pela IA", "Registra exatamente quatro testes", "Aponta uma resposta que exige verificação", "Explica por que a IA pode errar"],
+    planB: "Use respostas previamente salvas ou simule previsões de palavras no papel.",
+  },
+  {
+    project: 1, title: "Duelo de ferramentas",
+    challenge: "Executar a mesma tarefa em duas ferramentas e escolher a mais adequada com base em critérios observáveis.",
+    objective: "Comparar duas ferramentas de IA pela mesma tarefa e justificar qual serve melhor ao assistente do ciclo.",
+    steps: ["Defina uma tarefa única.", "Execute a mesma instrução em duas ferramentas.", "Compare clareza, utilidade e confiabilidade.", "Registre a escolha no formato X para Y porque Z."],
+    requirements: [{ kind: "text", label: "Tabela comparativa", required: true }, { kind: "text", label: "Escolha justificada", required: true }, { kind: "file", label: "Comparação visual", required: false }],
+    criteria: ["Usa a mesma tarefa nas duas ferramentas", "Compara a clareza", "Compara a utilidade", "Considera a verificação", "Justifica com um critério observável"],
+    planB: "Compare respostas salvas ou exemplos impressos preparados pelo orientador.",
+  },
+  {
+    project: 1, title: "Laboratório de prompts: da v0 à v3",
+    challenge: "Transformar uma instrução vaga em um prompt com contexto, objetivo, restrições e formato de saída.",
+    objective: "Produzir e comparar quatro estados do mesmo prompt: original, v1, v2 e v3.",
+    steps: ["Registre o prompt original.", "Torne o pedido específico na v1.", "Acrescente contexto e objetivo na v2.", "Defina restrições e formato na v3.", "Compare os resultados."],
+    requirements: [{ kind: "text", label: "Histórico do prompt", required: true }, { kind: "text", label: "Amostra de respostas", required: true }, { kind: "text", label: "Análise da iteração", required: true }],
+    criteria: ["A v3 informa o contexto", "A v3 declara um objetivo", "A v3 contém uma restrição", "A v3 define o formato esperado", "A análise compara versões"],
+    planB: "Revise prompts impressos em grupo e simule respostas com colegas.",
+  },
+  {
+    project: 1, title: "Project Day: Meu Assistente Inteligente",
+    challenge: "Entregar um assistente de escopo pequeno que reconheça limites e melhore após testes.",
+    objective: "Construir, testar, corrigir, documentar e apresentar o Projeto 1.",
+    steps: ["Defina problema e público.", "Escreva personalidade, prompt e limites.", "Crie três exemplos.", "Execute cinco testes.", "Aplique uma melhoria.", "Prepare a demonstração."],
+    requirements: [{ kind: "text", label: "Ficha do assistente", required: true }, { kind: "text", label: "Prompt principal", required: true }, { kind: "text", label: "Exemplos", required: true }, { kind: "text", label: "Relatório de testes", required: true }, { kind: "text", label: "Melhoria aplicada", required: true }, { kind: "external_link", label: "Demonstração gravada", required: false }],
+    criteria: ["Resolve um problema específico", "O prompt contém papel, objetivo, tom e limites", "Possui três exemplos", "Registra cinco testes", "Aplica uma melhoria baseada em teste", "Pode ser explicado em três minutos"],
+    planB: "Demonstre com respostas salvas e apresente o roteiro de testes.",
+  },
+  {
+    project: 2, title: "Três direções para uma imagem",
+    challenge: "Gerar três versões da mesma ideia, alterando somente um elemento visual por vez.",
+    objective: "Experimentar estilo, luz, cenário ou composição e justificar uma escolha visual.",
+    steps: ["Defina ideia e mensagem.", "Produza a imagem-base.", "Crie duas variações controladas.", "Compare as versões.", "Escolha uma direção."],
+    requirements: [{ kind: "file", label: "Grade visual", required: true }, { kind: "text", label: "Prompts", required: true }, { kind: "text", label: "Curadoria", required: true }],
+    criteria: ["A grade contém três versões", "Cada variação muda um elemento", "Os prompts identificam a mudança", "A justificativa cita um aspecto visual", "A escolha sustenta a mensagem"],
+    planB: "Monte um moodboard ou escreva os três prompts para geração posterior.",
+  },
+  {
+    project: 2, title: "Brief de campanha que comunica",
+    challenge: "Transformar a direção visual em uma campanha com público, mensagem, slogan, copy e tom coerentes.",
+    objective: "Definir o conceito criativo completo do Projeto 2.",
+    steps: ["Nomeie a campanha.", "Defina o público.", "Escreva a mensagem central.", "Defina estilo e tom.", "Crie slogan e copy.", "Selecione a imagem."],
+    requirements: [{ kind: "text", label: "Brief criativo", required: true }, { kind: "text", label: "Slogan e copy", required: true }, { kind: "file", label: "Imagem principal", required: true }],
+    criteria: ["O público é específico", "A mensagem cabe em uma frase", "O slogan sustenta a mensagem", "A copy é adequada ao público", "A imagem sustenta a campanha"],
+    planB: "Crie o brief em papel ou slides e reutilize a grade da atividade anterior.",
+  },
+  {
+    project: 2, title: "Vídeo curto: roteiro à primeira versão",
+    challenge: "Transformar o brief em uma peça de 15 a 30 segundos com começo, meio e fim.",
+    objective: "Produzir uma primeira versão assistível ou um storyboard temporal completo da campanha.",
+    steps: ["Escreva o roteiro.", "Divida em cenas e durações.", "Defina imagens.", "Defina áudio.", "Edite e confira a mensagem."],
+    requirements: [{ kind: "text", label: "Roteiro temporal", required: true }, { kind: "external_link", label: "Primeira versão", required: true }, { kind: "text", label: "Copy da peça", required: true }, { kind: "file", label: "Backup", required: false }],
+    criteria: ["O roteiro tem começo, meio e fim", "A duração está entre 15 e 30 segundos", "O link abre para o orientador", "Imagem e áudio sustentam a mensagem", "A peça é compreensível"],
+    planB: "Crie um storyboard compartilhável ou use imagens estáticas com narração.",
+  },
+  {
+    project: 2, title: "Project Day: Creative Studio",
+    challenge: "Finalizar e apresentar uma campanha cuja imagem, peça, copy e processo comuniquem a mesma ideia.",
+    objective: "Concluir, documentar e apresentar o Projeto 2.",
+    steps: ["Revalide público e mensagem.", "Finalize a imagem.", "Finalize vídeo ou storyboard.", "Revise a copy.", "Documente o processo.", "Apresente em três minutos."],
+    requirements: [{ kind: "text", label: "Resumo da campanha", required: true }, { kind: "file", label: "Imagem final", required: true }, { kind: "external_link", label: "Peça audiovisual", required: true }, { kind: "text", label: "Copy final", required: true }, { kind: "text", label: "Processo criativo", required: true }],
+    criteria: ["O resumo identifica público e mensagem", "A imagem está legível", "A peça abre pelo link", "A copy segue o brief", "O processo registra uma decisão", "A apresentação dura até três minutos"],
+    planB: "Entregue imagem, storyboard e roteiro ou demonstre a peça offline.",
+  },
+  {
+    project: 3, title: "Raio-X de uma automação",
+    challenge: "Representar uma tarefa repetitiva como entrada, processamento, decisão e saída.",
+    objective: "Desenhar um fluxo simples e explicar para quem ele gera valor.",
+    steps: ["Escolha uma tarefa repetitiva.", "Identifique a entrada.", "Descreva o processamento.", "Defina a saída.", "Nomeie o usuário beneficiado.", "Resuma o valor."],
+    requirements: [{ kind: "file", label: "Diagrama do fluxo", required: true }, { kind: "text", label: "Ficha do processo", required: true }, { kind: "text", label: "Frase de valor", required: true }],
+    criteria: ["Possui uma entrada", "Possui processamento", "Possui uma saída", "Nomeia o usuário", "A frase corresponde ao fluxo"],
+    planB: "Desenhe com papel ou post-its e fotografe o resultado.",
+  },
+  {
+    project: 3, title: "Primeiro workflow em execução",
+    challenge: "Transformar o diagrama em um workflow mínimo realmente executado.",
+    objective: "Construir e testar um workflow básico no n8n ou alternativa disponível.",
+    steps: ["Crie o gatilho.", "Adicione um processamento.", "Configure uma saída.", "Execute um teste.", "Registre fluxo e resultado."],
+    requirements: [{ kind: "external_link", label: "Workflow compartilhado", required: false }, { kind: "file", label: "Print da execução", required: true }, { kind: "text", label: "Explicação dos nós", required: true }, { kind: "text", label: "Caso de teste", required: true }],
+    criteria: ["Existe um gatilho", "Existe processamento", "Existe uma saída", "O teste chegou à saída", "A explicação não expõe segredo"],
+    planB: "Use o ambiente do orientador, um template ou simule com formulário e planilha.",
+  },
+  {
+    project: 3, title: "IA como etapa do fluxo",
+    challenge: "Inserir uma etapa de IA com entrada definida, resposta previsível e ação seguinte.",
+    objective: "Construir ou simular um workflow em que a IA produz uma saída usada pela automação.",
+    steps: ["Defina a entrada.", "Escreva um prompt com formato.", "Ligue a resposta à próxima ação.", "Execute um teste.", "Registre o percurso completo."],
+    requirements: [{ kind: "file", label: "Fluxo com IA", required: true }, { kind: "text", label: "Prompt da automação", required: true }, { kind: "text", label: "Registro do teste", required: true }, { kind: "external_link", label: "Workflow compartilhado", required: false }],
+    criteria: ["A entrada está definida", "O prompt define o formato", "A resposta está registrada", "Existe uma ação posterior", "O teste chega à saída final"],
+    planB: "Use uma resposta mockada e execute manualmente somente a etapa de IA.",
+  },
+  {
+    project: 3, title: "Project Day: Automation Lab",
+    challenge: "Entregar uma automação real ou simulada que resolva um problema pequeno de ponta a ponta.",
+    objective: "Concluir, testar, documentar e apresentar o Projeto 3.",
+    steps: ["Declare problema e resultado.", "Revise o diagrama.", "Execute um caso de sucesso.", "Descreva uma falha segura.", "Registre limitações.", "Prepare a demonstração."],
+    requirements: [{ kind: "text", label: "Ficha da automação", required: true }, { kind: "file", label: "Diagrama final", required: true }, { kind: "file", label: "Evidência de execução", required: true }, { kind: "text", label: "Teste e resultado", required: true }, { kind: "external_link", label: "Demonstração", required: false }],
+    criteria: ["O problema cabe em uma frase", "O diagrama mostra o fluxo", "A evidência mostra execução", "O teste corresponde ao objetivo", "Registra uma limitação", "Explica o fluxo completo"],
+    planB: "Entregue diagrama, prompt, resposta mockada e roteiro da simulação.",
+  },
+  {
+    project: 4, title: "Product Brief: problema antes da solução",
+    challenge: "Investigar uma necessidade real e reduzir a ideia a um produto demonstrável em uma semana.",
+    objective: "Definir problema, usuário, solução, papel da IA e limites do MVP do Projeto 4.",
+    steps: ["Descreva problema e usuário.", "Registre a solução atual.", "Converse com uma pessoa.", "Proponha a solução.", "Defina entrada e saída.", "Fixe o escopo."],
+    requirements: [{ kind: "text", label: "Product Brief", required: true }, { kind: "text", label: "Registro de descoberta", required: true }, { kind: "text", label: "Escopo do MVP", required: true }],
+    criteria: ["O problema não começa pela ferramenta", "O usuário está identificado", "Há descoberta real", "O papel da IA está explícito", "A demo está definida", "O escopo separa entra e fica fora"],
+    planB: "Use entrevista em dupla, relato fornecido e template impresso.",
+  },
+  {
+    project: 4, title: "Blueprint da solução",
+    challenge: "Desenhar o caminho completo do usuário e localizar onde IA ou automação participa.",
+    objective: "Produzir o blueprint do MVP com entrada, processamento, resultado e demonstração.",
+    steps: ["Desenhe o ponto inicial.", "Mostre a entrada.", "Represente processamento e IA.", "Desenhe o resultado.", "Marque a demo.", "Liste materiais e backups."],
+    requirements: [{ kind: "file", label: "Wireframe", required: true }, { kind: "file", label: "Fluxo do produto", required: true }, { kind: "text", label: "Plano de build", required: true }, { kind: "text", label: "Roteiro da demo", required: true }],
+    criteria: ["O wireframe mostra a entrada", "O fluxo mostra o dado", "A etapa de IA está identificada", "O resultado está representado", "O roteiro demonstra a promessa", "Existe um backup executável"],
+    planB: "Desenhe em papel, fotografe e escreva o roteiro.",
+  },
+  {
+    project: 4, title: "Build Day: AI Product",
+    challenge: "Construir primeiro o núcleo demonstrável e cortar qualquer extra que ameace a entrega.",
+    objective: "Produzir, testar e documentar uma versão demonstrável do Projeto 4.",
+    steps: ["Construa o caminho mínimo.", "Teste uma entrada.", "Confira o resultado.", "Reduza o escopo.", "Capture evidências.", "Ensaie a apresentação."],
+    requirements: [{ kind: "external_link", label: "Demo do MVP", required: true }, { kind: "text", label: "Documentação do produto", required: true }, { kind: "file", label: "Evidência de teste", required: true }, { kind: "text", label: "Registro de escopo", required: true }, { kind: "github_repository", label: "Repositório do produto", required: false }],
+    criteria: ["A demo abre para o orientador", "A demo apresenta uma entrada", "A demo apresenta um resultado", "Existe um teste concluído", "Declara uma limitação", "Registra um corte de escopo", "O repositório corresponde ao produto"],
+    planB: "Demonstre com formulário, slides, protótipo, vídeo ou automação parcial.",
+  },
+  {
+    project: 4, title: "Demo Day: eu construí isto",
+    challenge: "Apresentar o AI Product e provar a evolução dos quatro projetos com backup pronto.",
+    objective: "Apresentar o Projeto 4, consolidar o portfólio Explorer e registrar a reflexão final.",
+    steps: ["Apresente o problema.", "Explique a solução.", "Demonstre o produto.", "Conte o principal aprendizado.", "Use o backup se necessário.", "Publique o portfólio."],
+    requirements: [{ kind: "external_link", label: "Portfólio Explorer", required: true }, { kind: "file", label: "Backup da apresentação", required: true }, { kind: "external_link", label: "Registro do Demo Day", required: false }, { kind: "text", label: "Reflexão final", required: true }, { kind: "github_repository", label: "Repositório final", required: false }],
+    criteria: ["Apresenta o problema", "Explica a solução", "Mostra o resultado", "Respeita cinco minutos", "Mostra o Projeto 1", "Mostra o Projeto 2", "Mostra o Projeto 3", "Mostra o Projeto 4", "Possui backup", "Responde à reflexão"],
+    planB: "Apresente vídeo, prints, PDF ou demonstração simulada com roteiro.",
+  },
+];

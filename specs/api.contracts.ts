@@ -154,9 +154,56 @@ export interface ConceptSummary {
   releasedAt: ISODateTime;
 }
 
+export type KnowledgeContentBlock =
+  | { type: "text"; heading: string; body: string }
+  | { type: "callout"; heading: string; body: string }
+  | { type: "image"; url: string; alt: string; caption: string | null }
+  | { type: "diagram"; heading: string; nodes: readonly { label: string; detail: string }[] };
+
 export interface ConceptDetail extends ConceptSummary {
   body: string;
+  videoUrl: string | null;
+  videoTitle: string | null;
+  videoDurationMinutes: number | null;
+  readingMinutes: number;
+  contentBlocks: readonly KnowledgeContentBlock[];
   relatedConcepts: readonly ConceptSummary[];
+}
+
+export type LibraryResourceKind = "prompt" | "design_system";
+
+export interface LibraryResourceSummary {
+  id: UUID;
+  kind: LibraryResourceKind;
+  slug: string;
+  title: string;
+  summary: string;
+  releasedAt: ISODateTime;
+  lessonPosition: number;
+}
+
+export type LibraryArtifact =
+  | {
+      type: "prompt";
+      template: string;
+      variables: readonly { token: string; description: string }[];
+      exampleInput: string | null;
+      exampleOutput: string | null;
+    }
+  | {
+      type: "design_system";
+      palette: readonly { name: string; value: string; role: string }[];
+      typography: readonly { name: string; sample: string; role: string }[];
+      principles: readonly string[];
+      components: readonly { name: string; description: string }[];
+    };
+
+export interface LibraryResourceDetail extends LibraryResourceSummary {
+  body: string;
+  readingMinutes: number;
+  contentBlocks: readonly KnowledgeContentBlock[];
+  artifact: LibraryArtifact;
+  relatedResources: readonly LibraryResourceSummary[];
 }
 
 export interface ActivityCriterion {
@@ -166,12 +213,30 @@ export interface ActivityCriterion {
   position: number;
 }
 
+export interface ActivityStep {
+  position: number;
+  label: string;
+}
+
 export interface ActivityRequirement {
   id: UUID;
   kind: SubmissionItemKind;
   label: string;
   required: boolean;
   position: number;
+}
+
+export interface ActivityProjectContext {
+  id: UUID;
+  title: string;
+  cyclePosition: number;
+  activities: readonly {
+    assignmentId: UUID;
+    lessonPosition: number;
+    title: string;
+    status: AssignmentStatus;
+    latestVersion: number | null;
+  }[];
 }
 
 export interface ActivityDetail {
@@ -186,12 +251,26 @@ export interface ActivityDetail {
   dueAt: ISODateTime | null;
   status: AssignmentStatus;
   isOverdue: boolean;
+  canEdit?: boolean;
+  readOnlyReason?: "inactive_enrollment" | "submitted" | "approved" | null;
   supplementalInstructions: string | null;
+  /** Campos pedagógicos da migration 0047 — nullable durante o rollout. */
+  context: string | null;
+  expectedResult: string | null;
+  steps: readonly ActivityStep[];
+  planB: string | null;
+  reflectionPrompt: string | null;
+  portfolioEvidence: string | null;
+  toolHint: string | null;
+  /** Nullable durante o rollout da migration 0046. */
+  project: ActivityProjectContext | null;
   concepts: readonly ConceptSummary[];
   requirements: readonly ActivityRequirement[];
   criteria: readonly ActivityCriterion[];
+  latestReview?: ReviewDetail | null;
   latestSubmission: SubmissionDetail | null;
-  submissionHistory: readonly SubmissionDetail[];
+  /** A lista pode estar paginada durante o rollout, preservando a resposta legada. */
+  submissionHistory: Page<SubmissionDetail> | readonly SubmissionDetail[];
 }
 
 export interface SubmissionItemInput {
@@ -204,6 +283,8 @@ export interface SubmissionItemInput {
 
 export interface SubmissionItem extends SubmissionItemInput {
   id: UUID;
+  /** Nome real do arquivo enviado; null quando o item não é de arquivo. Migration 0047. */
+  fileName: string | null;
 }
 
 export interface CriterionReview {
@@ -227,9 +308,11 @@ export interface SubmissionDetail {
   assignmentId: UUID;
   version: number;
   isDraft: boolean;
+  isLate: boolean;
   submittedAt: ISODateTime | null;
   items: readonly SubmissionItem[];
   review: ReviewDetail | null;
+  reviews: readonly ReviewDetail[];
 }
 
 /** Entrega na fila administrativa, com a rubrica necess\u00e1ria para publicar o feedback. */
@@ -247,13 +330,31 @@ export interface ProjectSummary {
   activityCount: number;
 }
 
+export interface ProjectBrief {
+  challenge: string;
+  problem: string;
+  audience: string;
+  expectedResult: string;
+  qualityCriteria: readonly string[];
+  concepts: readonly string[];
+}
+
 export interface ProjectDetail extends ProjectSummary {
+  /** Nullable durante o rollout da migration 0045. */
+  brief: ProjectBrief | null;
   activities: readonly {
     assignmentId: UUID;
     lessonPosition: number;
     title: string;
     status: AssignmentStatus;
     latestVersion: number | null;
+    decision: string | null;
+    latestFeedback: {
+      decision: ReviewDecision;
+      feedback: string;
+      reviewerName: string;
+      reviewedAt: ISODateTime;
+    } | null;
   }[];
 }
 
@@ -424,6 +525,8 @@ export interface ApiContracts {
   }>>;
   "GET /api/student/concepts": Endpoint<PageQuery & { search?: string }, Page<ConceptSummary>>;
   "GET /api/student/concepts/:conceptId": Endpoint<{ conceptId: UUID }, ConceptDetail>;
+  "GET /api/student/library": Endpoint<PageQuery & { kind: LibraryResourceKind; search?: string }, Page<LibraryResourceSummary>>;
+  "GET /api/student/library/:resourceId": Endpoint<{ resourceId: UUID }, LibraryResourceDetail>;
   "GET /api/student/activities/:assignmentId": Endpoint<{ assignmentId: UUID }, ActivityDetail>;
   "PUT /api/student/activities/:assignmentId/draft": Endpoint<{
     assignmentId: UUID;

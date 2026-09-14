@@ -12,7 +12,7 @@ export class ProjectRepository implements ProjectStore {
   private readonly client:SupabaseClient; private readonly key:string;
   constructor(){const env=getAdminSupabaseEnv();this.key=env.PII_ENCRYPTION_KEY;this.client=createClient(env.NEXT_PUBLIC_SUPABASE_URL,env.SUPABASE_SECRET_KEY,{auth:{autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});}
   async projects(a:Actor,e:string|undefined,r:string){return this.rpc("student_projects",{p_tenant_id:a.tenantId,p_actor_user_id:a.userId,p_enrollment_id:e??null},r) as Promise<ProjectSummary[]>;}
-  async detail(a:Actor,p:string,r:string){return this.rpc("student_project_detail",{p_tenant_id:a.tenantId,p_actor_user_id:a.userId,p_project_id:p},r) as Promise<ProjectDetail>;}
+  async detail(a:Actor,p:string,r:string){return this.rpc("student_project_detail",{p_tenant_id:a.tenantId,p_actor_user_id:a.userId,p_project_id:p,p_encryption_key:this.key},r) as Promise<ProjectDetail>;}
   async portfolio(a:Actor,q:PortfolioQuery,r:string){return this.rpc("student_portfolio_page",{p_tenant_id:a.tenantId,p_actor_user_id:a.userId,p_enrollment_id:q.enrollmentId??null,p_cursor:q.cursor??null,p_limit:q.limit},r) as Promise<Page<ProjectDetail>>;}
   async completion(a:Actor,e:string,r:string){return this.rpc("admin_completion_check",{p_tenant_id:a.tenantId,p_actor_user_id:a.userId,p_enrollment_id:e},r) as Promise<CompletionCheck>;}
   async presentation(a:Actor,e:string,i:PresentationInput,r:string){return this.rpc("admin_record_presentation",{p_tenant_id:a.tenantId,p_actor_user_id:a.userId,p_enrollment_id:e,p_kind:i.kind,p_performed_at:i.performedAt,p_contextual_note:i.contextualNote??null,p_encryption_key:this.key,p_request_id:r},r) as Promise<PresentationRecord>;}

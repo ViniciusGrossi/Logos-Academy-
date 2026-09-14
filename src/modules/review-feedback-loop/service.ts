@@ -11,7 +11,12 @@ export class ReviewFeedbackService {
   }
 
   async publish(actor: AdminActor, input: unknown, requestId: string): Promise<ReviewDetail> {
-    return this.repository.publish(actor, parse(PublishReviewSchema, input, requestId), requestId);
+    const parsed = parse(PublishReviewSchema, input, requestId);
+    const needsAdjustment = parsed.criteria.some((criterion) => criterion.result === "needs_adjustment");
+    if ((parsed.decision === "approved" && needsAdjustment) || (parsed.decision === "revision_requested" && !needsAdjustment)) {
+      throw new AppError("VALIDATION_ERROR", "A decisão deve corresponder aos resultados da rubrica.", requestId, { decision: ["Use revisão solicitada quando houver ajuste; aprove somente quando todos os critérios forem atendidos."] });
+    }
+    return this.repository.publish(actor, parsed, requestId);
   }
 }
 
