@@ -49,9 +49,9 @@ export function StudentHome() {
   const x = useSpring(mapX, { stiffness: 90, damping: 28, mass: 0.7 });
   const y = useSpring(mapY, { stiffness: 90, damping: 28, mass: 0.7 });
 
-  if (loading) return <LoadingState />;
-  if (error) return <ErrorState retry={reload} message={error.message} />;
-  if (!data || data.primaryAction.kind === "none") return <EmptyState scope="missão disponível" />;
+  if (loading) return <LoadingState layout="home" />;
+  if (error) return <ErrorState layout="home" retry={reload} message={error.message} />;
+  if (!data || data.primaryAction.kind === "none") return <EmptyState layout="home" scope="missão disponível" />;
 
   const action = data.primaryAction;
   const activityHref = "assignmentId" in action ? `/atividade?assignmentId=${action.assignmentId}` : "/atividade";

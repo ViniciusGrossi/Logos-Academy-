@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-13
+date: 2026-09-15
 fase_atual: "12"
-etapa_atual: "Gate da spec Explorer Activity System v2"
+etapa_atual: "Mesa de Atividade Explorer v2 concluída e publicada no Supabase"
 produto_tipo: "saas-premium"
-proximo_passo: "Aguardar aprovação da spec explorer-activity-system-v2; depois corrigir currículo, fluxo de revisão e Mesa de Atividade"
+proximo_passo: "Planejar o deploy frontend que levará a Mesa de Atividade concluída ao ambiente público"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -34,11 +34,21 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] `explorer-activity-system-v2`: auditoria curricular/técnica concluída; proposta das 16 atividades e spec de implementação aguardam aprovação humana antes de migrations, contratos e UI.
-- [ ] `student-activity-workbench`: candidato desktop v7 com circuito contínuo entre núcleo, percurso e envio; aguarda novo gate visual humano antes da responsividade.
+- [x] `explorer-activity-system-v2`: implementação local concluída, gate visual aprovado e migrations aplicadas de forma controlada no Supabase.
+- [x] `student-activity-workbench`: Mesa de Atividade Explorer v2 validada em 1440/768/375, tema claro/escuro e movimento reduzido; gate visual aprovado.
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-09-15] Publicação controlada do Explorer v2 no Supabase: como a 0045 original tentava reescrever o snapshot imutável da v1, ela foi corrigida para acrescentar apenas os campos de brief com valores históricos preservados; o conteúdo específico entrou exclusivamente no namespace v2. Foram aplicadas 0045, 0046, 0047, 0049 e 0050. Auditoria remota confirmou currículo v2 ativo, 4 ciclos, 16 atividades, Project Days 4/8/12/16, 63 requisitos, 92 critérios, projeção `student_activity_detail` v2, RLS forçado e execução exclusiva por `service_role`.
+
+- [2026-09-15] Auditoria final da Mesa de Atividade Explorer v2: a prévia demo foi alinhada aos campos pedagógicos específicos das 16 missões (contexto, continuidade, evidência de portfólio, reflexão e ferramentas), em vez de usar textos genéricos. A suíte agora assegura que as 16 atividades e as 16 orientações existem e são completas; TypeScript, lint focalizado e 69 testes passaram. A disponibilidade remota continua condicionada ao gate humano e à aplicação controlada das migrations 0049/0050.
+
+- [2026-09-15] Sincronizado o commit remoto `de3c071` (`feat: remodela agenda e perfil do estudante`): a branch local avançou por fast-forward, preservando a Mesa de Atividade ainda em trabalho. Dependências do calendário foram instaladas; TypeScript, 69 testes e build passaram. O calendário importado mantém avisos de lint internos sem bloquear a compilação.
+
+- [2026-09-15] Correção do circuito da Mesa de Atividade: o destino dos seis fios deixou de usar uma altura fixa e agora é medido no DOM a partir do botão de envio ativo. Assim, em cada atividade e versão, a convergência termina na borda visível de “Enviar versão” ou “Enviar nova versão”, mesmo com formulários de alturas diferentes. TypeScript e 69 testes passaram.
+
+- [2026-09-15] `explorer-activity-system-v2` consolidado localmente: 16 atividades em quatro ciclos foram estruturadas com desafio, objetivo, passos, entregáveis, critérios, plano B e evidência de portfólio; cada Project Day fecha um ciclo. A Mesa de Atividade passou a exibir contexto, rota do projeto, feedback e iteração, histórico paginado (cinco versões por página), abertura de arquivo já anexado, razão explícita de somente leitura e revisões imutáveis. Contracts, Controller → Service → Repository e migrations 0049/0050 foram sincronizados. Browser validou os percursos Explorer, Automation Lab e AI Product, 1440/768/375 sem overflow, tema claro/escuro e movimento reduzido; 69 testes, TypeScript, lint e build passaram. pgTAP 047/048 foi escrito, mas não executado porque Docker/Supabase local não estão disponíveis. Aguarda gate visual e aplicação remota.
 
 - [2026-09-12] Acabamento v7 da emenda do circuito concluído: as terminações da hero foram recalculadas na altura real da borda, os seis pares agora se prolongam sobre ela e encontram o campo da página com desvio máximo de 0,8 px, sem terminais arredondados visíveis. Auditoria do fluxo confirmou que `/atividade` é orientada pelo `assignmentId`: o endpoint deriva projeto e trilha pelo ciclo da atividade, e a liberação de uma atividade de outro ciclo coloca o respectivo projeto em andamento. Assim, ao entrar pela navegação normal, o novo projeto e suas atividades substituem os anteriores; uma URL antiga com `assignmentId` continua exibindo deliberadamente o histórico antigo. Browser 1440, 64 testes, TypeScript, lint e build passaram.
 
@@ -172,6 +182,9 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 - [2026-09-12] Em polish solicitado como “mais efeitos e componentes”, microinterações isoladas não bastam: a diferença precisa aparecer na composição e na hierarquia do primeiro viewport. Na Atividade, o foco aprovado para nova tentativa foi núcleo energético + circuito funcional, com os demais movimentos subordinados ao fluxo pedagógico.
 - [2026-09-12] Executar `next build` enquanto qualquer `next dev` usa a mesma pasta `.next` deixa HTML e chunks CSS incompatíveis e pode exibir o SVG bruto. Antes de todo build, localizar e encerrar os processos dev deste projeto; depois do build, reiniciar o servidor e validar visualmente o mesmo `localhost` entregue ao usuário.
+- [2026-09-15] Estados assíncronos da área do aluno não podem usar um esqueleto universal: cada página informa um `layout` para reservar a geometria da experiência final. Ação de vazio deve levar ao próximo passo real e falha deve manter retry + retorno seguro; o `AppShell` precisa continuar fora do conteúdo assíncrono.
+- [2026-09-15] Em layouts com sidebar, os breakpoints precisam considerar a largura útil do conteúdo, não apenas o viewport. A Home deve empilhar título e indicadores ainda em larguras de notebook para evitar quebra palavra a palavra no título principal.
+- [2026-09-15] O Logos Academy está aninhado em um workspace que também possui `package-lock.json`; sem fixar `turbopack.root` no `next.config.ts`, o Next pode resolver módulos pela raiz errada e interromper a compilação de todas as páginas após uma importação nova. Após mudar dependências ou imports de páginas, reiniciar o dev server e validar as sete rotas autenticadas antes de apresentar o localhost.
 - [2026-08-31] A plataforma não substitui a aula presencial → conceitos são referência; atividades e acompanhamento prolongam o encontro.
 - [2026-08-31] Dados pessoais do aluno não justificam um tenant por aluno → tenant representa a Logos Academy; propriedade individual usa aluno, matrícula e RLS.
 - [2026-08-31] “GitHub conectado” não implica OAuth → no MVP, vincular perfil e enviar URL do repositório.

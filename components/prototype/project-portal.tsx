@@ -48,12 +48,12 @@ export function ProjectPortal() {
   const { data, error, loading, reload } = useLiveApi<readonly ProjectSummary[]>(`/api/student/projects${query}`);
   const portfolio = useLiveApi<{ items: readonly ProjectDetail[] }>(`/api/student/portfolio${query}`);
 
-  if (loading || portfolio.loading) return <LoadingState />;
-  if (error || portfolio.error) return <ErrorState retry={() => { void reload(); void portfolio.reload(); }} message={error?.message ?? portfolio.error?.message ?? "Erro"} />;
+  if (loading || portfolio.loading) return <LoadingState layout="projects" />;
+  if (error || portfolio.error) return <ErrorState layout="projects" retry={() => { void reload(); void portfolio.reload(); }} message={error?.message ?? portfolio.error?.message ?? "Erro"} />;
 
   const projects = data ?? [];
   const approved = portfolio.data?.items ?? [];
-  if (!projects.length) return <EmptyState scope="projeto iniciado" />;
+  if (!projects.length) return <EmptyState layout="projects" scope="projeto iniciado" />;
 
   const active = projects.find((project) => project.status === "in_progress") ?? projects.find((project) => project.status !== "locked") ?? projects[0];
   const totalEvidence = projects.reduce((sum, project) => sum + project.activityCount, 0);

@@ -189,8 +189,11 @@
 @keyframes ambient-pulse { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.2); } }
 @keyframes ambient-spin { to { transform: rotate(360deg); } }
 
-@media (max-width: 82rem) {
+/* O shell consome parte do viewport; empilhar antes evita que o título quebre palavra a palavra. */
+@media (max-width: 96rem) {
   .header { grid-template-columns: 1fr; }
+  .headerCopy { max-width: min(100%, 48rem); }
+  .header h1 { max-width: 13ch; font-size: clamp(3.15rem, 6vw, 5.4rem); }
   .headerStats { width: min(100%, 42rem); min-height: 0; }
 }
 

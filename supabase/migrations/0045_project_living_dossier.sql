@@ -1,13 +1,15 @@
 begin;
 
 alter table logos_academy.cycles
-  add column project_challenge text,
-  add column project_problem text,
-  add column project_audience text,
-  add column project_expected_result text,
-  add column project_quality_criteria text[],
-  add column project_concepts text[];
+  add column project_challenge text not null default 'Projeto Explorer preservado.',
+  add column project_problem text not null default 'Contexto pedagogico preservado.',
+  add column project_audience text not null default 'Estudante Explorer.',
+  add column project_expected_result text not null default 'Evidencia de aprendizagem preservada.',
+  add column project_quality_criteria text[] not null default array['Evidencia preservada'],
+  add column project_concepts text[] not null default array['Conceitos preservados'];
 
+/* O snapshot Explorer v1 e imutavel; o Explorer v2 recebe seu brief completo na 0049. */
+/*
 update logos_academy.cycles set
   project_challenge = case position
     when 1 then 'Criar um assistente de IA útil, confiável e fácil de explicar para um público específico.'
@@ -40,6 +42,7 @@ update logos_academy.cycles set
     when 3 then array['Gatilho','Entrada','Processamento','Condição','Saída']
     else array['Problema','Usuário','Escopo','MVP','Demonstração'] end;
 
+*/
 alter table logos_academy.cycles
   alter column project_challenge set not null,
   alter column project_problem set not null,

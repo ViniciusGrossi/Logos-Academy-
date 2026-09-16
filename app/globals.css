@@ -648,10 +648,27 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .state-scene-premium__copy { max-width: var(--spacing-reading); }
   .state-scene-premium__copy h2 { font-size: calc(var(--spacing-unit) * 5); }
   .state-scene-premium__copy p { margin-top: calc(var(--spacing-unit) * 2); color: var(--muted-foreground); line-height: 1.6; }
-  .state-scene-premium__skeleton { display: grid; width: min(calc(var(--spacing-unit) * 44), 28vw); gap: calc(var(--spacing-unit) * 2); }
-  .state-scene-premium__skeleton > * { height: calc(var(--spacing-unit) * 2); }
-  .state-scene-premium__skeleton > :nth-child(2) { width: 78%; }
-  .state-scene-premium__skeleton > :nth-child(3) { width: 52%; }
+  .state-scene-premium__skeleton { display: grid; width: min(calc(var(--spacing-unit) * 44), 28vw); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(var(--spacing-unit) * 2); }
+  .state-scene-premium__skeleton > * { min-height: calc(var(--spacing-unit) * 4); border-radius: var(--radius-sm); background: color-mix(in srgb, var(--color-academy-orange) 10%, var(--muted)); animation: academy-state-shimmer 1.35s var(--ease-standard) infinite alternate; }
+  .state-scene-premium__skeleton > :nth-child(2) { animation-delay: 90ms; }
+  .state-scene-premium__skeleton > :nth-child(3) { animation-delay: 180ms; }
+  .state-scene-premium__skeleton > :nth-child(4) { animation-delay: 270ms; }
+  .state-scene-premium__skeleton > :nth-child(5) { animation-delay: 360ms; }
+  .state-scene-premium__skeleton > :nth-child(6) { animation-delay: 450ms; }
+  .state-scene-premium__skeleton[data-layout="home"] { grid-template-columns: 1.3fr .7fr; }
+  .state-scene-premium__skeleton[data-layout="home"] > :first-child { grid-column: 1 / -1; min-height: calc(var(--spacing-unit) * 10); }
+  .state-scene-premium__skeleton[data-layout="activity"] { grid-template-columns: 1fr; }
+  .state-scene-premium__skeleton[data-layout="activity"] > :first-child { min-height: calc(var(--spacing-unit) * 12); }
+  .state-scene-premium__skeleton[data-layout="journey"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .state-scene-premium__skeleton[data-layout="journey"] > * { min-height: calc(var(--spacing-unit) * 8); }
+  .state-scene-premium__skeleton[data-layout="projects"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .state-scene-premium__skeleton[data-layout="projects"] > :first-child { grid-column: 1 / -1; min-height: calc(var(--spacing-unit) * 13); }
+  .state-scene-premium__skeleton[data-layout="agenda"] { grid-template-columns: 1fr 1.4fr; }
+  .state-scene-premium__skeleton[data-layout="agenda"] > :first-child { grid-row: span 2; min-height: calc(var(--spacing-unit) * 14); }
+  .state-scene-premium--empty .state-scene-premium__icon { color: var(--color-academy-success); }
+  .state-scene-premium--error::before { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 calc(var(--spacing-unit) * 7), color-mix(in srgb, var(--color-academy-error) 9%, transparent) calc(var(--spacing-unit) * 7) calc(var(--spacing-unit) * 7.25)); content: ""; }
+  .state-scene-premium__copy, .state-scene-premium__icon, .state-scene-premium__action { position: relative; z-index: 1; }
+  @keyframes academy-state-shimmer { from { opacity: .42; transform: scaleX(.97); } to { opacity: .88; transform: scaleX(1); } }
 
   .component-gallery { display: grid; gap: clamp(calc(var(--spacing-unit) * 7), 6vw, calc(var(--spacing-unit) * 14)); }
   .component-gallery__grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: calc(var(--spacing-unit) * 5); align-items: start; }
@@ -713,7 +730,8 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .avatar { transition-duration: 0.01ms; }
   .spotlight-card::before { display: none; }
   .state-scene-premium--loading::after,
-  .state-scene-premium--loading .state-scene-premium__icon svg { animation: none; }
+  .state-scene-premium--loading .state-scene-premium__icon svg,
+  .state-scene-premium__skeleton > * { animation: none; }
   :is(a, button, [role="button"]):hover .destination-cue svg,
   .avatar:hover { transform: none; }
 }

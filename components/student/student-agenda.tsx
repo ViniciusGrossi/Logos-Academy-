@@ -118,8 +118,8 @@ export function StudentAgenda() {
     requestAnimationFrame(() => attendanceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
-  if (loading) return <StateScene state="loading" title="Sincronizando calendário" description="Organizando encontros, remarcações e registros de presença." />;
-  if (error) return <StateScene state="error" title="Não foi possível abrir sua agenda" description={error.message} action={<button type="button" onClick={() => { void journey.reload(); void calendar.reload(); void attendance.reload(); }}>Tentar novamente</button>} />;
+  if (loading) return <StateScene layout="agenda" state="loading" title="Ritmo presencial sendo calculado" description="Organizando encontros, remarcações e registros de presença." />;
+  if (error) return <StateScene layout="agenda" state="error" title="Sinal interrompido na agenda" description={error.message} action={<button type="button" onClick={() => { void journey.reload(); void calendar.reload(); void attendance.reload(); }}>Tentar novamente</button>} />;
 
   return <main className={styles.fieldPage}>
     <header className={styles.heading}>
@@ -210,7 +210,7 @@ export function StudentAgenda() {
             <p>Selecione outro encontro no calendário para manter o contexto sem sair da página.</p>
           </>}
         </aside>
-      </div> : <StateScene state="empty" title="Calendário em preparação" description="Assim que as datas forem confirmadas, elas aparecerão aqui." />}
+      </div> : <StateScene layout="agenda" state="empty" title="Espaço para o próximo encontro" description="Assim que as datas forem confirmadas, elas aparecerão aqui." />}
     </section> : <section ref={attendanceRef} className={styles.tabPanel} aria-label="Histórico de frequência">
       <div className={styles.attendanceGrid}>
         <aside className={styles.presenceArc}>
@@ -235,7 +235,7 @@ export function StudentAgenda() {
               <TimelineSeparator />
               <TimelineContent>{entry.makeup ? "Reposição concluída e registro regularizado." : statusCopy[entry.status]}</TimelineContent>
             </TimelineItem>)}
-          </Timeline> : <StateScene state="empty" title="Nenhum registro ainda" description="A frequência será registrada após cada encontro presencial." />}
+          </Timeline> : <StateScene layout="agenda" state="empty" title="Espaço para o próximo registro" description="A frequência será registrada após cada encontro presencial." />}
         </div>
       </div>
 

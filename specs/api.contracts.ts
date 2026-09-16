@@ -6,8 +6,10 @@ export type ISODateTime = string;
 
 export type Role = "admin" | "student";
 export type EnrollmentKind = "class" | "individual";
-export type EnrollmentStatus = "invited" | "active" | "paused" | "completed" | "cancelled";
-export type SessionStatus = "scheduled" | "completed" | "rescheduled" | "cancelled";
+export type EnrollmentStatus =
+  "invited" | "active" | "paused" | "completed" | "cancelled";
+export type SessionStatus =
+  "scheduled" | "completed" | "rescheduled" | "cancelled";
 export type AttendanceStatus = "present" | "absent" | "excused_absence";
 export type AssignmentStatus =
   | "locked"
@@ -16,7 +18,8 @@ export type AssignmentStatus =
   | "submitted"
   | "revision_requested"
   | "approved";
-export type SubmissionItemKind = "text" | "file" | "external_link" | "github_repository";
+export type SubmissionItemKind =
+  "text" | "file" | "external_link" | "github_repository";
 export type ReviewDecision = "approved" | "revision_requested";
 export type CriterionResult = "met" | "needs_adjustment";
 
@@ -35,8 +38,7 @@ export interface ApiError {
 }
 
 export type ApiResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: ApiError };
+  { ok: true; data: T } | { ok: false; error: ApiError };
 
 export interface PageQuery {
   cursor?: string;
@@ -80,10 +82,7 @@ export interface GuardianRecord {
 export type GuardianInput = {
   name: string;
   relationship: string;
-} & (
-  | { email: string; phone?: string }
-  | { email?: string; phone: string }
-);
+} & ({ email: string; phone?: string } | { email?: string; phone: string });
 
 export interface ConsentRecord {
   id: UUID;
@@ -158,7 +157,11 @@ export type KnowledgeContentBlock =
   | { type: "text"; heading: string; body: string }
   | { type: "callout"; heading: string; body: string }
   | { type: "image"; url: string; alt: string; caption: string | null }
-  | { type: "diagram"; heading: string; nodes: readonly { label: string; detail: string }[] };
+  | {
+      type: "diagram";
+      heading: string;
+      nodes: readonly { label: string; detail: string }[];
+    };
 
 export interface ConceptDetail extends ConceptSummary {
   body: string;
@@ -251,8 +254,8 @@ export interface ActivityDetail {
   dueAt: ISODateTime | null;
   status: AssignmentStatus;
   isOverdue: boolean;
-  canEdit?: boolean;
-  readOnlyReason?: "inactive_enrollment" | "submitted" | "approved" | null;
+  canEdit: boolean;
+  readOnlyReason: "inactive_enrollment" | "submitted" | "approved" | null;
   supplementalInstructions: string | null;
   /** Campos pedagógicos da migration 0047 — nullable durante o rollout. */
   context: string | null;
@@ -267,10 +270,9 @@ export interface ActivityDetail {
   concepts: readonly ConceptSummary[];
   requirements: readonly ActivityRequirement[];
   criteria: readonly ActivityCriterion[];
-  latestReview?: ReviewDetail | null;
+  latestReview: ReviewDetail | null;
   latestSubmission: SubmissionDetail | null;
-  /** A lista pode estar paginada durante o rollout, preservando a resposta legada. */
-  submissionHistory: Page<SubmissionDetail> | readonly SubmissionDetail[];
+  submissionHistory: Page<SubmissionDetail>;
 }
 
 export interface SubmissionItemInput {
@@ -416,136 +418,268 @@ export interface Endpoint<Request, Response> {
 
 export interface ApiContracts {
   "GET /api/me": Endpoint<Record<string, never>, MeProfile>;
-  "PATCH /api/me": Endpoint<{ displayName?: string; githubUsername?: string }, MeProfile>;
+  "PATCH /api/me": Endpoint<
+    { displayName?: string; githubUsername?: string },
+    MeProfile
+  >;
 
-  "POST /api/admin/students/invite": Endpoint<{
-    email: string;
-    displayName: string;
-    birthDate: ISODate;
-    guardian: GuardianInput;
-    consent: { termVersion: string; signedAt: ISODate; physicalCopyArchived: true };
-    enrollment: { curriculumId: UUID } & EnrollmentPlacementInput;
-  }, { studentId: UUID; enrollmentId: UUID; invitationSentAt: ISODateTime }>;
-  "GET /api/admin/students": Endpoint<PageQuery & { search?: string; classId?: UUID }, Page<StudentSummary>>;
-  "GET /api/admin/students/:studentId": Endpoint<{ studentId: UUID }, {
-    student: StudentSummary;
-    guardian: GuardianRecord;
-    consent: ConsentRecord;
-    enrollments: readonly EnrollmentSummary[];
-    projects: readonly ProjectSummary[];
-  }>;
-  "PUT /api/admin/students/:studentId/consent": Endpoint<{
-    studentId: UUID;
-    guardian: GuardianInput;
-    termVersion: string;
-    signedAt: ISODate;
-    physicalCopyArchived: true;
-  }, ConsentRecord>;
-  "POST /api/admin/students/:studentId/consent/revoke": Endpoint<{
-    studentId: UUID;
-    reason: string;
-  }, { consent: ConsentRecord; pausedEnrollmentIds: readonly UUID[]; accessDisabled: true }>;
+  "POST /api/admin/students/invite": Endpoint<
+    {
+      email: string;
+      displayName: string;
+      birthDate: ISODate;
+      guardian: GuardianInput;
+      consent: {
+        termVersion: string;
+        signedAt: ISODate;
+        physicalCopyArchived: true;
+      };
+      enrollment: { curriculumId: UUID } & EnrollmentPlacementInput;
+    },
+    { studentId: UUID; enrollmentId: UUID; invitationSentAt: ISODateTime }
+  >;
+  "GET /api/admin/students": Endpoint<
+    PageQuery & { search?: string; classId?: UUID },
+    Page<StudentSummary>
+  >;
+  "GET /api/admin/students/:studentId": Endpoint<
+    { studentId: UUID },
+    {
+      student: StudentSummary;
+      guardian: GuardianRecord;
+      consent: ConsentRecord;
+      enrollments: readonly EnrollmentSummary[];
+      projects: readonly ProjectSummary[];
+    }
+  >;
+  "PUT /api/admin/students/:studentId/consent": Endpoint<
+    {
+      studentId: UUID;
+      guardian: GuardianInput;
+      termVersion: string;
+      signedAt: ISODate;
+      physicalCopyArchived: true;
+    },
+    ConsentRecord
+  >;
+  "POST /api/admin/students/:studentId/consent/revoke": Endpoint<
+    {
+      studentId: UUID;
+      reason: string;
+    },
+    {
+      consent: ConsentRecord;
+      pausedEnrollmentIds: readonly UUID[];
+      accessDisabled: true;
+    }
+  >;
 
-  "POST /api/admin/classes": Endpoint<{
-    name: string;
-    curriculumId: UUID;
-    schedule: ScheduleInput;
-  }, { class: ClassSummary; sessions: readonly SessionSummary[] }>;
-  "GET /api/admin/classes": Endpoint<PageQuery & { status?: ClassSummary["status"] }, Page<ClassSummary>>;
-  "GET /api/admin/classes/:classId": Endpoint<{ classId: UUID }, {
-    class: ClassSummary;
-    enrollments: readonly EnrollmentSummary[];
-    sessions: readonly SessionSummary[];
-  }>;
-  "PATCH /api/admin/classes/:classId": Endpoint<{ classId: UUID; name?: string; status?: ClassSummary["status"] }, ClassSummary>;
+  "POST /api/admin/classes": Endpoint<
+    {
+      name: string;
+      curriculumId: UUID;
+      schedule: ScheduleInput;
+    },
+    { class: ClassSummary; sessions: readonly SessionSummary[] }
+  >;
+  "GET /api/admin/classes": Endpoint<
+    PageQuery & { status?: ClassSummary["status"] },
+    Page<ClassSummary>
+  >;
+  "GET /api/admin/classes/:classId": Endpoint<
+    { classId: UUID },
+    {
+      class: ClassSummary;
+      enrollments: readonly EnrollmentSummary[];
+      sessions: readonly SessionSummary[];
+    }
+  >;
+  "PATCH /api/admin/classes/:classId": Endpoint<
+    { classId: UUID; name?: string; status?: ClassSummary["status"] },
+    ClassSummary
+  >;
 
-  "POST /api/admin/enrollments": Endpoint<{
-    studentId: UUID;
-    curriculumId: UUID;
-  } & EnrollmentPlacementInput, EnrollmentSummary>;
-  "PATCH /api/admin/enrollments/:enrollmentId": Endpoint<{
-    enrollmentId: UUID;
-    status: Exclude<EnrollmentStatus, "completed">;
-  }, EnrollmentSummary>;
-  "GET /api/admin/enrollments/:enrollmentId/completion": Endpoint<{ enrollmentId: UUID }, CompletionCheck>;
-  "POST /api/admin/enrollments/:enrollmentId/presentation": Endpoint<{
-    enrollmentId: UUID;
-    kind: PresentationRecord["kind"];
-    performedAt: ISODateTime;
-    contextualNote?: string;
-  }, PresentationRecord>;
-  "POST /api/admin/enrollments/:enrollmentId/complete": Endpoint<{ enrollmentId: UUID }, CompletionCheck>;
+  "POST /api/admin/enrollments": Endpoint<
+    {
+      studentId: UUID;
+      curriculumId: UUID;
+    } & EnrollmentPlacementInput,
+    EnrollmentSummary
+  >;
+  "PATCH /api/admin/enrollments/:enrollmentId": Endpoint<
+    {
+      enrollmentId: UUID;
+      status: Exclude<EnrollmentStatus, "completed">;
+    },
+    EnrollmentSummary
+  >;
+  "GET /api/admin/enrollments/:enrollmentId/completion": Endpoint<
+    { enrollmentId: UUID },
+    CompletionCheck
+  >;
+  "POST /api/admin/enrollments/:enrollmentId/presentation": Endpoint<
+    {
+      enrollmentId: UUID;
+      kind: PresentationRecord["kind"];
+      performedAt: ISODateTime;
+      contextualNote?: string;
+    },
+    PresentationRecord
+  >;
+  "POST /api/admin/enrollments/:enrollmentId/complete": Endpoint<
+    { enrollmentId: UUID },
+    CompletionCheck
+  >;
 
-  "PATCH /api/admin/sessions/:sessionId": Endpoint<{
-    sessionId: UUID;
-    startsAt?: ISODateTime;
-    endsAt?: ISODateTime;
-    status?: SessionStatus;
-  }, SessionSummary>;
-  "GET /api/admin/sessions/:sessionId/attendance": Endpoint<{ sessionId: UUID }, readonly AttendanceEntry[]>;
-  "PUT /api/admin/sessions/:sessionId/attendance": Endpoint<{
-    sessionId: UUID;
-    entries: readonly { enrollmentId: UUID; status: AttendanceStatus; privateNote?: string }[];
-  }, readonly AttendanceEntry[]>;
-  "POST /api/admin/sessions/:sessionId/release": Endpoint<{
-    sessionId: UUID;
-    target: { kind: "all_active_enrollments" } | { kind: "enrollments"; enrollmentIds: readonly UUID[] };
-    dueAt: ISODateTime;
-    supplementalInstructions?: string;
-  }, { assignmentIds: readonly UUID[]; releasedAt: ISODateTime }>;
-  "POST /api/admin/attendance/:attendanceId/makeup": Endpoint<{
-    attendanceId: UUID;
-    makeupSessionId?: UUID;
-    completedAt: ISODateTime;
-    note?: string;
-  }, AttendanceEntry>;
+  "PATCH /api/admin/sessions/:sessionId": Endpoint<
+    {
+      sessionId: UUID;
+      startsAt?: ISODateTime;
+      endsAt?: ISODateTime;
+      status?: SessionStatus;
+    },
+    SessionSummary
+  >;
+  "GET /api/admin/sessions/:sessionId/attendance": Endpoint<
+    { sessionId: UUID },
+    readonly AttendanceEntry[]
+  >;
+  "PUT /api/admin/sessions/:sessionId/attendance": Endpoint<
+    {
+      sessionId: UUID;
+      entries: readonly {
+        enrollmentId: UUID;
+        status: AttendanceStatus;
+        privateNote?: string;
+      }[];
+    },
+    readonly AttendanceEntry[]
+  >;
+  "POST /api/admin/sessions/:sessionId/release": Endpoint<
+    {
+      sessionId: UUID;
+      target:
+        | { kind: "all_active_enrollments" }
+        | { kind: "enrollments"; enrollmentIds: readonly UUID[] };
+      dueAt: ISODateTime;
+      supplementalInstructions?: string;
+    },
+    { assignmentIds: readonly UUID[]; releasedAt: ISODateTime }
+  >;
+  "POST /api/admin/attendance/:attendanceId/makeup": Endpoint<
+    {
+      attendanceId: UUID;
+      makeupSessionId?: UUID;
+      completedAt: ISODateTime;
+      note?: string;
+    },
+    AttendanceEntry
+  >;
 
   "GET /api/admin/dashboard": Endpoint<{ classId?: UUID }, AdminDashboard>;
-  "GET /api/admin/reviews": Endpoint<PageQuery & { classId?: UUID; overdueOnly?: boolean }, Page<ReviewQueueSubmission>>;
-  "POST /api/admin/submissions/:submissionId/review": Endpoint<{
-    submissionId: UUID;
-    decision: ReviewDecision;
-    feedback: string;
-    criteria: readonly { criterionId: UUID; result: CriterionResult; comment?: string }[];
-  }, ReviewDetail>;
+  "GET /api/admin/reviews": Endpoint<
+    PageQuery & { classId?: UUID; overdueOnly?: boolean },
+    Page<ReviewQueueSubmission>
+  >;
+  "POST /api/admin/submissions/:submissionId/review": Endpoint<
+    {
+      submissionId: UUID;
+      decision: ReviewDecision;
+      feedback: string;
+      criteria: readonly {
+        criterionId: UUID;
+        result: CriterionResult;
+        comment?: string;
+      }[];
+    },
+    ReviewDetail
+  >;
 
   "GET /api/student/home": Endpoint<Record<string, never>, StudentHome>;
-  "POST /api/student/reviews/:reviewId/seen": Endpoint<{ reviewId: UUID }, ReviewDetail>;
-  "GET /api/student/journey": Endpoint<{ enrollmentId?: UUID }, {
-    enrollment: EnrollmentSummary;
-    projects: readonly ProjectSummary[];
-    sessionsCompleted: number;
-    sessionsTotal: 16;
-  }>;
-  "GET /api/student/calendar": Endpoint<{ enrollmentId: UUID; from?: ISODate; to?: ISODate }, readonly SessionSummary[]>;
-  "GET /api/student/attendance": Endpoint<PageQuery & { enrollmentId?: UUID }, Page<{
-    session: SessionSummary;
-    status: AttendanceStatus;
-    makeup: AttendanceEntry["makeup"];
-  }>>;
-  "GET /api/student/concepts": Endpoint<PageQuery & { search?: string }, Page<ConceptSummary>>;
-  "GET /api/student/concepts/:conceptId": Endpoint<{ conceptId: UUID }, ConceptDetail>;
-  "GET /api/student/library": Endpoint<PageQuery & { kind: LibraryResourceKind; search?: string }, Page<LibraryResourceSummary>>;
-  "GET /api/student/library/:resourceId": Endpoint<{ resourceId: UUID }, LibraryResourceDetail>;
-  "GET /api/student/activities/:assignmentId": Endpoint<{ assignmentId: UUID }, ActivityDetail>;
-  "PUT /api/student/activities/:assignmentId/draft": Endpoint<{
-    assignmentId: UUID;
-    items: readonly SubmissionItemInput[];
-  }, SubmissionDetail>;
-  "POST /api/student/activities/:assignmentId/submit": Endpoint<{
-    assignmentId: UUID;
-    expectedDraftId: UUID;
-  }, SubmissionDetail>;
-  "GET /api/student/projects": Endpoint<{ enrollmentId?: UUID }, readonly ProjectSummary[]>;
-  "GET /api/student/projects/:projectId": Endpoint<{ projectId: UUID }, ProjectDetail>;
-  "GET /api/student/portfolio": Endpoint<PageQuery & { enrollmentId?: UUID }, Page<ProjectDetail>>;
+  "POST /api/student/reviews/:reviewId/seen": Endpoint<
+    { reviewId: UUID },
+    ReviewDetail
+  >;
+  "GET /api/student/journey": Endpoint<
+    { enrollmentId?: UUID },
+    {
+      enrollment: EnrollmentSummary;
+      projects: readonly ProjectSummary[];
+      sessionsCompleted: number;
+      sessionsTotal: 16;
+    }
+  >;
+  "GET /api/student/calendar": Endpoint<
+    { enrollmentId: UUID; from?: ISODate; to?: ISODate },
+    readonly SessionSummary[]
+  >;
+  "GET /api/student/attendance": Endpoint<
+    PageQuery & { enrollmentId?: UUID },
+    Page<{
+      session: SessionSummary;
+      status: AttendanceStatus;
+      makeup: AttendanceEntry["makeup"];
+    }>
+  >;
+  "GET /api/student/concepts": Endpoint<
+    PageQuery & { search?: string },
+    Page<ConceptSummary>
+  >;
+  "GET /api/student/concepts/:conceptId": Endpoint<
+    { conceptId: UUID },
+    ConceptDetail
+  >;
+  "GET /api/student/library": Endpoint<
+    PageQuery & { kind: LibraryResourceKind; search?: string },
+    Page<LibraryResourceSummary>
+  >;
+  "GET /api/student/library/:resourceId": Endpoint<
+    { resourceId: UUID },
+    LibraryResourceDetail
+  >;
+  "GET /api/student/activities/:assignmentId": Endpoint<
+    { assignmentId: UUID; cursor?: string },
+    ActivityDetail
+  >;
+  "PUT /api/student/activities/:assignmentId/draft": Endpoint<
+    {
+      assignmentId: UUID;
+      items: readonly SubmissionItemInput[];
+    },
+    SubmissionDetail
+  >;
+  "POST /api/student/activities/:assignmentId/submit": Endpoint<
+    {
+      assignmentId: UUID;
+      expectedDraftId: UUID;
+    },
+    SubmissionDetail
+  >;
+  "GET /api/student/projects": Endpoint<
+    { enrollmentId?: UUID },
+    readonly ProjectSummary[]
+  >;
+  "GET /api/student/projects/:projectId": Endpoint<
+    { projectId: UUID },
+    ProjectDetail
+  >;
+  "GET /api/student/portfolio": Endpoint<
+    PageQuery & { enrollmentId?: UUID },
+    Page<ProjectDetail>
+  >;
 
-  "POST /api/files/upload-url": Endpoint<{
-    assignmentId: UUID;
-    filename: string;
-    contentType: string;
-    sizeBytes: number;
-  }, { file: UploadedFile; signedUploadUrl: string; expiresAt: ISODateTime }>;
+  "POST /api/files/upload-url": Endpoint<
+    {
+      assignmentId: UUID;
+      filename: string;
+      contentType: string;
+      sizeBytes: number;
+    },
+    { file: UploadedFile; signedUploadUrl: string; expiresAt: ISODateTime }
+  >;
   "POST /api/files/:fileId/finalize": Endpoint<{ fileId: UUID }, UploadedFile>;
-  "GET /api/files/:fileId/download-url": Endpoint<{ fileId: UUID }, { signedDownloadUrl: string; expiresAt: ISODateTime }>;
+  "GET /api/files/:fileId/download-url": Endpoint<
+    { fileId: UUID },
+    { signedDownloadUrl: string; expiresAt: ISODateTime }
+  >;
 }

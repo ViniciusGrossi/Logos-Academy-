@@ -1,2 +1,11 @@
 import { activityController } from "@/src/modules/activity-submission-files/controller";
-export async function GET(request: Request, { params }: { params: Promise<{ assignmentId: string }> }) { const { assignmentId } = await params; return activityController(request, (service, actor, requestId) => service.detail(actor, assignmentId, requestId)); }
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ assignmentId: string }> },
+) {
+  const { assignmentId } = await params;
+  const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
+  return activityController(request, (service, actor, requestId) =>
+    service.detail(actor, assignmentId, requestId, cursor),
+  );
+}

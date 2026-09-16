@@ -40,9 +40,9 @@ function moveFocusGrid(event: ReactPointerEvent<HTMLElement>) {
 export function ProjectDetailPage() {
   const params = useParams<{ projectId: string }>();
   const { data, error, loading, reload } = useLiveApi<ProjectDto>(params.projectId ? `/api/student/projects/${params.projectId}` : null);
-  if (loading) return <LoadingState />;
-  if (error) return <ErrorState retry={reload} message={error.message} />;
-  if (!data) return <EmptyState scope="projeto" />;
+  if (loading) return <LoadingState layout="detail" />;
+  if (error) return <ErrorState layout="detail" retry={reload} message={error.message} />;
+  if (!data) return <EmptyState layout="detail" scope="projeto" />;
 
   const progress = data.activityCount ? Math.round((data.completedActivityCount / data.activityCount) * 100) : 0;
   const active = data.activities.find((activity) => ["revision_requested", "draft", "available"].includes(activity.status)) ?? data.activities.find((activity) => activity.status !== "locked") ?? data.activities[0];
@@ -111,15 +111,17 @@ export function ProjectDetailPage() {
         {data.activities.map((activity, index) => {
           const Icon = statusIcon[activity.status];
           const current = active?.assignmentId === activity.assignmentId;
+          const locked = activity.status === "locked";
+          const card = <>
+            <div className={styles.evidenceTop}><span>Aula {String(activity.lessonPosition).padStart(2, "0")}</span><small><Icon /> {statusCopy[activity.status]}</small></div>
+            <div className={styles.evidenceBody}><div><h3>{activity.title}</h3><p>{activity.latestVersion ? `Versão ${String(activity.latestVersion).padStart(2, "0")} registrada neste projeto.` : locked ? "Conclua a etapa atual para liberar esta atividade." : "A primeira versão ainda não foi registrada."}</p></div>{locked ? <LockKeyhole aria-label="Bloqueada" /> : <ArrowRight />}</div>
+            {activity.decision && <div className={styles.decisionNote}><Lightbulb /><span><small>Decisão registrada</small>{activity.decision}</span></div>}
+            {activity.latestFeedback && <div className={styles.feedbackNote}><MessageSquareQuote /><span><small>Feedback de {activity.latestFeedback.reviewerName}</small>{activity.latestFeedback.feedback}</span></div>}
+            <div className={styles.evidenceFooter}><span><Clock3 /> {current ? "Posição atual" : activity.status === "approved" ? "Etapa percorrida" : "Etapa do ciclo"}</span>{activity.latestVersion && <em>v{String(activity.latestVersion).padStart(2, "0")}</em>}</div>
+          </>;
           return <li key={activity.assignmentId} data-status={activity.status} data-current={current}>
             <span className={styles.routeNode}>{activity.status === "approved" ? <Check /> : String(index + 1).padStart(2, "0")}</span>
-            <Link href={`/atividade?assignmentId=${activity.assignmentId}`} className={styles.evidenceCard}>
-              <div className={styles.evidenceTop}><span>Aula {String(activity.lessonPosition).padStart(2, "0")}</span><small><Icon /> {statusCopy[activity.status]}</small></div>
-              <div className={styles.evidenceBody}><div><h3>{activity.title}</h3><p>{activity.latestVersion ? `Versão ${String(activity.latestVersion).padStart(2, "0")} registrada neste projeto.` : "A primeira versão ainda não foi registrada."}</p></div><ArrowRight /></div>
-              {activity.decision && <div className={styles.decisionNote}><Lightbulb /><span><small>Decisão registrada</small>{activity.decision}</span></div>}
-              {activity.latestFeedback && <div className={styles.feedbackNote}><MessageSquareQuote /><span><small>Feedback de {activity.latestFeedback.reviewerName}</small>{activity.latestFeedback.feedback}</span></div>}
-              <div className={styles.evidenceFooter}><span><Clock3 /> {current ? "Posição atual" : activity.status === "approved" ? "Etapa percorrida" : "Etapa do ciclo"}</span>{activity.latestVersion && <em>v{String(activity.latestVersion).padStart(2, "0")}</em>}</div>
-            </Link>
+            {locked ? <div className={styles.evidenceCard} aria-disabled="true">{card}</div> : <Link href={`/atividade?assignmentId=${activity.assignmentId}`} className={styles.evidenceCard}>{card}</Link>}
           </li>;
         })}
       </ol>

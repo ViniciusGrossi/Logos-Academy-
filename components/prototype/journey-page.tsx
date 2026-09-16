@@ -19,9 +19,9 @@ export function JourneyPage() {
   const enrollmentId = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).get("enrollmentId");
   const { data, error, loading, reload } = useLiveApi<Journey>(enrollmentId ? `/api/student/journey?enrollmentId=${enrollmentId}` : "/api/student/journey");
 
-  if (loading) return <LoadingState />;
-  if (error) return <ErrorState retry={reload} message={error.message} />;
-  if (!data) return <EmptyState scope="jornada ativa" />;
+  if (loading) return <LoadingState layout="journey" />;
+  if (error) return <ErrorState layout="journey" retry={reload} message={error.message} />;
+  if (!data) return <EmptyState layout="journey" scope="jornada ativa" />;
 
   const activeIndex = Math.max(0, data.projects.findIndex((project) => project.status === "in_progress"));
   const sessionsPercentage = data.sessionsTotal ? Math.round((data.sessionsCompleted / data.sessionsTotal) * 100) : 0;

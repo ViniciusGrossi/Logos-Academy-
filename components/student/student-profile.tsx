@@ -72,10 +72,10 @@ export function StudentProfile() {
     }
   }
 
-  if (profile.loading || journey.loading) return <StateScene state="loading" title="Preparando seu passaporte" description="Reunindo identidade, ciclo e vínculo técnico." />;
+  if (profile.loading || journey.loading) return <StateScene layout="profile" state="loading" title="Identidade em revelação" description="Reunindo identidade, ciclo e vínculo técnico." />;
   const error = profile.error ?? journey.error;
-  if (error) return <StateScene state="error" title="Não foi possível abrir seu perfil" description={error.message} action={<button type="button" onClick={() => { void profile.reload(); void journey.reload(); }}>Tentar novamente</button>} />;
-  if (!profile.data) return <StateScene state="empty" title="Perfil indisponível" description="Entre novamente para continuar." />;
+  if (error) return <StateScene layout="profile" state="error" title="Sinal interrompido no perfil" description={error.message} action={<button type="button" onClick={() => { void profile.reload(); void journey.reload(); }}>Tentar novamente</button>} />;
+  if (!profile.data) return <StateScene layout="profile" state="empty" title="Espaço para completar seu perfil" description="Entre novamente para continuar sua construção." />;
 
   const initial = profile.data.displayName.trim().charAt(0).toUpperCase();
   const roleLabel = profile.data.role === "admin" ? "Administrador" : "Estudante";
