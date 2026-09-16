@@ -16,7 +16,7 @@ const studentNav = [
   { href: "/atividade", label: "Atividade", icon: ClipboardCheck },
   { href: "/jornada", label: "Jornada", icon: Gauge },
   { href: "/projetos", label: "Projetos", icon: FolderKanban },
-  { href: "/glossario", label: "Glossário", icon: BookOpenText },
+  { href: "/atlas", label: "Atlas", icon: BookOpenText },
   { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/perfil", label: "Perfil", icon: UserRound },
 ] as const;

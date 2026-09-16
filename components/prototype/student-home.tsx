@@ -148,7 +148,7 @@ export function StudentHome() {
         <div className={styles.sectionHeading}><div><span>Mapa de construção</span><h2 id="route-title">Do conceito à evidência.</h2></div><small>Rota 01 — 03</small></div>
         <ol className={styles.route}>
           {stages.map((stage, index) => <motion.li key={stage.id} data-state={stage.state} initial={reduceMotion ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.7 }} transition={{ duration: reduceMotion ? 0 : 0.42, delay: index * 0.09, ease: entrance }}>
-            <Link className={styles.routeLink} href={stage.id === "explorar" ? "/glossario" : stage.id === "construir" ? actionHref : projectHref}>
+            <Link className={styles.routeLink} href={stage.id === "explorar" ? "/atlas?tab=conceitos" : stage.id === "construir" ? actionHref : projectHref}>
               <span className={styles.routeNode}>{stage.state === "complete" ? <Check size={15} /> : stage.number}</span>
               <span className={styles.routeCopy}><small>{stage.state === "complete" ? "Percorrido" : stage.state === "current" ? "Você está aqui" : "A seguir"}</small><strong>{stage.label}</strong><em>{stage.detail}</em></span>
             </Link>

@@ -896,7 +896,7 @@ export function ActivityDetail() {
               {activity.concepts.map((concept) => (
                 <Link
                   key={concept.id}
-                  href={`/glossario?conceptId=${concept.id}`}
+                  href={`/atlas?tab=conceitos&item=${concept.id}`}
                 >
                   <GitBranch />
                   {concept.title}
