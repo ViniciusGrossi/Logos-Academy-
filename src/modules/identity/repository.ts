@@ -9,7 +9,10 @@ const IdentityRowSchema = z.object({
   tenant_id: z.string().uuid(),
   auth_user_id: z.string().uuid(),
   access_enabled: z.boolean(),
-  tenant_memberships: z.array(z.object({ role: z.enum(["admin", "student"]) })),
+  tenant_memberships: z.preprocess(
+    (value) => (Array.isArray(value) ? value : value == null ? [] : [value]),
+    z.array(z.object({ role: z.enum(["admin", "student"]) })),
+  ),
 });
 
 export class IdentityRepository {

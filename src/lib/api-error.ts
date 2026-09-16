@@ -17,6 +17,7 @@ export class AppError extends Error {
 export function asApiError(error: unknown, requestId: string, fallback: string): AppError {
   if (error instanceof AppError) return error;
   if (error instanceof SyntaxError) return new AppError("VALIDATION_ERROR", "JSON inválido.", requestId);
+  console.error(`[${requestId}] unhandled error:`, error instanceof Error ? error.stack ?? error.message : error);
   return new AppError("INTERNAL_ERROR", fallback, requestId);
 }
 
