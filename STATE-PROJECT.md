@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-15
+date: 2026-09-20
 fase_atual: "12"
-etapa_atual: "Mesa de Atividade Explorer v2 concluída e publicada no Supabase"
+etapa_atual: "Atlas ampliado com leitura progressiva, referências visuais e conceito de RAG; pronto para gate visual"
 produto_tipo: "saas-premium"
-proximo_passo: "Planejar o deploy frontend que levará a Mesa de Atividade concluída ao ambiente público"
+proximo_passo: "Realizar gate visual humano do Atlas premium em 1440, 768 e 375 px; após aprovação, consolidar a página"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -34,11 +34,26 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [ ] `student-knowledge-atlas`: versão premium implementada e validada em 1440/768/375, tema claro/escuro e movimento reduzido; aguardando gate visual humano.
 - [x] `explorer-activity-system-v2`: implementação local concluída, gate visual aprovado e migrations aplicadas de forma controlada no Supabase.
 - [x] `student-activity-workbench`: Mesa de Atividade Explorer v2 validada em 1440/768/375, tema claro/escuro e movimento reduzido; gate visual aprovado.
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-09-20] Referência visual de RAG corrigida: conectores agora pertencem ao nó de destino por meio do componente interno reutilizável `FlowSequence`, evitando setas soltas, texto comprimido ou contato com bordas quando um fluxo cresce ou quebra linha. O beacon decorativo sem função do mapa foi removido para não parecer um quarto estado. Browser confirmou o RAG em 1440 e 375 px sem overflow; TypeScript, lint focalizado e testes do Atlas passaram.
+
+- [2026-09-20] Auditoria e polish estrutural do Atlas concluídos: mapa e workspace passaram a compartilhar a mesma coluna, eliminando divisores desalinhados; âncoras respeitam as tabs sticky; a barra de leitura ganhou afastamento e progresso inicial correto; borda lateral irregular do item ativo foi removida; focos dentro de superfícies recortadas e alvos de toque foram corrigidos. Conceitos, Prompts e Sistemas de Design foram verificados em 1440/768/375, temas claro/escuro e movimento reduzido, sem overflow. Detector Impeccable zerou findings; TypeScript, lint focalizado, 72 testes e build passaram.
+
+- [2026-09-20] Mapa de domínio do Atlas corrigido para representar exatamente as três coleções disponíveis: Conceitos, Prompts e Sistemas de Design. Os cinco nós e o pacote animado independente foram reduzidos a três marcadores; cada aba agora ativa exclusivamente seu ponto correspondente.
+
+- [2026-09-20] Leitura conceitual do Atlas ampliada sem alongar a página: o primeiro bloco permanece exposto e os tópicos complementares entram em um `<details>` nativo, acessível por teclado. Hierarquia visual, Contraste e RAG receberam comparações visuais explicativas; RAG foi criado como conceito completo e vinculado à aula 11 pela migration 0052, respeitando a liberação progressiva. TypeScript, lint focalizado, 72 testes e build passaram; o browser confirmou o fluxo e ausência de overflow em 375 px.
+
+- [2026-09-20] Player real do Atlas: “Hierarquia visual” passou a carregar sob demanda um vídeo público da Visme, com capa real, autoplay após gesto, controles, legendas do YouTube, tela cheia e saída externa. A CSP ganhou permissão mínima apenas para `youtube-nocookie.com`; a migration 0051 sincroniza os metadados no Supabase sem alterar migrations históricas.
+
+- [2026-09-20] Atlas reformulado pela fusão entre a mesa cartográfica existente e o protótipo `Atlas.dc.html`, sem copiar sua estrutura: campo orbital SVG animado, rota viva entre coleções, marcador de progresso de leitura, transição compartilhada de abas e resposta física nos materiais. Framer Motion já presente no projeto foi reutilizado, sem dependências novas; 72 testes, lint com zero erros e build passaram. Inspeção real confirmou ausência de overflow em 1440/768/375, temas claro/escuro e fallback de movimento reduzido.
+
+- [2026-09-20] Candidato desktop do Atlas implementado em `/atlas`, com redirecionamento permanente de `/glossario`, três bibliotecas conectadas, mapa de domínio, busca contextual, vídeo sob demanda, personalização e cópia de prompts e espécimes vivos de sistemas de design. TypeScript, lint com zero erros, 72 testes e build passaram; temas claro/escuro foram inspecionados em 1440 px sem overflow. O CMS permanece fora desta entrega porque sua spec ainda está em rascunho.
 
 - [2026-09-15] Publicação controlada do Explorer v2 no Supabase: como a 0045 original tentava reescrever o snapshot imutável da v1, ela foi corrigida para acrescentar apenas os campos de brief com valores históricos preservados; o conteúdo específico entrou exclusivamente no namespace v2. Foram aplicadas 0045, 0046, 0047, 0049 e 0050. Auditoria remota confirmou currículo v2 ativo, 4 ciclos, 16 atividades, Project Days 4/8/12/16, 63 requisitos, 92 critérios, projeção `student_activity_detail` v2, RLS forçado e execução exclusiva por `service_role`.
 
@@ -180,6 +195,20 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Lições
 
+- [2026-09-20] Indicadores em SVG devem normalizar o percurso pelo número real de estados. No mapa do Atlas, `pathLength="3"` garante um segmento por aba e evita que mudanças no desenho da curva deixem sobra no último estado.
+
+- [2026-09-20] Em fluxos visuais compactos, setas não devem ser irmãos soltos entre caixas: o conector deve pertencer ao próximo passo, para que uma quebra de linha preserve a direção da leitura. Elementos puramente decorativos que parecem controles ou estados devem ser removidos quando não comunicam uma ação ou informação real.
+
+- [2026-09-20] Superfícies visualmente relacionadas precisam derivar sua geometria da mesma variável, não de proporções independentes: no Atlas, mapa e workspace pareciam próximos, mas seus divisores divergiam alguns pixels. Elementos sticky também exigem `scroll-margin-top` nos destinos e progresso afastado das bordas para não cobrir conteúdo nem parecer uma borda duplicada.
+
+- [2026-09-20] Elementos de navegação abstratos precisam manter correspondência visual 1:1 com a estrutura real. No mapa do Atlas, nós extras e um pacote percorrendo a rota sugeriam etapas inexistentes; três coleções exigem três marcadores de estado, sem um quarto sinal concorrente.
+
+- [2026-09-20] Conteúdo denso não precisa produzir uma página longa: no Atlas, divulgação progressiva mantém a síntese e a referência visual no fluxo principal, enquanto exemplos, diagramas e ressalvas permanecem disponíveis sob demanda. Comparações “sem/com” devem explicar a falha e a correção, não apenas decorar o texto.
+
+- [2026-09-20] Em conteúdo audiovisual, player e explicação não devem dividir uma coluna estreita: controles, título e imagem precisam de largura própria. No Atlas, o player ocupa uma linha inteira e o contexto pedagógico virou uma faixa independente abaixo, com espaçamento explícito.
+- [2026-09-20] Um iframe correto ainda falha se `frame-src` herdar `default-src 'self'`: players externos devem receber uma permissão CSP explícita e restrita ao host necessário. Validar vídeo exige clicar e observar reprodução real; capa e iframe presente no DOM não provam que o conteúdo toca.
+- [2026-09-20] Referências `.dc.html` são documentação visual, não fonte de produção: devem ficar fora do lint. Ao absorver uma referência, preservar o fluxo validado e importar apenas os princípios que faltam; no Atlas, profundidade e movimento entraram no campo orbital, enquanto busca, índice e leitura permaneceram próprios do produto.
+- [2026-09-20] Uma biblioteca pedagógica ganha identidade quando sua assinatura visual também explica a navegação: no Atlas, o mapa cartográfico conduz entre conceitos, prompts e sistemas de design, enquanto `tab`, busca e item permanecem na URL para preservar o contexto de estudo.
 - [2026-09-12] Em polish solicitado como “mais efeitos e componentes”, microinterações isoladas não bastam: a diferença precisa aparecer na composição e na hierarquia do primeiro viewport. Na Atividade, o foco aprovado para nova tentativa foi núcleo energético + circuito funcional, com os demais movimentos subordinados ao fluxo pedagógico.
 - [2026-09-12] Executar `next build` enquanto qualquer `next dev` usa a mesma pasta `.next` deixa HTML e chunks CSS incompatíveis e pode exibir o SVG bruto. Antes de todo build, localizar e encerrar os processos dev deste projeto; depois do build, reiniciar o servidor e validar visualmente o mesmo `localhost` entregue ao usuário.
 - [2026-09-15] Estados assíncronos da área do aluno não podem usar um esqueleto universal: cada página informa um `layout` para reservar a geometria da experiência final. Ação de vazio deve levar ao próximo passo real e falha deve manter retry + retorno seguro; o `AppShell` precisa continuar fora do conteúdo assíncrono.

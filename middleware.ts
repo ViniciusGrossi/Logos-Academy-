@@ -10,6 +10,7 @@ function applySecurityHeaders(headers: Headers, production: boolean): void {
     "form-action 'self'",
     "frame-ancestors 'none'",
     "object-src 'none'",
+    "frame-src https://www.youtube-nocookie.com",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",

@@ -169,77 +169,86 @@ const concepts: readonly ConceptSummary[] = [
     summary: "Cria diferença perceptível entre elementos e decisões.",
     releasedAt: now,
   },
+  {
+    id: "00000000-0000-4000-8000-000000000016",
+    slug: "rag",
+    title: "RAG",
+    summary: "Conecta a IA a fontes externas antes de produzir uma resposta.",
+    releasedAt: now,
+  },
 ];
-const conceptDetails: readonly ConceptDetail[] = concepts.map((concept) => ({
-  ...concept,
-  body:
-    concept.slug === "hierarquia-visual"
-      ? "Hierarquia visual é a ordem de atenção planejada entre os elementos. Ela ajuda alguém a entender primeiro a mensagem principal, depois o contexto e, por fim, a ação."
-      : "Contraste é a diferença perceptível entre elementos. Tamanho, peso, cor, espaço e posição podem criar contraste quando existe uma intenção clara.",
-  videoUrl: null,
-  videoTitle:
-    concept.slug === "hierarquia-visual"
-      ? "Hierarquia visual em 4 minutos"
-      : "Contraste que orienta em 3 minutos",
-  videoDurationMinutes: concept.slug === "hierarquia-visual" ? 4 : 3,
-  readingMinutes: 6,
-  contentBlocks:
-    concept.slug === "hierarquia-visual"
-      ? [
-          {
-            type: "text",
-            heading: "Como o olhar decide",
-            body: "Antes de ler, o olhar compara escala, posição, contraste e espaço. A hierarquia organiza essas diferenças para que uma peça comunique sem depender de explicação adicional.",
-          },
-          {
-            type: "diagram",
-            heading: "Uma sequência de atenção",
-            nodes: [
-              {
-                label: "Mensagem",
-                detail: "O que precisa ser entendido primeiro.",
-              },
-              {
-                label: "Contexto",
-                detail: "O que sustenta e qualifica a mensagem.",
-              },
-              { label: "Ação", detail: "O que a pessoa deve fazer depois." },
-            ],
-          },
-          {
-            type: "callout",
-            heading: "Teste rápido",
-            body: "Afaste-se da tela por alguns segundos. Ao voltar, observe qual elemento você percebe primeiro. Se não for a mensagem principal, a hierarquia ainda precisa de ajuste.",
-          },
-        ]
-      : [
-          {
-            type: "text",
-            heading: "Contraste não é decoração",
-            body: "A diferença só é útil quando torna uma decisão mais clara. Aumentar tudo ao mesmo tempo elimina a própria hierarquia que o contraste deveria construir.",
-          },
-          {
-            type: "diagram",
-            heading: "Quatro alavancas",
-            nodes: [
-              {
-                label: "Escala",
-                detail: "Grande e pequeno estabelecem prioridade.",
-              },
-              {
-                label: "Peso",
-                detail: "Densidade tipográfica muda a presença.",
-              },
-              {
-                label: "Cor",
-                detail: "Luminosidade e saturação criam separação.",
-              },
-              { label: "Espaço", detail: "Isolamento também produz ênfase." },
-            ],
-          },
-        ],
-  relatedConcepts: concepts.filter((item) => item.id !== concept.id),
-}));
+
+type ConceptLessonContent = Pick<
+  ConceptDetail,
+  "body" | "videoUrl" | "videoTitle" | "videoDurationMinutes" | "readingMinutes" | "contentBlocks"
+>;
+
+const conceptContent = {
+  "hierarquia-visual": {
+    body: "Hierarquia visual é a ordem de atenção planejada entre os elementos. Ela ajuda alguém a entender primeiro a mensagem principal, depois o contexto e, por fim, a ação.",
+    videoUrl: "https://www.youtube.com/watch?v=ZXItTIjC0Wk",
+    videoTitle: "11 princípios de hierarquia visual, por Visme",
+    videoDurationMinutes: 8,
+    readingMinutes: 8,
+    contentBlocks: [
+      { type: "text", heading: "Como o olhar decide", body: "Antes de ler, o olhar compara escala, posição, contraste e espaço. A hierarquia organiza essas diferenças para que uma peça comunique sem depender de explicação adicional." },
+      { type: "diagram", heading: "Uma sequência de atenção", nodes: [
+        { label: "Mensagem", detail: "O que precisa ser entendido primeiro." },
+        { label: "Contexto", detail: "O que sustenta e qualifica a mensagem." },
+        { label: "Ação", detail: "O que a pessoa deve fazer depois." },
+      ] },
+      { type: "text", heading: "Escaneabilidade e padrões", body: "O olhar procura âncoras conhecidas: título, imagem dominante, grupos próximos e uma ação destacada. Quando alinhamento e repetição são consistentes, a pessoa gasta menos energia para descobrir onde começar e consegue comparar informações com mais segurança." },
+      { type: "callout", heading: "Teste rápido", body: "Afaste-se da tela por alguns segundos. Ao voltar, observe qual elemento você percebe primeiro. Se não for a mensagem principal, a hierarquia ainda precisa de ajuste." },
+      { type: "text", heading: "Erros frequentes", body: "Muitos tamanhos, excesso de negrito e várias cores de destaque fazem cada elemento pedir atenção ao mesmo tempo. Uma hierarquia forte reduz protagonistas e usa as diferenças restantes para sustentar a leitura." },
+    ],
+  },
+  contraste: {
+    body: "Contraste é a diferença perceptível entre elementos. Tamanho, peso, cor, espaço e posição podem criar contraste quando existe uma intenção clara.",
+    videoUrl: null,
+    videoTitle: null,
+    videoDurationMinutes: null,
+    readingMinutes: 6,
+    contentBlocks: [
+      { type: "text", heading: "Contraste não é decoração", body: "A diferença só é útil quando torna uma decisão mais clara. Aumentar tudo ao mesmo tempo elimina a própria hierarquia que o contraste deveria construir." },
+      { type: "diagram", heading: "Quatro alavancas", nodes: [
+        { label: "Escala", detail: "Grande e pequeno estabelecem prioridade." },
+        { label: "Peso", detail: "Densidade tipográfica muda a presença." },
+        { label: "Cor", detail: "Luminosidade e saturação criam separação." },
+        { label: "Espaço", detail: "Isolamento também produz ênfase." },
+      ] },
+      { type: "text", heading: "Contraste funcional", body: "Compare os elementos que precisam ser diferenciados: título e corpo, ação e informação, estado ativo e inativo. A diferença deve continuar perceptível sem depender apenas da cor." },
+      { type: "callout", heading: "Verificação", body: "Converta a interface para tons de cinza e reduza o zoom. Se prioridade e agrupamentos desaparecerem, o contraste estava apoiado demais na cor." },
+    ],
+  },
+  rag: {
+    body: "RAG, ou geração aumentada por recuperação, busca trechos relevantes em uma base de conhecimento e entrega esse contexto ao modelo antes de gerar a resposta.",
+    videoUrl: null,
+    videoTitle: null,
+    videoDurationMinutes: null,
+    readingMinutes: 9,
+    contentBlocks: [
+      { type: "text", heading: "O problema: memória não é fonte", body: "Um modelo responde a partir dos padrões aprendidos no treinamento e do contexto recebido na conversa. Ele não conhece automaticamente documentos privados, mudanças recentes ou a fonte exata de cada afirmação." },
+      { type: "diagram", heading: "O fluxo de uma resposta com RAG", nodes: [
+        { label: "Pergunta", detail: "O usuário descreve o que precisa saber." },
+        { label: "Recuperação", detail: "O sistema encontra os trechos mais relacionados." },
+        { label: "Contexto", detail: "Os trechos recuperados acompanham a instrução." },
+        { label: "Resposta", detail: "O modelo responde usando as evidências disponíveis." },
+      ] },
+      { type: "text", heading: "O que entra na base", body: "Manuais, políticas, páginas, atas e catálogos precisam ser divididos em trechos pesquisáveis. Metadados como origem, data, autor e permissão ajudam a recuperar o material certo sem misturar contextos." },
+      { type: "callout", heading: "RAG não elimina verificação", body: "Recuperar uma fonte ruim produz uma resposta bem escrita sobre uma evidência ruim. O sistema ainda precisa mostrar origem, lidar com ausência de resultado e admitir quando não encontrou base suficiente." },
+      { type: "text", heading: "Quando faz sentido", body: "Use RAG quando a resposta depende de conteúdo específico, atualizado ou privado. Para tarefas criativas sem uma base documental, acrescentar recuperação pode aumentar custo e complexidade sem melhorar o resultado." },
+    ],
+  },
+} satisfies Record<string, ConceptLessonContent>;
+
+const conceptDetails: readonly ConceptDetail[] = concepts.map((concept) => {
+  const content = conceptContent[concept.slug as keyof typeof conceptContent] ?? conceptContent.contraste;
+  return {
+    ...concept,
+    ...content,
+    relatedConcepts: concepts.filter((item) => item.id !== concept.id),
+  };
+});
 
 const libraryResources: readonly LibraryResourceDetail[] = [
   {
