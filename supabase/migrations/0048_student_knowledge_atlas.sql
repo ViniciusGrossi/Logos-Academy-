@@ -65,8 +65,20 @@ alter table logos_academy.concepts
   add constraint concepts_reading_minutes_check check (reading_minutes between 1 and 120),
   add constraint concepts_content_blocks_check check (private.knowledge_content_blocks_valid(content_blocks));
 
-update logos_academy.concepts
-set content_blocks = jsonb_build_array(jsonb_build_object('type','text','heading','Em resumo','body',body));
+-- O backfill ignora conceitos do Explorer v1: a trigger de 0015 torna esse
+-- currículo imutável e aborta qualquer update nessas linhas. Elas nascem com
+-- content_blocks '[]' e recebem conteúdo por migration própria no namespace v2.
+update logos_academy.concepts c
+set content_blocks = jsonb_build_array(jsonb_build_object('type','text','heading','Em resumo','body',c.body))
+where not exists (
+  select 1
+  from logos_academy.lesson_concepts lc
+  join logos_academy.lesson_templates l on l.tenant_id = lc.tenant_id and l.id = lc.lesson_template_id
+  join logos_academy.cycles cy on cy.tenant_id = l.tenant_id and cy.id = l.cycle_id
+  where lc.tenant_id = c.tenant_id
+    and lc.concept_id = c.id
+    and cy.curriculum_id = md5('logos-academy-explorer-v1-curriculum')::uuid
+);
 
 create table logos_academy.knowledge_resources (
   id uuid primary key default gen_random_uuid(),

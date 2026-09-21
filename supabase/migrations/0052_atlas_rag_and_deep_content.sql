@@ -82,4 +82,25 @@ on conflict (tenant_id, lesson_template_id, concept_id) do update set
   deleted_at = null,
   updated_at = now();
 
+-- O vínculo acima cobre apenas o Explorer v1. As matrículas ativas usam o
+-- currículo v2 (migration 0049), cujas aulas têm ids próprios; sem este
+-- segundo vínculo o conceito RAG nunca seria liberado para o aluno.
+with rag_concept as (
+  select c.id, c.tenant_id
+  from logos_academy.concepts c
+  join logos_academy.tenants t on t.id = c.tenant_id
+  where t.slug = 'logos-academy' and t.deleted_at is null
+    and c.slug = 'rag' and c.deleted_at is null
+)
+insert into logos_academy.lesson_concepts (id, tenant_id, lesson_template_id, concept_id)
+select
+  md5('logos-academy-atlas-lesson-concept-rag-v2')::uuid,
+  r.tenant_id,
+  md5('logos-academy-explorer-v2-lesson-11')::uuid,
+  r.id
+from rag_concept r
+on conflict (tenant_id, lesson_template_id, concept_id) do update set
+  deleted_at = null,
+  updated_at = now();
+
 commit;
