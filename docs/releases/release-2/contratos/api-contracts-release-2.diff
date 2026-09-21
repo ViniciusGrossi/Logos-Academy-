@@ -1,0 +1,97 @@
+diff --git a/specs/api.contracts.ts b/specs/api.contracts.ts
+index 5ac5e35..b6ce062 100644
+--- a/specs/api.contracts.ts
++++ b/specs/api.contracts.ts
+@@ -138,6 +138,8 @@ export interface SessionSummary {
+ }
+ 
+ export interface AttendanceEntry {
++  /** SR-A1 (Release 2): id do registro de frequência, exigido para registrar reposição. */
++  attendanceId: UUID;
+   enrollmentId: UUID;
+   studentName: string;
+   status: AttendanceStatus;
+@@ -320,6 +322,43 @@ export interface SubmissionDetail {
+ /** Entrega na fila administrativa, com a rubrica necess\u00e1ria para publicar o feedback. */
+ export interface ReviewQueueSubmission extends SubmissionDetail {
+   criteria: readonly ActivityCriterion[];
++  /** SR-A4 (Release 2): contexto legível para a fila de revisão. */
++  student: { id: UUID; displayName: string };
++  activity: { title: string; lessonPosition: number; cyclePosition: number };
++  classSummary: { id: UUID; name: string } | null;
++  dueAt: ISODateTime | null;
++}
++
++/** SR-A5 (Release 2): workspace único de revisão. */
++export interface AdminSubmissionWorkspace extends ReviewQueueSubmission {
++  requirements: readonly ActivityRequirement[];
++  /** Versões anteriores enviadas da mesma atividade, mais recente primeiro. */
++  previousVersions: readonly SubmissionDetail[];
++}
++
++/** SR-A2 (Release 2): falta sem reposição concluída. */
++export interface PendingMakeup {
++  attendanceId: UUID;
++  enrollmentId: UUID;
++  studentId: UUID;
++  studentName: string;
++  classId: UUID | null;
++  className: string | null;
++  session: SessionSummary;
++  status: Exclude<AttendanceStatus, "present">;
++}
++
++/** SR-A3 (Release 2). */
++export interface CurriculumOption {
++  id: UUID;
++  name: string;
++  version: string;
++  status: "active";
++}
++
++/** SR-A6 (Release 2): frequência do aluno na visão administrativa (inclui nota privada). */
++export interface AdminStudentAttendanceEntry extends AttendanceEntry {
++  session: SessionSummary;
+ }
+ 
+ export interface ProjectSummary {
+@@ -594,6 +633,31 @@ export interface ApiContracts {
+     },
+     ReviewDetail
+   >;
++  /** SR-A5 */
++  "GET /api/admin/submissions/:submissionId": Endpoint<
++    { submissionId: UUID },
++    AdminSubmissionWorkspace
++  >;
++  /** SR-A2 */
++  "GET /api/admin/makeups": Endpoint<
++    PageQuery & { classId?: UUID; studentId?: UUID },
++    Page<PendingMakeup>
++  >;
++  /** SR-A3 */
++  "GET /api/admin/curricula": Endpoint<
++    Record<string, never>,
++    readonly CurriculumOption[]
++  >;
++  /** SR-A6 */
++  "GET /api/admin/students/:studentId/submissions": Endpoint<
++    PageQuery & { studentId: UUID },
++    Page<ReviewQueueSubmission>
++  >;
++  /** SR-A6 */
++  "GET /api/admin/students/:studentId/attendance": Endpoint<
++    PageQuery & { studentId: UUID; enrollmentId?: UUID },
++    Page<AdminStudentAttendanceEntry>
++  >;
+ 
+   "GET /api/student/home": Endpoint<Record<string, never>, StudentHome>;
+   "POST /api/student/reviews/:reviewId/seen": Endpoint<
+@@ -678,6 +742,7 @@ export interface ApiContracts {
+     { file: UploadedFile; signedUploadUrl: string; expiresAt: ISODateTime }
+   >;
+   "POST /api/files/:fileId/finalize": Endpoint<{ fileId: UUID }, UploadedFile>;
++  /** SR-A7 (Release 2): aluno dono do arquivo ou admin do mesmo tenant. */
+   "GET /api/files/:fileId/download-url": Endpoint<
+     { fileId: UUID },
+     { signedDownloadUrl: string; expiresAt: ISODateTime }

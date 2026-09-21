@@ -1,0 +1,17 @@
+{
+  "admin-operations-completion": {
+    "spec": "docs/specs/admin-operations-completion.md",
+    "status": "approved",
+    "wave": 11,
+    "scope": "release-2-onda-a-admin",
+    "built": false,
+    "reviewed": false,
+    "dependencies": [
+      "admissions-classes-calendar",
+      "sessions-attendance-release",
+      "review-feedback-loop",
+      "projects-portfolio-completion",
+      "admin-dashboard"
+    ]
+  }
+}
