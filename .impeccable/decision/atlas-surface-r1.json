@@ -1,0 +1,62 @@
+{
+  "title": "Atlas — escolha a composição (novo sorteio)",
+  "question": "Três novas estruturas, mesmo mundo visual da Academy. Escolha uma, direcione ou sorteie de novo.",
+  "options": [
+    {
+      "id": "bussola",
+      "label": "Bússola de Busca",
+      "kicker": "THE ROLL",
+      "lineage": "bússola de orientação e rumos numerados",
+      "thesis": "A busca é o instrumento: uma agulha aponta o rumo de cada material encontrado.",
+      "palette": ["#101114", "#FFFFFF", "#F5F6F7", "#FF6B00"],
+      "materials": ["rosa de rumos em traço fino", "graus como coordenada de aula"],
+      "viewport": "Cabeçalho Ink com bússola SVG à direita cuja agulha gira para a coleção e o item em foco; abas e busca logo abaixo; índice à esquerda como lista de rumos; leitor amplo.",
+      "risk": "Se a agulha só decorar, vira ornamento; ela precisa refletir tab, busca e seleção.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "título + contador", "x": 0, "y": 0, "w": 8, "h": 2},
+        {"label": "bússola viva", "x": 8, "y": 0, "w": 4, "h": 2, "accent": true},
+        {"label": "abas + busca contextual", "x": 0, "y": 2, "w": 12, "h": 1},
+        {"label": "índice como rumos", "x": 0, "y": 3, "w": 4, "h": 7},
+        {"label": "leitor editorial", "x": 4, "y": 3, "w": 8, "h": 7}
+      ]}
+    },
+    {
+      "id": "regua-aulas",
+      "label": "Régua das 16 Aulas",
+      "lineage": "régua técnica graduada",
+      "thesis": "Todo material está ancorado numa aula; a régua mostra onde você está e o que já foi liberado.",
+      "palette": ["#101114", "#FFFFFF", "#7C5CFC", "#FF6B00"],
+      "materials": ["régua graduada em 16 marcas e 4 ciclos", "marcas laranja por material liberado; trecho futuro hachurado"],
+      "viewport": "Régua sticky sob as abas com 16 graduações; clicar numa aula filtra o índice; o item aberto acende sua marca; índice à esquerda, leitor à direita.",
+      "risk": "Em 375 a régua precisa virar seletor compacto para não comprimir.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "cabeçalho", "x": 0, "y": 0, "w": 12, "h": 2},
+        {"label": "abas + busca", "x": 0, "y": 2, "w": 12, "h": 1},
+        {"label": "régua 01–16 · C1–C4", "x": 0, "y": 3, "w": 12, "h": 1, "accent": true},
+        {"label": "índice", "x": 0, "y": 4, "w": 4, "h": 6},
+        {"label": "leitor editorial", "x": 4, "y": 4, "w": 8, "h": 6}
+      ]}
+    },
+    {
+      "id": "carta-atlas",
+      "label": "Carta do Atlas",
+      "lineage": "carta náutica com grade de coordenadas",
+      "thesis": "O conhecimento liberado é território mapeado; o que virá é terra incógnita.",
+      "palette": ["#101114", "#FFFFFF", "#D5D8DC", "#FF6B00"],
+      "materials": ["grade ciclo × aula com marcadores", "zona futura em hachura sem rótulos"],
+      "viewport": "Carta horizontal no cabeçalho com materiais plotados por aula; a troca de aba reprojeta os marcadores; o item em foco ganha coordenada C·A no leitor; índice à esquerda, leitor amplo.",
+      "risk": "A carta ocupa altura; precisa colapsar em faixa fina ao rolar.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "título", "x": 0, "y": 0, "w": 4, "h": 3},
+        {"label": "carta ciclo×aula + terra incógnita", "x": 4, "y": 0, "w": 8, "h": 3, "accent": true},
+        {"label": "abas + busca", "x": 0, "y": 3, "w": 12, "h": 1},
+        {"label": "índice", "x": 0, "y": 4, "w": 4, "h": 6},
+        {"label": "leitor com coordenada", "x": 4, "y": 4, "w": 8, "h": 6}
+      ]}
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true,
+  "buildPath": {"value": "code", "toggle": false}
+}

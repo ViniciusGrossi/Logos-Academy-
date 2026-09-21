@@ -145,6 +145,162 @@ export interface AttendanceEntry {
   makeup: { completedAt: ISODateTime; makeupSessionId: UUID | null } | null;
 }
 
+/* ---------------------------------------------------------------------------
+ * Atlas — central de conhecimento (spec: docs/specs/student-knowledge-atlas.md v2)
+ * Conceitos, Prompts e Sistemas de Design com CMS editorial por blocos.
+ * Nenhum bloco aceita HTML, CSS ou JavaScript arbitrário.
+ * ------------------------------------------------------------------------- */
+
+export type KnowledgeItemKind = "concept" | "prompt" | "design_system";
+export type LibraryResourceKind = Exclude<KnowledgeItemKind, "concept">;
+export type KnowledgeItemStatus = "draft" | "published" | "archived";
+
+/** Trecho inline seguro. `href` aceita somente HTTPS ou caminho interno iniciado por "/". */
+export interface KnowledgeInline {
+  text: string;
+  marks?: readonly ("bold" | "italic" | "code")[];
+  href?: string;
+}
+export type KnowledgeParagraph = readonly KnowledgeInline[];
+
+/** Referência a imagem editorial em `knowledge-assets`. `url` é assinada pelo backend e nunca é persistida. */
+export interface KnowledgeImage {
+  assetId: UUID;
+  alt: string;
+  caption: string | null;
+  width: number;
+  height: number;
+  url?: string;
+}
+
+export type KnowledgeBlock =
+  | { id: string; type: "rich_text"; content: readonly KnowledgeParagraph[] }
+  | { id: string; type: "heading"; level: 2 | 3; text: string }
+  | { id: string; type: "list"; style: "bullet" | "ordered"; items: readonly KnowledgeParagraph[] }
+  | { id: string; type: "callout"; tone: "info" | "tip" | "warning"; title: string; content: readonly KnowledgeParagraph[] }
+  | { id: string; type: "image"; image: KnowledgeImage }
+  | { id: string; type: "gallery"; images: readonly KnowledgeImage[] }
+  | {
+      id: string;
+      type: "diagram";
+      title: string;
+      layout: "sequence" | "cycle" | "hierarchy";
+      nodes: readonly { id: string; label: string; detail: string }[];
+      edges: readonly { from: string; to: string; label: string | null }[];
+    }
+  | { id: string; type: "code"; language: string; code: string; caption: string | null }
+  | { id: string; type: "quote"; variant: "quote" | "definition"; text: string; attribution: string | null };
+
+export type KnowledgeBlockType = KnowledgeBlock["type"];
+
+/** Vídeo não listado do YouTube. Distribuição, não controle de acesso. */
+export interface KnowledgeVideo {
+  provider: "youtube";
+  /** ID normalizado de 11 caracteres [A-Za-z0-9_-]. */
+  videoId: string;
+  title: string;
+  durationSeconds: number;
+  transcript: string;
+  captionsReviewed: boolean;
+}
+
+export interface KnowledgeLessonRef {
+  lessonTemplateId: UUID;
+  curriculumId: UUID;
+  cyclePosition: number;
+  lessonPosition: number;
+  lessonTitle: string;
+}
+
+export interface ConceptArtifact {
+  type: "concept";
+  objective: string;
+  video: KnowledgeVideo | null;
+  summaryPoints: readonly string[];
+  reviewQuestions: readonly string[];
+}
+
+export interface PromptVariable {
+  /** Nome usado no template como {{key}}; [a-z][a-z0-9_]{0,39}. */
+  key: string;
+  label: string;
+  description: string;
+  example: string;
+  required: boolean;
+}
+
+export interface PromptArtifact {
+  type: "prompt";
+  objective: string;
+  whenToUse: readonly string[];
+  whenNotToUse: readonly string[];
+  template: string;
+  anatomy: readonly { label: string; excerpt: string; explanation: string }[];
+  variables: readonly PromptVariable[];
+  exampleInput: string;
+  exampleOutput: string;
+  cautions: readonly string[];
+  adaptMinutes: number;
+}
+
+export type DesignFontRole = "sans" | "serif" | "mono" | "display";
+export type DesignPreviewKind = "button" | "field" | "card" | "badge" | "callout" | "navigation" | "editorial_block";
+
+/** Espécime renderizado somente por componentes controlados do frontend. */
+export interface DesignComponentPreview {
+  id: string;
+  kind: DesignPreviewKind;
+  label: string;
+  description: string;
+  /** Textos exibidos no espécime; nunca markup. */
+  copy: readonly string[];
+  /** Nomes de cores da paleta deste sistema (não valores livres). */
+  tokens: { background: string; foreground: string; accent: string | null; border: string | null };
+  /** Nome de um raio definido em `radii`. */
+  radius: string | null;
+}
+
+export interface DesignSystemArtifact {
+  type: "design_system";
+  purpose: string;
+  context: string;
+  principles: readonly { title: string; detail: string }[];
+  /** `value` em #RRGGBB. */
+  palette: readonly { name: string; value: string; role: string }[];
+  typography: readonly {
+    name: string;
+    fontRole: DesignFontRole;
+    weight: 400 | 500 | 600 | 700 | 800;
+    sizePx: number;
+    sample: string;
+    role: string;
+  }[];
+  spacing: readonly { name: string; valuePx: number }[];
+  radii: readonly { name: string; valuePx: number }[];
+  components: readonly DesignComponentPreview[];
+  usageExamples: readonly { title: string; description: string }[];
+  dos: readonly string[];
+  donts: readonly string[];
+  referenceImages: readonly KnowledgeImage[];
+}
+
+export type KnowledgeArtifact = ConceptArtifact | PromptArtifact | DesignSystemArtifact;
+
+/** Documento editorial completo; o aluno recebe sempre o snapshot publicado. */
+export interface KnowledgeDocument {
+  kind: KnowledgeItemKind;
+  title: string;
+  slug: string;
+  summary: string;
+  tags: readonly string[];
+  readingMinutes: number;
+  blocks: readonly KnowledgeBlock[];
+  artifact: KnowledgeArtifact;
+}
+
+/* ----- Leitura do aluno ----- */
+
+/** Resumo mínimo usado por Início, Atividade e Projetos. */
 export interface ConceptSummary {
   id: UUID;
   slug: string;
@@ -153,60 +309,176 @@ export interface ConceptSummary {
   releasedAt: ISODateTime;
 }
 
-export type KnowledgeContentBlock =
-  | { type: "text"; heading: string; body: string }
-  | { type: "callout"; heading: string; body: string }
-  | { type: "image"; url: string; alt: string; caption: string | null }
-  | {
-      type: "diagram";
-      heading: string;
-      nodes: readonly { label: string; detail: string }[];
-    };
-
-export interface ConceptDetail extends ConceptSummary {
-  body: string;
-  videoUrl: string | null;
-  videoTitle: string | null;
-  videoDurationMinutes: number | null;
-  readingMinutes: number;
-  contentBlocks: readonly KnowledgeContentBlock[];
-  relatedConcepts: readonly ConceptSummary[];
+export interface KnowledgeRelatedItem {
+  id: UUID;
+  kind: KnowledgeItemKind;
+  title: string;
+  summary: string;
 }
 
-export type LibraryResourceKind = "prompt" | "design_system";
-
-export interface LibraryResourceSummary {
+/** Item de índice do Atlas: Conceitos e bibliotecas compartilham a mesma base. */
+export interface AtlasItemSummary {
   id: UUID;
-  kind: LibraryResourceKind;
+  kind: KnowledgeItemKind;
   slug: string;
   title: string;
   summary: string;
+  tags: readonly string[];
+  /** Apenas aulas já liberadas ao aluno. */
+  lessons: readonly KnowledgeLessonRef[];
   releasedAt: ISODateTime;
+  readingMinutes: number;
+}
+
+export interface AtlasConceptSummary extends AtlasItemSummary {
+  kind: "concept";
+  videoDurationSeconds: number | null;
+}
+
+export interface LibraryResourceSummary extends AtlasItemSummary {
+  kind: LibraryResourceKind;
+  /** Prompt: quantidade de variáveis. Design system: 0. */
+  variableCount: number;
+  /** Prompt: minutos para compreender e adaptar. Design system: null. */
+  adaptMinutes: number | null;
+  /** Design system: miniatura com até 5 cores (#RRGGBB). Prompt: []. */
+  swatches: readonly string[];
+  /** Design system: contagens documentadas. Prompt: null. */
+  colorCount: number | null;
+  componentCount: number | null;
+  /** Prompt: template base para ação rápida "Copiar base". Design system: null. */
+  template: string | null;
+}
+
+export interface AtlasFacets {
+  /** Total liberado na coleção consultada, ignorando busca e filtros. */
+  totalReleased: number;
+  tags: readonly string[];
+  lessons: readonly KnowledgeLessonRef[];
+  /** Existe conteúdo publicado ainda não liberado; nunca revela quantidade, título ou tipo. */
+  hasUpcoming: boolean;
+}
+
+export interface AtlasPage<T> extends Page<T> {
+  facets: AtlasFacets;
+}
+
+export interface AtlasActivityLink {
+  assignmentId: UUID;
+  title: string;
   lessonPosition: number;
 }
 
-export type LibraryArtifact =
-  | {
-      type: "prompt";
-      template: string;
-      variables: readonly { token: string; description: string }[];
-      exampleInput: string | null;
-      exampleOutput: string | null;
-    }
-  | {
-      type: "design_system";
-      palette: readonly { name: string; value: string; role: string }[];
-      typography: readonly { name: string; sample: string; role: string }[];
-      principles: readonly string[];
-      components: readonly { name: string; description: string }[];
-    };
+export interface ConceptDetail extends AtlasConceptSummary {
+  /** Resumo textual legado (compatibilidade). */
+  body: string;
+  objective: string;
+  /** Somente vídeo publicado com legenda revisada. */
+  video: Omit<KnowledgeVideo, "captionsReviewed"> | null;
+  blocks: readonly KnowledgeBlock[];
+  summaryPoints: readonly string[];
+  reviewQuestions: readonly string[];
+  relatedConcepts: readonly AtlasConceptSummary[];
+  relatedItems: readonly KnowledgeRelatedItem[];
+  activity: AtlasActivityLink | null;
+}
 
 export interface LibraryResourceDetail extends LibraryResourceSummary {
-  body: string;
-  readingMinutes: number;
-  contentBlocks: readonly KnowledgeContentBlock[];
-  artifact: LibraryArtifact;
-  relatedResources: readonly LibraryResourceSummary[];
+  blocks: readonly KnowledgeBlock[];
+  artifact: PromptArtifact | DesignSystemArtifact;
+  relatedItems: readonly KnowledgeRelatedItem[];
+}
+
+export interface AtlasListQuery extends PageQuery {
+  search?: string;
+  cycle?: number;
+  lesson?: number;
+  tag?: string;
+}
+
+/* ----- CMS administrativo ----- */
+
+export interface KnowledgeEditor {
+  userId: UUID;
+  displayName: string;
+}
+
+export interface AdminKnowledgeItemSummary {
+  id: UUID;
+  kind: KnowledgeItemKind;
+  status: KnowledgeItemStatus;
+  title: string;
+  slug: string;
+  summary: string;
+  tags: readonly string[];
+  curriculumId: UUID;
+  curriculumName: string;
+  lessons: readonly KnowledgeLessonRef[];
+  /** Existe rascunho salvo diferente do snapshot publicado. */
+  hasUnpublishedChanges: boolean;
+  publishedAt: ISODateTime | null;
+  archivedAt: ISODateTime | null;
+  updatedAt: ISODateTime;
+  updatedBy: KnowledgeEditor | null;
+}
+
+export interface KnowledgeAsset {
+  id: UUID;
+  filename: string;
+  contentType: "image/png" | "image/jpeg" | "image/webp";
+  sizeBytes: number;
+  width: number;
+  height: number;
+  status: "pending" | "ready" | "rejected";
+  /** URL assinada curta; ausente enquanto `pending`. */
+  url: string | null;
+}
+
+export interface KnowledgePublishIssue {
+  /** Caminho do campo, ex.: "summary", "blocks[3].image.alt", "artifact.video.captionsReviewed". */
+  path: string;
+  message: string;
+}
+
+export interface AdminKnowledgeItemDetail extends AdminKnowledgeItemSummary {
+  /** Rascunho de trabalho (sempre o mais recente salvo). */
+  document: KnowledgeDocument;
+  /** Snapshot visto pelos alunos; null antes da primeira publicação. */
+  publishedDocument: KnowledgeDocument | null;
+  lessonTemplateIds: readonly UUID[];
+  /** Imagens referenciadas pelo rascunho, com URL assinada para a prévia. */
+  assets: readonly KnowledgeAsset[];
+  /** Pendências que hoje impediriam a publicação; vazio = publicável. */
+  publishIssues: readonly KnowledgePublishIssue[];
+}
+
+export interface AdminKnowledgeCurriculumOption {
+  id: UUID;
+  name: string;
+  lessons: readonly KnowledgeLessonRef[];
+}
+
+export interface AdminKnowledgePage extends Page<AdminKnowledgeItemSummary> {
+  options: {
+    curricula: readonly AdminKnowledgeCurriculumOption[];
+    tags: readonly string[];
+  };
+}
+
+export interface AdminKnowledgeListQuery extends PageQuery {
+  kind?: KnowledgeItemKind;
+  status?: KnowledgeItemStatus;
+  curriculumId?: UUID;
+  cycle?: number;
+  lesson?: number;
+  tag?: string;
+  search?: string;
+}
+
+export interface AdminKnowledgeWriteInput {
+  curriculumId: UUID;
+  lessonTemplateIds: readonly UUID[];
+  document: KnowledgeDocument;
 }
 
 export interface ActivityCriterion {
@@ -595,6 +867,39 @@ export interface ApiContracts {
     ReviewDetail
   >;
 
+  "GET /api/admin/atlas": Endpoint<AdminKnowledgeListQuery, AdminKnowledgePage>;
+  "POST /api/admin/atlas": Endpoint<AdminKnowledgeWriteInput, AdminKnowledgeItemDetail>;
+  "GET /api/admin/atlas/:itemId": Endpoint<{ itemId: UUID }, AdminKnowledgeItemDetail>;
+  /** Salva rascunho; nunca publica. 409 CONFLICT quando expectedUpdatedAt diverge. */
+  "PATCH /api/admin/atlas/:itemId": Endpoint<
+    { itemId: UUID; expectedUpdatedAt: ISODateTime } & AdminKnowledgeWriteInput,
+    AdminKnowledgeItemDetail
+  >;
+  /** Valida e copia o rascunho para o snapshot publicado. 400 VALIDATION_ERROR com fieldErrors quando houver pendências. */
+  "POST /api/admin/atlas/:itemId/publish": Endpoint<
+    { itemId: UUID; expectedUpdatedAt: ISODateTime },
+    AdminKnowledgeItemDetail
+  >;
+  /** Remove das listas estudantis sem apagar o registro. */
+  "POST /api/admin/atlas/:itemId/archive": Endpoint<
+    { itemId: UUID; expectedUpdatedAt: ISODateTime },
+    AdminKnowledgeItemDetail
+  >;
+  "POST /api/admin/atlas/assets/upload-url": Endpoint<
+    {
+      filename: string;
+      contentType: KnowledgeAsset["contentType"];
+      sizeBytes: number;
+      width: number;
+      height: number;
+    },
+    { asset: KnowledgeAsset; signedUploadUrl: string; expiresAt: ISODateTime }
+  >;
+  "POST /api/admin/atlas/assets/:assetId/finalize": Endpoint<
+    { assetId: UUID },
+    KnowledgeAsset
+  >;
+
   "GET /api/student/home": Endpoint<Record<string, never>, StudentHome>;
   "POST /api/student/reviews/:reviewId/seen": Endpoint<
     { reviewId: UUID },
@@ -622,16 +927,16 @@ export interface ApiContracts {
     }>
   >;
   "GET /api/student/concepts": Endpoint<
-    PageQuery & { search?: string },
-    Page<ConceptSummary>
+    AtlasListQuery & { hasVideo?: boolean; maxReadingMinutes?: number },
+    AtlasPage<AtlasConceptSummary>
   >;
   "GET /api/student/concepts/:conceptId": Endpoint<
     { conceptId: UUID },
     ConceptDetail
   >;
   "GET /api/student/library": Endpoint<
-    PageQuery & { kind: LibraryResourceKind; search?: string },
-    Page<LibraryResourceSummary>
+    AtlasListQuery & { kind: LibraryResourceKind },
+    AtlasPage<LibraryResourceSummary>
   >;
   "GET /api/student/library/:resourceId": Endpoint<
     { resourceId: UUID },

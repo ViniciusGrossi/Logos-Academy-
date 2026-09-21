@@ -1,0 +1,59 @@
+{
+  "title": "Atlas — escolha a composição",
+  "question": "O mundo visual da Academy é mantido. Escolha a estrutura e o destaque visual do Atlas, ou peça outro sorteio.",
+  "options": [
+    {
+      "id": "mesa-de-luz",
+      "label": "Mesa de Luz",
+      "kicker": "THE ROLL",
+      "lineage": "mesa de luz de estúdio com folha de contato",
+      "thesis": "Cada material é um slide; abrir é projetá-lo sobre a mesa iluminada.",
+      "palette": ["#101114", "#FFFFFF", "#F5F6F7", "#FF6B00"],
+      "materials": ["folha de contato", "moldura de slide com coordenada C·A"],
+      "viewport": "Cabeçalho Ink com a mesa acesa; abas como três bandejas; índice em folha de contato à esquerda; leitor amplo como superfície iluminada.",
+      "risk": "Se a moldura de slide for tímida, vira lista comum com borda.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "cabeçalho + contador liberado", "x": 0, "y": 0, "w": 12, "h": 2},
+        {"label": "bandejas: Conceitos · Prompts · Sistemas", "x": 0, "y": 2, "w": 12, "h": 1, "accent": true},
+        {"label": "folha de contato (índice)", "x": 0, "y": 3, "w": 4, "h": 7},
+        {"label": "mesa iluminada: player + artigo", "x": 4, "y": 3, "w": 8, "h": 7, "accent": true}
+      ]}
+    },
+    {
+      "id": "estante-espinhas",
+      "label": "Estante em Espinhas",
+      "lineage": "prateleira de biblioteca técnica",
+      "thesis": "Tudo o que foi liberado aparece como lombadas; espaços vazios guardam o que virá.",
+      "palette": ["#101114", "#FFFFFF", "#7C5CFC", "#FF6B00"],
+      "materials": ["lombadas com altura = tempo de leitura", "vãos tracejados para aulas futuras"],
+      "viewport": "Faixa-estante no topo com lombadas das 16 aulas; a lombada escolhida se projeta; abaixo, índice à esquerda e leitor à direita.",
+      "risk": "A estante disputa altura com o leitor em notebooks.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "cabeçalho", "x": 0, "y": 0, "w": 12, "h": 1},
+        {"label": "estante: lombadas por aula + vãos futuros", "x": 0, "y": 1, "w": 12, "h": 2, "accent": true},
+        {"label": "abas + busca", "x": 0, "y": 3, "w": 12, "h": 1},
+        {"label": "índice", "x": 0, "y": 4, "w": 4, "h": 6},
+        {"label": "leitor editorial", "x": 4, "y": 4, "w": 8, "h": 6}
+      ]}
+    },
+    {
+      "id": "fichario",
+      "label": "Fichário de Consulta",
+      "lineage": "gaveta de fichas catalográficas",
+      "thesis": "O índice é uma gaveta com divisórias por ciclo; o leitor é a ficha técnica aberta.",
+      "palette": ["#101114", "#FFFFFF", "#D5D8DC", "#FF6B00"],
+      "materials": ["divisórias com orelha por ciclo", "carimbo de coordenada e perfuração"],
+      "viewport": "Abas como etiquetas de gaveta; índice com divisórias C1–C4 escalonadas; ficha ampla com carimbo de aula e perfuração lateral.",
+      "risk": "Pode soar arquivístico demais para adolescentes se o carimbo pesar.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "cabeçalho", "x": 0, "y": 0, "w": 12, "h": 2},
+        {"label": "etiquetas de gaveta (abas)", "x": 0, "y": 2, "w": 6, "h": 1, "accent": true},
+        {"label": "gaveta com divisórias C1–C4", "x": 0, "y": 3, "w": 4, "h": 7, "accent": true},
+        {"label": "ficha técnica aberta", "x": 4, "y": 3, "w": 8, "h": 7}
+      ]}
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "buildPath": {"value": "code", "toggle": false}
+}

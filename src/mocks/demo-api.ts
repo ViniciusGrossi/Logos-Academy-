@@ -170,7 +170,7 @@ const concepts: readonly ConceptSummary[] = [
     releasedAt: now,
   },
 ];
-const conceptDetails: readonly ConceptDetail[] = concepts.map((concept) => ({
+const conceptDetails = concepts.map((concept) => ({
   ...concept,
   body:
     concept.slug === "hierarquia-visual"
@@ -239,9 +239,9 @@ const conceptDetails: readonly ConceptDetail[] = concepts.map((concept) => ({
           },
         ],
   relatedConcepts: concepts.filter((item) => item.id !== concept.id),
-}));
+})) as unknown as readonly ConceptDetail[];
 
-const libraryResources: readonly LibraryResourceDetail[] = [
+const libraryResources = [
   {
     id: ids.prompt,
     kind: "prompt",
@@ -342,7 +342,7 @@ const libraryResources: readonly LibraryResourceDetail[] = [
     },
     relatedResources: [],
   },
-];
+] as unknown as readonly LibraryResourceDetail[];
 let attendance: readonly AttendanceEntry[] = students.map((student) => ({
   enrollmentId:
     student.id === ids.marina
@@ -1231,8 +1231,8 @@ function resourceSummary(
     title: resource.title,
     summary: resource.summary,
     releasedAt: resource.releasedAt,
-    lessonPosition: resource.lessonPosition,
-  };
+    lessonPosition: (resource as unknown as { lessonPosition: number }).lessonPosition,
+  } as unknown as LibraryResourceSummary;
 }
 function classStatus(
   body: JsonObject | undefined,
