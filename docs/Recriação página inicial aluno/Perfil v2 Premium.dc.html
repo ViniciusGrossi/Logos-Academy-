@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/tokens/tokens.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/fonts/fonts.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/styles.css">
+<script src="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scrollbar-color: #343941 #101114; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--color-ink-950); color: var(--color-white); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--color-orange-400); }
+  [data-icon] > svg { width: 100%; height: 100%; display: block; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @keyframes word-up { from { opacity: 0; transform: translate3d(0, .7em, 0) rotate(1.5deg); filter: blur(6px); } }
+  @keyframes line-reveal { from { transform: scaleX(0); } }
+  @keyframes rail-in { from { transform: scaleY(0); } }
+  @keyframes sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(240%) skewX(-18deg); } }
+  @keyframes ambient-pulse { 0%, 100% { opacity: .22; transform: scale(.75); } 50% { opacity: 1; transform: scale(1.25); } }
+  @keyframes ambient-spin { to { transform: rotate(360deg); } }
+  @keyframes glow-breathe { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .78; transform: scale(1.12); } }
+  @keyframes grid-drift { to { background-position: 4rem 4rem, 4rem 4rem; } }
+  @keyframes core-ring { 0% { opacity: .75; transform: scale(.42); } 100% { opacity: 0; transform: scale(1.65); } }
+  @keyframes bar-grow { from { transform: scaleX(0); } }
+
+  @keyframes prf-ring { 0%, 34% { box-shadow: 0 0 0 1px rgb(255 255 255 / 14%); } 52%, 100% { box-shadow: 0 0 0 2px rgb(255 107 0 / 70%), 0 0 1.1rem rgb(255 107 0 / 45%); } }
+  @keyframes prf-skel { 0%, 30% { opacity: 1; } 44%, 100% { opacity: 0; } }
+  @keyframes prf-text { 0%, 36% { opacity: 0; transform: translateY(.25rem); } 50%, 100% { opacity: 1; transform: none; } }
+  @keyframes prf-thumb { 0%, 46% { opacity: .12; transform: translateY(.4rem) scale(.96); } 62%, 100% { opacity: 1; transform: none; } }
+  @keyframes prf-vis-a { 0%, 62% { opacity: 1; } 74%, 100% { opacity: 0; } }
+  @keyframes prf-vis-b { 0%, 66% { opacity: 0; } 78%, 100% { opacity: 1; } }
+  @keyframes prf-cap-a { 0%, 58% { opacity: 1; transform: none; } 70%, 100% { opacity: 0; transform: translateY(-.35rem); } }
+  @keyframes prf-cap-b { 0%, 64% { opacity: 0; transform: translateY(.35rem); } 78%, 100% { opacity: 1; transform: none; } }
+  @keyframes prf-meter { 0%, 32% { width: 52%; } 50%, 100% { width: 88%; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+
+  @media (max-width: 90rem) {
+    [data-r="hero"] { grid-template-columns: 1fr !important; }
+    [data-r="core"] { justify-self: stretch !important; max-width: none !important; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) !important; align-items: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 16 / 10 !important; }
+  }
+  @media (max-width: 76rem) {
+    [data-r="identity"] { grid-template-columns: 1fr !important; }
+    [data-r="works"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    [data-r="visibility"] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 64rem) {
+    [data-r="sidebar"] { transform: translateX(-105%); box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 60%); }
+    [data-r="sidebar"][data-open="true"] { transform: translateX(0); }
+    [data-r="workspace"] { margin-inline-start: 0 !important; }
+    [data-r="menu"] { display: inline-grid !important; }
+    [data-r="scrim"] { display: block !important; }
+  }
+  @media (max-width: 58rem) {
+    [data-r="works"] { grid-template-columns: minmax(0, 1fr) !important; }
+    [data-r="seals"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    [data-r="account"] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 48rem) {
+    [data-r="topbar"] { padding-inline: 12px !important; }
+    [data-r="crumb-root"], [data-r="avatar"], [data-r="role"], [data-r="pulse-label"] { display: none !important; }
+    [data-r="hero"] h1 { font-size: clamp(2.2rem, 9vw, 3.2rem) !important; }
+    [data-r="actions"] { flex-direction: column !important; align-items: stretch !important; }
+    [data-r="actions"] > a, [data-r="actions"] > button { width: 100% !important; }
+    [data-r="nav-sections"] { overflow-x: auto !important; }
+    [data-r="seals"] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 40rem) {
+    [data-r="core"] { grid-template-columns: 1fr !important; max-width: 22rem !important; justify-self: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 4 / 3 !important; }
+  }
+</style>
+</helmet>
+<div class="dark" style="position: relative; min-height: 100vh; overflow-x: hidden; background: var(--color-ink-950); color: var(--color-white)">
+  <div aria-hidden="true" style="position: fixed; z-index: 0; inset: 0; pointer-events: none">
+    <span style="position: absolute; left: 14%; top: -18rem; width: 46rem; height: 46rem; border-radius: 50%; background: radial-gradient(circle, rgb(124 92 252 / 14%), transparent 62%); filter: blur(1rem); animation: glow-breathe 15s ease-in-out infinite"></span>
+    <span style="position: absolute; right: -14rem; top: 34%; width: 42rem; height: 42rem; border-radius: 50%; background: radial-gradient(circle, rgb(255 107 0 / 13%), transparent 64%); filter: blur(1rem); animation: glow-breathe 19s ease-in-out -6s infinite"></span>
+    <span style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px); background-size: 4rem 4rem, 4rem 4rem; mask-image: radial-gradient(circle at 50% 18%, #000 0, transparent 70%); animation: grid-drift 26s linear infinite"></span>
+    <span style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 28%, transparent 38%, rgb(8 9 11 / 74%) 100%)"></span>
+  </div>
+
+  <div data-r="scrim" onClick="{{ closeNav }}" aria-hidden="true" style="display: none; position: fixed; z-index: 45; inset: 0; background: rgb(8 9 11 / 62%); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity var(--motion-standard) var(--ease-standard)"></div>
+
+  <aside data-r="sidebar" style="position: fixed; z-index: 50; inset: 0 auto 0 0; display: flex; width: 16.5rem; flex-direction: column; padding: 24px 20px; background: linear-gradient(180deg, rgb(23 25 29 / 96%), rgb(16 17 20 / 96%)); backdrop-filter: blur(1.25rem); border-right: 1px solid var(--border); transition: transform var(--motion-standard) var(--ease-standard)">
+    <span aria-hidden="true" style="position: absolute; inset: 0 0 auto auto; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, rgb(255 107 0 / 55%) 22%, rgb(255 107 0 / 12%) 62%, transparent); transform-origin: top; animation: rail-in var(--motion-emphasis) var(--ease-emphasis) both"></span>
+    <a href="Inicio Aluno v2 Premium.dc.html" style="position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: 12px; color: var(--color-white)">
+      <span style="position: relative; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%)">
+        <img src="brand/logos-academy-symbol-dark.png" alt="" width="52" height="52" style="width: 26px; height: 26px; object-fit: contain">
+        <i aria-hidden="true" style="position: absolute; inset: -0.35rem; border: 1px dashed rgb(255 107 0 / 22%); border-radius: var(--radius-lg); animation: ambient-spin 28s linear infinite"></i>
+      </span>
+      <span style="display: grid; gap: 1px; text-transform: uppercase; letter-spacing: .16em">
+        <strong style="font-size: var(--text-xs); line-height: 1">Logos</strong>
+        <small style="color: var(--accent); font: 700 9px/1.2 var(--font-mono); letter-spacing: .28em">Academy</small>
+      </span>
+    </a>
+
+    <div style="position: relative; flex: 0 0 auto; margin: 40px 0 28px; padding: 14px 14px 14px 16px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(124 92 252 / 12%), rgb(255 107 0 / 8%))">
+      <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-explorer); box-shadow: 0 0 1rem rgb(124 92 252 / 70%)"></span>
+      <span aria-hidden="true" style="position: absolute; inset: 0; width: 38%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 12%), transparent); animation: sheen 6.5s var(--ease-standard) infinite"></span>
+      <span style="display: inline-flex; align-items: center; gap: .4rem; font: 700 10px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--color-explorer)">
+        <i style="width: .4rem; height: .4rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .6rem var(--color-explorer)"></i> Explorer · nível 01
+      </span>
+      <strong style="display: block; max-width: 16ch; margin-top: 10px; font-size: var(--text-md); font-weight: 600; line-height: 1.3; letter-spacing: -.02em">Rumo ao Builder</strong>
+      <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 11px">3 evidências para desbloquear</small>
+    </div>
+
+    <nav style="display: grid; gap: 20px; min-height: 0; overflow-y: auto">
+      <div style="display: grid; gap: 6px">
+        <span style="display: block; margin: 0 12px 6px; font: 700 10px var(--font-mono); color: rgb(255 255 255 / 40%); letter-spacing: .12em; text-transform: uppercase">Meu espaço</span>
+        <a href="Inicio Aluno v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="house" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Início</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Atividade v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="clipboard-check" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Atividade</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Jornada v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="gauge" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Jornada</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Projetos v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="folder-kanban" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Projetos</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Atlas.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="book-open-text" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Atlas</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Agenda v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="calendar-days" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Agenda</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" aria-current="page" style="position: relative; display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; overflow: hidden; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); color: var(--color-white); background: linear-gradient(90deg, rgb(255 107 0 / 16%), rgb(255 107 0 / 3%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent)"></span>
+          <span data-icon="user-round" style="width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent)"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm); font-weight: 600">Perfil</span><span data-side-pct="" style="border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-pill); padding: 2px 7px; color: var(--accent); font: 700 9px/1 var(--font-mono)">64%</span>
+        </a>
+      </div>
+    </nav>
+
+    <div style="display: flex; flex: 0 0 auto; gap: 12px; align-items: center; margin-top: auto; padding-top: 28px; color: rgb(255 255 255 / 66%)">
+      <span data-icon="shield-check" style="width: 20px; height: 20px; flex: 0 0 auto; color: var(--color-success)"></span>
+      <span style="display: block">
+        <strong style="display: block; color: var(--color-white); font-size: var(--text-xs)">Você controla o que aparece</strong>
+        <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 11px">Nada sai do perfil sem sua permissão</small>
+      </span>
+    </div>
+  </aside>
+
+  <div data-r="workspace" style="position: relative; z-index: 1; min-width: 0; margin-inline-start: 16.5rem">
+    <header data-r="topbar" style="position: sticky; top: 0; z-index: 30; display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 16px; padding-inline: clamp(16px, 4vw, 40px); background: rgb(16 17 20 / 78%); border-bottom: 1px solid var(--border); backdrop-filter: blur(1rem)">
+      <div style="display: flex; min-width: 0; align-items: center; gap: 10px; font-size: var(--text-xs); color: var(--muted)">
+        <button type="button" data-r="menu" onClick="{{ toggleNav }}" aria-label="Abrir navegação" style="display: none; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer"><span data-icon="menu" style="width: 18px; height: 18px"></span></button>
+        <span data-r="crumb-root">Logos Academy</span>
+        <span data-icon="chevron-right" data-r="crumb-root" style="width: 14px; height: 14px"></span>
+        <strong style="color: var(--color-white)">Perfil</strong>
+        <span data-r="pulse-label" data-top-vis="" style="display: inline-flex; align-items: center; gap: .45rem; margin-left: 8px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 5px 10px; font: 700 10px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent)">
+          <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> <span data-top-vis-text="">perfil por link</span>
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <a href="#" data-r="role" style="display: inline-flex; min-height: 44px; align-items: center; padding-inline: 16px; border-radius: var(--radius-md); color: var(--muted); font-weight: 600; font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(255 255 255 / 6%); color: var(--color-white)">Ver como visitante</a>
+        <button type="button" aria-label="Ativar tema claro" style="display: inline-grid; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+          <span data-icon="sun" style="width: 18px; height: 18px"></span>
+        </button>
+        <a href="#" data-r="avatar" aria-label="Abrir perfil de Marina Alves" style="display: inline-flex; min-height: 44px; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 4px 12px 4px 4px; background: rgb(255 255 255 / 4%); color: var(--color-white); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent)">
+          <span style="display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-orange-500), var(--color-explorer)); color: var(--color-white); font: 700 11px var(--font-mono)">MA</span>
+          <span style="display: grid; gap: 1px; line-height: 1.1">
+            <strong style="font-size: 11px">Marina</strong>
+            <small style="color: var(--muted); font: 700 8px var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Explorer</small>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main data-screen-label="Perfil" style="width: min(100%, 82rem); margin-inline: auto; padding: clamp(20px, 4vw, 44px) clamp(16px, 4vw, 40px) 96px">
+      <a href="Inicio Aluno v2 Premium.dc.html" style="display: inline-flex; min-height: 44px; align-items: center; gap: .55rem; margin-bottom: 1rem; color: var(--muted); font: 700 .68rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; transition: gap var(--motion-fast) var(--ease-standard)" style-hover="color: var(--accent); gap: .85rem">
+        <span data-icon="arrow-left" style="width: 1rem; height: 1rem"></span> Voltar ao início
+      </a>
+
+      <header data-r="hero" data-spotlight="" data-reveal="" style="position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 21rem; gap: clamp(24px, 4vw, 48px); align-items: center; overflow: hidden; padding: clamp(24px, 4vw, 52px); border: 1px solid var(--border); border-radius: 1.6rem .35rem 1.6rem 1.6rem; background: linear-gradient(140deg, rgb(34 37 42 / 76%), rgb(16 17 20 / 92%) 62%, rgb(41 24 12 / 58%)); backdrop-filter: blur(1.5rem); box-shadow: 0 2.5rem 6rem rgb(0 0 0 / 55%), inset 0 1px rgb(255 255 255 / 7%)" style-after="position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--accent) 16%, var(--color-explorer) 52%, transparent 82%); content: ''; box-shadow: 0 0 1.2rem rgb(255 107 0 / 45%)">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(22rem 22rem at var(--sx, 78%) var(--sy, 36%), rgb(255 107 0 / 11%), transparent 70%); transition: background 220ms var(--ease-standard)"></div>
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px); background-size: 2.5rem 2.5rem, 2.5rem 2.5rem; mask-image: radial-gradient(16rem 16rem at var(--sx, 78%) var(--sy, 36%), #000, transparent 72%)"></div>
+
+        <div style="position: relative; z-index: 3; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: .5rem; color: var(--accent); font: 800 .64rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+            <span data-icon="id-card" style="width: 13px; height: 13px"></span> Perfil público · <span data-handle-url="">logos.academy/marina</span>
+          </span>
+          <h1 style="max-width: 22ch; margin: .9rem 0 .7rem; font-size: clamp(2.4rem, 4.4vw, 4.2rem); font-weight: 600; line-height: .95; letter-spacing: -.055em; text-wrap: balance">
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) both">Seu</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .07s both">perfil</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .14s both">é</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .21s both">o</span>
+            <span style="position: relative; display: inline-block; color: var(--accent); text-shadow: 0 0 2.5rem rgb(255 107 0 / 45%); animation: word-up .9s var(--ease-emphasis) .28s both">portfólio<i aria-hidden="true" style="position: absolute; inset: auto 0 -.1em 0; height: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent); transform-origin: left; animation: line-reveal .9s var(--ease-emphasis) .85s both"></i></span>
+          </h1>
+          <p style="max-width: 52ch; margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.6">Nada aqui é biografia inventada: o que aparece são projetos publicados, selos com evidência aprovada e o nível que você realmente alcançou.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem">
+            <span style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgb(124 92 252 / 38%); border-radius: var(--radius-pill); padding: .45rem .8rem; background: rgb(124 92 252 / 10%); color: #A78BFA; font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">
+              <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .6rem var(--color-explorer); animation: ambient-pulse 2.2s ease-in-out infinite"></i> Explorer ativo
+            </span>
+            <span style="display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .45rem .8rem; color: var(--color-white); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em">2 projetos publicados</span>
+            <span style="display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .45rem .8rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em">Desde mar 2026</span>
+          </div>
+          <div data-r="actions" style="display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.6rem">
+            <a href="#identidade" style="display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; border-radius: var(--radius-md); padding-inline: 1.1rem; background: var(--accent); color: #FFFFFF; font-size: .84rem; font-weight: 600; transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: var(--color-orange-400); color: #FFFFFF; transform: translateY(-2px)">
+              <span data-icon="pencil" style="width: .9rem; height: .9rem"></span> Completar perfil
+            </a>
+            <button type="button" onClick="{{ copyLink }}" style="display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; border: 1px solid rgb(255 255 255 / 20%); border-radius: var(--radius-md); padding-inline: 1.1rem; background: transparent; color: var(--color-white); font-size: .84rem; font-weight: 600; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+              <span data-icon="link" style="width: .9rem; height: .9rem"></span> <span data-copy-label="">Copiar link do perfil</span>
+            </button>
+          </div>
+        </div>
+
+        <aside data-r="core" aria-label="Cartão público e estado do perfil" style="position: relative; z-index: 3; display: grid; gap: .6rem; width: 100%; max-width: 21rem; align-content: start; justify-self: end">
+          <figure style="position: relative; display: grid; gap: .7rem; margin: 0; overflow: hidden; padding: .95rem; border: 1px solid rgb(255 107 0 / 28%); border-radius: 1.2rem .3rem 1.2rem 1.2rem; background: linear-gradient(158deg, rgb(255 107 0 / 11%), rgb(16 17 20 / 88%) 66%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgb(255 107 0 / 70%), transparent)"></span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--accent); font: 800 .55rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+                <i style="width: .34rem; height: .34rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .5rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> cartão público
+              </span>
+              <span style="color: rgb(255 255 255 / 45%); font: 750 .55rem/1 var(--font-mono); letter-spacing: .06em">prévia ao vivo</span>
+            </div>
+
+            <div data-r="spec-sheet" role="img" aria-label="Prévia animada do cartão público: o avatar recebe o anel do nível, a bio substitui os campos vazios, os três projetos publicados aparecem e a visibilidade muda de somente você para público" style="position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: .7rem; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; padding: .95rem; border: 1px solid rgb(255 255 255 / 12%); border-radius: var(--radius-md); background: linear-gradient(180deg, #0D0E11, #14161B)">
+              <span style="display: flex; align-items: center; gap: .6rem">
+                <b aria-hidden="true" style="display: grid; width: 2.3rem; height: 2.3rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-orange-500), var(--color-explorer)); color: var(--color-white); font: 700 .65rem/1 var(--font-mono); animation: prf-ring 8s var(--ease-emphasis) infinite">MA</b>
+                <span style="display: grid; gap: .25rem; min-width: 0; flex: 1">
+                  <b style="font-size: .72rem; font-weight: 600; letter-spacing: -.01em">Marina Alves</b>
+                  <small data-handle-mini="" style="color: rgb(255 255 255 / 48%); font: 750 .52rem/1 var(--font-mono)">/marina</small>
+                </span>
+                <b style="flex: 0 0 auto; border-radius: var(--radius-pill); padding: .25rem .5rem; background: rgb(124 92 252 / 18%); color: #A78BFA; font: 750 .5rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(124 92 252 / 45%)">Explorer</b>
+              </span>
+
+              <span style="position: relative; display: block; height: 2.6rem">
+                <span aria-hidden="true" style="position: absolute; inset: 0; display: grid; align-content: center; gap: .35rem; animation: prf-skel 8s var(--ease-emphasis) infinite">
+                  <i style="display: block; width: 92%; height: .4rem; border-radius: 2px; background: rgb(255 255 255 / 9%)"></i>
+                  <i style="display: block; width: 64%; height: .4rem; border-radius: 2px; background: rgb(255 255 255 / 9%)"></i>
+                  <i style="display: block; width: 38%; height: .4rem; border-radius: 2px; background: rgb(255 255 255 / 9%)"></i>
+                </span>
+                <small style="position: absolute; inset: 0; display: grid; align-content: center; color: rgb(255 255 255 / 68%); font-size: .62rem; line-height: 1.45; animation: prf-text 8s var(--ease-emphasis) infinite">Estudo design com IA e construo peças que precisam existir de verdade — cartazes, radares de referência, protótipos.</small>
+              </span>
+
+              <span style="display: grid; gap: .3rem">
+                <small style="color: rgb(255 255 255 / 42%); font: 750 .48rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">no portfólio</small>
+                <span style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3rem">
+                  <i style="display: block; height: 2.2rem; border-radius: 4px; background: linear-gradient(140deg, rgb(255 107 0 / 55%), rgb(255 107 0 / 12%)); animation: prf-thumb 8s var(--ease-emphasis) infinite"></i>
+                  <i style="display: block; height: 2.2rem; border-radius: 4px; background: linear-gradient(140deg, rgb(124 92 252 / 55%), rgb(124 92 252 / 12%)); animation: prf-thumb 8s var(--ease-emphasis) .18s infinite"></i>
+                  <i style="display: block; height: 2.2rem; border-radius: 4px; background: linear-gradient(140deg, rgb(22 163 74 / 45%), rgb(22 163 74 / 10%)); animation: prf-thumb 8s var(--ease-emphasis) .36s infinite"></i>
+                </span>
+              </span>
+
+              <span style="display: grid; gap: .3rem">
+                <i style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><b style="display: block; width: 52%; height: 100%; border-radius: 2px; background: var(--accent); animation: prf-meter 8s var(--ease-emphasis) infinite"></b></i>
+                <span style="position: relative; display: block; height: 1.2rem">
+                  <b style="position: absolute; inset: 0; display: inline-flex; align-items: center; gap: .3rem; color: rgb(255 255 255 / 45%); font: 750 .5rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; animation: prf-vis-a 8s var(--ease-emphasis) infinite">
+                    <i style="width: .3rem; height: .3rem; border-radius: 50%; background: rgb(255 255 255 / 40%)"></i> somente você
+                  </b>
+                  <b style="position: absolute; inset: 0; display: inline-flex; align-items: center; gap: .3rem; color: var(--color-success); font: 750 .5rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; animation: prf-vis-b 8s var(--ease-emphasis) infinite">
+                    <i style="width: .3rem; height: .3rem; border-radius: 50%; background: var(--color-success); box-shadow: 0 0 .5rem rgb(22 163 74 / 70%)"></i> público · indexado
+                  </b>
+                </span>
+              </span>
+            </div>
+
+            <figcaption style="position: relative; height: 2.4rem">
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: prf-cap-a 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">Bio e projetos preenchem o cartão</strong>
+                <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">64% · rascunho</small>
+              </span>
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: prf-cap-b 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">Completo, o perfil vira link público</strong>
+                <small style="color: var(--color-success); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">88% · pronto</small>
+              </span>
+            </figcaption>
+          </figure>
+
+          <div style="display: grid; gap: .5rem; align-content: start; min-width: 0">
+            <div style="position: relative; display: flex; align-items: center; gap: .8rem; overflow: hidden; padding: .8rem .9rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 88%)">
+              <span style="position: relative; display: grid; flex: 0 0 auto; width: 4.5rem; height: 4.5rem; place-items: center">
+                <i aria-hidden="true" style="position: absolute; inset: -.25rem; border: 1px solid rgb(255 107 0 / 22%); border-radius: 50%; animation: core-ring 3.6s var(--ease-standard) infinite"></i>
+                <i aria-hidden="true" data-gauge="" style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from -90deg, var(--accent) 64%, rgb(255 255 255 / 8%) 64%); transition: background var(--motion-emphasis) var(--ease-emphasis)"></i>
+                <i aria-hidden="true" style="position: absolute; inset: .3rem; border-radius: 50%; background: radial-gradient(circle at 42% 34%, rgb(255 107 0 / 14%), rgb(16 17 20 / 97%) 66%)"></i>
+                <strong data-gauge-pct="" style="position: relative; font: 700 .95rem/1 var(--font-sans); letter-spacing: -.03em; color: var(--color-white); font-variant-numeric: tabular-nums">64%</strong>
+              </span>
+              <span style="display: grid; gap: .25rem; min-width: 0">
+                <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Perfil completo</small>
+                <strong data-gauge-note="" style="color: var(--accent); font: 750 .72rem/1 var(--font-mono); letter-spacing: .04em">faltam 3 itens</strong>
+                <small style="color: var(--muted); font-size: .68rem; line-height: 1.4">Cada item marcado abaixo avança este anel.</small>
+              </span>
+            </div>
+
+            <ul style="display: grid; gap: 1px; margin: 0; padding: 0; overflow: hidden; list-style: none; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(255 255 255 / 7%)">
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="eye" style="width: .95rem; height: .95rem; justify-self: center; color: var(--accent)"></span>
+                <small style="color: var(--muted); font-size: .72rem">Visitas ao perfil</small>
+                <strong style="font: 750 .7rem/1 var(--font-mono); color: var(--color-white)">24 · 30 dias</strong>
+              </li>
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="award" style="width: .95rem; height: .95rem; justify-self: center; color: #F0A63B"></span>
+                <small style="color: var(--muted); font-size: .72rem">Selos com evidência</small>
+                <strong style="font: 750 .7rem/1 var(--font-mono); color: #F0A63B">5 de 12</strong>
+              </li>
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="globe" style="width: .95rem; height: .95rem; justify-self: center; color: var(--color-success)"></span>
+                <small style="color: var(--muted); font-size: .72rem">Visibilidade</small>
+                <strong data-vis-chip="" style="font: 750 .7rem/1 var(--font-mono); color: var(--color-white)">Por link</strong>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </header>
+
+      <nav data-r="nav-sections" aria-label="Seções do perfil" style="position: sticky; top: 72px; z-index: 20; display: flex; gap: .3rem; margin-top: 1rem; padding: .4rem; border: 1px solid var(--border); border-radius: var(--radius-pill); background: rgb(16 17 20 / 88%); backdrop-filter: blur(1rem)">
+        <a href="#identidade" data-section-link="identidade" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Identidade</a>
+        <a href="#portfolio" data-section-link="portfolio" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Portfólio</a>
+        <a href="#selos" data-section-link="selos" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Selos</a>
+        <a href="#visibilidade" data-section-link="visibilidade" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Visibilidade</a>
+        <a href="#conta" data-section-link="conta" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Conta</a>
+      </nav>
+
+      <section id="identidade" data-section="identidade" data-reveal="" aria-labelledby="ident-title" data-r="identity" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: .6rem; margin-top: 1.6rem; scroll-margin-top: 9rem">
+        <div style="padding: clamp(20px, 2.6vw, 32px); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 72%)">
+          <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Quem constrói</span>
+          <h2 id="ident-title" style="margin: .5rem 0 .3rem; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Identidade</h2>
+          <p style="max-width: 46ch; margin: 0 0 1.3rem; color: var(--muted); font-size: .8rem; line-height: 1.55">Nome e link são como colegas e mentores te encontram. A bio explica o que você constrói — em uma frase.</p>
+
+          <div style="display: grid; gap: .8rem">
+            <label style="display: grid; gap: .35rem">
+              <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Nome exibido</small>
+              <input type="text" value="Marina Alves" style="min-height: 44px; padding-inline: .85rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(16 17 20 / 82%); color: var(--color-white); font-size: .86rem" style-focus="border-color: var(--accent); outline: none">
+            </label>
+            <label style="display: grid; gap: .35rem">
+              <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Link do perfil</small>
+              <span style="display: flex; min-height: 44px; align-items: center; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(16 17 20 / 82%)">
+                <small style="flex: 0 0 auto; padding-inline: .85rem; color: rgb(255 255 255 / 40%); font: 750 .72rem/1 var(--font-mono)">logos.academy/</small>
+                <input type="text" value="marina" onInput="{{ onHandle }}" style="min-width: 0; flex: 1; min-height: 42px; padding-inline: 0 .85rem; border: 0; background: transparent; color: var(--color-white); font: 750 .82rem/1 var(--font-mono)" style-focus="outline: none">
+              </span>
+            </label>
+            <label style="display: grid; gap: .35rem">
+              <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Bio · uma frase</small>
+              <textarea rows="3" style="padding: .7rem .85rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(16 17 20 / 82%); color: var(--color-white); font-size: .86rem; line-height: 1.5; resize: vertical" style-focus="border-color: var(--accent); outline: none">Estudo design com IA e construo peças que precisam existir de verdade — cartazes, radares de referência, protótipos.</textarea>
+              <small style="color: var(--muted); font-size: .68rem">Aparece no cartão público, abaixo do seu nome.</small>
+            </label>
+            <div style="display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .2rem">
+              <button type="button" style="display: inline-flex; min-height: 44px; align-items: center; gap: .45rem; border: 0; border-radius: var(--radius-md); padding-inline: 1.1rem; background: var(--accent); color: #FFFFFF; font-size: .82rem; font-weight: 600; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: var(--color-orange-400)">
+                <span data-icon="check" style="width: .85rem; height: .85rem"></span> Salvar identidade
+              </button>
+              <button type="button" style="display: inline-flex; min-height: 44px; align-items: center; gap: .45rem; border: 1px solid #D5D8DC; border-radius: var(--radius-md); padding-inline: 1.1rem; background: transparent; color: var(--color-white); font-size: .82rem; font-weight: 600; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+                <span data-icon="image-plus" style="width: .85rem; height: .85rem"></span> Trocar avatar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative; display: grid; gap: .7rem; align-content: start; overflow: hidden; padding: clamp(18px, 2.4vw, 28px); border: 1px solid rgb(255 107 0 / 32%); border-radius: var(--radius-lg); background: linear-gradient(140deg, rgb(41 24 12 / 62%), rgb(23 25 29 / 90%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: linear-gradient(180deg, var(--accent), transparent); box-shadow: 0 0 1rem rgb(255 107 0 / 60%)"></span>
+          <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Completar perfil</span>
+          <p style="margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Marque o que já fez — o anel do cartão acompanha.</p>
+          <ul style="display: grid; gap: .4rem; margin: 0; padding: 0; list-style: none">
+            <li>
+              <button type="button" data-step="0" aria-pressed="false" onClick="{{ toggleStep0 }}" style="display: grid; width: 100%; grid-template-columns: 1.25rem minmax(0, 1fr); gap: .7rem; align-items: center; padding: .75rem .85rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+                <span data-step-mark="0" data-icon="circle" style="width: 1.1rem; height: 1.1rem; color: rgb(255 255 255 / 30%)"></span>
+                <span style="display: grid; gap: .2rem; min-width: 0">
+                  <strong style="font-size: .8rem; font-weight: 600">Avatar próprio</strong>
+                  <small style="color: var(--muted); font-size: .7rem">Hoje suas iniciais ocupam o lugar</small>
+                </span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-step="1" aria-pressed="false" onClick="{{ toggleStep1 }}" style="display: grid; width: 100%; grid-template-columns: 1.25rem minmax(0, 1fr); gap: .7rem; align-items: center; padding: .75rem .85rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+                <span data-step-mark="1" data-icon="circle" style="width: 1.1rem; height: 1.1rem; color: rgb(255 255 255 / 30%)"></span>
+                <span style="display: grid; gap: .2rem; min-width: 0">
+                  <strong style="font-size: .8rem; font-weight: 600">Capa do cartaz atualizada</strong>
+                  <small style="color: var(--muted); font-size: .7rem">A versão 02 ainda não tem imagem de capa</small>
+                </span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-step="2" aria-pressed="false" onClick="{{ toggleStep2 }}" style="display: grid; width: 100%; grid-template-columns: 1.25rem minmax(0, 1fr); gap: .7rem; align-items: center; padding: .75rem .85rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+                <span data-step-mark="2" data-icon="circle" style="width: 1.1rem; height: 1.1rem; color: rgb(255 255 255 / 30%)"></span>
+                <span style="display: grid; gap: .2rem; min-width: 0">
+                  <strong style="font-size: .8rem; font-weight: 600">Escolher visibilidade</strong>
+                  <small style="color: var(--muted); font-size: .7rem">Defina quem pode abrir seu perfil</small>
+                </span>
+              </button>
+            </li>
+          </ul>
+          <small data-step-note="" style="color: var(--muted); font: 750 .6rem/1.4 var(--font-mono); letter-spacing: .04em">3 itens abertos · o anel está em 64%</small>
+        </div>
+      </section>
+
+      <section id="portfolio" data-section="portfolio" data-reveal="" aria-labelledby="port-title" style="margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Evidência, não promessa</span>
+            <h2 id="port-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">O que aparece no portfólio</h2>
+          </div>
+          <div role="group" aria-label="Filtrar peças do portfólio" style="display: flex; flex-wrap: wrap; gap: .3rem">
+            <button type="button" data-filter="todos" aria-pressed="true" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Todos</button>
+            <button type="button" data-filter="publicado" aria-pressed="false" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Publicados</button>
+            <button type="button" data-filter="revisao" aria-pressed="false" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Em revisão</button>
+            <button type="button" data-filter="oculto" aria-pressed="false" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Ocultos</button>
+          </div>
+        </div>
+
+        <ul data-r="works" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin: 1rem 0 0; padding: 0; list-style: none">
+          <li data-work="publicado" style="display: grid; gap: .55rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span aria-hidden="true" style="display: block; width: 100%; height: 6.5rem; border-radius: var(--radius-md); background: linear-gradient(140deg, rgb(255 107 0 / 45%), rgb(255 107 0 / 8%)); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%)"></span>
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <small style="color: var(--color-success); font: 750 .56rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">Publicado · 12 ago</small>
+              <span data-icon="globe" style="width: .85rem; height: .85rem; color: var(--color-success)"></span>
+            </span>
+            <strong style="font-size: .9rem; font-weight: 600">Radar de referências</strong>
+            <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Painel que compara 12 estúdios por decisão tipográfica.</small>
+            <button type="button" style="display: inline-flex; min-height: 38px; width: fit-content; align-items: center; gap: .4rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding-inline: .7rem; background: transparent; color: var(--muted); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">Ocultar do perfil</button>
+          </li>
+          <li data-work="revisao" style="display: grid; gap: .55rem; padding: 1rem; border: 1px solid rgb(255 107 0 / 34%); border-radius: var(--radius-lg); background: linear-gradient(140deg, rgb(255 107 0 / 10%), rgb(23 25 29 / 86%))">
+            <span aria-hidden="true" style="display: block; width: 100%; height: 6.5rem; border-radius: var(--radius-md); background: linear-gradient(140deg, rgb(124 92 252 / 45%), rgb(124 92 252 / 8%)); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%)"></span>
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <small style="color: var(--accent); font: 750 .56rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">Em revisão · v02</small>
+              <span data-icon="git-branch" style="width: .85rem; height: .85rem; color: var(--accent)"></span>
+            </span>
+            <strong style="font-size: .9rem; font-weight: 600">Cartaz Creative Studio</strong>
+            <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Vinicius pediu um ajuste de hierarquia — a v02 responde.</small>
+            <a href="Projetos v2 Premium.dc.html" style="display: inline-flex; min-height: 38px; width: fit-content; align-items: center; gap: .4rem; border: 1px solid rgb(255 107 0 / 45%); border-radius: var(--radius-md); padding-inline: .7rem; color: var(--accent); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; transition: gap var(--motion-fast) var(--ease-standard)" style-hover="gap: .65rem">Abrir projeto</a>
+          </li>
+          <li data-work="publicado" style="display: grid; gap: .55rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span aria-hidden="true" style="display: block; width: 100%; height: 6.5rem; border-radius: var(--radius-md); background: linear-gradient(140deg, rgb(22 163 74 / 40%), rgb(22 163 74 / 8%)); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%)"></span>
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <small style="color: var(--color-success); font: 750 .56rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">Publicado · 29 ago</small>
+              <span data-icon="globe" style="width: .85rem; height: .85rem; color: var(--color-success)"></span>
+            </span>
+            <strong style="font-size: .9rem; font-weight: 600">Assistente de leitura</strong>
+            <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Protótipo que resume artigos longos em três perguntas.</small>
+            <button type="button" style="display: inline-flex; min-height: 38px; width: fit-content; align-items: center; gap: .4rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding-inline: .7rem; background: transparent; color: var(--muted); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">Ocultar do perfil</button>
+          </li>
+          <li data-work="oculto" style="display: grid; gap: .55rem; padding: 1rem; border: 1px dashed rgb(255 255 255 / 16%); border-radius: var(--radius-lg); background: rgb(23 25 29 / 45%)">
+            <span aria-hidden="true" style="display: block; width: 100%; height: 6.5rem; border-radius: var(--radius-md); background: repeating-linear-gradient(135deg, rgb(255 255 255 / 6%) 0 .5rem, transparent .5rem 1rem); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 6%)"></span>
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <small style="color: var(--muted); font: 750 .56rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">Oculto · rascunho</small>
+              <span data-icon="eye-off" style="width: .85rem; height: .85rem; color: var(--muted)"></span>
+            </span>
+            <strong style="font-size: .9rem; font-weight: 600">Estudo de cores</strong>
+            <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Exercício da semana 03 — sem feedback de mentor ainda.</small>
+            <button type="button" style="display: inline-flex; min-height: 38px; width: fit-content; align-items: center; gap: .4rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding-inline: .7rem; background: transparent; color: var(--muted); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">Mostrar no perfil</button>
+          </li>
+        </ul>
+        <small data-work-count="" style="display: block; margin-top: .7rem; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">4 peças · 2 visíveis no perfil público</small>
+      </section>
+
+      <section id="selos" data-section="selos" data-reveal="" aria-labelledby="selos-title" style="margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Competência verificada</span>
+            <h2 id="selos-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Selos com evidência</h2>
+          </div>
+          <a href="Jornada v2 Premium.dc.html" style="display: inline-flex; min-height: 40px; align-items: center; gap: .45rem; color: var(--muted); font: 750 .64rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; transition: gap var(--motion-fast) var(--ease-standard)" style-hover="color: var(--accent); gap: .7rem">Ver mapa de competências <span data-icon="arrow-right" style="width: .9rem; height: .9rem"></span></a>
+        </div>
+
+        <ul data-r="seals" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; margin: 1rem 0 0; padding: 0; list-style: none">
+          <li style="position: relative; display: grid; gap: .4rem; overflow: hidden; padding: 1rem; border: 1px solid rgb(22 163 74 / 32%); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-success)"></span>
+            <span data-icon="terminal" style="width: 1.1rem; height: 1.1rem; color: var(--color-success)"></span>
+            <strong style="font-size: .84rem; font-weight: 600">Pensamento com prompts</strong>
+            <small style="color: var(--muted); font-size: .72rem; line-height: 1.45">6 evidências aprovadas</small>
+            <span style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><i style="display: block; width: 100%; height: 100%; background: var(--color-success); transform-origin: left; animation: bar-grow 1s var(--ease-emphasis) both"></i></span>
+          </li>
+          <li style="position: relative; display: grid; gap: .4rem; overflow: hidden; padding: 1rem; border: 1px solid rgb(124 92 252 / 32%); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-explorer)"></span>
+            <span data-icon="chart-line" style="width: 1.1rem; height: 1.1rem; color: #A78BFA"></span>
+            <strong style="font-size: .84rem; font-weight: 600">Leitura de dados</strong>
+            <small style="color: var(--muted); font-size: .72rem; line-height: 1.45">3 evidências aprovadas</small>
+            <span style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><i style="display: block; width: 75%; height: 100%; background: var(--color-explorer); transform-origin: left; animation: bar-grow 1s var(--ease-emphasis) .1s both"></i></span>
+          </li>
+          <li style="position: relative; display: grid; gap: .4rem; overflow: hidden; padding: 1rem; border: 1px solid rgb(255 107 0 / 34%); border-radius: var(--radius-lg); background: linear-gradient(140deg, rgb(255 107 0 / 10%), rgb(23 25 29 / 86%))">
+            <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .9rem var(--accent)"></span>
+            <span data-icon="hammer" style="width: 1.1rem; height: 1.1rem; color: var(--accent)"></span>
+            <strong style="font-size: .84rem; font-weight: 600">Protótipo funcional</strong>
+            <small style="color: var(--accent); font-size: .72rem; line-height: 1.45">Em construção · ciclo 02</small>
+            <span style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><i style="display: block; width: 50%; height: 100%; background: var(--accent); transform-origin: left; animation: bar-grow 1s var(--ease-emphasis) .2s both"></i></span>
+          </li>
+          <li style="display: grid; gap: .4rem; padding: 1rem; border: 1px dashed rgb(255 255 255 / 16%); border-radius: var(--radius-lg); background: rgb(23 25 29 / 45%)">
+            <span data-icon="lock-keyhole" style="width: 1.1rem; height: 1.1rem; color: var(--muted)"></span>
+            <strong style="font-size: .84rem; font-weight: 600; color: rgb(255 255 255 / 72%)">Defesa de decisão</strong>
+            <small style="color: var(--muted); font-size: .72rem; line-height: 1.45">Abre com a próxima entrega documentada</small>
+            <span style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><i style="display: block; width: 25%; height: 100%; background: rgb(255 255 255 / 28%)"></i></span>
+          </li>
+        </ul>
+      </section>
+
+      <section id="visibilidade" data-section="visibilidade" data-reveal="" aria-labelledby="vis-title" data-r="visibility" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: .6rem; margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="padding: clamp(20px, 2.6vw, 32px); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 72%)">
+          <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Quem pode abrir</span>
+          <h2 id="vis-title" style="margin: .5rem 0 .3rem; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Visibilidade</h2>
+          <p style="max-width: 46ch; margin: 0 0 1.2rem; color: var(--muted); font-size: .8rem; line-height: 1.55">Escolha um nível — o cartão público e o topo da página respondem na hora.</p>
+
+          <div role="radiogroup" aria-label="Nível de visibilidade do perfil" style="display: grid; gap: .45rem">
+            <button type="button" data-vis="privado" role="radio" aria-checked="false" style="display: grid; width: 100%; grid-template-columns: 1.25rem minmax(0, 1fr); gap: .75rem; align-items: start; padding: .95rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(16 17 20 / 72%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+              <span data-vis-mark="privado" data-icon="circle" style="width: 1.1rem; height: 1.1rem; margin-top: .1rem; color: rgb(255 255 255 / 30%)"></span>
+              <span style="display: grid; gap: .25rem; min-width: 0">
+                <strong style="font-size: .86rem; font-weight: 600">Privado</strong>
+                <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Só você e seu mentor veem o perfil e os projetos.</small>
+              </span>
+            </button>
+            <button type="button" data-vis="link" role="radio" aria-checked="true" style="display: grid; width: 100%; grid-template-columns: 1.25rem minmax(0, 1fr); gap: .75rem; align-items: start; padding: .95rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(16 17 20 / 72%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+              <span data-vis-mark="link" data-icon="circle" style="width: 1.1rem; height: 1.1rem; margin-top: .1rem; color: rgb(255 255 255 / 30%)"></span>
+              <span style="display: grid; gap: .25rem; min-width: 0">
+                <strong style="font-size: .86rem; font-weight: 600">Por link</strong>
+                <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Quem tem o link abre. Não aparece em busca nem na vitrine da turma.</small>
+              </span>
+            </button>
+            <button type="button" data-vis="publico" role="radio" aria-checked="false" style="display: grid; width: 100%; grid-template-columns: 1.25rem minmax(0, 1fr); gap: .75rem; align-items: start; padding: .95rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(16 17 20 / 72%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+              <span data-vis-mark="publico" data-icon="circle" style="width: 1.1rem; height: 1.1rem; margin-top: .1rem; color: rgb(255 255 255 / 30%)"></span>
+              <span style="display: grid; gap: .25rem; min-width: 0">
+                <strong style="font-size: .86rem; font-weight: 600">Público</strong>
+                <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Entra na vitrine da turma e pode ser indexado por buscadores.</small>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; gap: .5rem; align-content: start">
+          <div data-vis-card="" style="display: grid; gap: .55rem; padding: clamp(18px, 2.4vw, 26px); border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 82%)">
+            <span style="display: inline-flex; align-items: center; gap: .45rem; color: var(--muted); font: 800 .56rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">
+              <i data-vis-dot="" style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent)"></i> <span data-vis-state="">por link</span>
+            </span>
+            <strong data-vis-title="" style="font-size: 1.05rem; font-weight: 600; letter-spacing: -.02em">Visível para quem tem o link</strong>
+            <p data-vis-copy="" style="margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Bom para enviar em processo seletivo sem publicar na vitrine. Seus rascunhos continuam ocultos.</p>
+            <ul data-vis-list="" style="display: grid; gap: .3rem; margin: .2rem 0 0; padding: 0; list-style: none; color: var(--muted); font-size: .74rem">
+              <li style="display: flex; gap: .45rem; align-items: center"><span data-icon="check" style="width: .8rem; height: .8rem; color: var(--color-success)"></span> 2 projetos publicados</li>
+              <li style="display: flex; gap: .45rem; align-items: center"><span data-icon="check" style="width: .8rem; height: .8rem; color: var(--color-success)"></span> 5 selos com evidência</li>
+              <li style="display: flex; gap: .45rem; align-items: center"><span data-icon="x" style="width: .8rem; height: .8rem; color: var(--muted)"></span> Vitrine da turma</li>
+            </ul>
+          </div>
+          <div style="display: grid; gap: .4rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 62%)">
+            <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Sempre privado</small>
+            <small style="color: rgb(255 255 255 / 72%); font-size: .74rem; line-height: 1.5">Notas de mentor, rascunhos e histórico de tempo nunca aparecem no perfil público — em nenhum nível.</small>
+          </div>
+        </div>
+      </section>
+
+      <sc-if value="{{ showConta }}" hint-placeholder-val="{{ true }}">
+        <section id="conta" data-section="conta" data-reveal="" aria-labelledby="conta-title" style="margin-top: 2rem; scroll-margin-top: 9rem">
+          <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Acesso e dados</span>
+          <h2 id="conta-title" style="margin: .5rem 0 1rem; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Conta</h2>
+
+          <ul data-r="account" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin: 0; padding: 0; list-style: none">
+            <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+              <span data-icon="mail" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--muted)"></span>
+              <span style="display: grid; gap: .2rem; min-width: 0">
+                <strong style="font-size: .84rem; font-weight: 600">marina.alves@email.com</strong>
+                <small style="color: var(--muted); font-size: .72rem">E-mail de acesso · verificado</small>
+              </span>
+              <button type="button" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-md); padding-inline: .7rem; background: transparent; color: var(--muted); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">Trocar</button>
+            </li>
+            <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+              <span data-icon="bell" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--muted)"></span>
+              <span style="display: grid; gap: .2rem; min-width: 0">
+                <strong style="font-size: .84rem; font-weight: 600">Avisos de revisão</strong>
+                <small style="color: var(--muted); font-size: .72rem">E-mail quando o mentor responde</small>
+              </span>
+              <button type="button" data-toggle="avisos" aria-pressed="true" aria-label="Avisos de revisão" style="position: relative; width: 2.8rem; min-height: 38px; height: 1.6rem; border: 0; border-radius: var(--radius-pill); background: var(--accent); cursor: pointer; transition: background var(--motion-fast) var(--ease-standard)">
+                <i data-toggle-knob="avisos" aria-hidden="true" style="position: absolute; top: .18rem; left: 1.4rem; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: #FFFFFF; transition: left var(--motion-fast) var(--ease-standard)"></i>
+              </button>
+            </li>
+            <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+              <span data-icon="download" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--muted)"></span>
+              <span style="display: grid; gap: .2rem; min-width: 0">
+                <strong style="font-size: .84rem; font-weight: 600">Exportar meus dados</strong>
+                <small style="color: var(--muted); font-size: .72rem">Projetos, evidências e histórico em um .zip</small>
+              </span>
+              <button type="button" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-md); padding-inline: .7rem; background: transparent; color: var(--muted); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">Gerar</button>
+            </li>
+            <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: 1rem; border: 1px solid rgb(220 38 38 / 30%); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+              <span data-icon="log-out" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--color-error)"></span>
+              <span style="display: grid; gap: .2rem; min-width: 0">
+                <strong style="font-size: .84rem; font-weight: 600">Encerrar sessões</strong>
+                <small style="color: var(--muted); font-size: .72rem">2 dispositivos conectados agora</small>
+              </span>
+              <button type="button" style="min-height: 38px; border: 1px solid rgb(220 38 38 / 45%); border-radius: var(--radius-md); padding-inline: .7rem; background: transparent; color: #F87171; font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(220 38 38 / 12%)">Sair</button>
+            </li>
+          </ul>
+        </section>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startVisibility&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;privado&quot;,&quot;link&quot;,&quot;publico&quot;],&quot;default&quot;:&quot;link&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Perfil&quot;},&quot;showConta&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Seções&quot;}}">
+class Component extends DCLogic {
+  state = { vis: "link", filter: "todos", steps: [false, false, false], handle: "marina", copied: false, avisos: true };
+
+  renderVals() {
+    return {
+      showConta: this.props.showConta !== false,
+      toggleNav: () => this.setNav(!this.navOpen),
+      closeNav: () => this.setNav(false),
+      toggleStep0: () => this.toggleStep(0),
+      toggleStep1: () => this.toggleStep(1),
+      toggleStep2: () => this.toggleStep(2),
+      onHandle: (e) => {
+        const v = e.target.value.toLowerCase().replace(/[^a-z0-9.\-_]/g, "");
+        if (v !== e.target.value) e.target.value = v;
+        this.setState({ handle: v || "seu-usuario" });
+      },
+      copyLink: () => {
+        const url = "logos.academy/" + this.state.handle;
+        if (navigator.clipboard) navigator.clipboard.writeText("https://" + url).catch(() => {});
+        this.setState({ copied: true });
+        clearTimeout(this.copyTimer);
+        this.copyTimer = setTimeout(() => this.setState({ copied: false }), 2200);
+      }
+    };
+  }
+
+  toggleStep(i) {
+    this.setState((s) => {
+      const steps = s.steps.slice();
+      steps[i] = !steps[i];
+      return { steps: steps };
+    });
+  }
+
+  setNav(open) {
+    const aside = document.querySelector('[data-r="sidebar"]');
+    const scrim = document.querySelector('[data-r="scrim"]');
+    if (aside) aside.setAttribute("data-open", open ? "true" : "false");
+    if (scrim) {
+      scrim.style.opacity = open ? "1" : "0";
+      scrim.style.pointerEvents = open ? "auto" : "none";
+    }
+    this.navOpen = open;
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const start = this.props.startVisibility;
+    if (start === "privado" || start === "publico") this.setState({ vis: start });
+    this.paintIcons();
+    this.setupReveal();
+    this.setupSections();
+    this.setupSpotlight();
+    this.bindControls();
+    this.sync();
+  }
+
+  componentDidUpdate() {
+    this.paintIcons();
+    this.sync();
+  }
+
+  componentWillUnmount() {
+    if (this.observer) this.observer.disconnect();
+    if (this.sectionObserver) this.sectionObserver.disconnect();
+    if (this.onMove) window.removeEventListener("mousemove", this.onMove);
+    clearTimeout(this.copyTimer);
+  }
+
+  bindControls() {
+    document.querySelectorAll("[data-vis]").forEach((btn) => {
+      btn.onclick = () => this.setState({ vis: btn.getAttribute("data-vis") });
+    });
+    document.querySelectorAll("[data-filter]").forEach((btn) => {
+      btn.onclick = () => this.setState({ filter: btn.getAttribute("data-filter") });
+    });
+    document.querySelectorAll("[data-toggle]").forEach((btn) => {
+      btn.onclick = () => this.setState({ avisos: !this.state.avisos });
+    });
+  }
+
+  paintIcons(tries) {
+    const L = window.lucide;
+    if (!L || !L.icons) { if ((tries || 0) < 80) setTimeout(() => this.paintIcons((tries || 0) + 1), 120); return; }
+    const alias = { house: "House", "id-card": "IdCard", "chart-line": "ChartLine", "image-plus": "ImagePlus", "eye-off": "EyeOff", "log-out": "LogOut", "circle-check-big": "CircleCheckBig", "circle-dot": "CircleDot", x: "X" };
+    document.querySelectorAll("[data-icon]").forEach((el) => {
+      if (el.firstElementChild) return;
+      const raw = el.getAttribute("data-icon");
+      const pascal = raw.split("-").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+      const node = L.icons[alias[raw] || pascal] || L.icons[pascal] || L.icons[raw];
+      if (node) el.appendChild(L.createElement(node));
+    });
+  }
+
+  sync() {
+    const done = this.state.steps.filter(Boolean).length;
+    const pct = 64 + done * 12;
+
+    const gauge = document.querySelector("[data-gauge]");
+    if (gauge) gauge.style.background = "conic-gradient(from -90deg, " + (done === 3 ? "var(--color-success)" : "var(--accent)") + " " + pct + "%, rgb(255 255 255 / 8%) " + pct + "%)";
+    const pctEl = document.querySelector("[data-gauge-pct]");
+    if (pctEl) pctEl.textContent = pct + "%";
+    const side = document.querySelector("[data-side-pct]");
+    if (side) side.textContent = pct + "%";
+    const note = document.querySelector("[data-gauge-note]");
+    if (note) {
+      note.textContent = done === 3 ? "perfil completo" : done === 2 ? "falta 1 item" : "faltam " + (3 - done) + " itens";
+      note.style.color = done === 3 ? "var(--color-success)" : "var(--accent)";
+    }
+    const stepNote = document.querySelector("[data-step-note]");
+    if (stepNote) stepNote.textContent = done === 3 ? "Tudo pronto · o anel chegou a 100%" : (3 - done) + (3 - done === 1 ? " item aberto" : " itens abertos") + " · o anel está em " + pct + "%";
+
+    document.querySelectorAll("[data-step]").forEach((btn) => {
+      const i = Number(btn.getAttribute("data-step"));
+      const on = this.state.steps[i];
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.style.borderColor = on ? "rgb(22 163 74 / 45%)" : "var(--border)";
+      btn.style.background = on ? "rgb(22 163 74 / 9%)" : "rgb(23 25 29 / 82%)";
+      const mark = btn.querySelector("[data-step-mark]");
+      if (mark) {
+        mark.style.color = on ? "var(--color-success)" : "rgb(255 255 255 / 30%)";
+        const want = on ? "circle-check-big" : "circle";
+        if (mark.getAttribute("data-icon") !== want) { mark.setAttribute("data-icon", want); mark.innerHTML = ""; }
+      }
+    });
+
+    const handle = this.state.handle;
+    const url = document.querySelector("[data-handle-url]");
+    if (url) url.textContent = "logos.academy/" + handle;
+    const mini = document.querySelector("[data-handle-mini]");
+    if (mini) mini.textContent = "/" + handle;
+    const copyLabel = document.querySelector("[data-copy-label]");
+    if (copyLabel) copyLabel.textContent = this.state.copied ? "Link copiado" : "Copiar link do perfil";
+
+    const vis = this.state.vis;
+    const meta = {
+      privado: { state: "privado", chip: "Privado", title: "Visível só para você", dot: "rgb(255 255 255 / 45%)", copy: "Nada sai daqui. Use enquanto ainda está montando as primeiras peças.", border: "var(--border)", items: [false, false, false] },
+      link: { state: "por link", chip: "Por link", title: "Visível para quem tem o link", dot: "var(--accent)", copy: "Bom para enviar em processo seletivo sem publicar na vitrine. Seus rascunhos continuam ocultos.", border: "rgb(255 107 0 / 38%)", items: [true, true, false] },
+      publico: { state: "público", chip: "Público", title: "Visível na vitrine da turma", dot: "var(--color-success)", copy: "Seu perfil entra na vitrine e pode ser encontrado por buscadores. Você pode voltar atrás quando quiser.", border: "rgb(22 163 74 / 45%)", items: [true, true, true] }
+    }[vis];
+
+    const topText = document.querySelector("[data-top-vis-text]");
+    if (topText) topText.textContent = "perfil " + meta.state;
+    const topPill = document.querySelector("[data-top-vis]");
+    if (topPill) topPill.style.color = vis === "publico" ? "var(--color-success)" : vis === "privado" ? "var(--muted)" : "var(--accent)";
+    const chip = document.querySelector("[data-vis-chip]");
+    if (chip) chip.textContent = meta.chip;
+    const vstate = document.querySelector("[data-vis-state]");
+    if (vstate) vstate.textContent = meta.state;
+    const vdot = document.querySelector("[data-vis-dot]");
+    if (vdot) { vdot.style.background = meta.dot; vdot.style.boxShadow = "0 0 .6rem " + meta.dot; }
+    const vtitle = document.querySelector("[data-vis-title]");
+    if (vtitle) vtitle.textContent = meta.title;
+    const vcopy = document.querySelector("[data-vis-copy]");
+    if (vcopy) vcopy.textContent = meta.copy;
+    const vcard = document.querySelector("[data-vis-card]");
+    if (vcard) vcard.style.borderColor = meta.border;
+    const vlist = document.querySelector("[data-vis-list]");
+    if (vlist) {
+      Array.from(vlist.children).forEach((li, i) => {
+        const on = meta.items[i];
+        const icon = li.querySelector("[data-icon]");
+        if (icon) {
+          const want = on ? "check" : "x";
+          if (icon.getAttribute("data-icon") !== want) { icon.setAttribute("data-icon", want); icon.innerHTML = ""; }
+          icon.style.color = on ? "var(--color-success)" : "var(--muted)";
+        }
+        li.style.opacity = on ? "1" : ".55";
+      });
+    }
+
+    document.querySelectorAll("[data-vis]").forEach((btn) => {
+      const on = btn.getAttribute("data-vis") === vis;
+      btn.setAttribute("aria-checked", on ? "true" : "false");
+      btn.style.borderColor = on ? "rgb(255 107 0 / 50%)" : "var(--border)";
+      btn.style.background = on ? "linear-gradient(120deg, rgb(255 107 0 / 12%), rgb(16 17 20 / 82%))" : "rgb(16 17 20 / 72%)";
+      const mark = btn.querySelector("[data-vis-mark]");
+      if (mark) {
+        mark.style.color = on ? "var(--accent)" : "rgb(255 255 255 / 30%)";
+        const want = on ? "circle-dot" : "circle";
+        if (mark.getAttribute("data-icon") !== want) { mark.setAttribute("data-icon", want); mark.innerHTML = ""; }
+      }
+    });
+
+    document.querySelectorAll("[data-filter]").forEach((btn) => {
+      const on = btn.getAttribute("data-filter") === this.state.filter;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.style.borderColor = on ? "rgb(255 107 0 / 45%)" : "var(--border)";
+      btn.style.background = on ? "rgb(255 107 0 / 12%)" : "transparent";
+      btn.style.color = on ? "var(--accent)" : "var(--muted)";
+    });
+    let shown = 0;
+    document.querySelectorAll("[data-work]").forEach((li) => {
+      const show = this.state.filter === "todos" || li.getAttribute("data-work") === this.state.filter;
+      li.style.display = show ? "grid" : "none";
+      if (show) shown++;
+    });
+    const wcount = document.querySelector("[data-work-count]");
+    if (wcount) {
+      const total = document.querySelectorAll("[data-work]").length;
+      const pub = document.querySelectorAll('[data-work="publicado"]').length;
+      const visible = vis === "privado" ? 0 : pub;
+      const head = this.state.filter === "todos" ? total + " peças" : shown + (shown === 1 ? " peça" : " peças") + " de " + total;
+      wcount.textContent = head + " · " + (vis === "privado" ? "nenhuma visível — perfil privado" : visible + (visible === 1 ? " visível" : " visíveis") + " no perfil " + (vis === "publico" ? "público" : "por link"));
+    }
+
+    const toggle = document.querySelector('[data-toggle="avisos"]');
+    if (toggle) {
+      toggle.setAttribute("aria-pressed", this.state.avisos ? "true" : "false");
+      toggle.style.background = this.state.avisos ? "var(--accent)" : "rgb(255 255 255 / 14%)";
+      const knob = document.querySelector('[data-toggle-knob="avisos"]');
+      if (knob) knob.style.left = this.state.avisos ? "1.4rem" : ".18rem";
+    }
+
+    this.paintIcons();
+  }
+
+  setupReveal() {
+    const targets = Array.from(document.querySelectorAll("[data-reveal]"));
+    if (!targets.length || this.reduced || typeof IntersectionObserver === "undefined") return;
+    targets.forEach((el, i) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(2rem) scale(.99)";
+      el.style.transition = "opacity 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms, transform 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms";
+    });
+    const show = (el) => { el.style.opacity = "1"; el.style.transform = "none"; };
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { show(e.target); this.observer.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -10% 0px", threshold: 0.06 });
+    targets.forEach((el) => this.observer.observe(el));
+    setTimeout(() => targets.forEach(show), 2800);
+  }
+
+  setupSections() {
+    const links = Array.from(document.querySelectorAll("[data-section-link]"));
+    const sections = Array.from(document.querySelectorAll("[data-section]"));
+    if (!links.length || !sections.length) return;
+    const mark = (id) => links.forEach((a) => {
+      const on = a.getAttribute("data-section-link") === id;
+      a.style.background = on ? "linear-gradient(120deg, rgb(255 107 0 / 20%), rgb(255 107 0 / 6%))" : "transparent";
+      a.style.color = on ? "var(--color-white)" : "var(--muted)";
+      a.style.boxShadow = on ? "inset 0 0 0 1px rgb(255 107 0 / 40%)" : "none";
+    });
+    mark("identidade");
+    if (typeof IntersectionObserver === "undefined") return;
+    this.sectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) mark(visible.target.id);
+    }, { rootMargin: "-20% 0px -60%", threshold: [0, 0.25, 0.6] });
+    sections.forEach((s) => this.sectionObserver.observe(s));
+  }
+
+  setupSpotlight() {
+    if (this.reduced) return;
+    const hero = document.querySelector("[data-spotlight]");
+    if (!hero) return;
+    this.onMove = (event) => {
+      const r = hero.getBoundingClientRect();
+      if (event.clientY < r.top - 80 || event.clientY > r.bottom + 80) return;
+      hero.style.setProperty("--sx", Math.round(((event.clientX - r.left) / r.width) * 100) + "%");
+      hero.style.setProperty("--sy", Math.round(((event.clientY - r.top) / r.height) * 100) + "%");
+    };
+    window.addEventListener("mousemove", this.onMove, { passive: true });
+  }
+}
+</script>
+</body>
+</html>

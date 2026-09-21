@@ -11,3 +11,7 @@ supabase/.temp/
 .gstack/
 
 .vercel
+
+# review/screenshot junk
+artifacts/
+--full-page

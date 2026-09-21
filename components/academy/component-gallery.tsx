@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { CinematicPage, DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, ProgressRail, SpotlightCard, SpringCard, StateScene, StatusBadge } from ".";
+import { CinematicPage, DataList, FilterBar, GlowField, MagneticAction, MetricStrip, PageHeader, ProgressRail, SpotlightCard, SpringCard, StateScene, StatusBadge, Ticker, WordReveal } from ".";
 
 const evidence = [
   { id: "rag", label: "Mapa de recuperação", status: "Ajuste solicitado" },
@@ -13,6 +13,20 @@ export function ComponentGallery() {
   return (
     <CinematicPage className="component-gallery">
       <PageHeader eyebrow="Laboratório de componentes" title="Cinema de Evidências" description="Estados, movimento e densidade compartilhados por toda a plataforma." marker="v0.8" />
+      <div style={{ position: "relative", minHeight: "12rem", overflow: "hidden", borderRadius: "var(--radius-xl)", border: "1px solid var(--border)" }}>
+        <GlowField grid />
+        <div style={{ position: "relative", padding: "calc(var(--spacing-unit) * 7)" }}>
+          <WordReveal amplitudePx={4} staggerMs={70}>
+            Primitivos vivos da Home Premium
+          </WordReveal>
+        </div>
+      </div>
+      <Ticker items={["Missão 04 · Retrieval", "Evidência aprovada", "Percurso Explorer · ciclo 02", "Checkpoint atualizado"]} />
+      <SpotlightCard beam className="component-gallery__surface">
+        <StatusBadge tone="explorer">Halo de Prioridade (beam)</StatusBadge>
+        <h2>Risco urgente ou próxima missão</h2>
+        <p>Feixe de borda animado — reservado, nunca decoração em série.</p>
+      </SpotlightCard>
       <MetricStrip metrics={[
         { id: "a", label: "Frequência", value: "100%", detail: "requisito do módulo", emphasis: true },
         { id: "b", label: "Evidências", value: "08", detail: "entregas registradas" },

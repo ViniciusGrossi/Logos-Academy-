@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/tokens/tokens.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/fonts/fonts.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/styles.css">
+<script src="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scrollbar-color: #343941 #101114; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--color-ink-950); color: var(--color-white); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--color-orange-400); }
+  [data-icon] > svg { width: 100%; height: 100%; display: block; }
+  button { font: inherit; color: inherit; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @keyframes word-up { from { opacity: 0; transform: translate3d(0, .7em, 0) rotate(1.5deg); filter: blur(6px); } }
+  @keyframes line-reveal { from { transform: scaleX(0); } }
+  @keyframes rail-in { from { transform: scaleY(0); } }
+  @keyframes sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(240%) skewX(-18deg); } }
+  @keyframes ambient-pulse { 0%, 100% { opacity: .22; transform: scale(.75); } 50% { opacity: 1; transform: scale(1.25); } }
+  @keyframes ambient-spin { to { transform: rotate(360deg); } }
+  @keyframes glow-breathe { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .78; transform: scale(1.12); } }
+  @keyframes grid-drift { to { background-position: 4rem 4rem, 4rem 4rem; } }
+  @keyframes core-ring { 0% { opacity: .75; transform: scale(.42); } 100% { opacity: 0; transform: scale(1.65); } }
+  @keyframes node-lit { 0%, 100% { box-shadow: 0 0 0 .18rem rgb(255 107 0 / 8%), 0 0 .7rem rgb(255 107 0 / 30%); } 50% { box-shadow: 0 0 0 .4rem rgb(255 107 0 / 12%), 0 0 1.4rem rgb(255 107 0 / 55%); } }
+  @keyframes bar-grow { from { transform: scaleX(0); } }
+
+  @keyframes jrn-fill { 0%, 36% { height: 30%; } 54%, 100% { height: 68%; } }
+  @keyframes jrn-flow { 0% { opacity: 0; transform: translateY(-40%); } 14%, 70% { opacity: 1; } 100% { opacity: 0; transform: translateY(620%); } }
+  @keyframes jrn-node-on { 0%, 40% { border-color: rgb(255 255 255 / 14%); background: #12141A; color: rgb(255 255 255 / 34%); } 56%, 100% { border-color: rgb(255 107 0 / 60%); background: rgb(255 107 0 / 16%); color: var(--accent); box-shadow: 0 0 1rem rgb(255 107 0 / 45%); } }
+  @keyframes jrn-node-next { 0%, 40% { opacity: .35; } 56%, 100% { opacity: .62; } }
+  @keyframes jrn-rail { 0%, 40% { opacity: .2; transform: scaleX(.3); } 56%, 100% { opacity: 1; transform: scaleX(1); } }
+  @keyframes jrn-bar-1 { 0%, 34% { width: 46%; } 50%, 100% { width: 92%; } }
+  @keyframes jrn-bar-2 { 0%, 38% { width: 28%; } 54%, 100% { width: 74%; } }
+  @keyframes jrn-bar-3 { 0%, 42% { width: 14%; } 58%, 100% { width: 55%; } }
+  @keyframes jrn-cap-a { 0%, 38% { opacity: 1; transform: none; } 50%, 100% { opacity: 0; transform: translateY(-.35rem); } }
+  @keyframes jrn-cap-b { 0%, 44% { opacity: 0; transform: translateY(.35rem); } 58%, 100% { opacity: 1; transform: none; } }
+  @keyframes jrn-badge { 0%, 42% { background: rgb(124 92 252 / 16%); color: #A78BFA; box-shadow: inset 0 0 0 1px rgb(124 92 252 / 45%); } 56%, 100% { background: rgb(255 107 0 / 16%); color: var(--accent); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 45%); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+
+  @media (max-width: 90rem) {
+    [data-r="hero"] { grid-template-columns: 1fr !important; }
+    [data-r="core"] { justify-self: stretch !important; max-width: none !important; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) !important; align-items: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 16 / 10 !important; }
+  }
+  @media (max-width: 76rem) {
+    [data-r="levels"] { grid-template-columns: 1fr !important; }
+    [data-r="matrix"] { grid-template-columns: minmax(0, 1fr) !important; }
+    [data-r="detail"] { position: static !important; }
+  }
+  @media (max-width: 64rem) {
+    [data-r="sidebar"] { transform: translateX(-105%); box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 60%); }
+    [data-r="sidebar"][data-open="true"] { transform: translateX(0); }
+    [data-r="workspace"] { margin-inline-start: 0 !important; }
+    [data-r="menu"] { display: inline-grid !important; }
+    [data-r="scrim"] { display: block !important; }
+  }
+  @media (max-width: 58rem) {
+    [data-r="unlock"] { grid-template-columns: 1fr !important; }
+    [data-r="rhythm"] { grid-template-columns: 1fr !important; }
+    [data-r="marks"] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 48rem) {
+    [data-r="topbar"] { padding-inline: 12px !important; }
+    [data-r="crumb-root"], [data-r="avatar"], [data-r="role"], [data-r="pulse-label"] { display: none !important; }
+    [data-r="hero"] h1 { font-size: clamp(2.2rem, 9vw, 3.2rem) !important; }
+    [data-r="actions"] { flex-direction: column !important; align-items: stretch !important; }
+    [data-r="actions"] > a, [data-r="actions"] > button { width: 100% !important; }
+    [data-r="nav-sections"] { overflow-x: auto !important; }
+    [data-r="week"] { gap: .35rem !important; }
+  }
+  @media (max-width: 40rem) {
+    [data-r="core"] { grid-template-columns: 1fr !important; max-width: 22rem !important; justify-self: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 4 / 3 !important; }
+  }
+</style>
+</helmet>
+<div class="dark" style="position: relative; min-height: 100vh; overflow-x: hidden; background: var(--color-ink-950); color: var(--color-white)">
+  <div aria-hidden="true" style="position: fixed; z-index: 0; inset: 0; pointer-events: none">
+    <span style="position: absolute; left: 14%; top: -18rem; width: 46rem; height: 46rem; border-radius: 50%; background: radial-gradient(circle, rgb(124 92 252 / 14%), transparent 62%); filter: blur(1rem); animation: glow-breathe 15s ease-in-out infinite"></span>
+    <span style="position: absolute; right: -14rem; top: 34%; width: 42rem; height: 42rem; border-radius: 50%; background: radial-gradient(circle, rgb(255 107 0 / 13%), transparent 64%); filter: blur(1rem); animation: glow-breathe 19s ease-in-out -6s infinite"></span>
+    <span style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px); background-size: 4rem 4rem, 4rem 4rem; mask-image: radial-gradient(circle at 50% 18%, #000 0, transparent 70%); animation: grid-drift 26s linear infinite"></span>
+    <span style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 28%, transparent 38%, rgb(8 9 11 / 74%) 100%)"></span>
+  </div>
+
+  <div data-r="scrim" onClick="{{ closeNav }}" aria-hidden="true" style="display: none; position: fixed; z-index: 45; inset: 0; background: rgb(8 9 11 / 62%); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity var(--motion-standard) var(--ease-standard)"></div>
+
+  <aside data-r="sidebar" style="position: fixed; z-index: 50; inset: 0 auto 0 0; display: flex; width: 16.5rem; flex-direction: column; padding: 24px 20px; background: linear-gradient(180deg, rgb(23 25 29 / 96%), rgb(16 17 20 / 96%)); backdrop-filter: blur(1.25rem); border-right: 1px solid var(--border); transition: transform var(--motion-standard) var(--ease-standard)">
+    <span aria-hidden="true" style="position: absolute; inset: 0 0 auto auto; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, rgb(255 107 0 / 55%) 22%, rgb(255 107 0 / 12%) 62%, transparent); transform-origin: top; animation: rail-in var(--motion-emphasis) var(--ease-emphasis) both"></span>
+    <a href="Inicio Aluno v2 Premium.dc.html" style="position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: 12px; color: var(--color-white)">
+      <span style="position: relative; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%)">
+        <img src="brand/logos-academy-symbol-dark.png" alt="" width="52" height="52" style="width: 26px; height: 26px; object-fit: contain">
+        <i aria-hidden="true" style="position: absolute; inset: -0.35rem; border: 1px dashed rgb(255 107 0 / 22%); border-radius: var(--radius-lg); animation: ambient-spin 28s linear infinite"></i>
+      </span>
+      <span style="display: grid; gap: 1px; text-transform: uppercase; letter-spacing: .16em">
+        <strong style="font-size: var(--text-xs); line-height: 1">Logos</strong>
+        <small style="color: var(--accent); font: 700 9px/1.2 var(--font-mono); letter-spacing: .28em">Academy</small>
+      </span>
+    </a>
+
+    <div style="position: relative; flex: 0 0 auto; margin: 40px 0 28px; padding: 14px 14px 14px 16px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(124 92 252 / 12%), rgb(255 107 0 / 8%))">
+      <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-explorer); box-shadow: 0 0 1rem rgb(124 92 252 / 70%)"></span>
+      <span aria-hidden="true" style="position: absolute; inset: 0; width: 38%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 12%), transparent); animation: sheen 6.5s var(--ease-standard) infinite"></span>
+      <span style="display: inline-flex; align-items: center; gap: .4rem; font: 700 10px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--color-explorer)">
+        <i style="width: .4rem; height: .4rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .6rem var(--color-explorer)"></i> Explorer · nível 01
+      </span>
+      <strong style="display: block; max-width: 16ch; margin-top: 10px; font-size: var(--text-md); font-weight: 600; line-height: 1.3; letter-spacing: -.02em">Rumo ao Builder</strong>
+      <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 11px">3 evidências para desbloquear</small>
+    </div>
+
+    <nav style="display: grid; gap: 20px; min-height: 0; overflow-y: auto">
+      <div style="display: grid; gap: 6px">
+        <span style="display: block; margin: 0 12px 6px; font: 700 10px var(--font-mono); color: rgb(255 255 255 / 40%); letter-spacing: .12em; text-transform: uppercase">Meu espaço</span>
+        <a href="Inicio Aluno v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="house" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Início</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Atividade v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="clipboard-check" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Atividade</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" aria-current="page" style="position: relative; display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; overflow: hidden; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); color: var(--color-white); background: linear-gradient(90deg, rgb(255 107 0 / 16%), rgb(255 107 0 / 3%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent)"></span>
+          <span data-icon="gauge" style="width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent)"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm); font-weight: 600">Jornada</span><span style="border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-pill); padding: 2px 7px; color: var(--accent); font: 700 9px/1 var(--font-mono)">76%</span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="folder-kanban" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Projetos</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Atlas.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="book-open-text" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Atlas</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="calendar-days" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Agenda</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="user-round" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Perfil</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+      </div>
+    </nav>
+
+    <div style="display: flex; flex: 0 0 auto; gap: 12px; align-items: center; margin-top: auto; padding-top: 28px; color: rgb(255 255 255 / 66%)">
+      <span data-icon="shield-check" style="width: 20px; height: 20px; flex: 0 0 auto; color: var(--color-success)"></span>
+      <span style="display: block">
+        <strong style="display: block; color: var(--color-white); font-size: var(--text-xs)">Progresso verificado</strong>
+        <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 11px">Cada nível abre com evidência aprovada</small>
+      </span>
+    </div>
+  </aside>
+
+  <div data-r="workspace" style="position: relative; z-index: 1; min-width: 0; margin-inline-start: 16.5rem">
+    <header data-r="topbar" style="position: sticky; top: 0; z-index: 30; display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 16px; padding-inline: clamp(16px, 4vw, 40px); background: rgb(16 17 20 / 78%); border-bottom: 1px solid var(--border); backdrop-filter: blur(1rem)">
+      <div style="display: flex; min-width: 0; align-items: center; gap: 10px; font-size: var(--text-xs); color: var(--muted)">
+        <button type="button" data-r="menu" onClick="{{ toggleNav }}" aria-label="Abrir navegação" style="display: none; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer"><span data-icon="menu" style="width: 18px; height: 18px"></span></button>
+        <span data-r="crumb-root">Logos Academy</span>
+        <span data-icon="chevron-right" data-r="crumb-root" style="width: 14px; height: 14px"></span>
+        <strong style="color: var(--color-white)">Jornada</strong>
+        <span data-r="pulse-label" style="display: inline-flex; align-items: center; gap: .45rem; margin-left: 8px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 5px 10px; font: 700 10px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--color-explorer)">
+          <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .6rem var(--color-explorer); animation: ambient-pulse 2.2s ease-in-out infinite"></i> explorer ativo
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <a href="#" data-r="role" style="display: inline-flex; min-height: 44px; align-items: center; padding-inline: 16px; border-radius: var(--radius-md); color: var(--muted); font-weight: 600; font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(255 255 255 / 6%); color: var(--color-white)">Baixar histórico</a>
+        <button type="button" aria-label="Ativar tema claro" style="display: inline-grid; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+          <span data-icon="sun" style="width: 18px; height: 18px"></span>
+        </button>
+        <a href="#" data-r="avatar" aria-label="Abrir perfil de Marina Alves" style="display: inline-flex; min-height: 44px; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 4px 12px 4px 4px; background: rgb(255 255 255 / 4%); color: var(--color-white); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent)">
+          <span style="display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-orange-500), var(--color-explorer)); color: var(--color-white); font: 700 11px var(--font-mono)">MA</span>
+          <span style="display: grid; gap: 1px; line-height: 1.1">
+            <strong style="font-size: 11px">Marina</strong>
+            <small style="color: var(--muted); font: 700 8px var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Explorer</small>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main data-screen-label="Jornada" style="width: min(100%, 82rem); margin-inline: auto; padding: clamp(20px, 4vw, 44px) clamp(16px, 4vw, 40px) 96px">
+      <a href="Inicio Aluno v2 Premium.dc.html" style="display: inline-flex; min-height: 44px; align-items: center; gap: .55rem; margin-bottom: 1rem; color: var(--muted); font: 700 .68rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; transition: gap var(--motion-fast) var(--ease-standard)" style-hover="color: var(--accent); gap: .85rem">
+        <span data-icon="arrow-left" style="width: 1rem; height: 1rem"></span> Voltar ao início
+      </a>
+
+      <header data-r="hero" data-spotlight="" data-reveal="" style="position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 21rem; gap: clamp(24px, 4vw, 48px); align-items: center; overflow: hidden; padding: clamp(24px, 4vw, 52px); border: 1px solid var(--border); border-radius: 1.6rem .35rem 1.6rem 1.6rem; background: linear-gradient(140deg, rgb(34 37 42 / 76%), rgb(16 17 20 / 92%) 62%, rgb(28 20 48 / 62%)); backdrop-filter: blur(1.5rem); box-shadow: 0 2.5rem 6rem rgb(0 0 0 / 55%), inset 0 1px rgb(255 255 255 / 7%)" style-after="position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--color-explorer) 14%, var(--accent) 48%, transparent 80%); content: ''; box-shadow: 0 0 1.2rem rgb(255 107 0 / 45%)">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(22rem 22rem at var(--sx, 78%) var(--sy, 36%), rgb(124 92 252 / 12%), transparent 70%); transition: background 220ms var(--ease-standard)"></div>
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px); background-size: 2.5rem 2.5rem, 2.5rem 2.5rem; mask-image: radial-gradient(16rem 16rem at var(--sx, 78%) var(--sy, 36%), #000, transparent 72%)"></div>
+
+        <div style="position: relative; z-index: 3; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: .5rem; color: var(--color-explorer); font: 800 .64rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+            <span data-icon="route" style="width: 13px; height: 13px"></span> Trilha · Explorer 01
+          </span>
+          <h1 style="max-width: 24ch; margin: .9rem 0 .7rem; font-size: clamp(2.4rem, 4.4vw, 4.2rem); font-weight: 600; line-height: .95; letter-spacing: -.055em; text-wrap: balance">
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) both">Três</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .07s both">evidências</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .14s both">até</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .21s both">virar</span>
+            <span style="position: relative; display: inline-block; color: var(--accent); text-shadow: 0 0 2.5rem rgb(255 107 0 / 45%); animation: word-up .9s var(--ease-emphasis) .28s both">Builder<i aria-hidden="true" style="position: absolute; inset: auto 0 -.1em 0; height: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent); transform-origin: left; animation: line-reveal .9s var(--ease-emphasis) .85s both"></i></span>
+          </h1>
+          <p style="max-width: 52ch; margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.6">Você consolidou fundamentos e já constrói com apoio. O próximo nível pede projeto publicado, decisão documentada e leitura de feedback.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem">
+            <span style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgb(124 92 252 / 38%); border-radius: var(--radius-pill); padding: .45rem .8rem; background: rgb(124 92 252 / 10%); color: #A78BFA; font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">
+              <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .6rem var(--color-explorer); animation: ambient-pulse 2.2s ease-in-out infinite"></i> Explorer ativo
+            </span>
+            <span style="display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .45rem .8rem; color: var(--color-white); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em">9 de 12 competências</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem; border: 1px solid rgb(255 107 0 / 42%); border-radius: var(--radius-pill); padding: .45rem .8rem; background: rgb(255 107 0 / 12%); color: var(--accent); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">
+              <span data-icon="flame" style="width: .7rem; height: .7rem"></span> 6 semanas seguidas
+            </span>
+          </div>
+          <div data-r="actions" style="display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.6rem">
+            <a href="Atividade v2 Premium.dc.html" style="display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; border-radius: var(--radius-md); padding-inline: 1.1rem; background: var(--accent); color: #FFFFFF; font-size: .84rem; font-weight: 600; transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: var(--color-orange-400); color: #FFFFFF; transform: translateY(-2px)">
+              <span data-icon="play" style="width: .9rem; height: .9rem"></span> Continuar atividade 07
+            </a>
+            <a href="#desbloqueio" style="display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; border: 1px solid rgb(255 255 255 / 20%); border-radius: var(--radius-md); padding-inline: 1.1rem; color: var(--color-white); font-size: .84rem; font-weight: 600; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+              <span data-icon="list-checks" style="width: .9rem; height: .9rem"></span> Ver o que falta
+            </a>
+          </div>
+        </div>
+
+        <aside data-r="core" aria-label="Mapa da trilha e painel de estado" style="position: relative; z-index: 3; display: grid; gap: .6rem; width: 100%; max-width: 21rem; align-content: start; justify-self: end">
+          <figure style="position: relative; display: grid; gap: .7rem; margin: 0; overflow: hidden; padding: .95rem; border: 1px solid rgb(124 92 252 / 28%); border-radius: 1.2rem .3rem 1.2rem 1.2rem; background: linear-gradient(158deg, rgb(124 92 252 / 12%), rgb(16 17 20 / 88%) 66%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgb(124 92 252 / 70%), transparent)"></span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: #A78BFA; font: 800 .55rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+                <i style="width: .34rem; height: .34rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .5rem var(--color-explorer); animation: ambient-pulse 2.2s ease-in-out infinite"></i> mapa da trilha
+              </span>
+              <span aria-hidden="true" style="position: relative; width: 6.4rem; height: 1.2rem">
+                <b style="position: absolute; inset: 0; display: grid; place-items: center; border-radius: var(--radius-pill); font: 750 .55rem/1 var(--font-mono); letter-spacing: .06em; animation: jrn-badge 8s var(--ease-emphasis) infinite">Explorer → Builder</b>
+              </span>
+            </div>
+
+            <div data-r="spec-sheet" role="img" aria-label="Mapa animado da trilha: o nível Explorer está completo, o trilho de progresso sobe e o nó Builder acende quando as três evidências são entregues; Engineer permanece adiante" style="position: relative; display: grid; grid-template-columns: 1.3rem minmax(0, 1fr); gap: .75rem; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; padding: .95rem; border: 1px solid rgb(255 255 255 / 12%); border-radius: var(--radius-md); background: linear-gradient(180deg, #0D0E11, #14161B)">
+              <span aria-hidden="true" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between">
+                <i style="position: absolute; inset: .6rem auto .6rem 50%; width: 2px; background: rgb(255 255 255 / 10%); transform: translateX(-50%)"></i>
+                <i style="position: absolute; inset: .6rem auto auto 50%; width: 2px; height: 30%; background: linear-gradient(180deg, var(--color-explorer), var(--accent)); box-shadow: 0 0 .7rem rgb(255 107 0 / 45%); transform: translateX(-50%); animation: jrn-fill 8s var(--ease-emphasis) infinite"></i>
+                <i style="position: absolute; left: 50%; top: .6rem; width: .3rem; height: .9rem; border-radius: 2px; background: linear-gradient(180deg, transparent, rgb(255 255 255 / 85%)); transform: translateX(-50%); animation: jrn-flow 8s var(--ease-standard) infinite"></i>
+                <b style="position: relative; display: grid; width: 1.3rem; height: 1.3rem; place-items: center; border: 1px solid rgb(22 163 74 / 55%); border-radius: 50%; background: rgb(22 163 74 / 18%); color: var(--color-success); font: 750 .5rem/1 var(--font-mono)">01</b>
+                <b style="position: relative; display: grid; width: 1.3rem; height: 1.3rem; place-items: center; border: 1px solid rgb(255 255 255 / 14%); border-radius: 50%; background: #12141A; color: rgb(255 255 255 / 34%); font: 750 .5rem/1 var(--font-mono); animation: jrn-node-on 8s var(--ease-emphasis) infinite">02</b>
+                <b style="position: relative; display: grid; width: 1.3rem; height: 1.3rem; place-items: center; border: 1px solid rgb(37 99 235 / 40%); border-radius: 50%; background: rgb(37 99 235 / 10%); color: #93B4FB; font: 750 .5rem/1 var(--font-mono); animation: jrn-node-next 8s var(--ease-emphasis) infinite">03</b>
+              </span>
+
+              <span style="position: relative; z-index: 2; display: flex; min-width: 0; flex-direction: column; justify-content: space-between; gap: .5rem">
+                <span style="display: grid; gap: .3rem">
+                  <i style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><b style="display: block; width: 46%; height: 100%; border-radius: 2px; background: var(--color-explorer); animation: jrn-bar-1 8s var(--ease-emphasis) infinite"></b></i>
+                  <small style="color: rgb(255 255 255 / 52%); font: 750 .5rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">fundamentos</small>
+                </span>
+                <span style="display: grid; gap: .3rem">
+                  <i style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><b style="display: block; width: 28%; height: 100%; border-radius: 2px; background: var(--accent); animation: jrn-bar-2 8s var(--ease-emphasis) infinite"></b></i>
+                  <small style="color: rgb(255 255 255 / 52%); font: 750 .5rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">construção</small>
+                </span>
+                <span style="display: grid; gap: .3rem">
+                  <i style="display: block; width: 100%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><b style="display: block; width: 14%; height: 100%; border-radius: 2px; background: #93B4FB; animation: jrn-bar-3 8s var(--ease-emphasis) infinite"></b></i>
+                  <small style="color: rgb(255 255 255 / 52%); font: 750 .5rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">comunicação</small>
+                </span>
+                <i aria-hidden="true" style="display: block; width: 100%; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--color-explorer), var(--accent)); transform-origin: left; animation: jrn-rail 8s var(--ease-emphasis) infinite"></i>
+              </span>
+            </div>
+
+            <figcaption style="position: relative; height: 2.4rem">
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: jrn-cap-a 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">Fundamentos firmes, construção iniciando</strong>
+                <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">Explorer · agora</small>
+              </span>
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: jrn-cap-b 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">Três evidências acendem o nó Builder</strong>
+                <small style="color: var(--accent); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">Builder · a seguir</small>
+              </span>
+            </figcaption>
+          </figure>
+
+          <div style="display: grid; gap: .5rem; align-content: start; min-width: 0">
+            <div style="position: relative; display: flex; align-items: center; gap: .8rem; overflow: hidden; padding: .8rem .9rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 88%)">
+              <span style="position: relative; display: grid; flex: 0 0 auto; width: 4.5rem; height: 4.5rem; place-items: center">
+                <i aria-hidden="true" style="position: absolute; inset: -.25rem; border: 1px solid rgb(255 107 0 / 22%); border-radius: 50%; animation: core-ring 3.6s var(--ease-standard) infinite"></i>
+                <i aria-hidden="true" data-gauge="" style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from -90deg, var(--accent) 76%, rgb(255 255 255 / 8%) 76%); transition: background var(--motion-emphasis) var(--ease-emphasis)"></i>
+                <i aria-hidden="true" style="position: absolute; inset: .3rem; border-radius: 50%; background: radial-gradient(circle at 42% 34%, rgb(255 107 0 / 14%), rgb(16 17 20 / 97%) 66%)"></i>
+                <strong data-gauge-pct="" style="position: relative; font: 700 .95rem/1 var(--font-sans); letter-spacing: -.03em; color: var(--color-white); font-variant-numeric: tabular-nums">76%</strong>
+              </span>
+              <span style="display: grid; gap: .25rem; min-width: 0">
+                <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Nível Explorer</small>
+                <strong data-gauge-note="" style="color: var(--accent); font: 750 .72rem/1 var(--font-mono); letter-spacing: .04em">faltam 3 evidências</strong>
+                <small style="color: var(--muted); font-size: .68rem; line-height: 1.4">O anel avança quando você marca uma evidência entregue.</small>
+              </span>
+            </div>
+
+            <ul style="display: grid; gap: 1px; margin: 0; padding: 0; overflow: hidden; list-style: none; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(255 255 255 / 7%)">
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="target" style="width: .95rem; height: .95rem; justify-self: center; color: var(--accent)"></span>
+                <small style="color: var(--muted); font-size: .72rem">Próximo marco</small>
+                <strong style="font: 750 .7rem/1 var(--font-mono); color: var(--color-white)">Builder 01</strong>
+              </li>
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="flame" style="width: .95rem; height: .95rem; justify-self: center; color: #F0A63B"></span>
+                <small style="color: var(--muted); font-size: .72rem">Ritmo</small>
+                <strong style="font: 750 .7rem/1 var(--font-mono); color: #F0A63B">6 semanas</strong>
+              </li>
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="folder-check" style="width: .95rem; height: .95rem; justify-self: center; color: var(--color-success)"></span>
+                <small style="color: var(--muted); font-size: .72rem">Portfólio</small>
+                <strong style="font: 750 .7rem/1 var(--font-mono); color: var(--color-white)">2 projetos</strong>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </header>
+
+      <nav data-r="nav-sections" aria-label="Seções da jornada" style="position: sticky; top: 72px; z-index: 20; display: flex; gap: .3rem; margin-top: 1rem; padding: .4rem; border: 1px solid var(--border); border-radius: var(--radius-pill); background: rgb(16 17 20 / 88%); backdrop-filter: blur(1rem)">
+        <a href="#trilha" data-section-link="trilha" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Três níveis</a>
+        <a href="#competencias" data-section-link="competencias" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Competências</a>
+        <a href="#desbloqueio" data-section-link="desbloqueio" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Desbloqueio</a>
+        <a href="#ritmo" data-section-link="ritmo" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Ritmo</a>
+        <a href="#marcos" data-section-link="marcos" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; gap: .4rem; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Marcos</a>
+      </nav>
+
+      <section id="trilha" data-section="trilha" data-reveal="" aria-labelledby="trilha-title" style="margin-top: 1.6rem; scroll-margin-top: 9rem">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Estrutura da trilha</span>
+            <h2 id="trilha-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Explorer, Builder, Engineer</h2>
+          </div>
+          <p style="max-width: 34ch; margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Cada nível abre com evidência aprovada — nunca por tempo de curso.</p>
+        </div>
+
+        <div data-r="levels" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; margin-top: 1rem">
+          <button type="button" data-level="explorer" aria-pressed="true" style="position: relative; display: grid; gap: .5rem; overflow: hidden; padding: 1.1rem; border: 1px solid rgb(124 92 252 / 45%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(124 92 252 / 14%), rgb(23 25 29 / 86%)); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="transform: translateY(-3px)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-explorer); box-shadow: 0 0 .9rem var(--color-explorer)"></span>
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: #A78BFA; font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Nível 01 <span data-icon="compass" style="width: .9rem; height: .9rem"></span></span>
+            <strong style="font-size: 1.05rem; font-weight: 600; letter-spacing: -.02em">Explorer</strong>
+            <small style="color: var(--muted); font-size: .76rem; line-height: 1.5">Entende a ferramenta, experimenta e registra o que aprendeu.</small>
+            <span style="display: block; width: 100%; height: .35rem; margin-top: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><i style="display: block; width: 76%; height: 100%; background: var(--color-explorer); transform-origin: left; animation: bar-grow 1.1s var(--ease-emphasis) both"></i></span>
+            <small style="color: #A78BFA; font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Em curso · 9 de 12</small>
+          </button>
+
+          <button type="button" data-level="builder" aria-pressed="false" style="position: relative; display: grid; gap: .5rem; overflow: hidden; padding: 1.1rem; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 68%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="transform: translateY(-3px); border-color: rgb(255 107 0 / 45%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0; width: 32%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 8%), transparent); animation: sheen 6s var(--ease-standard) infinite"></span>
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: var(--accent); font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Nível 02 <span data-icon="hammer" style="width: .9rem; height: .9rem"></span></span>
+            <strong style="font-size: 1.05rem; font-weight: 600; letter-spacing: -.02em">Builder</strong>
+            <small style="color: var(--muted); font-size: .76rem; line-height: 1.5">Constrói projetos próprios, publica e defende decisões.</small>
+            <span style="display: block; width: 100%; height: .35rem; margin-top: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><i data-level-bar="builder" style="display: block; width: 18%; height: 100%; background: var(--accent); transition: width var(--motion-emphasis) var(--ease-emphasis)"></i></span>
+            <small data-level-note="builder" style="color: var(--accent); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Próximo · 3 evidências</small>
+          </button>
+
+          <button type="button" data-level="engineer" aria-pressed="false" style="position: relative; display: grid; gap: .5rem; overflow: hidden; padding: 1.1rem; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 45%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="transform: translateY(-3px); border-color: rgb(37 99 235 / 45%)">
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: #93B4FB; font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Nível 03 <span data-icon="lock-keyhole" style="width: .9rem; height: .9rem"></span></span>
+            <strong style="font-size: 1.05rem; font-weight: 600; letter-spacing: -.02em">Engineer</strong>
+            <small style="color: var(--muted); font-size: .76rem; line-height: 1.5">Projeta sistemas, revisa o trabalho dos outros e sustenta o que criou.</small>
+            <span style="display: block; width: 100%; height: .35rem; margin-top: .3rem; border-radius: 2px; background: rgb(255 255 255 / 10%); overflow: hidden"><i style="display: block; width: 4%; height: 100%; background: #2563EB"></i></span>
+            <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Bloqueado</small>
+          </button>
+        </div>
+
+        <div data-level-panel="explorer" style="position: relative; display: grid; gap: .7rem; margin-top: .6rem; overflow: hidden; padding: clamp(18px, 2.4vw, 28px); border: 1px solid rgb(124 92 252 / 34%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(120deg, rgb(28 20 48 / 62%), rgb(23 25 29 / 88%))">
+          <span style="color: #A78BFA; font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Explorer · o que este nível prova</span>
+          <p style="max-width: 62ch; margin: 0; font-size: .92rem; line-height: 1.6">Você sabe usar as ferramentas com intenção: escolhe um caminho, testa, registra o resultado e explica o porquê em linguagem simples.</p>
+          <ul style="display: flex; flex-wrap: wrap; gap: .45rem; margin: .2rem 0 0; padding: 0; list-style: none">
+            <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono)">4 atividades concluídas</li>
+            <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono)">1 projeto publicado</li>
+            <li style="border: 1px solid rgb(22 163 74 / 42%); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--color-success); font: 750 .6rem/1 var(--font-mono)">9 competências firmes</li>
+          </ul>
+        </div>
+
+        <div data-level-panel="builder" style="position: relative; display: none; gap: .7rem; margin-top: .6rem; overflow: hidden; padding: clamp(18px, 2.4vw, 28px); border: 1px solid rgb(255 107 0 / 34%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(120deg, rgb(41 24 12 / 66%), rgb(23 25 29 / 88%))">
+          <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Builder · o que este nível pede</span>
+          <p style="max-width: 62ch; margin: 0; font-size: .92rem; line-height: 1.6">Você conduz um projeto do zero até publicado, documenta as decisões que tomou e responde ao feedback com uma nova versão.</p>
+          <ul style="display: flex; flex-wrap: wrap; gap: .45rem; margin: .2rem 0 0; padding: 0; list-style: none">
+            <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono)">Projeto publicado</li>
+            <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono)">Decisão documentada</li>
+            <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono)">Revisão respondida</li>
+          </ul>
+        </div>
+
+        <div data-level-panel="engineer" style="position: relative; display: none; gap: .7rem; margin-top: .6rem; overflow: hidden; padding: clamp(18px, 2.4vw, 28px); border: 1px solid rgb(37 99 235 / 34%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(120deg, rgb(15 26 51 / 66%), rgb(23 25 29 / 88%))">
+          <span style="color: #93B4FB; font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Engineer · o que vem depois</span>
+          <p style="max-width: 62ch; margin: 0; font-size: .92rem; line-height: 1.6">Você desenha sistemas que outras pessoas usam, faz revisão técnica de projetos de colegas e mantém o que construiu funcionando ao longo do tempo.</p>
+          <ul style="display: flex; flex-wrap: wrap; gap: .45rem; margin: .2rem 0 0; padding: 0; list-style: none">
+            <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono)">Abre com Builder completo</li>
+            <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono)">3 revisões de pares</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="competencias" data-section="competencias" data-reveal="" aria-labelledby="comp-title" style="margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Mapa de competências</span>
+            <h2 id="comp-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">O que já está firme</h2>
+          </div>
+          <div role="group" aria-label="Filtrar competências" style="display: flex; flex-wrap: wrap; gap: .3rem">
+            <button type="button" data-filter="todas" aria-pressed="true" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Todas</button>
+            <button type="button" data-filter="fundamentos" aria-pressed="false" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Fundamentos</button>
+            <button type="button" data-filter="construcao" aria-pressed="false" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Construção</button>
+            <button type="button" data-filter="comunicacao" aria-pressed="false" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Comunicação</button>
+          </div>
+        </div>
+
+        <ul data-r="matrix" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin: 1rem 0 0; padding: 0; list-style: none">
+          <li data-cat="fundamentos" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <strong style="font-size: .86rem; font-weight: 600">Pensamento com prompts</strong>
+            <span style="display: flex; gap: .2rem" aria-label="Domínio: 4 de 4"><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-success)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-success)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-success)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-success)"></i></span>
+            <small style="grid-column: 1 / -1; color: var(--muted); font-size: .72rem">Domínio · 6 evidências aprovadas</small>
+          </li>
+          <li data-cat="fundamentos" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <strong style="font-size: .86rem; font-weight: 600">Leitura de dados</strong>
+            <span style="display: flex; gap: .2rem" aria-label="Prática: 3 de 4"><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-explorer)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-explorer)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-explorer)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i></span>
+            <small style="grid-column: 1 / -1; color: var(--muted); font-size: .72rem">Prática · 3 evidências aprovadas</small>
+          </li>
+          <li data-cat="construcao" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <strong style="font-size: .86rem; font-weight: 600">Protótipo funcional</strong>
+            <span style="display: flex; gap: .2rem" aria-label="Prática: 2 de 4"><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--accent)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--accent)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i></span>
+            <small style="grid-column: 1 / -1; color: var(--accent); font-size: .72rem">Em construção · esta é a competência do ciclo 02</small>
+          </li>
+          <li data-cat="construcao" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <strong style="font-size: .86rem; font-weight: 600">Versionamento de trabalho</strong>
+            <span style="display: flex; gap: .2rem" aria-label="Base: 2 de 4"><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--accent)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--accent)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i></span>
+            <small style="grid-column: 1 / -1; color: var(--muted); font-size: .72rem">Base · 2 evidências aprovadas</small>
+          </li>
+          <li data-cat="comunicacao" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <strong style="font-size: .86rem; font-weight: 600">Defesa de decisão</strong>
+            <span style="display: flex; gap: .2rem" aria-label="Base: 1 de 4"><i style="width: .85rem; height: .3rem; border-radius: 2px; background: #93B4FB"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i></span>
+            <small style="grid-column: 1 / -1; color: var(--muted); font-size: .72rem">Base · a próxima entrega cobre isso</small>
+          </li>
+          <li data-cat="comunicacao" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <strong style="font-size: .86rem; font-weight: 600">Feedback para colegas</strong>
+            <span style="display: flex; gap: .2rem" aria-label="Prática: 3 de 4"><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-explorer)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-explorer)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: var(--color-explorer)"></i><i style="width: .85rem; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 12%)"></i></span>
+            <small style="grid-column: 1 / -1; color: var(--muted); font-size: .72rem">Prática · 4 revisões escritas</small>
+          </li>
+        </ul>
+      </section>
+
+      <section id="desbloqueio" data-section="desbloqueio" data-reveal="" aria-labelledby="unlock-title" data-r="unlock" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: .6rem; margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="position: relative; overflow: hidden; padding: clamp(20px, 2.6vw, 32px); border: 1px solid rgb(255 107 0 / 32%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(41 24 12 / 62%), rgb(23 25 29 / 90%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: linear-gradient(180deg, var(--accent), transparent); box-shadow: 0 0 1rem rgb(255 107 0 / 60%)"></span>
+          <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Para desbloquear Builder</span>
+          <h2 id="unlock-title" style="max-width: 32ch; margin: .6rem 0 .3rem; font-size: clamp(1.2rem, 2.1vw, 1.8rem); font-weight: 600; line-height: 1.25; letter-spacing: -.03em">Três evidências, nesta ordem</h2>
+          <p style="max-width: 48ch; margin: 0 0 1.1rem; color: var(--muted); font-size: .8rem; line-height: 1.55">Marque o que já entregou — o anel da trilha e o cartão Builder acompanham.</p>
+
+          <ul style="display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none">
+            <li>
+              <button type="button" data-req="0" aria-pressed="false" onClick="{{ toggleReq0 }}" style="display: grid; width: 100%; grid-template-columns: 1.35rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+                <span data-req-mark="0" data-icon="circle" style="width: 1.15rem; height: 1.15rem; color: rgb(255 255 255 / 30%)"></span>
+                <span style="display: grid; gap: .25rem; min-width: 0">
+                  <strong style="font-size: .86rem; font-weight: 600">Projeto publicado no portfólio</strong>
+                  <small style="color: var(--muted); font-size: .72rem">Creative Studio · aguardando a versão 02 do cartaz</small>
+                </span>
+                <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">01</small>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-req="1" aria-pressed="false" onClick="{{ toggleReq1 }}" style="display: grid; width: 100%; grid-template-columns: 1.35rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+                <span data-req-mark="1" data-icon="circle" style="width: 1.15rem; height: 1.15rem; color: rgb(255 255 255 / 30%)"></span>
+                <span style="display: grid; gap: .25rem; min-width: 0">
+                  <strong style="font-size: .86rem; font-weight: 600">Decisão de design documentada</strong>
+                  <small style="color: var(--muted); font-size: .72rem">Uma frase explicando o que você cortou e por quê</small>
+                </span>
+                <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">02</small>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-req="2" aria-pressed="false" onClick="{{ toggleReq2 }}" style="display: grid; width: 100%; grid-template-columns: 1.35rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+                <span data-req-mark="2" data-icon="circle" style="width: 1.15rem; height: 1.15rem; color: rgb(255 255 255 / 30%)"></span>
+                <span style="display: grid; gap: .25rem; min-width: 0">
+                  <strong style="font-size: .86rem; font-weight: 600">Revisão do Vinicius respondida</strong>
+                  <small style="color: var(--muted); font-size: .72rem">Nova versão que trata o ajuste pedido</small>
+                </span>
+                <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">03</small>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div style="display: grid; gap: .5rem; align-content: start">
+          <div data-unlock-card="" style="position: relative; display: grid; gap: .6rem; overflow: hidden; padding: clamp(18px, 2.4vw, 26px); border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 82%)">
+            <span style="display: inline-flex; align-items: center; gap: .45rem; color: var(--muted); font: 800 .56rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">
+              <i data-unlock-dot="" style="width: .38rem; height: .38rem; border-radius: 50%; background: #F0A63B; box-shadow: 0 0 .6rem rgb(240 166 59 / 70%)"></i> <span data-unlock-state="">aguardando evidências</span>
+            </span>
+            <strong data-unlock-count="" style="font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; letter-spacing: -.04em; font-variant-numeric: tabular-nums">0 / 3</strong>
+            <p data-unlock-copy="" style="margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Builder abre quando as três evidências forem aprovadas. Comece pela versão 02 do cartaz.</p>
+            <span data-unlock-badge="" style="display: none; align-items: center; gap: .4rem; width: fit-content; border: 1px solid rgb(22 163 74 / 45%); border-radius: var(--radius-pill); padding: .4rem .75rem; background: rgb(22 163 74 / 12%); color: var(--color-success); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">
+              <span data-icon="badge-check" style="width: .8rem; height: .8rem"></span> Builder 01 desbloqueado
+            </span>
+          </div>
+
+          <div style="display: grid; gap: .45rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 62%)">
+            <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Quem valida</small>
+            <div style="display: flex; align-items: center; gap: .6rem">
+              <span style="display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-explorer), var(--color-orange-500)); font: 700 .6rem var(--font-mono)">VF</span>
+              <span style="display: grid; gap: .15rem; min-width: 0">
+                <strong style="font-size: .78rem; font-weight: 600">Vinicius Ferraz</strong>
+                <small style="color: var(--muted); font-size: .7rem">Mentor de trilha · responde em até 2 dias</small>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <sc-if value="{{ showRitmo }}" hint-placeholder-val="{{ true }}">
+        <section id="ritmo" data-section="ritmo" data-reveal="" aria-labelledby="ritmo-title" data-r="rhythm" style="display: grid; grid-template-columns: minmax(0, 1fr) 17rem; gap: .6rem; margin-top: 2rem; scroll-margin-top: 9rem">
+          <div style="padding: clamp(20px, 2.6vw, 30px); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Ritmo das últimas 8 semanas</span>
+            <h2 id="ritmo-title" style="margin: .5rem 0 1.2rem; font-size: clamp(1.2rem, 2.1vw, 1.8rem); font-weight: 600; letter-spacing: -.03em">Constância vale mais que intensidade</h2>
+            <div data-r="week" style="display: flex; gap: .55rem; align-items: end; height: 8rem">
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="display: block; width: 100%; height: 38%; border-radius: 3px 3px 2px 2px; background: rgb(124 92 252 / 45%)"></i><small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">s1</small></span>
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="display: block; width: 100%; height: 52%; border-radius: 3px 3px 2px 2px; background: rgb(124 92 252 / 55%)"></i><small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">s2</small></span>
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="display: block; width: 100%; height: 30%; border-radius: 3px 3px 2px 2px; background: rgb(124 92 252 / 40%)"></i><small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">s3</small></span>
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="display: block; width: 100%; height: 64%; border-radius: 3px 3px 2px 2px; background: rgb(124 92 252 / 62%)"></i><small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">s4</small></span>
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="display: block; width: 100%; height: 72%; border-radius: 3px 3px 2px 2px; background: rgb(255 107 0 / 55%)"></i><small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">s5</small></span>
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="display: block; width: 100%; height: 58%; border-radius: 3px 3px 2px 2px; background: rgb(255 107 0 / 48%)"></i><small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">s6</small></span>
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="display: block; width: 100%; height: 86%; border-radius: 3px 3px 2px 2px; background: rgb(255 107 0 / 70%)"></i><small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">s7</small></span>
+              <span style="display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: .45rem; height: 100%"><i style="position: relative; display: block; width: 100%; height: 94%; border-radius: 3px 3px 2px 2px; background: var(--accent); box-shadow: 0 0 1.2rem rgb(255 107 0 / 45%)"></i><small style="color: var(--accent); font: 750 .55rem/1 var(--font-mono)">s8</small></span>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: .5rem; align-content: start">
+            <div style="display: grid; gap: .3rem; padding: 1rem; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-lg); background: linear-gradient(140deg, rgb(255 107 0 / 12%), rgb(23 25 29 / 88%))">
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Sequência atual</small>
+              <strong style="font-size: 1.6rem; font-weight: 700; letter-spacing: -.03em">6 semanas</strong>
+              <small style="color: var(--muted); font-size: .72rem; line-height: 1.45">Seu recorde é 7. Uma entrega nesta semana empata.</small>
+            </div>
+            <div style="display: grid; gap: .3rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Tempo médio por atividade</small>
+              <strong style="font-size: 1.6rem; font-weight: 700; letter-spacing: -.03em">34 min</strong>
+              <small style="color: var(--muted); font-size: .72rem; line-height: 1.45">Estimativa da trilha: 25 min.</small>
+            </div>
+          </div>
+        </section>
+      </sc-if>
+
+      <section id="marcos" data-section="marcos" data-reveal="" aria-labelledby="marcos-title" style="margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Registro da trilha</span>
+            <h2 id="marcos-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Marcos conquistados</h2>
+          </div>
+          <a href="#" style="display: inline-flex; min-height: 40px; align-items: center; gap: .45rem; color: var(--muted); font: 750 .64rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; transition: gap var(--motion-fast) var(--ease-standard)" style-hover="color: var(--accent); gap: .7rem">Ver histórico completo <span data-icon="arrow-right" style="width: .9rem; height: .9rem"></span></a>
+        </div>
+
+        <ol data-r="marks" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin: 1rem 0 0; padding: 0; list-style: none">
+          <li style="position: relative; display: grid; gap: .4rem; overflow: hidden; padding: 1.1rem; border: 1px solid rgb(22 163 74 / 32%); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-success)"></span>
+            <span style="display: flex; align-items: center; gap: .45rem; color: var(--color-success); font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="badge-check" style="width: .85rem; height: .85rem"></span> 12 ago</span>
+            <strong style="font-size: .9rem; font-weight: 600">Primeiro projeto publicado</strong>
+            <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Radar de referências entrou no portfólio com aprovação direta.</small>
+          </li>
+          <li style="position: relative; display: grid; gap: .4rem; overflow: hidden; padding: 1.1rem; border: 1px solid rgb(124 92 252 / 32%); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-explorer)"></span>
+            <span style="display: flex; align-items: center; gap: .45rem; color: #A78BFA; font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="sparkles" style="width: .85rem; height: .85rem"></span> 29 ago</span>
+            <strong style="font-size: .9rem; font-weight: 600">Competência em domínio</strong>
+            <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Pensamento com prompts chegou a 4 de 4 com seis evidências.</small>
+          </li>
+          <li style="position: relative; display: grid; gap: .4rem; overflow: hidden; padding: 1.1rem; border: 1px solid rgb(255 107 0 / 34%); border-radius: var(--radius-lg); background: linear-gradient(140deg, rgb(255 107 0 / 10%), rgb(23 25 29 / 86%))">
+            <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .9rem var(--accent)"></span>
+            <span style="display: flex; align-items: center; gap: .45rem; color: var(--accent); font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="git-branch" style="width: .85rem; height: .85rem"></span> 16 set</span>
+            <strong style="font-size: .9rem; font-weight: 600">Primeira revisão respondida</strong>
+            <small style="color: var(--muted); font-size: .74rem; line-height: 1.5">Cartaz na versão 02 — o ajuste pedido está em aberto agora.</small>
+          </li>
+        </ol>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startLevel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;explorer&quot;,&quot;builder&quot;,&quot;engineer&quot;],&quot;default&quot;:&quot;explorer&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Trilha&quot;},&quot;showRitmo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Seções&quot;}}">
+class Component extends DCLogic {
+  state = { level: "explorer", reqs: [false, false, false], filter: "todas" };
+
+  renderVals() {
+    return {
+      showRitmo: this.props.showRitmo !== false,
+      toggleNav: () => this.setNav(!this.navOpen),
+      closeNav: () => this.setNav(false),
+      toggleReq0: () => this.toggleReq(0),
+      toggleReq1: () => this.toggleReq(1),
+      toggleReq2: () => this.toggleReq(2)
+    };
+  }
+
+  toggleReq(i) {
+    this.setState((s) => {
+      const reqs = s.reqs.slice();
+      reqs[i] = !reqs[i];
+      return { reqs: reqs };
+    });
+  }
+
+  setNav(open) {
+    const aside = document.querySelector('[data-r="sidebar"]');
+    const scrim = document.querySelector('[data-r="scrim"]');
+    if (aside) aside.setAttribute("data-open", open ? "true" : "false");
+    if (scrim) {
+      scrim.style.opacity = open ? "1" : "0";
+      scrim.style.pointerEvents = open ? "auto" : "none";
+    }
+    this.navOpen = open;
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const start = this.props.startLevel;
+    if (start === "builder" || start === "engineer") this.setState({ level: start });
+    this.paintIcons();
+    this.setupReveal();
+    this.setupSections();
+    this.setupSpotlight();
+    this.bindControls();
+    this.sync();
+  }
+
+  componentDidUpdate() {
+    this.paintIcons();
+    this.sync();
+  }
+
+  componentWillUnmount() {
+    if (this.observer) this.observer.disconnect();
+    if (this.sectionObserver) this.sectionObserver.disconnect();
+    if (this.onMove) window.removeEventListener("mousemove", this.onMove);
+  }
+
+  bindControls() {
+    document.querySelectorAll("[data-level]").forEach((btn) => {
+      btn.onclick = () => this.setState({ level: btn.getAttribute("data-level") });
+    });
+    document.querySelectorAll("[data-filter]").forEach((btn) => {
+      btn.onclick = () => this.setState({ filter: btn.getAttribute("data-filter") });
+    });
+  }
+
+  paintIcons(tries) {
+    const L = window.lucide;
+    if (!L || !L.icons) { if ((tries || 0) < 80) setTimeout(() => this.paintIcons((tries || 0) + 1), 120); return; }
+    const alias = { house: "House", "clock-3": "Clock3", "link-2": "Link2", "alert-triangle": "TriangleAlert", "rotate-ccw": "RotateCcw", "circle-check-big": "CircleCheckBig" };
+    document.querySelectorAll("[data-icon]").forEach((el) => {
+      if (el.firstElementChild) return;
+      const raw = el.getAttribute("data-icon");
+      const pascal = raw.split("-").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+      const node = L.icons[alias[raw] || pascal] || L.icons[pascal] || L.icons[raw];
+      if (node) el.appendChild(L.createElement(node));
+    });
+  }
+
+  sync() {
+    const done = this.state.reqs.filter(Boolean).length;
+    const pct = 76 + done * 8;
+
+    const gauge = document.querySelector("[data-gauge]");
+    if (gauge) gauge.style.background = "conic-gradient(from -90deg, var(--accent) " + pct + "%, rgb(255 255 255 / 8%) " + pct + "%)";
+    const pctEl = document.querySelector("[data-gauge-pct]");
+    if (pctEl) pctEl.textContent = pct + "%";
+    const note = document.querySelector("[data-gauge-note]");
+    if (note) {
+      note.textContent = done === 3 ? "Builder desbloqueado" : done === 2 ? "falta 1 evidência" : "faltam " + (3 - done) + " evidências";
+      note.style.color = done === 3 ? "var(--color-success)" : "var(--accent)";
+    }
+
+    const lbar = document.querySelector('[data-level-bar="builder"]');
+    if (lbar) lbar.style.width = (18 + done * 27) + "%";
+    const lnote = document.querySelector('[data-level-note="builder"]');
+    if (lnote) {
+      lnote.textContent = done === 3 ? "Pronto para abrir" : done === 2 ? "Próximo · 1 evidência" : "Próximo · " + (3 - done) + " evidências";
+      lnote.style.color = done === 3 ? "var(--color-success)" : "var(--accent)";
+    }
+
+    const count = document.querySelector("[data-unlock-count]");
+    if (count) count.textContent = done + " / 3";
+    const state = document.querySelector("[data-unlock-state]");
+    if (state) state.textContent = done === 3 ? "tudo entregue" : done === 0 ? "aguardando evidências" : "em andamento";
+    const dot = document.querySelector("[data-unlock-dot]");
+    if (dot) {
+      dot.style.background = done === 3 ? "var(--color-success)" : "#F0A63B";
+      dot.style.boxShadow = done === 3 ? "0 0 .6rem rgb(22 163 74 / 75%)" : "0 0 .6rem rgb(240 166 59 / 70%)";
+    }
+    const copy = document.querySelector("[data-unlock-copy]");
+    if (copy) copy.textContent = done === 3 ? "As três evidências estão no lugar. O mentor confirma a virada de nível na próxima revisão." : done === 0 ? "Builder abre quando as três evidências forem aprovadas. Comece pela versão 02 do cartaz." : "Boa. Continue na ordem — a próxima evidência mantém o ritmo da trilha.";
+    const card = document.querySelector("[data-unlock-card]");
+    if (card) {
+      card.style.borderColor = done === 3 ? "rgb(22 163 74 / 45%)" : "var(--border)";
+      card.style.background = done === 3 ? "linear-gradient(140deg, rgb(22 163 74 / 14%), rgb(23 25 29 / 88%))" : "rgb(23 25 29 / 82%)";
+    }
+    const badge = document.querySelector("[data-unlock-badge]");
+    if (badge) badge.style.display = done === 3 ? "inline-flex" : "none";
+
+    document.querySelectorAll("[data-req]").forEach((btn) => {
+      const i = Number(btn.getAttribute("data-req"));
+      const on = this.state.reqs[i];
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.style.borderColor = on ? "rgb(22 163 74 / 45%)" : "var(--border)";
+      btn.style.background = on ? "rgb(22 163 74 / 9%)" : "rgb(23 25 29 / 82%)";
+      const mark = btn.querySelector("[data-req-mark]");
+      if (mark) {
+        mark.style.color = on ? "var(--color-success)" : "rgb(255 255 255 / 30%)";
+        const want = on ? "circle-check-big" : "circle";
+        if (mark.getAttribute("data-icon") !== want) { mark.setAttribute("data-icon", want); mark.innerHTML = ""; }
+      }
+    });
+
+    const tint = { explorer: "rgb(124 92 252 / 45%)", builder: "rgb(255 107 0 / 45%)", engineer: "rgb(37 99 235 / 45%)" };
+    document.querySelectorAll("[data-level]").forEach((btn) => {
+      const key = btn.getAttribute("data-level");
+      const on = key === this.state.level;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.style.borderColor = on ? tint[key] : "var(--border)";
+      btn.style.boxShadow = on ? "0 0 2rem rgb(255 255 255 / 6%)" : "none";
+    });
+    document.querySelectorAll("[data-level-panel]").forEach((p) => {
+      p.style.display = p.getAttribute("data-level-panel") === this.state.level ? "grid" : "none";
+    });
+
+    document.querySelectorAll("[data-filter]").forEach((btn) => {
+      const on = btn.getAttribute("data-filter") === this.state.filter;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.style.borderColor = on ? "rgb(255 107 0 / 45%)" : "var(--border)";
+      btn.style.background = on ? "rgb(255 107 0 / 12%)" : "transparent";
+      btn.style.color = on ? "var(--accent)" : "var(--muted)";
+    });
+    document.querySelectorAll("[data-cat]").forEach((li) => {
+      const show = this.state.filter === "todas" || li.getAttribute("data-cat") === this.state.filter;
+      li.style.display = show ? "grid" : "none";
+    });
+
+    this.paintIcons();
+  }
+
+  setupReveal() {
+    const targets = Array.from(document.querySelectorAll("[data-reveal]"));
+    if (!targets.length || this.reduced || typeof IntersectionObserver === "undefined") return;
+    targets.forEach((el, i) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(2rem) scale(.99)";
+      el.style.transition = "opacity 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms, transform 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms";
+    });
+    const show = (el) => { el.style.opacity = "1"; el.style.transform = "none"; };
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { show(e.target); this.observer.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -10% 0px", threshold: 0.06 });
+    targets.forEach((el) => this.observer.observe(el));
+    setTimeout(() => targets.forEach(show), 2800);
+  }
+
+  setupSections() {
+    const links = Array.from(document.querySelectorAll("[data-section-link]"));
+    const sections = Array.from(document.querySelectorAll("[data-section]"));
+    if (!links.length || !sections.length) return;
+    const mark = (id) => links.forEach((a) => {
+      const on = a.getAttribute("data-section-link") === id;
+      a.style.background = on ? "linear-gradient(120deg, rgb(255 107 0 / 20%), rgb(255 107 0 / 6%))" : "transparent";
+      a.style.color = on ? "var(--color-white)" : "var(--muted)";
+      a.style.boxShadow = on ? "inset 0 0 0 1px rgb(255 107 0 / 40%)" : "none";
+    });
+    mark("trilha");
+    if (typeof IntersectionObserver === "undefined") return;
+    this.sectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) mark(visible.target.id);
+    }, { rootMargin: "-20% 0px -60%", threshold: [0, 0.25, 0.6] });
+    sections.forEach((s) => this.sectionObserver.observe(s));
+  }
+
+  setupSpotlight() {
+    if (this.reduced) return;
+    const hero = document.querySelector("[data-spotlight]");
+    if (!hero) return;
+    this.onMove = (event) => {
+      const r = hero.getBoundingClientRect();
+      if (event.clientY < r.top - 80 || event.clientY > r.bottom + 80) return;
+      hero.style.setProperty("--sx", Math.round(((event.clientX - r.left) / r.width) * 100) + "%");
+      hero.style.setProperty("--sy", Math.round(((event.clientY - r.top) / r.height) * 100) + "%");
+    };
+    window.addEventListener("mousemove", this.onMove, { passive: true });
+  }
+}
+</script>
+</body>
+</html>

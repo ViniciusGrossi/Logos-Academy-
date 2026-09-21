@@ -530,6 +530,58 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .spotlight-card.is-interactive:hover::before,
   .spotlight-card.is-interactive:focus-visible::before { opacity: 1; }
   .spotlight-card.is-interactive:focus-visible { outline: 3px solid color-mix(in srgb, var(--color-academy-orange) 34%, transparent); outline-offset: 3px; }
+  .spotlight-card.no-spotlight::before { display: none; }
+
+  /* Halo de Prioridade (design-system §122/§136) — reservado a próxima missão / risco urgente, nunca decoração em série. */
+  @property --beam-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  .spotlight-card.has-beam { position: relative; }
+  .spotlight-card.has-beam::after {
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--beam-angle, 0deg), transparent 0deg, color-mix(in srgb, var(--color-academy-orange) 70%, transparent) 40deg, transparent 100deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    content: "";
+    pointer-events: none;
+    animation: border-beam-rotate 3.2s linear infinite;
+  }
+  @keyframes border-beam-rotate { to { --beam-angle: 360deg; } }
+
+  .glow-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .glow-field__orb {
+    position: absolute;
+    left: var(--glow-x);
+    top: var(--glow-y);
+    width: var(--glow-size);
+    height: var(--glow-size);
+    background: radial-gradient(circle, color-mix(in srgb, var(--glow-color) 55%, transparent), transparent 70%);
+    border-radius: 50%;
+    filter: blur(2rem);
+    opacity: .42;
+    transform: translate(-50%, -50%) scale(1);
+    animation: glow-breathe var(--glow-dur, 15s) ease-in-out infinite;
+    animation-delay: var(--glow-delay, 0s);
+  }
+  .glow-field__grid {
+    position: absolute;
+    inset: -1px;
+    background-image: linear-gradient(color-mix(in srgb, var(--color-academy-ink) 6%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--color-academy-ink) 6%, transparent) 1px, transparent 1px);
+    background-size: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 8);
+    animation: grid-drift 24s linear infinite;
+  }
+  @keyframes glow-breathe { 0%, 100% { opacity: .42; transform: translate(-50%, -50%) scale(1); } 50% { opacity: .70; transform: translate(-50%, -50%) scale(1.08); } }
+  @keyframes grid-drift { to { background-position: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 8); } }
+
+  .ticker { position: relative; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); }
+  .ticker__track { display: flex; width: max-content; gap: calc(var(--spacing-unit) * 10); animation: ticker-scroll var(--ticker-dur, 22s) linear infinite; }
+  .ticker[data-pause-on-hover="true"]:hover .ticker__track { animation-play-state: paused; }
+  .ticker__set { display: flex; flex: none; gap: calc(var(--spacing-unit) * 10); }
+  .ticker__item { flex: none; font-family: var(--font-mono); font-size: calc(var(--spacing-unit) * 2.75); letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); white-space: nowrap; }
+  @keyframes ticker-scroll { to { transform: translateX(-50%); } }
 
   .spring-card {
     overflow: clip;
@@ -729,6 +781,11 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .side-nav a::before,
   .avatar { transition-duration: 0.01ms; }
   .spotlight-card::before { display: none; }
+  .spotlight-card.has-beam::after { animation: none; }
+  .glow-field__orb { animation: none; opacity: .5; }
+  .glow-field__grid { animation: none; }
+  .ticker__track { animation: none; }
+  .word-reveal__word { transform: none !important; opacity: 1 !important; transition: none !important; }
   .state-scene-premium--loading::after,
   .state-scene-premium--loading .state-scene-premium__icon svg,
   .state-scene-premium__skeleton > * { animation: none; }

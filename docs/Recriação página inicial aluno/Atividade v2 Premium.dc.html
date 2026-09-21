@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/tokens/tokens.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/fonts/fonts.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/styles.css">
+<script src="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scrollbar-color: #343941 #101114; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--color-ink-950); color: var(--color-white); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--color-orange-400); }
+  [data-icon] > svg { width: 100%; height: 100%; display: block; }
+  textarea, input, button { font: inherit; color: inherit; }
+  textarea::placeholder, input::placeholder { color: rgb(255 255 255 / 34%); }
+  textarea:focus-visible, input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @keyframes word-up { from { opacity: 0; transform: translate3d(0, .7em, 0) rotate(1.5deg); filter: blur(6px); } }
+  @keyframes line-reveal { from { transform: scaleX(0); } }
+  @keyframes rail-in { from { transform: scaleY(0); } }
+  @keyframes sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(240%) skewX(-18deg); } }
+  @keyframes ambient-pulse { 0%, 100% { opacity: .22; transform: scale(.75); } 50% { opacity: 1; transform: scale(1.25); } }
+  @keyframes ambient-spin { to { transform: rotate(360deg); } }
+  @keyframes orbit { to { transform: rotate(-360deg); } }
+  @keyframes glow-breathe { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .78; transform: scale(1.12); } }
+  @keyframes grid-drift { to { background-position: 4rem 4rem, 4rem 4rem; } }
+  @keyframes core-ring { 0% { opacity: .75; transform: scale(.42); } 100% { opacity: 0; transform: scale(1.65); } }
+  @keyframes core-scan { 0%, 100% { opacity: .18; } 50% { opacity: .5; } }
+  @keyframes bar-grow { from { transform: scaleX(0); } }
+  @keyframes caret { 50% { opacity: .15; } }
+  @keyframes spine-flow { 0% { opacity: 0; transform: translateY(-102%); } 12%, 72% { opacity: 1; } 100% { opacity: 0; transform: translateY(340%); } }
+  @keyframes node-lit { 0%, 100% { box-shadow: 0 0 0 .18rem rgb(255 107 0 / 8%), 0 0 .7rem rgb(255 107 0 / 30%); } 50% { box-shadow: 0 0 0 .4rem rgb(255 107 0 / 12%), 0 0 1.4rem rgb(255 107 0 / 55%); } }
+  @keyframes step-in { from { opacity: 0; transform: translateX(-.9rem); } }
+
+  @keyframes spec-h1 { 0%, 40% { width: 56%; height: .5rem; background: rgb(255 255 255 / 42%); } 54%, 100% { width: 82%; height: 1.05rem; background: rgb(255 255 255 / 94%); } }
+  @keyframes spec-h2 { 0%, 40% { width: 44%; height: .5rem; background: rgb(255 255 255 / 42%); } 54%, 100% { width: 60%; height: 1.05rem; background: var(--accent); } }
+  @keyframes spec-rule { 0%, 42% { opacity: 0; transform: scaleX(0); } 56%, 100% { opacity: 1; transform: scaleX(1); } }
+  @keyframes spec-keep { 0%, 40% { opacity: .95; background: rgb(255 255 255 / 52%); } 54%, 100% { opacity: .62; background: rgb(255 255 255 / 34%); } }
+  @keyframes spec-drop { 0%, 40% { opacity: .9; height: .3rem; margin-top: .3rem; } 54%, 100% { opacity: 0; height: 0; margin-top: 0; } }
+  @keyframes spec-tick-on { 0%, 42% { color: rgb(255 255 255 / 34%); border-color: rgb(255 255 255 / 16%); } 56%, 100% { color: var(--accent); border-color: rgb(255 107 0 / 55%); box-shadow: 0 0 .7rem rgb(255 107 0 / 35%); } }
+  @keyframes spec-tick-off { 0%, 42% { color: rgb(255 255 255 / 34%); border-color: rgb(255 255 255 / 16%); } 56%, 100% { color: rgb(255 255 255 / 20%); border-color: rgb(255 255 255 / 8%); } }
+  @keyframes spec-scan { 0% { opacity: 0; transform: translateY(-8%); } 6% { opacity: .85; } 26% { opacity: .85; } 34%, 100% { opacity: 0; transform: translateY(260%); } }
+  @keyframes spec-cap-a { 0%, 38% { opacity: 1; transform: none; } 50%, 100% { opacity: 0; transform: translateY(-.35rem); } }
+  @keyframes spec-cap-b { 0%, 44% { opacity: 0; transform: translateY(.35rem); } 58%, 100% { opacity: 1; transform: none; } }
+  @keyframes spec-badge { 0%, 42% { background: rgb(255 255 255 / 8%); color: rgb(255 255 255 / 55%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 14%); } 56%, 100% { background: rgb(255 107 0 / 16%); color: var(--accent); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 45%); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+
+  @media (max-width: 90rem) {
+    [data-r="hero"] { grid-template-columns: 1fr !important; }
+    [data-r="core"] { justify-self: stretch !important; max-width: none !important; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) !important; align-items: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 16 / 10 !important; }
+  }
+  @media (max-width: 76rem) {
+    [data-r="grid"] { grid-template-columns: 1fr !important; }
+    [data-r="rail"] { position: static !important; }
+  }
+  @media (max-width: 64rem) {
+    [data-r="sidebar"] { transform: translateX(-105%); box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 60%); }
+    [data-r="sidebar"][data-open="true"] { transform: translateX(0); }
+    [data-r="workspace"] { margin-inline-start: 0 !important; }
+    [data-r="menu"] { display: inline-grid !important; }
+    [data-r="scrim"] { display: block !important; }
+  }
+  @media (max-width: 58rem) {
+    [data-r="compare"] { grid-template-columns: 1fr !important; }
+    [data-r="compare-link"] { height: 2.2rem !important; }
+    [data-r="compare"] [role="img"] { aspect-ratio: 16 / 9 !important; max-height: 13rem !important; }
+    [data-r="route"] { grid-auto-flow: row !important; grid-template-columns: 1fr !important; }
+    [data-r="support"] { grid-template-columns: 1fr !important; }
+    [data-r="desk-body"] { grid-template-columns: 1fr !important; }
+    [data-r="spine"] { display: none !important; }
+    [data-r="console"] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 48rem) {
+    [data-r="topbar"] { padding-inline: 12px !important; }
+    [data-r="crumb-root"], [data-r="avatar"], [data-r="role"], [data-r="pulse-label"] { display: none !important; }
+    [data-r="hero"] h1 { font-size: clamp(2.2rem, 9vw, 3.2rem) !important; }
+    [data-r="meta"] { gap: .5rem !important; }
+    [data-r="actions"] { flex-direction: column !important; align-items: stretch !important; }
+    [data-r="actions"] > button { width: 100% !important; }
+    [data-r="nav-sections"] { overflow-x: auto !important; }
+  }
+  @media (max-width: 40rem) {
+    [data-r="core"] { grid-template-columns: 1fr !important; max-width: 22rem !important; justify-self: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 4 / 3 !important; }
+  }
+</style>
+</helmet>
+<div class="dark" style="position: relative; min-height: 100vh; overflow-x: hidden; background: var(--color-ink-950); color: var(--color-white)">
+  <div aria-hidden="true" style="position: fixed; z-index: 0; inset: 0; pointer-events: none">
+    <span style="position: absolute; left: 18%; top: -16rem; width: 46rem; height: 46rem; border-radius: 50%; background: radial-gradient(circle, rgb(255 107 0 / 15%), transparent 62%); filter: blur(1rem); animation: glow-breathe 14s ease-in-out infinite"></span>
+    <span style="position: absolute; right: -14rem; top: 38%; width: 40rem; height: 40rem; border-radius: 50%; background: radial-gradient(circle, rgb(124 92 252 / 12%), transparent 64%); filter: blur(1rem); animation: glow-breathe 18s ease-in-out -5s infinite"></span>
+    <span style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px); background-size: 4rem 4rem, 4rem 4rem; mask-image: radial-gradient(circle at 50% 18%, #000 0, transparent 70%); animation: grid-drift 26s linear infinite"></span>
+    <span style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 28%, transparent 38%, rgb(8 9 11 / 74%) 100%)"></span>
+  </div>
+
+  <div data-r="scrim" onClick="{{ closeNav }}" aria-hidden="true" style="display: none; position: fixed; z-index: 45; inset: 0; background: rgb(8 9 11 / 62%); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity var(--motion-standard) var(--ease-standard)"></div>
+
+  <aside data-r="sidebar" style="position: fixed; z-index: 50; inset: 0 auto 0 0; display: flex; width: 16.5rem; flex-direction: column; padding: 24px 20px; background: linear-gradient(180deg, rgb(23 25 29 / 96%), rgb(16 17 20 / 96%)); backdrop-filter: blur(1.25rem); border-right: 1px solid var(--border); transition: transform var(--motion-standard) var(--ease-standard)">
+    <span aria-hidden="true" style="position: absolute; inset: 0 0 auto auto; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, rgb(255 107 0 / 55%) 22%, rgb(255 107 0 / 12%) 62%, transparent); transform-origin: top; animation: rail-in var(--motion-emphasis) var(--ease-emphasis) both"></span>
+    <a href="Inicio Aluno v2 Premium.dc.html" style="position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: 12px; color: var(--color-white)">
+      <span style="position: relative; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%)">
+        <img src="brand/logos-academy-symbol-dark.png" alt="" width="52" height="52" style="width: 26px; height: 26px; object-fit: contain">
+        <i aria-hidden="true" style="position: absolute; inset: -0.35rem; border: 1px dashed rgb(255 107 0 / 22%); border-radius: var(--radius-lg); animation: ambient-spin 28s linear infinite"></i>
+      </span>
+      <span style="display: grid; gap: 1px; text-transform: uppercase; letter-spacing: .16em">
+        <strong style="font-size: var(--text-xs); line-height: 1">Logos</strong>
+        <small style="color: var(--accent); font: 700 9px/1.2 var(--font-mono); letter-spacing: .28em">Academy</small>
+      </span>
+    </a>
+
+    <div style="position: relative; flex: 0 0 auto; margin: 40px 0 28px; padding: 14px 14px 14px 16px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(255 107 0 / 10%), rgb(124 92 252 / 7%))">
+      <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 1rem rgb(255 107 0 / 70%)"></span>
+      <span aria-hidden="true" style="position: absolute; inset: 0; width: 38%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 12%), transparent); animation: sheen 6.5s var(--ease-standard) infinite"></span>
+      <span style="display: inline-flex; align-items: center; gap: .4rem; font: 700 10px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--color-explorer)">
+        <i style="width: .4rem; height: .4rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .6rem var(--color-explorer)"></i> Explorer · ciclo 02
+      </span>
+      <strong style="display: block; max-width: 16ch; margin-top: 10px; font-size: var(--text-md); font-weight: 600; line-height: 1.3; letter-spacing: -.02em">Creative Studio</strong>
+      <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 11px">3 de 4 evidências aprovadas</small>
+    </div>
+
+    <nav style="display: grid; gap: 20px; min-height: 0; overflow-y: auto">
+      <div style="display: grid; gap: 6px">
+        <span style="display: block; margin: 0 12px 6px; font: 700 10px var(--font-mono); color: rgb(255 255 255 / 40%); letter-spacing: .12em; text-transform: uppercase">Meu espaço</span>
+        <a href="Inicio Aluno v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="house" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Início</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" aria-current="page" style="position: relative; display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; overflow: hidden; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); color: var(--color-white); background: linear-gradient(90deg, rgb(255 107 0 / 16%), rgb(255 107 0 / 3%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent)"></span>
+          <span data-icon="clipboard-check" style="width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent)"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm); font-weight: 600">Atividade</span><span style="border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-pill); padding: 2px 7px; color: var(--accent); font: 700 9px/1 var(--font-mono)">v02</span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="gauge" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Jornada</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="folder-kanban" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Projetos</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="book-open-text" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Glossário</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="calendar-days" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Agenda</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="user-round" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Perfil</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+      </div>
+    </nav>
+
+    <div style="display: flex; flex: 0 0 auto; gap: 12px; align-items: center; margin-top: auto; padding-top: 28px; color: rgb(255 255 255 / 66%)">
+      <span data-icon="shield-check" style="width: 20px; height: 20px; flex: 0 0 auto; color: var(--color-success)"></span>
+      <span style="display: block">
+        <strong style="display: block; color: var(--color-white); font-size: var(--text-xs)">Rascunho privado</strong>
+        <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 11px">Nada é enviado até você decidir</small>
+      </span>
+    </div>
+  </aside>
+
+  <div data-r="workspace" style="position: relative; z-index: 1; min-width: 0; margin-inline-start: 16.5rem">
+    <header data-r="topbar" style="position: sticky; top: 0; z-index: 30; display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 16px; padding-inline: clamp(16px, 4vw, 40px); background: rgb(16 17 20 / 78%); border-bottom: 1px solid var(--border); backdrop-filter: blur(1rem)">
+      <div style="display: flex; min-width: 0; align-items: center; gap: 10px; font-size: var(--text-xs); color: var(--muted)">
+        <button type="button" data-r="menu" onClick="{{ toggleNav }}" aria-label="Abrir navegação" style="display: none; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer"><span data-icon="menu" style="width: 18px; height: 18px"></span></button>
+        <span data-r="crumb-root">Logos Academy</span>
+        <span data-icon="chevron-right" data-r="crumb-root" style="width: 14px; height: 14px"></span>
+        <strong style="color: var(--color-white)">Atividade</strong>
+        <span data-r="pulse-label" style="display: inline-flex; align-items: center; gap: .45rem; margin-left: 8px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 5px 10px; font: 700 10px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent)">
+          <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> rascunho privado
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <a href="#" data-r="role" style="display: inline-flex; min-height: 44px; align-items: center; padding-inline: 16px; border-radius: var(--radius-md); color: var(--muted); font-weight: 600; font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(255 255 255 / 6%); color: var(--color-white)">Abrir gestão</a>
+        <button type="button" aria-label="Ativar tema claro" style="display: inline-grid; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+          <span data-icon="sun" style="width: 18px; height: 18px"></span>
+        </button>
+        <a href="#" data-r="avatar" aria-label="Abrir perfil de Marina Alves" style="display: inline-flex; min-height: 44px; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 4px 12px 4px 4px; background: rgb(255 255 255 / 4%); color: var(--color-white); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent)">
+          <span style="display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-orange-500), var(--color-explorer)); color: var(--color-white); font: 700 11px var(--font-mono)">MA</span>
+          <span style="display: grid; gap: 1px; line-height: 1.1">
+            <strong style="font-size: 11px">Marina</strong>
+            <small style="color: var(--muted); font: 700 8px var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Explorer</small>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main data-screen-label="Atividade" style="width: min(100%, 82rem); margin-inline: auto; padding: clamp(20px, 4vw, 44px) clamp(16px, 4vw, 40px) 96px">
+      <a href="#" style="display: inline-flex; min-height: 44px; align-items: center; gap: .55rem; margin-bottom: 1rem; color: var(--muted); font: 700 .68rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; transition: gap var(--motion-fast) var(--ease-standard)" style-hover="color: var(--accent); gap: .85rem">
+        <span data-icon="arrow-left" style="width: 1rem; height: 1rem"></span> Voltar ao projeto
+      </a>
+
+      <header data-r="hero" data-spotlight="" data-reveal="" style="position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 17rem; gap: clamp(24px, 4vw, 48px); align-items: center; overflow: hidden; padding: clamp(24px, 4vw, 52px); border: 1px solid var(--border); border-radius: 1.6rem .35rem 1.6rem 1.6rem; background: linear-gradient(140deg, rgb(34 37 42 / 76%), rgb(16 17 20 / 92%) 62%, rgb(41 24 12 / 62%)); backdrop-filter: blur(1.5rem); box-shadow: 0 2.5rem 6rem rgb(0 0 0 / 55%), inset 0 1px rgb(255 255 255 / 7%)" style-after="position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--accent) 16% 46%, transparent 78%); content: ''; box-shadow: 0 0 1.2rem rgb(255 107 0 / 55%)">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(22rem 22rem at var(--sx, 78%) var(--sy, 36%), rgb(255 107 0 / 13%), transparent 70%); transition: background 220ms var(--ease-standard)"></div>
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px); background-size: 2.5rem 2.5rem, 2.5rem 2.5rem; mask-image: radial-gradient(16rem 16rem at var(--sx, 78%) var(--sy, 36%), #000, transparent 72%)"></div>
+
+        <div style="position: relative; z-index: 3; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: .5rem; color: var(--accent); font: 800 .64rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+            <span data-icon="git-branch" style="width: 13px; height: 13px"></span> Ciclo 02 · Creative Studio
+          </span>
+          <h1 style="max-width: 24ch; margin: .9rem 0 .7rem; font-size: clamp(2.4rem, 4.4vw, 4.2rem); font-weight: 600; line-height: .95; letter-spacing: -.055em; text-wrap: balance">
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) both">Cartaz</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .07s both">que</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .14s both">orienta</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .21s both">uma</span>
+            <span style="position: relative; display: inline-block; color: var(--accent); text-shadow: 0 0 2.5rem rgb(255 107 0 / 45%); animation: word-up .9s var(--ease-emphasis) .28s both">decisão<i aria-hidden="true" style="position: absolute; inset: auto 0 -.1em 0; height: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent); transform-origin: left; animation: line-reveal .9s var(--ease-emphasis) .85s both"></i></span>
+          </h1>
+          <p style="max-width: 52ch; margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.6">Refinar a hierarquia visual e provar a mensagem principal.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem">
+            <span style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgb(255 107 0 / 34%); border-radius: var(--radius-pill); padding: .45rem .8rem; background: rgb(255 107 0 / 8%); color: var(--accent); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">
+              <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> Núcleo ativo
+            </span>
+            <span style="display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .45rem .8rem; color: var(--color-white); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em">v02</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem; border: 1px solid rgb(217 119 6 / 42%); border-radius: var(--radius-pill); padding: .45rem .8rem; background: rgb(217 119 6 / 12%); color: #F0A63B; font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">
+              <span data-icon="rotate-ccw" style="width: .7rem; height: .7rem"></span> Ajustes pedidos
+            </span>
+          </div>
+        </div>
+
+        <aside data-r="core" aria-label="Espécime da versão e painel de estado" style="position: relative; z-index: 3; display: grid; gap: .6rem; width: 100%; max-width: 21rem; align-content: start; justify-self: end">
+          <figure data-r="spec" style="position: relative; display: grid; gap: .7rem; margin: 0; overflow: hidden; padding: .95rem; border: 1px solid rgb(255 107 0 / 26%); border-radius: 1.2rem .3rem 1.2rem 1.2rem; background: linear-gradient(158deg, rgb(255 107 0 / 12%), rgb(16 17 20 / 88%) 66%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgb(255 107 0 / 70%), transparent)"></span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--accent); font: 800 .55rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+                <i style="width: .34rem; height: .34rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .5rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> hierarquia · atividade 07
+              </span>
+              <span aria-hidden="true" style="position: relative; width: 4.6rem; height: 1.2rem">
+                <b style="position: absolute; inset: 0; display: grid; place-items: center; border-radius: var(--radius-pill); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; animation: spec-badge 8s var(--ease-emphasis) infinite">v01 → v02</b>
+              </span>
+            </div>
+
+            <div data-r="spec-sheet" role="img" aria-label="Simulação do cartaz: na v01 título e texto de apoio têm o mesmo peso; na v02 o título domina e o apoio se reduz a uma linha" style="position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 1.15rem; gap: .6rem; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; padding: .9rem; border: 1px solid rgb(255 255 255 / 12%); border-radius: var(--radius-md); background: linear-gradient(180deg, #0D0E11, #14161B)">
+              <i aria-hidden="true" style="position: absolute; inset: 0 0 auto 0; height: 24%; background: linear-gradient(180deg, transparent, rgb(255 107 0 / 20%), transparent); animation: spec-scan 8s var(--ease-standard) infinite"></i>
+              <span data-r="spec-stack" style="position: relative; z-index: 2; display: flex; min-width: 0; flex-direction: column; gap: .5rem">
+              <span style="display: flex; flex-direction: column; gap: .3rem">
+                <i style="display: block; width: 56%; height: .5rem; border-radius: 2px; background: rgb(255 255 255 / 42%); animation: spec-h1 8s var(--ease-emphasis) infinite"></i>
+                <i style="display: block; width: 44%; height: .5rem; border-radius: 2px; background: rgb(255 255 255 / 42%); animation: spec-h2 8s var(--ease-emphasis) infinite"></i>
+              </span>
+              <i aria-hidden="true" style="display: block; width: 40%; height: 2px; border-radius: 2px; background: var(--accent); box-shadow: 0 0 .6rem rgb(255 107 0 / 60%); transform-origin: left; animation: spec-rule 8s var(--ease-emphasis) infinite"></i>
+              <i aria-hidden="true" style="display: block; flex: 1; min-height: 2.2rem; border-radius: 3px; background: repeating-linear-gradient(135deg, rgb(255 255 255 / 7%) 0 6px, transparent 6px 12px), rgb(255 255 255 / 4%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 9%)"></i>
+              <span style="position: relative; z-index: 2; display: flex; flex-direction: column">
+                <i style="display: block; width: 84%; height: .3rem; border-radius: 2px; background: rgb(255 255 255 / 52%); animation: spec-keep 8s var(--ease-emphasis) infinite"></i>
+                <i style="display: block; width: 76%; height: .3rem; margin-top: .3rem; border-radius: 2px; background: rgb(255 255 255 / 44%); animation: spec-drop 8s var(--ease-emphasis) infinite"></i>
+                <i style="display: block; width: 68%; height: .3rem; margin-top: .3rem; border-radius: 2px; background: rgb(255 255 255 / 44%); animation: spec-drop 8s var(--ease-emphasis) infinite"></i>
+                <i style="display: block; width: 46%; height: .3rem; margin-top: .3rem; border-radius: 2px; background: rgb(255 255 255 / 44%); animation: spec-drop 8s var(--ease-emphasis) infinite"></i>
+              </span>
+              </span>
+
+              <span aria-hidden="true" style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding-block: .1rem">
+                <b style="display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; font: 750 .5rem/1 var(--font-mono); animation: spec-tick-on 8s var(--ease-emphasis) infinite">1</b>
+                <b style="display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; font: 750 .5rem/1 var(--font-mono); animation: spec-tick-off 8s var(--ease-emphasis) infinite">2</b>
+                <b style="display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; font: 750 .5rem/1 var(--font-mono); animation: spec-tick-off 8s var(--ease-emphasis) infinite">3</b>
+              </span>
+            </div>
+
+            <figcaption style="position: relative; height: 2.2rem">
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: spec-cap-a 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">Três elementos disputam o primeiro lugar</strong>
+                <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">v01 · sem hierarquia</small>
+              </span>
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: spec-cap-b 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">Uma mensagem vence à distância</strong>
+                <small style="color: var(--accent); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">v02 · decisão tomada</small>
+              </span>
+            </figcaption>
+          </figure>
+
+          <div data-r="instr" style="display: grid; gap: .5rem; align-content: start; min-width: 0">
+          <div style="position: relative; display: flex; align-items: center; gap: .8rem; overflow: hidden; padding: .8rem .9rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 88%)">
+            <span style="position: relative; display: grid; flex: 0 0 auto; width: 4.5rem; height: 4.5rem; place-items: center">
+              <i aria-hidden="true" style="position: absolute; inset: -.25rem; border: 1px solid rgb(255 107 0 / 22%); border-radius: 50%; animation: core-ring 3.6s var(--ease-standard) infinite"></i>
+              <i aria-hidden="true" data-gauge="" style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from -90deg, var(--accent) 0%, rgb(255 255 255 / 8%) 0%); transition: background var(--motion-emphasis) var(--ease-emphasis)"></i>
+              <i aria-hidden="true" style="position: absolute; inset: .3rem; border-radius: 50%; background: radial-gradient(circle at 42% 34%, rgb(255 107 0 / 14%), rgb(16 17 20 / 97%) 66%)"></i>
+              <strong data-gauge-pct="" style="position: relative; font: 700 .95rem/1 var(--font-sans); letter-spacing: -.03em; color: var(--color-white); font-variant-numeric: tabular-nums">{{ completionLabel }}</strong>
+            </span>
+            <span style="display: grid; gap: .25rem; min-width: 0">
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Versão 02 pronta</small>
+              <strong data-prog-count="" style="color: var(--accent); font: 750 .72rem/1 var(--font-mono); letter-spacing: .04em">{{ filledLabel }}</strong>
+              <small style="color: var(--muted); font-size: .68rem; line-height: 1.4">O anel preenche conforme você completa a mesa de versão.</small>
+            </span>
+          </div>
+
+          <ul style="display: grid; gap: 1px; margin: 0; padding: 0; overflow: hidden; list-style: none; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(255 255 255 / 7%)">
+            <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+              <span data-icon="clock-3" style="width: .95rem; height: .95rem; justify-self: center; color: var(--accent)"></span>
+              <small style="color: var(--muted); font-size: .72rem">Prazo</small>
+              <strong style="font: 750 .7rem/1 var(--font-mono); color: #F0A63B">2 dias</strong>
+            </li>
+            <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+              <span data-icon="rotate-ccw" style="width: .95rem; height: .95rem; justify-self: center; color: var(--muted)"></span>
+              <small style="color: var(--muted); font-size: .72rem">Tentativa</small>
+              <strong style="font: 750 .7rem/1 var(--font-mono); color: var(--color-white)">2ª</strong>
+            </li>
+            <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+              <span data-icon="message-square-text" style="width: .95rem; height: .95rem; justify-self: center; color: var(--muted)"></span>
+              <small style="color: var(--muted); font-size: .72rem">Revisor</small>
+              <strong style="font: 750 .7rem/1 var(--font-mono); color: var(--color-white)">Vinicius</strong>
+            </li>
+          </ul>
+
+          <ol aria-label="Trilha de versões" style="display: grid; grid-auto-flow: column; gap: .3rem; margin: 0; padding: .7rem .8rem; list-style: none; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 68%)">
+            <li style="display: grid; justify-items: center; gap: .35rem">
+              <i aria-hidden="true" style="display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border-radius: 50%; background: rgb(22 163 74 / 20%); box-shadow: inset 0 0 0 1px rgb(22 163 74 / 55%)"><b style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--color-success)"></b></i>
+              <small style="color: var(--color-success); font: 750 .55rem/1 var(--font-mono)">v01</small>
+            </li>
+            <li aria-hidden="true" style="align-self: start; margin-top: .55rem; height: 1px; background: linear-gradient(90deg, rgb(22 163 74 / 60%), rgb(255 107 0 / 60%))"></li>
+            <li aria-current="step" style="display: grid; justify-items: center; gap: .35rem">
+              <i aria-hidden="true" style="display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border-radius: 50%; background: rgb(255 107 0 / 18%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 60%), 0 0 .7rem rgb(255 107 0 / 45%); animation: node-lit 2.4s ease-in-out infinite"><b style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--accent)"></b></i>
+              <small style="color: var(--accent); font: 750 .55rem/1 var(--font-mono)">v02</small>
+            </li>
+            <li aria-hidden="true" style="align-self: start; margin-top: .55rem; height: 1px; background: rgb(255 255 255 / 12%)"></li>
+            <li style="display: grid; justify-items: center; gap: .35rem; opacity: .5">
+              <i aria-hidden="true" style="display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 20%)"><b style="width: .38rem; height: .38rem; border-radius: 50%; background: rgb(255 255 255 / 35%)"></b></i>
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono)">v03</small>
+            </li>
+          </ol>
+          </div>
+        </aside>
+      </header>
+
+      <sc-if value="{{ showProjectRoute }}" hint-placeholder-val="{{ true }}">
+        <ol data-r="route" data-reveal="" aria-label="Percurso do projeto" style="display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: .55rem; margin: 1rem 0 0; padding: 0; list-style: none">
+          <li style="min-width: 0">
+            <a href="#" style="position: relative; display: grid; gap: .3rem; height: 100%; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); padding: 1rem; background: rgb(23 25 29 / 68%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(22 163 74 / 45%); transform: translateY(-3px); color: inherit">
+              <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--color-success)"></span>
+              <span style="color: var(--color-success); font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em">01</span>
+              <strong style="font-size: .88rem; font-weight: 600">Radar de referências</strong>
+              <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Aprovada · v01</small>
+            </a>
+          </li>
+          <li aria-current="step" style="min-width: 0">
+            <div style="position: relative; display: grid; gap: .3rem; height: 100%; overflow: hidden; border: 1px solid rgb(255 107 0 / 45%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); padding: 1rem; background: linear-gradient(140deg, rgb(255 107 0 / 14%), rgb(23 25 29 / 82%)); box-shadow: 0 0 2rem rgb(255 107 0 / 14%)">
+              <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .9rem var(--accent)"></span>
+              <span aria-hidden="true" style="position: absolute; inset: 0; width: 32%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 10%), transparent); animation: sheen 5.5s var(--ease-standard) infinite"></span>
+              <span style="color: var(--accent); font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em">02 · você está aqui</span>
+              <strong style="font-size: .88rem; font-weight: 600">Cartaz que orienta uma decisão</strong>
+              <small style="color: var(--accent); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Ajustes pedidos · v02</small>
+            </div>
+          </li>
+          <li style="min-width: 0">
+            <div style="position: relative; display: grid; gap: .3rem; height: 100%; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); padding: 1rem; background: rgb(23 25 29 / 45%); opacity: .6">
+              <span style="display: flex; align-items: center; justify-content: space-between; color: var(--muted); font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em">03 <span data-icon="lock-keyhole" style="width: .8rem; height: .8rem"></span></span>
+              <strong style="font-size: .88rem; font-weight: 600">Protótipo que pede uma ação</strong>
+              <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Bloqueada</small>
+            </div>
+          </li>
+        </ol>
+      </sc-if>
+
+      <div data-r="meta" data-reveal="" style="display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1rem">
+        <span style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .5rem .85rem; background: rgb(23 25 29 / 68%); color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em">
+          <span data-icon="clock-3" style="width: .8rem; height: .8rem; color: var(--accent)"></span> 25 minutos
+        </span>
+        <span style="display: inline-flex; align-items: center; border: 1px solid rgb(217 119 6 / 42%); border-radius: var(--radius-pill); padding: .5rem .85rem; background: rgb(217 119 6 / 10%); color: #F0A63B; font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Ajustes pedidos</span>
+        <span style="display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .5rem .85rem; background: rgb(23 25 29 / 68%); color: var(--color-white); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em">Versão 02</span>
+        <span style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .5rem .85rem; background: rgb(23 25 29 / 68%); color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em">
+          <span data-icon="calendar-days" style="width: .8rem; height: .8rem"></span> Até 8 de setembro
+        </span>
+      </div>
+
+      <section aria-labelledby="feedback-title" data-reveal="" style="position: relative; display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: 1.25rem; margin-top: 1rem; overflow: hidden; padding: clamp(20px, 2.5vw, 30px); border: 1px solid rgb(217 119 6 / 34%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(120deg, rgb(41 30 14 / 72%), rgb(23 25 29 / 88%)); box-shadow: 0 1.5rem 3.5rem rgb(0 0 0 / 40%)">
+        <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: linear-gradient(180deg, #D97706, transparent); box-shadow: 0 0 1rem rgb(217 119 6 / 60%)"></span>
+        <span style="position: relative; display: grid; width: 3.5rem; height: 3.5rem; place-items: center; border: 1px solid rgb(217 119 6 / 45%); border-radius: 50%; background: rgb(217 119 6 / 14%); color: #F0A63B">
+          <span data-icon="message-square-text" style="width: 1.15rem; height: 1.15rem"></span>
+          <i aria-hidden="true" style="position: absolute; inset: -.45rem; border: 1px solid rgb(217 119 6 / 30%); border-radius: 50%; animation: core-ring 3.2s var(--ease-standard) infinite"></i>
+        </span>
+        <div style="min-width: 0">
+          <span style="color: #F0A63B; font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Ajuste que move esta versão</span>
+          <h2 id="feedback-title" style="max-width: 46ch; margin: .6rem 0 .5rem; font-size: clamp(1.15rem, 2vw, 1.7rem); font-weight: 600; line-height: 1.3; letter-spacing: -.03em">O título está forte. Reduza o texto de apoio e explique a decisão na próxima versão.</h2>
+          <p style="margin: 0; color: var(--muted); font-size: .8rem">Revisado por <strong style="color: var(--color-white)">Vinicius</strong> em 16 de setembro de 2026.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1rem">
+            <span style="display: inline-flex; align-items: center; gap: .4rem; border: 1px solid rgb(217 119 6 / 42%); border-radius: var(--radius-pill); padding: .4rem .75rem; background: rgb(217 119 6 / 10%); color: #F0A63B; font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em">
+              <span data-icon="alert-triangle" style="width: .75rem; height: .75rem"></span> Mensagem principal
+            </span>
+            <span style="color: var(--muted); font-size: .7rem; align-self: center">A mensagem principal ainda disputa atenção.</span>
+          </div>
+        </div>
+      </section>
+
+      <section data-r="compare" data-reveal="" aria-labelledby="compare-title" style="display: grid; grid-template-columns: minmax(0, 1fr) 2.6rem minmax(0, 1fr); gap: .6rem; align-items: stretch; margin-top: 1rem">
+        <article style="position: relative; display: grid; gap: .8rem; align-content: start; overflow: hidden; padding: clamp(16px, 2vw, 22px); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 68%); backdrop-filter: blur(1rem)">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: .75rem">
+            <span id="compare-title" style="display: inline-flex; align-items: center; gap: .45rem; color: var(--muted); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">
+              <span data-icon="history" style="width: .85rem; height: .85rem"></span> v01 · enviada
+            </span>
+            <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono)">16 set</small>
+          </div>
+          <div role="img" aria-label="Miniatura do cartaz enviado na versão 01" style="position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; max-height: 17rem; overflow: hidden; border: 1px solid rgb(255 255 255 / 12%); border-radius: var(--radius-md); background: repeating-linear-gradient(135deg, rgb(255 255 255 / 4%) 0 10px, transparent 10px 20px)">
+            <span style="display: grid; gap: .35rem; justify-items: center; padding: 1rem; text-align: center">
+              <span data-icon="image" style="width: 1.3rem; height: 1.3rem; color: rgb(255 255 255 / 40%)"></span>
+              <small style="color: var(--muted); font-size: .7rem; line-height: 1.45">Cartaz v01 · arraste sua imagem aqui</small>
+            </span>
+            <span style="position: absolute; left: .55rem; top: .55rem; border: 1px solid rgb(217 119 6 / 45%); border-radius: var(--radius-pill); padding: .25rem .55rem; background: rgb(23 25 29 / 88%); color: #F0A63B; font: 750 .55rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase">ajustes pedidos</span>
+          </div>
+          <ul style="display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none">
+            <li style="display: grid; grid-template-columns: .95rem minmax(0, 1fr); gap: .6rem; align-items: start; color: rgb(255 255 255 / 78%); font-size: .78rem; line-height: 1.5">
+              <span data-icon="alert-triangle" style="width: .95rem; height: .95rem; margin-top: .15rem; color: #F0A63B"></span> O texto de apoio ocupa o mesmo peso do título.
+            </li>
+            <li style="display: grid; grid-template-columns: .95rem minmax(0, 1fr); gap: .6rem; align-items: start; color: rgb(255 255 255 / 78%); font-size: .78rem; line-height: 1.5">
+              <span data-icon="alert-triangle" style="width: .95rem; height: .95rem; margin-top: .15rem; color: #F0A63B"></span> A decisão não foi explicada no envio.
+            </li>
+          </ul>
+        </article>
+
+        <div aria-hidden="true" data-r="compare-link" style="position: relative; display: grid; place-items: center">
+          <span style="position: absolute; inset: 50% 0 auto 0; height: 1px; background: linear-gradient(90deg, rgb(255 255 255 / 10%), rgb(255 107 0 / 70%))"></span>
+          <span style="position: relative; display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border: 1px solid rgb(255 107 0 / 45%); border-radius: 50%; background: rgb(16 17 20 / 96%); color: var(--accent)">
+            <span data-icon="arrow-right" style="width: .9rem; height: .9rem"></span>
+          </span>
+        </div>
+
+        <article style="position: relative; display: grid; gap: .8rem; align-content: start; overflow: hidden; padding: clamp(16px, 2vw, 22px); border: 1px solid rgb(255 107 0 / 34%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(150deg, rgb(255 107 0 / 10%), rgb(23 25 29 / 82%)); box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 35%)">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .9rem var(--accent)"></span>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: .75rem">
+            <span style="display: inline-flex; align-items: center; gap: .45rem; color: var(--accent); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">
+              <span data-icon="sparkles" style="width: .85rem; height: .85rem"></span> v02 · em construção
+            </span>
+            <small data-compare-state="" style="color: var(--muted); font: 750 .58rem/1 var(--font-mono)">aguardando</small>
+          </div>
+          <div role="img" aria-label="Espaço da nova versão do cartaz" style="position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; max-height: 17rem; overflow: hidden; border: 1px dashed rgb(255 107 0 / 40%); border-radius: var(--radius-md); background: rgb(255 107 0 / 6%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0; width: 38%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 10%), transparent); animation: sheen 6s var(--ease-standard) infinite"></span>
+            <span style="position: relative; display: grid; gap: .35rem; justify-items: center; padding: 1rem; text-align: center">
+              <span data-icon="paperclip" style="width: 1.3rem; height: 1.3rem; color: var(--accent)"></span>
+              <small data-compare-file="" style="max-width: 22ch; color: rgb(255 255 255 / 80%); font-size: .72rem; line-height: 1.45">A versão que você anexar aparece aqui</small>
+            </span>
+          </div>
+          <ul style="display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none">
+            <li style="display: grid; grid-template-columns: .95rem minmax(0, 1fr); gap: .6rem; align-items: start; color: rgb(255 255 255 / 84%); font-size: .78rem; line-height: 1.5">
+              <span data-icon="arrow-right" style="width: .95rem; height: .95rem; margin-top: .15rem; color: var(--accent)"></span> Texto de apoio reduzido a uma linha.
+            </li>
+            <li style="display: grid; grid-template-columns: .95rem minmax(0, 1fr); gap: .6rem; align-items: start; color: rgb(255 255 255 / 84%); font-size: .78rem; line-height: 1.5">
+              <span data-icon="arrow-right" style="width: .95rem; height: .95rem; margin-top: .15rem; color: var(--accent)"></span> Decisão registrada em uma frase.
+            </li>
+          </ul>
+        </article>
+      </section>
+
+      <nav data-r="nav-sections" aria-label="Seções da atividade" style="position: sticky; top: 72px; z-index: 20; display: flex; gap: .3rem; margin-top: 1.25rem; padding: .4rem; border: 1px solid var(--border); border-radius: var(--radius-pill); background: rgb(16 17 20 / 88%); backdrop-filter: blur(1rem); box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 40%)">
+        <a href="#orientacao" data-section-link="orientacao" style="display: inline-flex; min-height: 40px; flex: 1; align-items: center; justify-content: center; white-space: nowrap; border-radius: var(--radius-pill); padding: 0 1rem; color: var(--muted); font: 750 .64rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; transition: all var(--motion-fast) var(--ease-standard)">01 · Orientação</a>
+        <a href="#construcao" data-section-link="construcao" style="display: inline-flex; min-height: 40px; flex: 1; align-items: center; justify-content: center; white-space: nowrap; border-radius: var(--radius-pill); padding: 0 1rem; color: var(--muted); font: 750 .64rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; transition: all var(--motion-fast) var(--ease-standard)">02 · Construção</a>
+        <a href="#qualidade" data-section-link="qualidade" style="display: inline-flex; min-height: 40px; flex: 1; align-items: center; justify-content: center; white-space: nowrap; border-radius: var(--radius-pill); padding: 0 1rem; color: var(--muted); font: 750 .64rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; transition: all var(--motion-fast) var(--ease-standard)">03 · Qualidade</a>
+        <a href="#historico" data-section-link="historico" style="display: inline-flex; min-height: 40px; flex: 1; align-items: center; justify-content: center; white-space: nowrap; border-radius: var(--radius-pill); padding: 0 1rem; color: var(--muted); font: 750 .64rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; transition: all var(--motion-fast) var(--ease-standard)">04 · Histórico</a>
+      </nav>
+
+      <section id="orientacao" data-section="" data-reveal="" style="position: relative; margin-top: 1rem; overflow: hidden; padding: clamp(20px, 3vw, 34px); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 68%); backdrop-filter: blur(1rem); box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 35%), inset 0 1px rgb(255 255 255 / 5%)">
+        <span style="color: var(--accent); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Por que isso importa</span>
+        <p style="max-width: 68ch; margin: .8rem 0 0; color: rgb(255 255 255 / 82%); font-size: 1rem; line-height: 1.65">Você está refinando a hierarquia visual do cartaz. A mensagem principal precisa vencer o ruído antes de qualquer detalhe.</p>
+
+        <div style="position: relative; margin-top: 1.75rem; padding: 1.4rem 1.4rem 1.4rem 1.6rem; border: 1px solid rgb(255 107 0 / 26%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(130deg, rgb(255 107 0 / 10%), rgb(23 25 29 / 55%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 1rem rgb(255 107 0 / 65%)"></span>
+          <span style="color: var(--accent); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Sua missão</span>
+          <h2 style="max-width: 40ch; margin: .65rem 0 .6rem; font-size: clamp(1.4rem, 2.4vw, 2.1rem); font-weight: 600; line-height: 1.2; letter-spacing: -.035em">Compare a versão anterior com o feedback e envie uma nova decisão.</h2>
+          <p style="max-width: 62ch; margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.6">Reduza o texto de apoio antes de alterar novamente a imagem principal.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 1rem; margin-top: 1rem; padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(255 255 255 / 3%)">
+          <span style="position: relative; display: grid; width: 3rem; height: 3rem; place-items: center; border: 1px solid rgb(22 163 74 / 45%); border-radius: 50%; background: rgb(22 163 74 / 12%); color: var(--color-success)">
+            <span data-icon="package-check" style="width: 1.1rem; height: 1.1rem"></span>
+            <i aria-hidden="true" style="position: absolute; inset: -.4rem; border: 1px solid rgb(22 163 74 / 28%); border-radius: 50%; animation: core-ring 4s var(--ease-standard) infinite"></i>
+          </span>
+          <div style="min-width: 0">
+            <span style="color: var(--color-success); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Pronto significa</span>
+            <p style="max-width: 62ch; margin: .55rem 0 .4rem; font-size: .95rem; line-height: 1.55">Uma nova versão do cartaz com uma mensagem principal legível à distância e a decisão explicada.</p>
+            <small style="color: var(--muted); font-size: .72rem">Use este resultado para conferir sua versão antes do envio.</small>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.75rem">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-bottom: .85rem; border-bottom: 1px solid var(--border)">
+            <span style="color: var(--accent); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Rota de construção</span>
+            <small style="color: var(--muted); font-size: .7rem">Siga a sequência, volte quando precisar</small>
+          </div>
+          <ol style="display: grid; gap: .5rem; margin: 1.1rem 0 0; padding: 0; list-style: none">
+            <li style="display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .9rem; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .8rem; background: rgb(255 255 255 / 3%); animation: step-in .6s var(--ease-emphasis) both">
+              <span style="display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%); color: var(--accent); font: 750 .68rem/1 var(--font-mono)">01</span>
+              <p style="margin: 0; font-size: .9rem">Releia o feedback da versão anterior</p>
+            </li>
+            <li style="display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .9rem; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .8rem; background: rgb(255 255 255 / 3%); animation: step-in .6s var(--ease-emphasis) .1s both">
+              <span style="display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%); color: var(--accent); font: 750 .68rem/1 var(--font-mono)">02</span>
+              <p style="margin: 0; font-size: .9rem">Ajuste contraste e peso do título</p>
+            </li>
+            <li style="display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .9rem; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .8rem; background: rgb(255 255 255 / 3%); animation: step-in .6s var(--ease-emphasis) .2s both">
+              <span style="display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%); color: var(--accent); font: 750 .68rem/1 var(--font-mono)">03</span>
+              <p style="margin: 0; font-size: .9rem">Reduza o texto de apoio</p>
+            </li>
+            <li style="display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .9rem; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .8rem; background: rgb(255 255 255 / 3%); animation: step-in .6s var(--ease-emphasis) .3s both">
+              <span style="display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%); color: var(--accent); font: 750 .68rem/1 var(--font-mono)">04</span>
+              <p style="margin: 0; font-size: .9rem">Explique a decisão em uma frase</p>
+            </li>
+          </ol>
+        </div>
+
+        <sc-if value="{{ showSupportDeck }}" hint-placeholder-val="{{ true }}">
+          <div data-r="support" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; margin-top: 1.5rem">
+            <article style="border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 3%)">
+              <button type="button" data-disclosure="" onClick="{{ toggleSupport }}" aria-expanded="false" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 1rem; gap: .75rem; align-items: center; min-height: 56px; padding: .8rem; border: 0; border-radius: var(--radius-md); background: transparent; text-align: left; cursor: pointer">
+                <span data-icon="wrench" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--accent)"></span>
+                <span style="display: grid; gap: .15rem; min-width: 0">
+                  <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Apoio de oficina</small>
+                  <strong style="font-size: .84rem">Ferramentas sugeridas</strong>
+                </span>
+                <span data-icon="chevron-down" data-chevron="" style="width: 1rem; height: 1rem; color: var(--muted); transition: transform var(--motion-fast) var(--ease-standard)"></span>
+              </button>
+              <div data-panel="" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--motion-standard) var(--ease-standard)">
+                <div style="overflow: hidden"><p style="margin: 0; padding: 0 .8rem .9rem 3.75rem; color: var(--muted); font-size: .82rem; line-height: 1.55">Canva ou Figma; câmera do celular como backup.</p></div>
+              </div>
+            </article>
+            <article style="border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 3%)">
+              <button type="button" data-disclosure="" onClick="{{ toggleSupport }}" aria-expanded="false" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 1rem; gap: .75rem; align-items: center; min-height: 56px; padding: .8rem; border: 0; border-radius: var(--radius-md); background: transparent; text-align: left; cursor: pointer">
+                <span data-icon="lightbulb" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--accent)"></span>
+                <span style="display: grid; gap: .15rem; min-width: 0">
+                  <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Apoio de oficina</small>
+                  <strong style="font-size: .84rem">Se a ferramenta falhar</strong>
+                </span>
+                <span data-icon="chevron-down" data-chevron="" style="width: 1rem; height: 1rem; color: var(--muted); transition: transform var(--motion-fast) var(--ease-standard)"></span>
+              </button>
+              <div data-panel="" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--motion-standard) var(--ease-standard)">
+                <div style="overflow: hidden"><p style="margin: 0; padding: 0 .8rem .9rem 3.75rem; color: var(--muted); font-size: .82rem; line-height: 1.55">Se a ferramenta de edição falhar, monte a versão no papel e fotografe.</p></div>
+              </div>
+            </article>
+            <article style="border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 3%)">
+              <button type="button" data-disclosure="" onClick="{{ toggleSupport }}" aria-expanded="false" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 1rem; gap: .75rem; align-items: center; min-height: 56px; padding: .8rem; border: 0; border-radius: var(--radius-md); background: transparent; text-align: left; cursor: pointer">
+                <span data-icon="package-check" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--accent)"></span>
+                <span style="display: grid; gap: .15rem; min-width: 0">
+                  <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Apoio de oficina</small>
+                  <strong style="font-size: .84rem">Evidência para o projeto</strong>
+                </span>
+                <span data-icon="chevron-down" data-chevron="" style="width: 1rem; height: 1rem; color: var(--muted); transition: transform var(--motion-fast) var(--ease-standard)"></span>
+              </button>
+              <div data-panel="" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--motion-standard) var(--ease-standard)">
+                <div style="overflow: hidden"><p style="margin: 0; padding: 0 .8rem .9rem 3.75rem; color: var(--muted); font-size: .82rem; line-height: 1.55">A versão final do cartaz com o registro da decisão.</p></div>
+              </div>
+            </article>
+            <article style="border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 3%)">
+              <button type="button" data-disclosure="" onClick="{{ toggleSupport }}" aria-expanded="false" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 1rem; gap: .75rem; align-items: center; min-height: 56px; padding: .8rem; border: 0; border-radius: var(--radius-md); background: transparent; text-align: left; cursor: pointer">
+                <span data-icon="sparkles" style="width: 1.05rem; height: 1.05rem; justify-self: center; color: var(--accent)"></span>
+                <span style="display: grid; gap: .15rem; min-width: 0">
+                  <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Apoio de oficina</small>
+                  <strong style="font-size: .84rem">Pergunta de fechamento</strong>
+                </span>
+                <span data-icon="chevron-down" data-chevron="" style="width: 1rem; height: 1rem; color: var(--muted); transition: transform var(--motion-fast) var(--ease-standard)"></span>
+              </button>
+              <div data-panel="" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--motion-standard) var(--ease-standard)">
+                <div style="overflow: hidden"><p style="margin: 0; padding: 0 .8rem .9rem 3.75rem; color: var(--muted); font-size: .82rem; line-height: 1.55">O que a nova versão comunica em três segundos?</p></div>
+              </div>
+            </article>
+          </div>
+        </sc-if>
+
+        <footer style="display: grid; grid-template-columns: 1.1rem minmax(0, 1fr); gap: .8rem; align-items: start; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border)">
+          <span data-icon="arrow-right" style="width: 1.1rem; height: 1.1rem; margin-top: .15rem; color: var(--accent)"></span>
+          <span style="display: grid; gap: .3rem">
+            <strong style="font-size: .8rem">Depois desta atividade</strong>
+            <small style="color: var(--muted); font-size: .8rem">A próxima atividade só abre após esta evidência.</small>
+          </span>
+        </footer>
+      </section>
+
+      <section id="construcao" data-section="" data-reveal="" aria-labelledby="desk-title" style="position: relative; margin-top: 1rem; overflow: hidden; padding: clamp(20px, 3vw, 34px); border: 1px solid rgb(255 107 0 / 24%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(150deg, rgb(34 37 42 / 72%), rgb(16 17 20 / 90%)); backdrop-filter: blur(1.25rem); box-shadow: 0 1.75rem 4rem rgb(0 0 0 / 45%), inset 0 1px rgb(255 255 255 / 6%)">
+        <span aria-hidden="true" style="position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--accent) 18% 52%, transparent 82%); box-shadow: 0 0 1.1rem rgb(255 107 0 / 50%)"></span>
+        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Nova iteração</span>
+            <h2 id="desk-title" style="margin: .55rem 0 0; font-size: clamp(1.5rem, 2.6vw, 2.3rem); font-weight: 600; letter-spacing: -.04em">Construa a versão 02</h2>
+          </div>
+          <div style="display: grid; justify-items: end; gap: .2rem">
+            <strong data-prog-pct="" style="font: 700 2rem/1 var(--font-sans); letter-spacing: -.04em; color: var(--accent); font-variant-numeric: tabular-nums">{{ completionLabel }}</strong>
+            <small data-prog-count="" style="color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em">{{ filledLabel }}</small>
+          </div>
+        </div>
+
+        <p style="display: grid; grid-template-columns: 1rem minmax(0, 1fr); gap: .7rem; align-items: start; margin: 1.25rem 0 0; border: 1px solid rgb(217 119 6 / 32%); border-radius: var(--radius-md); padding: .8rem .9rem; background: rgb(217 119 6 / 9%); color: rgb(255 255 255 / 84%); font-size: .82rem; line-height: 1.55">
+          <span data-icon="rotate-ccw" style="width: 1rem; height: 1rem; margin-top: .1rem; color: #F0A63B"></span>
+          <span>A versão anterior foi trazida para cá. Ajuste somente o que o feedback pede e registre o que mudou.</span>
+        </p>
+
+        <div data-r="console" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; margin-top: 1rem">
+          <div style="display: grid; gap: .3rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .9rem; background: rgb(255 255 255 / 3%)">
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .1em">01</span>
+            <strong style="font-size: .84rem">Leia o ajuste</strong>
+            <small style="color: var(--muted); font-size: .72rem">Use o feedback como alvo da versão.</small>
+          </div>
+          <div style="display: grid; gap: .3rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .9rem; background: rgb(255 255 255 / 3%)">
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .1em">02</span>
+            <strong style="font-size: .84rem">Registre a decisão</strong>
+            <small style="color: var(--muted); font-size: .72rem">Explique o que mudou e por quê.</small>
+          </div>
+          <div style="display: grid; gap: .3rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .9rem; background: rgb(255 255 255 / 3%)">
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .1em">03</span>
+            <strong style="font-size: .84rem">Anexe a prova</strong>
+            <small style="color: var(--muted); font-size: .72rem">Inclua o artefato que comprova a melhoria.</small>
+          </div>
+        </div>
+
+        <div data-r="desk-body" style="display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 1.25rem; margin-top: 1.5rem">
+          <sc-if value="{{ showSpine }}" hint-placeholder-val="{{ true }}">
+            <div data-r="spine" aria-hidden="true" style="position: relative; display: grid; align-content: space-between; justify-items: center; padding: .5rem 0">
+              <span style="position: absolute; inset: 0 auto 0 50%; width: 2px; margin-left: -1px; border-radius: var(--radius-pill); background: rgb(255 255 255 / 10%)"></span>
+              <span data-spine-fill="" style="position: absolute; inset: 0 auto auto 50%; width: 2px; height: 0%; margin-left: -1px; border-radius: var(--radius-pill); background: linear-gradient(0deg, var(--color-orange-600), var(--accent)); box-shadow: 0 0 1rem rgb(255 107 0 / 75%); transition: height var(--motion-emphasis) var(--ease-emphasis)"></span>
+              <span style="position: absolute; inset: 0 auto 0 50%; width: 2px; margin-left: -1px; overflow: hidden">
+                <i style="position: absolute; inset: 0 0 auto 0; height: 30%; background: linear-gradient(180deg, transparent, rgb(255 255 255 / 85%), transparent); animation: spine-flow 3.4s var(--ease-standard) infinite"></i>
+              </span>
+              <span data-spine-node="" style="position: relative; display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; background: var(--color-ink-900); color: rgb(255 255 255 / 40%); font: 750 .52rem/1 var(--font-mono); transition: all var(--motion-standard) var(--ease-standard)">01</span>
+              <span data-spine-node="" style="position: relative; display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; background: var(--color-ink-900); color: rgb(255 255 255 / 40%); font: 750 .52rem/1 var(--font-mono); transition: all var(--motion-standard) var(--ease-standard)">02</span>
+              <span data-spine-node="" style="position: relative; display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; background: var(--color-ink-900); color: rgb(255 255 255 / 40%); font: 750 .52rem/1 var(--font-mono); transition: all var(--motion-standard) var(--ease-standard)">03</span>
+              <span data-spine-node="" style="position: relative; display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; background: var(--color-ink-900); color: rgb(255 255 255 / 40%); font: 750 .52rem/1 var(--font-mono); transition: all var(--motion-standard) var(--ease-standard)">04</span>
+            </div>
+          </sc-if>
+
+          <div style="display: grid; gap: .65rem; min-width: 0">
+            <label data-field="decisao" style="display: grid; gap: .5rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; background: rgb(255 255 255 / 3%); transition: border-color var(--motion-fast) var(--ease-standard)">
+              <span style="display: flex; align-items: center; gap: .5rem; color: var(--color-white); font-size: .82rem; font-weight: 600">
+                <span data-icon="file-text" style="width: .95rem; height: .95rem; color: var(--accent)"></span> Decisão registrada <em style="color: var(--accent); font-style: normal">*</em>
+              </span>
+              <textarea rows="3" onInput="{{ onDecisao }}" placeholder="Explique a escolha, o teste e o que mudou." style="width: 100%; resize: vertical; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .7rem .8rem; background: rgb(16 17 20 / 82%); color: var(--color-white); font-size: .85rem; line-height: 1.55"></textarea>
+            </label>
+
+            <label data-field="arquivo" style="display: grid; gap: .35rem; border: 1px dashed rgb(255 255 255 / 18%); border-radius: var(--radius-md); padding: 1rem; background: rgb(255 255 255 / 3%); cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 55%); background: rgb(255 107 0 / 7%)">
+              <span style="display: flex; align-items: center; gap: .5rem; color: var(--color-white); font-size: .82rem; font-weight: 600">
+                <span data-icon="paperclip" style="width: .95rem; height: .95rem; color: var(--accent)"></span> Nova versão do cartaz <em style="color: var(--accent); font-style: normal">*</em>
+              </span>
+              <strong data-file-name="" aria-live="polite" style="font-size: .95rem; font-weight: 600">{{ fileLabel }}</strong>
+              <small style="color: var(--muted); font-size: .72rem">PDF, imagem, texto, documento ou apresentação · até 20 MB</small>
+              <input type="file" onChange="{{ onArquivo }}" accept=".pdf,.txt,.md,.png,.jpg,.jpeg,.webp,.docx,.pptx" style="display: none">
+            </label>
+
+            <label data-field="link" style="display: grid; gap: .5rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; background: rgb(255 255 255 / 3%); transition: border-color var(--motion-fast) var(--ease-standard)">
+              <span style="display: flex; align-items: center; gap: .5rem; color: var(--color-white); font-size: .82rem; font-weight: 600">
+                <span data-icon="link-2" style="width: .95rem; height: .95rem; color: var(--muted)"></span> Referência externa <small style="color: var(--muted); font-weight: 500">· opcional</small>
+              </span>
+              <input type="url" onInput="{{ onLink }}" placeholder="https://..." style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .65rem .8rem; background: rgb(16 17 20 / 82%); color: var(--color-white); font-size: .85rem">
+            </label>
+
+            <label data-field="repo" style="display: grid; gap: .5rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; background: rgb(255 255 255 / 3%); transition: border-color var(--motion-fast) var(--ease-standard)">
+              <span style="display: flex; align-items: center; gap: .5rem; color: var(--color-white); font-size: .82rem; font-weight: 600">
+                <span data-icon="git-branch" style="width: .95rem; height: .95rem; color: var(--muted)"></span> Repositório do processo <small style="color: var(--muted); font-weight: 500">· opcional</small>
+              </span>
+              <input type="url" onInput="{{ onRepo }}" placeholder="https://github.com/usuario/repositorio" style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .65rem .8rem; background: rgb(16 17 20 / 82%); color: var(--color-white); font-family: var(--font-mono); font-size: .8rem">
+            </label>
+          </div>
+        </div>
+
+        <div style="position: relative; height: 4px; margin-top: 1.5rem; overflow: hidden; border-radius: var(--radius-pill); background: rgb(255 255 255 / 10%)">
+          <i data-prog-bar="" style="position: absolute; inset: 0 100% 0 0; border-radius: var(--radius-pill); background: linear-gradient(90deg, var(--color-orange-600), var(--accent)); box-shadow: 0 0 1.1rem rgb(255 107 0 / 85%); transition: inset var(--motion-emphasis) var(--ease-emphasis)"></i>
+        </div>
+
+        <div data-r="actions" style="display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1.25rem">
+          <p style="display: flex; align-items: center; gap: .5rem; margin: 0 auto 0 0; color: var(--muted); font-size: .74rem">
+            <i data-prog-dot="" style="width: .45rem; height: .45rem; border-radius: 50%; background: #F0A63B; box-shadow: 0 0 .6rem rgb(240 166 59 / 70%)"></i>
+            <span data-prog-status="">{{ statusLabel }}</span>
+          </p>
+          <button type="button" onClick="{{ saveDraft }}" style="display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: .55rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0 1.1rem; background: rgb(255 255 255 / 5%); color: var(--color-white); font-size: .78rem; font-weight: 700; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">Salvar rascunho</button>
+          <button type="button" data-submit="" onClick="{{ submitVersion }}" style="position: relative; display: inline-flex; min-height: 3rem; min-width: 13rem; align-items: center; justify-content: center; gap: .6rem; overflow: hidden; border: 0; border-radius: var(--radius-md); padding: 0 1.2rem; background: linear-gradient(120deg, var(--color-orange-500), var(--color-orange-400)); color: var(--color-white); font-size: .78rem; font-weight: 800; cursor: pointer; box-shadow: 0 .9rem 2.2rem rgb(255 107 0 / 34%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="transform: translateY(-2px); box-shadow: 0 1.2rem 2.8rem rgb(255 107 0 / 45%)">
+            <i aria-hidden="true" style="position: absolute; inset: 0; width: 40%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 38%), transparent); animation: sheen 4.5s var(--ease-standard) infinite"></i>
+            Enviar nova versão <span data-icon="send" style="width: 1rem; height: 1rem"></span>
+          </button>
+        </div>
+
+        <sc-if value="{{ hasMessage }}" hint-placeholder-val="{{ false }}">
+          <p role="status" data-message="" style="display: flex; align-items: center; gap: .6rem; margin: 1rem 0 0; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .8rem .9rem; background: rgb(255 255 255 / 4%); font-size: .8rem">
+            <span data-icon="check" data-message-icon="" style="width: 1rem; height: 1rem; color: var(--color-success)"></span>
+            <span>{{ messageText }}</span>
+          </p>
+        </sc-if>
+      </section>
+
+      <div data-r="grid" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(min(20rem, 100%), .65fr); gap: 1rem; align-items: start">
+        <section id="qualidade" data-section="" data-reveal="" style="position: relative; margin-top: 1rem; overflow: hidden; padding: clamp(20px, 2.5vw, 30px); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 68%); backdrop-filter: blur(1rem); box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 35%), inset 0 1px rgb(255 255 255 / 5%)">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem">
+            <span style="color: var(--accent); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Qualidade antes do envio</span>
+            <strong data-check-count="" style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .35rem .7rem; color: var(--muted); font: 750 .6rem/1 var(--font-mono); letter-spacing: .06em">{{ checkLabel }}</strong>
+          </div>
+          <h2 style="max-width: 30ch; margin: .55rem 0 .5rem; font-size: clamp(1.35rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -.035em">Confira o que a versão precisa provar.</h2>
+          <p style="max-width: 56ch; margin: 0; color: var(--muted); font-size: .85rem; line-height: 1.6">Use o feedback para construir uma versão mais precisa.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1rem">
+            <a href="#" style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .5rem .85rem; background: rgb(124 92 252 / 10%); color: var(--color-white); font: 750 .64rem/1 var(--font-mono); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--color-explorer); color: var(--color-white)">
+              <span data-icon="git-branch" style="width: .8rem; height: .8rem; color: var(--color-explorer)"></span> Hierarquia visual
+            </a>
+            <a href="#" style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .5rem .85rem; background: rgb(124 92 252 / 10%); color: var(--color-white); font: 750 .64rem/1 var(--font-mono); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--color-explorer); color: var(--color-white)">
+              <span data-icon="git-branch" style="width: .8rem; height: .8rem; color: var(--color-explorer)"></span> Contraste
+            </a>
+          </div>
+          <p style="margin: 1.25rem 0 0; color: var(--muted); font-size: .74rem">Marque cada critério quando sua versão o cumprir. A conferência é sua — nada é enviado por aqui.</p>
+          <ol style="display: grid; gap: .55rem; margin: .85rem 0 0; padding: 0; list-style: none">
+            <li style="min-width: 0">
+              <button type="button" data-check="0" data-edge="rgb(217 119 6 / 34%)" data-fill="rgb(217 119 6 / 8%)" onClick="{{ toggleCheck }}" aria-pressed="false" style="position: relative; display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 1.3rem; gap: .85rem; align-items: start; overflow: hidden; border: 1px solid rgb(217 119 6 / 34%); border-radius: var(--radius-md); padding: .9rem; background: rgb(217 119 6 / 8%); color: var(--color-white); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">
+                <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: #D97706"></span>
+                <span style="display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border: 1px solid rgb(217 119 6 / 45%); border-radius: 50%; color: #F0A63B"><span data-icon="alert-triangle" style="width: .9rem; height: .9rem"></span></span>
+                <span style="display: grid; gap: .3rem; min-width: 0">
+                  <strong style="font-size: .86rem">Mensagem principal</strong>
+                  <p style="margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Uma única mensagem é perceptível à distância.</p>
+                  <small style="color: #F0A63B; font-size: .72rem">A mensagem principal ainda disputa atenção.</small>
+                </span>
+                <span data-check-mark="" data-icon="circle" style="width: 1.15rem; height: 1.15rem; margin-top: .5rem; justify-self: end; color: rgb(255 255 255 / 30%); transition: color var(--motion-fast) var(--ease-standard)"></span>
+              </button>
+            </li>
+            <li style="min-width: 0">
+              <button type="button" data-check="1" data-edge="var(--border)" data-fill="rgb(255 255 255 / 3%)" onClick="{{ toggleCheck }}" aria-pressed="false" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 1.3rem; gap: .85rem; align-items: start; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .9rem; background: rgb(255 255 255 / 3%); color: var(--color-white); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">
+                <span style="display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; color: var(--muted); font: 750 .62rem/1 var(--font-mono)">02</span>
+                <span style="display: grid; gap: .3rem; min-width: 0">
+                  <strong style="font-size: .86rem">Contraste funcional</strong>
+                  <p style="margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Título, imagem e apoio ocupam níveis de atenção distintos.</p>
+                </span>
+                <span data-check-mark="" data-icon="circle" style="width: 1.15rem; height: 1.15rem; margin-top: .5rem; justify-self: end; color: rgb(255 255 255 / 30%); transition: color var(--motion-fast) var(--ease-standard)"></span>
+              </button>
+            </li>
+            <li style="min-width: 0">
+              <button type="button" data-check="2" data-edge="var(--border)" data-fill="rgb(255 255 255 / 3%)" onClick="{{ toggleCheck }}" aria-pressed="false" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 1.3rem; gap: .85rem; align-items: start; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .9rem; background: rgb(255 255 255 / 3%); color: var(--color-white); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">
+                <span style="display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 50%; color: var(--muted); font: 750 .62rem/1 var(--font-mono)">03</span>
+                <span style="display: grid; gap: .3rem; min-width: 0">
+                  <strong style="font-size: .86rem">Decisão explicável</strong>
+                  <p style="margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">A mudança responde diretamente ao feedback recebido.</p>
+                </span>
+                <span data-check-mark="" data-icon="circle" style="width: 1.15rem; height: 1.15rem; margin-top: .5rem; justify-self: end; color: rgb(255 255 255 / 30%); transition: color var(--motion-fast) var(--ease-standard)"></span>
+              </button>
+            </li>
+          </ol>
+        </section>
+
+        <section id="historico" data-section="" data-reveal="" style="position: relative; margin-top: 1rem; overflow: hidden; padding: clamp(20px, 2.5vw, 30px); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 68%); backdrop-filter: blur(1rem); box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 35%), inset 0 1px rgb(255 255 255 / 5%)">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem">
+            <div>
+              <span style="color: var(--accent); font: 800 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Histórico verificável</span>
+              <h2 style="max-width: 24ch; margin: .55rem 0 0; font-size: clamp(1.2rem, 2vw, 1.6rem); font-weight: 600; letter-spacing: -.035em">A evolução fica visível, versão por versão.</h2>
+            </div>
+            <div style="display: grid; justify-items: end">
+              <strong style="font: 700 1.6rem/1 var(--font-sans); letter-spacing: -.04em">1</strong>
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">registro</small>
+            </div>
+          </div>
+          <div style="position: relative; margin-top: 1.5rem; padding-left: 1.1rem">
+            <span aria-hidden="true" style="position: absolute; inset: .3rem auto .3rem 0; width: 1px; background: linear-gradient(180deg, var(--accent), transparent); box-shadow: 0 0 .8rem rgb(255 107 0 / 45%)"></span>
+            <article style="position: relative; display: grid; gap: .45rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .95rem; background: rgb(255 255 255 / 3%)">
+              <span aria-hidden="true" style="position: absolute; left: -1.42rem; top: 1.1rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .7rem var(--accent)"></span>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: .75rem">
+                <strong style="font: 750 .72rem/1 var(--font-mono); letter-spacing: .06em; color: var(--accent)">v01</strong>
+                <small style="color: var(--muted); font-size: .7rem">16 de setembro de 2026</small>
+              </div>
+              <strong style="font-size: .84rem">Ajustes pedidos por Vinicius</strong>
+              <p style="margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.5">Decisão registrada e cartaz anexados. O retorno pede redução do texto de apoio.</p>
+              <div style="display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .25rem">
+                <span style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .3rem .6rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono)">2 evidências</span>
+                <span style="border: 1px solid rgb(217 119 6 / 40%); border-radius: var(--radius-pill); padding: .3rem .6rem; color: #F0A63B; font: 750 .58rem/1 var(--font-mono)">revisada</span>
+              </div>
+            </article>
+          </div>
+          <p style="display: flex; align-items: center; gap: .5rem; margin: 1.25rem 0 0; color: var(--muted); font-size: .74rem">
+            <span data-icon="lock-keyhole" style="width: .85rem; height: .85rem"></span> Cada versão fica preservada com seu feedback.
+          </p>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showProjectRoute&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Estrutura&quot;},&quot;showSupportDeck&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Estrutura&quot;},&quot;showSpine&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Mesa de versão&quot;}}">
+class Component extends DCLogic {
+  state = { decisao: "", arquivo: "", link: "", repo: "", message: null, tone: "success", checks: [false, false, false] };
+
+  filledCount() {
+    const s = this.state;
+    return [s.decisao.trim(), s.arquivo, s.link.trim(), s.repo.trim()].filter(Boolean).length;
+  }
+
+  renderVals() {
+    const filled = this.filledCount();
+    const pct = Math.round((filled / 4) * 100);
+    const missing = [];
+    if (!this.state.decisao.trim()) missing.push("Decisão registrada");
+    if (!this.state.arquivo) missing.push("Nova versão do cartaz");
+    return {
+      showProjectRoute: this.props.showProjectRoute ?? true,
+      showSupportDeck: this.props.showSupportDeck ?? true,
+      showSpine: this.props.showSpine ?? true,
+      completionLabel: pct + "%",
+      filledLabel: filled + "/4 evidências",
+      fileLabel: this.state.arquivo || "Selecione a evidência do seu processo",
+      statusLabel: missing.length
+        ? missing.length + " pendência" + (missing.length > 1 ? "s" : "") + " obrigatória" + (missing.length > 1 ? "s" : "")
+        : "Pronto para enviar · o rascunho fica privado",
+      hasMessage: Boolean(this.state.message),
+      checkLabel: this.state.checks.filter(Boolean).length + "/3 confirmados",
+      toggleCheck: (e) => {
+        const i = Number(e.currentTarget.getAttribute("data-check"));
+        const next = this.state.checks.slice();
+        next[i] = !next[i];
+        this.setState({ checks: next });
+      },
+      messageText: this.state.message || "",
+      onDecisao: (e) => this.setState({ decisao: e.target.value, message: null }),
+      onLink: (e) => this.setState({ link: e.target.value, message: null }),
+      onRepo: (e) => this.setState({ repo: e.target.value, message: null }),
+      onArquivo: (e) => {
+        const f = e.target.files && e.target.files[0];
+        this.setState({ arquivo: f ? f.name : "", message: null });
+      },
+      saveDraft: () => this.setState({ tone: "success", message: "Rascunho v02 salvo. Nada foi enviado ainda." }),
+      submitVersion: () => {
+        if (missing.length) {
+          this.setState({ tone: "error", message: "Complete antes de enviar: " + missing.join(", ") + "." });
+          return;
+        }
+        this.setState({ tone: "success", message: "Versão 02 enviada para revisão." });
+      },
+      toggleNav: () => this.setNav(!this.navOpen),
+      closeNav: () => this.setNav(false),
+      toggleSupport: (e) => {
+        const btn = e.currentTarget;
+        const open = btn.getAttribute("aria-expanded") !== "true";
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        const panel = btn.parentElement.querySelector("[data-panel]");
+        const chevron = btn.querySelector("[data-chevron]");
+        if (panel) panel.style.gridTemplateRows = open ? "1fr" : "0fr";
+        if (chevron) chevron.style.transform = open ? "rotate(180deg)" : "none";
+      },
+    };
+  }
+
+  setNav(open) {
+    const aside = document.querySelector('[data-r="sidebar"]');
+    const scrim = document.querySelector('[data-r="scrim"]');
+    if (aside) aside.setAttribute("data-open", open ? "true" : "false");
+    if (scrim) {
+      scrim.style.opacity = open ? "1" : "0";
+      scrim.style.pointerEvents = open ? "auto" : "none";
+    }
+    this.navOpen = open;
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    this.paintIcons();
+    this.setupReveal();
+    this.setupSections();
+    this.setupSpotlight();
+    this.sync();
+  }
+
+  componentDidUpdate() {
+    this.paintIcons();
+    this.sync();
+  }
+
+  componentWillUnmount() {
+    if (this.observer) this.observer.disconnect();
+    if (this.sectionObserver) this.sectionObserver.disconnect();
+    if (this.onMove) window.removeEventListener("mousemove", this.onMove);
+  }
+
+  paintIcons(tries) {
+    const L = window.lucide;
+    if (!L || !L.icons) { if ((tries || 0) < 80) setTimeout(() => this.paintIcons((tries || 0) + 1), 120); return; }
+    const alias = { house: "House", "clock-3": "Clock3", "link-2": "Link2", "alert-triangle": "TriangleAlert", "rotate-ccw": "RotateCcw" };
+    document.querySelectorAll("[data-icon]").forEach((el) => {
+      if (el.firstElementChild) return;
+      const raw = el.getAttribute("data-icon");
+      const pascal = raw.split("-").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+      const node = L.icons[alias[raw] || pascal] || L.icons[pascal] || L.icons[raw];
+      if (node) el.appendChild(L.createElement(node));
+    });
+  }
+
+  sync() {
+    const filled = this.filledCount();
+    const pct = (filled / 4) * 100;
+    const bar = document.querySelector("[data-prog-bar]");
+    if (bar) bar.style.inset = "0 " + (100 - pct) + "% 0 0";
+    const fill = document.querySelector("[data-spine-fill]");
+    if (fill) fill.style.height = pct + "%";
+
+    const keys = ["decisao", "arquivo", "link", "repo"];
+    const nodes = document.querySelectorAll("[data-spine-node]");
+    keys.forEach((key, i) => {
+      const value = key === "arquivo" ? this.state.arquivo : this.state[key].trim();
+      const on = Boolean(value);
+      const node = nodes[i];
+      if (node) {
+        node.style.borderColor = on ? "var(--accent)" : "rgb(255 255 255 / 16%)";
+        node.style.color = on ? "var(--accent)" : "rgb(255 255 255 / 40%)";
+        node.style.background = on ? "rgb(255 107 0 / 12%)" : "var(--color-ink-900)";
+        node.style.animation = on && !this.reduced ? "node-lit 2.4s ease-in-out infinite" : "none";
+      }
+      const field = document.querySelector('[data-field="' + key + '"]');
+      if (field) field.style.borderColor = on ? "rgb(255 107 0 / 45%)" : (key === "arquivo" ? "rgb(255 255 255 / 18%)" : "var(--border)");
+    });
+
+    const gauge = document.querySelector("[data-gauge]");
+    if (gauge) gauge.style.background = "conic-gradient(from -90deg, var(--accent) " + pct + "%, rgb(255 255 255 / 8%) " + pct + "%)";
+
+    const cfile = document.querySelector("[data-compare-file]");
+    if (cfile) cfile.textContent = this.state.arquivo || "A versão que você anexar aparece aqui";
+    const cstate = document.querySelector("[data-compare-state]");
+    if (cstate) {
+      const okAll = Boolean(this.state.decisao.trim()) && Boolean(this.state.arquivo);
+      cstate.textContent = okAll ? "pronta para envio" : this.state.arquivo ? "anexada" : "aguardando";
+      cstate.style.color = okAll ? "var(--color-success)" : this.state.arquivo ? "var(--accent)" : "var(--muted)";
+    }
+
+    const confirmed = this.state.checks.filter(Boolean).length;
+    const count = document.querySelector("[data-check-count]");
+    if (count) {
+      count.style.borderColor = confirmed === 3 ? "rgb(22 163 74 / 45%)" : "var(--border)";
+      count.style.color = confirmed === 3 ? "var(--color-success)" : "var(--muted)";
+    }
+    document.querySelectorAll("[data-check]").forEach((btn) => {
+      const i = Number(btn.getAttribute("data-check"));
+      const isOn = this.state.checks[i];
+      btn.setAttribute("aria-pressed", isOn ? "true" : "false");
+      btn.style.borderColor = isOn ? "rgb(22 163 74 / 45%)" : btn.getAttribute("data-edge");
+      btn.style.background = isOn ? "rgb(22 163 74 / 9%)" : btn.getAttribute("data-fill");
+      const mark = btn.querySelector("[data-check-mark]");
+      if (mark) {
+        mark.style.color = isOn ? "var(--color-success)" : "rgb(255 255 255 / 30%)";
+        const want = isOn ? "circle-check-big" : "circle";
+        if (mark.getAttribute("data-icon") !== want) {
+          mark.setAttribute("data-icon", want);
+          mark.innerHTML = "";
+        }
+      }
+    });
+    this.paintIcons();
+
+    const dot = document.querySelector("[data-prog-dot]");
+    const ready = Boolean(this.state.decisao.trim()) && Boolean(this.state.arquivo);
+    if (dot) {
+      dot.style.background = ready ? "var(--color-success)" : "#F0A63B";
+      dot.style.boxShadow = ready ? "0 0 .6rem rgb(22 163 74 / 75%)" : "0 0 .6rem rgb(240 166 59 / 70%)";
+    }
+    const submit = document.querySelector("[data-submit]");
+    if (submit) submit.style.opacity = ready ? "1" : ".62";
+    const msg = document.querySelector("[data-message]");
+    if (msg) {
+      const error = this.state.tone === "error";
+      msg.style.borderColor = error ? "rgb(220 38 38 / 45%)" : "rgb(22 163 74 / 45%)";
+      msg.style.background = error ? "rgb(220 38 38 / 10%)" : "rgb(22 163 74 / 10%)";
+      msg.style.color = error ? "#F87171" : "var(--color-white)";
+      const icon = msg.querySelector("[data-message-icon]");
+      if (icon) {
+        icon.style.color = error ? "#F87171" : "var(--color-success)";
+        icon.setAttribute("data-icon", error ? "alert-triangle" : "check");
+        icon.innerHTML = "";
+        this.paintIcons();
+      }
+    }
+  }
+
+  setupReveal() {
+    const targets = Array.from(document.querySelectorAll("[data-reveal]"));
+    if (!targets.length || this.reduced || typeof IntersectionObserver === "undefined") return;
+    targets.forEach((el, i) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(2rem) scale(.99)";
+      el.style.transition = "opacity 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms, transform 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms";
+    });
+    const show = (el) => { el.style.opacity = "1"; el.style.transform = "none"; };
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { show(e.target); this.observer.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -10% 0px", threshold: 0.06 });
+    targets.forEach((el) => this.observer.observe(el));
+    setTimeout(() => targets.forEach(show), 2800);
+  }
+
+  setupSections() {
+    const links = Array.from(document.querySelectorAll("[data-section-link]"));
+    const sections = Array.from(document.querySelectorAll("[data-section]"));
+    if (!links.length || !sections.length) return;
+    const mark = (id) => links.forEach((a) => {
+      const on = a.getAttribute("data-section-link") === id;
+      a.style.background = on ? "linear-gradient(120deg, rgb(255 107 0 / 20%), rgb(255 107 0 / 6%))" : "transparent";
+      a.style.color = on ? "var(--color-white)" : "var(--muted)";
+      a.style.boxShadow = on ? "inset 0 0 0 1px rgb(255 107 0 / 40%)" : "none";
+    });
+    mark("orientacao");
+    if (typeof IntersectionObserver === "undefined") return;
+    this.sectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) mark(visible.target.id);
+    }, { rootMargin: "-20% 0px -60%", threshold: [0, 0.25, 0.6] });
+    sections.forEach((s) => this.sectionObserver.observe(s));
+  }
+
+  setupSpotlight() {
+    if (this.reduced) return;
+    const hero = document.querySelector("[data-spotlight]");
+    if (!hero) return;
+    this.onMove = (event) => {
+      const r = hero.getBoundingClientRect();
+      if (event.clientY < r.top - 80 || event.clientY > r.bottom + 80) return;
+      hero.style.setProperty("--sx", Math.round(((event.clientX - r.left) / r.width) * 100) + "%");
+      hero.style.setProperty("--sy", Math.round(((event.clientY - r.top) / r.height) * 100) + "%");
+    };
+    window.addEventListener("mousemove", this.onMove, { passive: true });
+  }
+}
+</script>
+</body>
+</html>

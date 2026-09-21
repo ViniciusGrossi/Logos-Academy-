@@ -55,6 +55,11 @@ export function CinematicPage({ children, className }: { children: ReactNode; cl
 type SpotlightCardProps = Omit<HTMLMotionProps<"article">, "children"> & {
   children?: ReactNode;
   interactive?: boolean;
+  /** Spotlight que segue o ponteiro. Default true (comportamento pré-existente do componente). */
+  spotlight?: boolean;
+  /** Feixe de borda animado (deriva do Halo de Prioridade, design-system §122/§136).
+   * Reservado à próxima missão ou a um risco operacional urgente — nunca decoração em série. */
+  beam?: boolean;
 };
 
 type SpotlightStyle = CSSProperties & {
@@ -62,12 +67,20 @@ type SpotlightStyle = CSSProperties & {
   "--spotlight-y"?: string;
 };
 
-export function SpotlightCard({ className, interactive = false, onClick, onKeyDown, ...props }: SpotlightCardProps) {
+export function SpotlightCard({
+  className,
+  interactive = false,
+  spotlight = true,
+  beam = false,
+  onClick,
+  onKeyDown,
+  ...props
+}: SpotlightCardProps) {
   const reduceMotion = useReducedMotion();
   const cardRef = useRef<HTMLElement>(null);
 
   function setPointer(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || event.pointerType === "touch" || !cardRef.current) return;
+    if (reduceMotion || !spotlight || event.pointerType === "touch" || !cardRef.current) return;
     const bounds = cardRef.current.getBoundingClientRect();
     cardRef.current.style.setProperty("--spotlight-x", `${event.clientX - bounds.left}px`);
     cardRef.current.style.setProperty("--spotlight-y", `${event.clientY - bounds.top}px`);
@@ -76,7 +89,7 @@ export function SpotlightCard({ className, interactive = false, onClick, onKeyDo
   return (
     <motion.article
       ref={cardRef}
-      className={cn("spotlight-card", interactive && "is-interactive", className)}
+      className={cn("spotlight-card", interactive && "is-interactive", !spotlight && "no-spotlight", beam && "has-beam", className)}
       tabIndex={interactive ? 0 : undefined}
       role={interactive ? "button" : undefined}
       onPointerMove={setPointer}

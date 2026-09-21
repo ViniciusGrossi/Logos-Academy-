@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/tokens/tokens.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/fonts/fonts.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/styles.css">
+<script src="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scrollbar-color: #343941 #101114; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--color-ink-950); color: var(--color-white); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--color-orange-400); }
+  [data-icon] > svg { width: 100%; height: 100%; display: block; }
+  button { font: inherit; color: inherit; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @keyframes word-up { from { opacity: 0; transform: translate3d(0, .7em, 0) rotate(1.5deg); filter: blur(6px); } }
+  @keyframes line-reveal { from { transform: scaleX(0); } }
+  @keyframes rail-in { from { transform: scaleY(0); } }
+  @keyframes sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(240%) skewX(-18deg); } }
+  @keyframes ambient-pulse { 0%, 100% { opacity: .22; transform: scale(.75); } 50% { opacity: 1; transform: scale(1.25); } }
+  @keyframes ambient-spin { to { transform: rotate(360deg); } }
+  @keyframes glow-breathe { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .78; transform: scale(1.12); } }
+  @keyframes grid-drift { to { background-position: 4rem 4rem, 4rem 4rem; } }
+  @keyframes core-ring { 0% { opacity: .75; transform: scale(.42); } 100% { opacity: 0; transform: scale(1.65); } }
+  @keyframes node-lit { 0%, 100% { box-shadow: 0 0 0 .18rem rgb(255 107 0 / 8%), 0 0 .7rem rgb(255 107 0 / 30%); } 50% { box-shadow: 0 0 0 .4rem rgb(255 107 0 / 12%), 0 0 1.4rem rgb(255 107 0 / 55%); } }
+
+  @keyframes agn-b1 { 0%, 16% { background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%); } 24%, 100% { background: rgb(255 107 0 / 26%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 60%), 0 0 .8rem rgb(255 107 0 / 30%); } }
+  @keyframes agn-b2 { 0%, 42% { background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%); } 50%, 100% { background: rgb(124 92 252 / 26%); box-shadow: inset 0 0 0 1px rgb(124 92 252 / 60%); } }
+  @keyframes agn-b3 { 0%, 66% { background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%); } 74%, 100% { background: rgb(22 163 74 / 24%); box-shadow: inset 0 0 0 1px rgb(22 163 74 / 55%); } }
+  @keyframes agn-label-1 { 0%, 18% { opacity: 0; } 28%, 100% { opacity: 1; } }
+  @keyframes agn-label-2 { 0%, 44% { opacity: 0; } 54%, 100% { opacity: 1; } }
+  @keyframes agn-label-3 { 0%, 68% { opacity: 0; } 78%, 100% { opacity: 1; } }
+  @keyframes agn-today { 0%, 100% { background: rgb(255 107 0 / 6%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 20%); } 50% { background: rgb(255 107 0 / 12%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 42%); } }
+  @keyframes agn-cap-a { 0%, 20% { opacity: 1; transform: none; } 30%, 100% { opacity: 0; transform: translateY(-.35rem); } }
+  @keyframes agn-cap-b { 0%, 26% { opacity: 0; transform: translateY(.35rem); } 36%, 62% { opacity: 1; transform: none; } 72%, 100% { opacity: 0; transform: translateY(-.35rem); } }
+  @keyframes agn-cap-c { 0%, 68% { opacity: 0; transform: translateY(.35rem); } 78%, 100% { opacity: 1; transform: none; } }
+  @keyframes agn-badge { 0%, 20% { background: rgb(255 255 255 / 8%); color: rgb(255 255 255 / 60%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 14%); } 30%, 62% { background: rgb(255 107 0 / 16%); color: var(--accent); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 45%); } 74%, 100% { background: rgb(22 163 74 / 18%); color: var(--color-success); box-shadow: inset 0 0 0 1px rgb(22 163 74 / 50%); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+
+  @media (max-width: 90rem) {
+    [data-r="hero"] { grid-template-columns: 1fr !important; }
+    [data-r="core"] { justify-self: stretch !important; max-width: none !important; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) !important; align-items: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 16 / 10 !important; }
+  }
+  @media (max-width: 76rem) {
+    [data-r="book"] { grid-template-columns: 1fr !important; }
+    [data-r="slots"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  }
+  @media (max-width: 64rem) {
+    [data-r="sidebar"] { transform: translateX(-105%); box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 60%); }
+    [data-r="sidebar"][data-open="true"] { transform: translateX(0); }
+    [data-r="workspace"] { margin-inline-start: 0 !important; }
+    [data-r="menu"] { display: inline-grid !important; }
+    [data-r="scrim"] { display: block !important; }
+  }
+  @media (max-width: 58rem) {
+    [data-r="week-board"] { overflow-x: auto !important; }
+    [data-r="week-inner"] { min-width: 38rem !important; }
+    [data-r="reminders"] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 48rem) {
+    [data-r="topbar"] { padding-inline: 12px !important; }
+    [data-r="crumb-root"], [data-r="avatar"], [data-r="role"], [data-r="pulse-label"] { display: none !important; }
+    [data-r="hero"] h1 { font-size: clamp(2.2rem, 9vw, 3.2rem) !important; }
+    [data-r="actions"] { flex-direction: column !important; align-items: stretch !important; }
+    [data-r="actions"] > a { width: 100% !important; }
+    [data-r="nav-sections"] { overflow-x: auto !important; }
+    [data-r="slots"] { grid-template-columns: 1fr !important; }
+    [data-ev] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 40rem) {
+    [data-r="core"] { grid-template-columns: 1fr !important; max-width: 22rem !important; justify-self: start !important; }
+    [data-r="spec-sheet"] { aspect-ratio: 4 / 3 !important; }
+  }
+</style>
+</helmet>
+<div class="dark" style="position: relative; min-height: 100vh; overflow-x: hidden; background: var(--color-ink-950); color: var(--color-white)">
+  <div aria-hidden="true" style="position: fixed; z-index: 0; inset: 0; pointer-events: none">
+    <span style="position: absolute; left: 20%; top: -17rem; width: 46rem; height: 46rem; border-radius: 50%; background: radial-gradient(circle, rgb(255 107 0 / 13%), transparent 62%); filter: blur(1rem); animation: glow-breathe 15s ease-in-out infinite"></span>
+    <span style="position: absolute; right: -14rem; top: 36%; width: 42rem; height: 42rem; border-radius: 50%; background: radial-gradient(circle, rgb(124 92 252 / 12%), transparent 64%); filter: blur(1rem); animation: glow-breathe 19s ease-in-out -6s infinite"></span>
+    <span style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px); background-size: 4rem 4rem, 4rem 4rem; mask-image: radial-gradient(circle at 50% 18%, #000 0, transparent 70%); animation: grid-drift 26s linear infinite"></span>
+    <span style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 28%, transparent 38%, rgb(8 9 11 / 74%) 100%)"></span>
+  </div>
+
+  <div data-r="scrim" onClick="{{ closeNav }}" aria-hidden="true" style="display: none; position: fixed; z-index: 45; inset: 0; background: rgb(8 9 11 / 62%); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity var(--motion-standard) var(--ease-standard)"></div>
+
+  <aside data-r="sidebar" style="position: fixed; z-index: 50; inset: 0 auto 0 0; display: flex; width: 16.5rem; flex-direction: column; padding: 24px 20px; background: linear-gradient(180deg, rgb(23 25 29 / 96%), rgb(16 17 20 / 96%)); backdrop-filter: blur(1.25rem); border-right: 1px solid var(--border); transition: transform var(--motion-standard) var(--ease-standard)">
+    <span aria-hidden="true" style="position: absolute; inset: 0 0 auto auto; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, rgb(255 107 0 / 55%) 22%, rgb(255 107 0 / 12%) 62%, transparent); transform-origin: top; animation: rail-in var(--motion-emphasis) var(--ease-emphasis) both"></span>
+    <a href="Inicio Aluno v2 Premium.dc.html" style="position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: 12px; color: var(--color-white)">
+      <span style="position: relative; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%)">
+        <img src="brand/logos-academy-symbol-dark.png" alt="" width="52" height="52" style="width: 26px; height: 26px; object-fit: contain">
+        <i aria-hidden="true" style="position: absolute; inset: -0.35rem; border: 1px dashed rgb(255 107 0 / 22%); border-radius: var(--radius-lg); animation: ambient-spin 28s linear infinite"></i>
+      </span>
+      <span style="display: grid; gap: 1px; text-transform: uppercase; letter-spacing: .16em">
+        <strong style="font-size: var(--text-xs); line-height: 1">Logos</strong>
+        <small style="color: var(--accent); font: 700 9px/1.2 var(--font-mono); letter-spacing: .28em">Academy</small>
+      </span>
+    </a>
+
+    <div style="position: relative; flex: 0 0 auto; margin: 40px 0 28px; padding: 14px 14px 14px 16px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(255 107 0 / 10%), rgb(124 92 252 / 8%))">
+      <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 1rem rgb(255 107 0 / 70%)"></span>
+      <span aria-hidden="true" style="position: absolute; inset: 0; width: 38%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 12%), transparent); animation: sheen 6.5s var(--ease-standard) infinite"></span>
+      <span style="display: inline-flex; align-items: center; gap: .4rem; font: 700 10px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent)">
+        <i style="width: .4rem; height: .4rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent)"></i> Semana 38
+      </span>
+      <strong style="display: block; max-width: 16ch; margin-top: 10px; font-size: var(--text-md); font-weight: 600; line-height: 1.3; letter-spacing: -.02em">Aula ao vivo quinta</strong>
+      <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 11px">19h · Hierarquia visual</small>
+    </div>
+
+    <nav style="display: grid; gap: 20px; min-height: 0; overflow-y: auto">
+      <div style="display: grid; gap: 6px">
+        <span style="display: block; margin: 0 12px 6px; font: 700 10px var(--font-mono); color: rgb(255 255 255 / 40%); letter-spacing: .12em; text-transform: uppercase">Meu espaço</span>
+        <a href="Inicio Aluno v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="house" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Início</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Atividade v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="clipboard-check" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Atividade</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Jornada v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="gauge" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Jornada</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Projetos v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="folder-kanban" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Projetos</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Atlas.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="book-open-text" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Atlas</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" aria-current="page" style="position: relative; display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; overflow: hidden; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); color: var(--color-white); background: linear-gradient(90deg, rgb(255 107 0 / 16%), rgb(255 107 0 / 3%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent)"></span>
+          <span data-icon="calendar-days" style="width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent)"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm); font-weight: 600">Agenda</span><span style="border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-pill); padding: 2px 7px; color: var(--accent); font: 700 9px/1 var(--font-mono)">4</span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="user-round" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Perfil</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+      </div>
+    </nav>
+
+    <div style="display: flex; flex: 0 0 auto; gap: 12px; align-items: center; margin-top: auto; padding-top: 28px; color: rgb(255 255 255 / 66%)">
+      <span data-icon="bell" style="width: 20px; height: 20px; flex: 0 0 auto; color: var(--accent)"></span>
+      <span style="display: block">
+        <strong style="display: block; color: var(--color-white); font-size: var(--text-xs)">Lembretes ativos</strong>
+        <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 11px">Aviso 1h antes de cada encontro</small>
+      </span>
+    </div>
+  </aside>
+
+  <div data-r="workspace" style="position: relative; z-index: 1; min-width: 0; margin-inline-start: 16.5rem">
+    <header data-r="topbar" style="position: sticky; top: 0; z-index: 30; display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 16px; padding-inline: clamp(16px, 4vw, 40px); background: rgb(16 17 20 / 78%); border-bottom: 1px solid var(--border); backdrop-filter: blur(1rem)">
+      <div style="display: flex; min-width: 0; align-items: center; gap: 10px; font-size: var(--text-xs); color: var(--muted)">
+        <button type="button" data-r="menu" onClick="{{ toggleNav }}" aria-label="Abrir navegação" style="display: none; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer"><span data-icon="menu" style="width: 18px; height: 18px"></span></button>
+        <span data-r="crumb-root">Logos Academy</span>
+        <span data-icon="chevron-right" data-r="crumb-root" style="width: 14px; height: 14px"></span>
+        <strong style="color: var(--color-white)">Agenda</strong>
+        <span data-r="pulse-label" style="display: inline-flex; align-items: center; gap: .45rem; margin-left: 8px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 5px 10px; font: 700 10px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent)">
+          <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> semana 38
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <a href="#" data-r="role" style="display: inline-flex; min-height: 44px; align-items: center; padding-inline: 16px; border-radius: var(--radius-md); color: var(--muted); font-weight: 600; font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(255 255 255 / 6%); color: var(--color-white)">Sincronizar calendário</a>
+        <button type="button" aria-label="Ativar tema claro" style="display: inline-grid; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+          <span data-icon="sun" style="width: 18px; height: 18px"></span>
+        </button>
+        <a href="#" data-r="avatar" aria-label="Abrir perfil de Marina Alves" style="display: inline-flex; min-height: 44px; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 4px 12px 4px 4px; background: rgb(255 255 255 / 4%); color: var(--color-white); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent)">
+          <span style="display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-orange-500), var(--color-explorer)); color: var(--color-white); font: 700 11px var(--font-mono)">MA</span>
+          <span style="display: grid; gap: 1px; line-height: 1.1">
+            <strong style="font-size: 11px">Marina</strong>
+            <small style="color: var(--muted); font: 700 8px var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Explorer</small>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main data-screen-label="Agenda" style="width: min(100%, 82rem); margin-inline: auto; padding: clamp(20px, 4vw, 44px) clamp(16px, 4vw, 40px) 96px">
+      <a href="Inicio Aluno v2 Premium.dc.html" style="display: inline-flex; min-height: 44px; align-items: center; gap: .55rem; margin-bottom: 1rem; color: var(--muted); font: 700 .68rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; transition: gap var(--motion-fast) var(--ease-standard)" style-hover="color: var(--accent); gap: .85rem">
+        <span data-icon="arrow-left" style="width: 1rem; height: 1rem"></span> Voltar ao início
+      </a>
+
+      <header data-r="hero" data-spotlight="" data-reveal="" style="position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 21rem; gap: clamp(24px, 4vw, 48px); align-items: center; overflow: hidden; padding: clamp(24px, 4vw, 52px); border: 1px solid var(--border); border-radius: 1.6rem .35rem 1.6rem 1.6rem; background: linear-gradient(140deg, rgb(34 37 42 / 76%), rgb(16 17 20 / 92%) 62%, rgb(41 24 12 / 58%)); backdrop-filter: blur(1.5rem); box-shadow: 0 2.5rem 6rem rgb(0 0 0 / 55%), inset 0 1px rgb(255 255 255 / 7%)" style-after="position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--accent) 18% 50%, transparent 80%); content: ''; box-shadow: 0 0 1.2rem rgb(255 107 0 / 50%)">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(22rem 22rem at var(--sx, 78%) var(--sy, 36%), rgb(255 107 0 / 12%), transparent 70%); transition: background 220ms var(--ease-standard)"></div>
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px); background-size: 2.5rem 2.5rem, 2.5rem 2.5rem; mask-image: radial-gradient(16rem 16rem at var(--sx, 78%) var(--sy, 36%), #000, transparent 72%)"></div>
+
+        <div style="position: relative; z-index: 3; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: .5rem; color: var(--accent); font: 800 .64rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+            <span data-icon="calendar-days" style="width: 13px; height: 13px"></span> Semana 38 · 14 a 20 de setembro
+          </span>
+          <h1 style="max-width: 24ch; margin: .9rem 0 .7rem; font-size: clamp(2.4rem, 4.4vw, 4.2rem); font-weight: 600; line-height: .95; letter-spacing: -.055em; text-wrap: balance">
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) both">Aula</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .07s both">ao</span>
+            <span style="display: inline-block; animation: word-up .9s var(--ease-emphasis) .14s both">vivo</span>
+            <span style="position: relative; display: inline-block; color: var(--accent); text-shadow: 0 0 2.5rem rgb(255 107 0 / 45%); animation: word-up .9s var(--ease-emphasis) .21s both">em 2 dias<i aria-hidden="true" style="position: absolute; inset: auto 0 -.1em 0; height: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent); transform-origin: left; animation: line-reveal .9s var(--ease-emphasis) .85s both"></i></span>
+          </h1>
+          <p style="max-width: 52ch; margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.6">Quinta, 19h — hierarquia visual aplicada ao seu cartaz. Leve a versão 02 aberta: a segunda meia hora é revisão em grupo.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem">
+            <span style="display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgb(255 107 0 / 38%); border-radius: var(--radius-pill); padding: .45rem .8rem; background: rgb(255 107 0 / 10%); color: var(--accent); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">
+              <i style="width: .38rem; height: .38rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> 4 compromissos
+            </span>
+            <span style="display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .45rem .8rem; color: var(--color-white); font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em">4h30 reservadas</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem; border: 1px solid rgb(217 119 6 / 42%); border-radius: var(--radius-pill); padding: .45rem .8rem; background: rgb(217 119 6 / 12%); color: #F0A63B; font: 750 .6rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">
+              <span data-icon="clock-3" style="width: .7rem; height: .7rem"></span> Prazo sexta
+            </span>
+          </div>
+          <div data-r="actions" style="display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.6rem">
+            <a href="#" style="display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; border-radius: var(--radius-md); padding-inline: 1.1rem; background: var(--accent); color: #FFFFFF; font-size: .84rem; font-weight: 600; transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: var(--color-orange-400); color: #FFFFFF; transform: translateY(-2px)">
+              <span data-icon="video" style="width: .9rem; height: .9rem"></span> Entrar na sala
+            </a>
+            <a href="#mentoria" style="display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; border: 1px solid rgb(255 255 255 / 20%); border-radius: var(--radius-md); padding-inline: 1.1rem; color: var(--color-white); font-size: .84rem; font-weight: 600; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+              <span data-icon="users-round" style="width: .9rem; height: .9rem"></span> Reservar mentoria
+            </a>
+          </div>
+        </div>
+
+        <aside data-r="core" aria-label="Espécime da semana e painel de estado" style="position: relative; z-index: 3; display: grid; gap: .6rem; width: 100%; max-width: 21rem; align-content: start; justify-self: end">
+          <figure style="position: relative; display: grid; gap: .7rem; margin: 0; overflow: hidden; padding: .95rem; border: 1px solid rgb(255 107 0 / 26%); border-radius: 1.2rem .3rem 1.2rem 1.2rem; background: linear-gradient(158deg, rgb(255 107 0 / 12%), rgb(16 17 20 / 88%) 66%)">
+            <span aria-hidden="true" style="position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgb(255 107 0 / 70%), transparent)"></span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: .5rem">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--accent); font: 800 .55rem/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+                <i style="width: .34rem; height: .34rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .5rem var(--accent); animation: ambient-pulse 2.2s ease-in-out infinite"></i> semana em blocos
+              </span>
+              <span aria-hidden="true" style="position: relative; width: 5.6rem; height: 1.2rem">
+                <b style="position: absolute; inset: 0; display: grid; place-items: center; border-radius: var(--radius-pill); font: 750 .55rem/1 var(--font-mono); letter-spacing: .06em; animation: agn-badge 8s var(--ease-emphasis) infinite">semana 38</b>
+              </span>
+            </div>
+
+            <div data-r="spec-sheet" role="img" aria-label="Espécime animado da semana: a grade começa vazia e três blocos se acendem na ordem — aula ao vivo na quinta, mentoria na terça e bloco de estudo no sábado" style="position: relative; display: grid; grid-template-rows: auto repeat(3, minmax(0, 1fr)); gap: .3rem; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; padding: .85rem; border: 1px solid rgb(255 255 255 / 12%); border-radius: var(--radius-md); background: linear-gradient(180deg, #0D0E11, #14161B)">
+              <span aria-hidden="true" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .3rem; color: rgb(255 255 255 / 45%); font: 750 .45rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">
+                <b>seg</b><b>ter</b><b>qua</b><b style="color: var(--accent)">qui</b><b>sáb</b>
+              </span>
+              <span aria-hidden="true" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .3rem">
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="border-radius: 3px; animation: agn-today 3.2s ease-in-out infinite"></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+              </span>
+              <span aria-hidden="true" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .3rem">
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="position: relative; display: grid; place-items: center; border-radius: 3px; animation: agn-b2 8s var(--ease-emphasis) infinite"><b style="color: #C4B5FD; font: 750 .42rem/1 var(--font-mono); text-transform: uppercase; animation: agn-label-2 8s var(--ease-emphasis) infinite">1:1</b></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="position: relative; display: grid; place-items: center; border-radius: 3px; animation: agn-b1 8s var(--ease-emphasis) infinite"><b style="color: var(--color-white); font: 750 .42rem/1 var(--font-mono); text-transform: uppercase; animation: agn-label-1 8s var(--ease-emphasis) infinite">19h</b></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+              </span>
+              <span aria-hidden="true" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .3rem">
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="border-radius: 3px; background: rgb(255 255 255 / 5%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%)"></i>
+                <i style="position: relative; display: grid; place-items: center; border-radius: 3px; animation: agn-b3 8s var(--ease-emphasis) infinite"><b style="color: #86EFAC; font: 750 .42rem/1 var(--font-mono); text-transform: uppercase; animation: agn-label-3 8s var(--ease-emphasis) infinite">est</b></i>
+              </span>
+            </div>
+
+            <figcaption style="position: relative; height: 2.4rem">
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: agn-cap-a 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">A semana começa aberta</strong>
+                <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">nenhum bloco fixo</small>
+              </span>
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: agn-cap-b 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">Aula e mentoria entram primeiro</strong>
+                <small style="color: var(--accent); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">compromisso com gente</small>
+              </span>
+              <span style="position: absolute; inset: 0; display: grid; align-content: center; gap: .2rem; animation: agn-cap-c 8s var(--ease-emphasis) infinite">
+                <strong style="font-size: .74rem; font-weight: 600">O estudo ocupa o que sobrou</strong>
+                <small style="color: var(--color-success); font: 750 .55rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">4h30 na semana</small>
+              </span>
+            </figcaption>
+          </figure>
+
+          <div style="display: grid; gap: .5rem; align-content: start; min-width: 0">
+            <div style="position: relative; display: flex; align-items: center; gap: .8rem; overflow: hidden; padding: .8rem .9rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 88%)">
+              <span style="position: relative; display: grid; flex: 0 0 auto; width: 4.5rem; height: 4.5rem; place-items: center">
+                <i aria-hidden="true" style="position: absolute; inset: -.25rem; border: 1px solid rgb(255 107 0 / 22%); border-radius: 50%; animation: core-ring 3.6s var(--ease-standard) infinite"></i>
+                <i aria-hidden="true" data-gauge="" style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from -90deg, var(--accent) 56%, rgb(255 255 255 / 8%) 56%); transition: background var(--motion-emphasis) var(--ease-emphasis)"></i>
+                <i aria-hidden="true" style="position: absolute; inset: .3rem; border-radius: 50%; background: radial-gradient(circle at 42% 34%, rgb(255 107 0 / 14%), rgb(16 17 20 / 97%) 66%)"></i>
+                <strong data-gauge-pct="" style="position: relative; font: 700 .9rem/1 var(--font-sans); letter-spacing: -.03em; color: var(--color-white); font-variant-numeric: tabular-nums">4h30</strong>
+              </span>
+              <span style="display: grid; gap: .25rem; min-width: 0">
+                <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Meta da semana · 8h</small>
+                <strong data-gauge-note="" style="color: var(--accent); font: 750 .72rem/1 var(--font-mono); letter-spacing: .04em">faltam 3h30</strong>
+                <small style="color: var(--muted); font-size: .68rem; line-height: 1.4">Reservar uma mentoria abaixo soma 30min ao anel.</small>
+              </span>
+            </div>
+
+            <ul style="display: grid; gap: 1px; margin: 0; padding: 0; overflow: hidden; list-style: none; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(255 255 255 / 7%)">
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="video" style="width: .95rem; height: .95rem; justify-self: center; color: var(--accent)"></span>
+                <small style="color: var(--muted); font-size: .72rem">Próxima aula</small>
+                <strong style="font: 750 .7rem/1 var(--font-mono); color: var(--color-white)">qui · 19h</strong>
+              </li>
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="clock-3" style="width: .95rem; height: .95rem; justify-self: center; color: #F0A63B"></span>
+                <small style="color: var(--muted); font-size: .72rem">Prazo do cartaz</small>
+                <strong style="font: 750 .7rem/1 var(--font-mono); color: #F0A63B">sex · 23h59</strong>
+              </li>
+              <li style="display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; padding: .7rem .85rem; background: rgb(23 25 29 / 92%)">
+                <span data-icon="users-round" style="width: .95rem; height: .95rem; justify-self: center; color: var(--muted)"></span>
+                <small style="color: var(--muted); font-size: .72rem">Mentoria 1:1</small>
+                <strong data-slot-chip="" style="font: 750 .7rem/1 var(--font-mono); color: var(--muted)">a marcar</strong>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </header>
+
+      <nav data-r="nav-sections" aria-label="Seções da agenda" style="position: sticky; top: 72px; z-index: 20; display: flex; gap: .3rem; margin-top: 1rem; padding: .4rem; border: 1px solid var(--border); border-radius: var(--radius-pill); background: rgb(16 17 20 / 88%); backdrop-filter: blur(1rem)">
+        <a href="#semana" data-section-link="semana" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Semana</a>
+        <a href="#proximos" data-section-link="proximos" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Próximos</a>
+        <a href="#mentoria" data-section-link="mentoria" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Mentoria</a>
+        <a href="#lembretes" data-section-link="lembretes" style="display: inline-flex; min-height: 40px; flex: 0 0 auto; align-items: center; border-radius: var(--radius-pill); padding-inline: .9rem; color: var(--muted); font: 750 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: all var(--motion-fast) var(--ease-standard)">Lembretes</a>
+      </nav>
+
+      <section id="semana" data-section="semana" data-reveal="" aria-labelledby="semana-title" style="margin-top: 1.6rem; scroll-margin-top: 9rem">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">14 a 20 de setembro</span>
+            <h2 id="semana-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Sua semana em blocos</h2>
+          </div>
+          <p style="max-width: 32ch; margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Compromissos com pessoas primeiro; estudo entra nos vãos.</p>
+        </div>
+
+        <div data-r="week-board" style="margin-top: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 72%)">
+          <div data-r="week-inner" style="display: grid; grid-template-columns: 3.2rem repeat(7, minmax(0, 1fr)); gap: .3rem">
+            <span aria-hidden="true"></span>
+            <span style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">seg 14</span>
+            <span style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">ter 15</span>
+            <span style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">qua 16</span>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">qui 17</span>
+            <span style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">sex 18</span>
+            <span style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">sáb 19</span>
+            <span style="color: var(--muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .06em; text-align: center; text-transform: uppercase">dom 20</span>
+
+            <span style="align-self: center; color: var(--muted); font: 750 .55rem/1 var(--font-mono)">14h</span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <span style="display: grid; align-content: center; gap: .15rem; height: 3rem; padding: .4rem .5rem; border-radius: var(--radius-sm); background: rgb(22 163 74 / 16%); box-shadow: inset 0 0 0 1px rgb(22 163 74 / 45%)">
+              <strong style="font-size: .62rem; font-weight: 600">Estudo</strong>
+              <small style="color: rgb(255 255 255 / 60%); font: 750 .5rem/1 var(--font-mono)">1h</small>
+            </span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 107 0 / 6%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 18%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+
+            <span style="align-self: center; color: var(--muted); font: 750 .55rem/1 var(--font-mono)">17h</span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <span style="display: grid; align-content: center; gap: .15rem; height: 3rem; padding: .4rem .5rem; border-radius: var(--radius-sm); background: rgb(124 92 252 / 18%); box-shadow: inset 0 0 0 1px rgb(124 92 252 / 48%)">
+              <strong style="font-size: .62rem; font-weight: 600">Grupo</strong>
+              <small style="color: rgb(255 255 255 / 60%); font: 750 .5rem/1 var(--font-mono)">30min</small>
+            </span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 107 0 / 6%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 18%)"></i>
+            <span style="display: grid; align-content: center; gap: .15rem; height: 3rem; padding: .4rem .5rem; border-radius: var(--radius-sm); background: rgb(217 119 6 / 18%); box-shadow: inset 0 0 0 1px rgb(217 119 6 / 48%)">
+              <strong style="font-size: .62rem; font-weight: 600">Prazo</strong>
+              <small style="color: rgb(255 255 255 / 60%); font: 750 .5rem/1 var(--font-mono)">23h59</small>
+            </span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+
+            <span style="align-self: center; color: var(--muted); font: 750 .55rem/1 var(--font-mono)">19h</span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+            <span style="position: relative; display: grid; align-content: center; gap: .15rem; height: 3rem; overflow: hidden; padding: .4rem .5rem; border-radius: var(--radius-sm); background: linear-gradient(140deg, rgb(255 107 0 / 30%), rgb(255 107 0 / 12%)); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 60%), 0 0 1.2rem rgb(255 107 0 / 25%)">
+              <span aria-hidden="true" style="position: absolute; inset: 0; width: 34%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 14%), transparent); animation: sheen 5.5s var(--ease-standard) infinite"></span>
+              <strong style="font-size: .62rem; font-weight: 600">Aula ao vivo</strong>
+              <small style="color: var(--color-white); font: 750 .5rem/1 var(--font-mono)">19h · 1h30</small>
+            </span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 107 0 / 6%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 18%)"></i>
+            <span style="display: grid; align-content: center; gap: .15rem; height: 3rem; padding: .4rem .5rem; border-radius: var(--radius-sm); background: rgb(22 163 74 / 16%); box-shadow: inset 0 0 0 1px rgb(22 163 74 / 45%)">
+              <strong style="font-size: .62rem; font-weight: 600">Estudo</strong>
+              <small style="color: rgb(255 255 255 / 60%); font: 750 .5rem/1 var(--font-mono)">1h30</small>
+            </span>
+            <i style="height: 3rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / 4%)"></i>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--border)">
+            <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono); text-transform: uppercase"><i style="width: .6rem; height: .6rem; border-radius: 2px; background: rgb(255 107 0 / 60%)"></i> aula</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono); text-transform: uppercase"><i style="width: .6rem; height: .6rem; border-radius: 2px; background: rgb(124 92 252 / 60%)"></i> encontro</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono); text-transform: uppercase"><i style="width: .6rem; height: .6rem; border-radius: 2px; background: rgb(22 163 74 / 55%)"></i> estudo</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono); text-transform: uppercase"><i style="width: .6rem; height: .6rem; border-radius: 2px; background: rgb(217 119 6 / 60%)"></i> prazo</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="proximos" data-section="proximos" data-reveal="" aria-labelledby="prox-title" style="margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+          <div>
+            <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Próximos compromissos</span>
+            <h2 id="prox-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">O que vem primeiro</h2>
+          </div>
+          <div role="group" aria-label="Filtrar por tipo" style="display: flex; flex-wrap: wrap; gap: .3rem">
+            <button type="button" data-filter="todos" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Todos</button>
+            <button type="button" data-filter="aula" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Aulas</button>
+            <button type="button" data-filter="encontro" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Encontros</button>
+            <button type="button" data-filter="prazo" style="min-height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: .85rem; background: transparent; color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Prazos</button>
+          </div>
+        </div>
+
+        <ul style="display: grid; gap: .5rem; margin: 1rem 0 0; padding: 0; list-style: none">
+          <li data-ev="aula" style="display: grid; grid-template-columns: 5rem minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid rgb(255 107 0 / 36%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(120deg, rgb(41 24 12 / 58%), rgb(23 25 29 / 88%))">
+            <span style="display: grid; gap: .1rem">
+              <strong style="font-size: .95rem; font-weight: 700; letter-spacing: -.02em">qui 17</strong>
+              <small style="color: var(--accent); font: 750 .58rem/1 var(--font-mono)">19h00</small>
+            </span>
+            <span style="display: grid; gap: .3rem; min-width: 0">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--accent); font: 800 .54rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="video" style="width: .8rem; height: .8rem"></span> Aula ao vivo · 1h30</span>
+              <strong style="font-size: .92rem; font-weight: 600">Hierarquia visual aplicada</strong>
+              <small style="color: var(--muted); font-size: .74rem">Traga a versão 02 do cartaz. Meia hora final é revisão em grupo.</small>
+            </span>
+            <a href="#" style="display: inline-flex; min-height: 40px; align-items: center; gap: .4rem; border-radius: var(--radius-md); padding-inline: .9rem; background: var(--accent); color: #FFFFFF; font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: var(--color-orange-400); color: #FFFFFF">Entrar</a>
+          </li>
+          <li data-ev="prazo" style="display: grid; grid-template-columns: 5rem minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid rgb(217 119 6 / 34%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(120deg, rgb(41 30 14 / 52%), rgb(23 25 29 / 88%))">
+            <span style="display: grid; gap: .1rem">
+              <strong style="font-size: .95rem; font-weight: 700; letter-spacing: -.02em">sex 18</strong>
+              <small style="color: #F0A63B; font: 750 .58rem/1 var(--font-mono)">23h59</small>
+            </span>
+            <span style="display: grid; gap: .3rem; min-width: 0">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: #F0A63B; font: 800 .54rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="clock-3" style="width: .8rem; height: .8rem"></span> Prazo de entrega</span>
+              <strong style="font-size: .92rem; font-weight: 600">Cartaz v02 com a decisão documentada</strong>
+              <small style="color: var(--muted); font-size: .74rem">Falta a frase explicando o que você cortou.</small>
+            </span>
+            <a href="Atividade v2 Premium.dc.html" style="display: inline-flex; min-height: 40px; align-items: center; gap: .4rem; border: 1px solid rgb(217 119 6 / 50%); border-radius: var(--radius-md); padding-inline: .9rem; color: #F0A63B; font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; transition: all var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(217 119 6 / 16%); color: #F0A63B">Abrir</a>
+          </li>
+          <li data-ev="encontro" style="display: grid; grid-template-columns: 5rem minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span style="display: grid; gap: .1rem">
+              <strong style="font-size: .95rem; font-weight: 700; letter-spacing: -.02em">ter 15</strong>
+              <small style="color: #C4B5FD; font: 750 .58rem/1 var(--font-mono)">17h00</small>
+            </span>
+            <span style="display: grid; gap: .3rem; min-width: 0">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: #C4B5FD; font: 800 .54rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="users-round" style="width: .8rem; height: .8rem"></span> Encontro de grupo · 30min</span>
+              <strong style="font-size: .92rem; font-weight: 600">Leitura cruzada de cartazes</strong>
+              <small style="color: var(--muted); font-size: .74rem">Você comenta o trabalho de duas pessoas e recebe dois comentários.</small>
+            </span>
+            <a href="#" style="display: inline-flex; min-height: 40px; align-items: center; gap: .4rem; border: 1px solid rgb(255 255 255 / 20%); border-radius: var(--radius-md); padding-inline: .9rem; color: var(--color-white); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--color-explorer); color: #C4B5FD">Detalhes</a>
+          </li>
+          <li data-ev="aula" style="display: grid; grid-template-columns: 5rem minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: rgb(23 25 29 / 72%)">
+            <span style="display: grid; gap: .1rem">
+              <strong style="font-size: .95rem; font-weight: 700; letter-spacing: -.02em">seg 21</strong>
+              <small style="color: var(--muted); font: 750 .58rem/1 var(--font-mono)">19h00</small>
+            </span>
+            <span style="display: grid; gap: .3rem; min-width: 0">
+              <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font: 800 .54rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="video" style="width: .8rem; height: .8rem"></span> Aula ao vivo · 1h30</span>
+              <strong style="font-size: .92rem; font-weight: 600">Do cartaz ao protótipo</strong>
+              <small style="color: var(--muted); font-size: .74rem">Abre o ciclo 03. Requer o cartaz aprovado.</small>
+            </span>
+            <span style="display: inline-flex; min-height: 40px; align-items: center; gap: .4rem; border-radius: var(--radius-md); padding-inline: .9rem; background: rgb(255 255 255 / 5%); color: var(--muted); font: 750 .62rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase"><span data-icon="lock-keyhole" style="width: .75rem; height: .75rem"></span> Depois</span>
+          </li>
+        </ul>
+        <p data-empty="" style="display: none; margin: 1rem 0 0; padding: 1.4rem; border: 1px dashed rgb(255 255 255 / 18%); border-radius: var(--radius-lg); color: var(--muted); font-size: .8rem; text-align: center">Nada deste tipo nos próximos dias.</p>
+      </section>
+
+      <section id="mentoria" data-section="mentoria" data-reveal="" aria-labelledby="mentoria-title" data-r="book" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: .6rem; margin-top: 2rem; scroll-margin-top: 9rem">
+        <div style="position: relative; overflow: hidden; padding: clamp(20px, 2.6vw, 32px); border: 1px solid rgb(124 92 252 / 32%); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(28 20 48 / 60%), rgb(23 25 29 / 90%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: linear-gradient(180deg, var(--color-explorer), transparent); box-shadow: 0 0 1rem rgb(124 92 252 / 55%)"></span>
+          <span style="color: #C4B5FD; font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Mentoria 1:1 · 30 minutos</span>
+          <h2 id="mentoria-title" style="max-width: 30ch; margin: .6rem 0 .4rem; font-size: clamp(1.2rem, 2.1vw, 1.8rem); font-weight: 600; line-height: 1.25; letter-spacing: -.03em">Escolha um horário com o Vinicius</h2>
+          <p style="max-width: 48ch; margin: 0 0 1.2rem; color: var(--muted); font-size: .8rem; line-height: 1.55">Use esta conversa para decidir o que cortar no cartaz. Reservar soma 30min à meta da semana.</p>
+
+          <div data-r="slots" role="group" aria-label="Horários disponíveis" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem">
+            <button type="button" data-slot="0" style="display: grid; gap: .25rem; min-height: 4.2rem; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(124 92 252 / 55%)">
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); text-transform: uppercase">qua 16</small>
+              <strong style="font-size: .88rem; font-weight: 600">11h00</strong>
+            </button>
+            <button type="button" data-slot="1" style="display: grid; gap: .25rem; min-height: 4.2rem; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(124 92 252 / 55%)">
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); text-transform: uppercase">qua 16</small>
+              <strong style="font-size: .88rem; font-weight: 600">15h30</strong>
+            </button>
+            <button type="button" data-slot="2" style="display: grid; gap: .25rem; min-height: 4.2rem; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(124 92 252 / 55%)">
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); text-transform: uppercase">qui 17</small>
+              <strong style="font-size: .88rem; font-weight: 600">09h00</strong>
+            </button>
+            <button type="button" data-slot="3" style="display: grid; gap: .25rem; min-height: 4.2rem; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(23 25 29 / 82%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(124 92 252 / 55%)">
+              <small style="color: var(--muted); font: 750 .55rem/1 var(--font-mono); text-transform: uppercase">sex 18</small>
+              <strong style="font-size: .88rem; font-weight: 600">14h00</strong>
+            </button>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin-top: 1.2rem">
+            <button type="button" data-confirm="" onClick="{{ confirmSlot }}" style="display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; border: none; border-radius: var(--radius-md); padding-inline: 1.1rem; background: var(--accent); color: #FFFFFF; font-size: .84rem; font-weight: 600; cursor: pointer; opacity: .55; transition: all var(--motion-fast) var(--ease-standard)">
+              <span data-icon="calendar-check" style="width: .9rem; height: .9rem"></span> <span data-confirm-label="">Escolha um horário</span>
+            </button>
+            <small data-confirm-note="" style="color: var(--muted); font-size: .74rem">Você pode remarcar até 6h antes.</small>
+          </div>
+        </div>
+
+        <div style="display: grid; gap: .5rem; align-content: start">
+          <div style="display: grid; gap: .6rem; padding: clamp(18px, 2.4vw, 26px); border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 82%)">
+            <div style="display: flex; align-items: center; gap: .7rem">
+              <span style="display: grid; width: 2.6rem; height: 2.6rem; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-explorer), var(--color-orange-500)); font: 700 .75rem var(--font-mono)">VF</span>
+              <span style="display: grid; gap: .15rem; min-width: 0">
+                <strong style="font-size: .88rem; font-weight: 600">Vinicius Ferraz</strong>
+                <small style="color: var(--muted); font-size: .72rem">Mentor de trilha · Creative Studio</small>
+              </span>
+            </div>
+            <p style="margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.55">Revisa cartazes, protótipos e defesa de decisão. Responde comentários em até 2 dias.</p>
+            <ul style="display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; list-style: none">
+              <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .35rem .7rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono)">hierarquia</li>
+              <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .35rem .7rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono)">prototipagem</li>
+              <li style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: .35rem .7rem; color: var(--muted); font: 750 .58rem/1 var(--font-mono)">portfólio</li>
+            </ul>
+          </div>
+          <div data-booked-card="" style="display: none; gap: .4rem; padding: 1rem; border: 1px solid rgb(22 163 74 / 45%); border-radius: var(--radius-lg); background: linear-gradient(140deg, rgb(22 163 74 / 14%), rgb(23 25 29 / 88%))">
+            <span style="display: inline-flex; align-items: center; gap: .4rem; color: var(--color-success); font: 800 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase"><span data-icon="badge-check" style="width: .8rem; height: .8rem"></span> mentoria reservada</span>
+            <strong data-booked-when="" style="font-size: .95rem; font-weight: 600">—</strong>
+            <small style="color: var(--muted); font-size: .72rem">Convite enviado para o seu e-mail e para o calendário.</small>
+          </div>
+        </div>
+      </section>
+
+      <sc-if value="{{ showLembretes }}" hint-placeholder-val="{{ true }}">
+        <section id="lembretes" data-section="lembretes" data-reveal="" aria-labelledby="lemb-title" style="margin-top: 2rem; scroll-margin-top: 9rem">
+          <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .8rem">
+            <div>
+              <span style="color: var(--accent); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Lembretes</span>
+              <h2 id="lemb-title" style="margin: .5rem 0 0; font-size: clamp(1.35rem, 2.5vw, 2.2rem); font-weight: 600; letter-spacing: -.035em">Como quer ser avisada</h2>
+            </div>
+            <p style="max-width: 30ch; margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5">Vale para aulas, encontros e prazos da trilha.</p>
+          </div>
+
+          <ul data-r="reminders" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin: 1rem 0 0; padding: 0; list-style: none">
+            <li>
+              <button type="button" data-toggle="0" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 2.6rem; gap: .8rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">
+                <span style="display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border-radius: var(--radius-md); background: rgb(255 255 255 / 6%)"><span data-icon="bell" style="width: 1rem; height: 1rem"></span></span>
+                <span style="display: grid; gap: .2rem; min-width: 0">
+                  <strong style="font-size: .84rem; font-weight: 600">1h antes</strong>
+                  <small style="color: var(--muted); font-size: .72rem">Aviso no navegador</small>
+                </span>
+                <span data-track="0" style="position: relative; display: block; width: 2.4rem; height: 1.3rem; border-radius: var(--radius-pill); background: rgb(255 255 255 / 12%); transition: background var(--motion-fast) var(--ease-standard)">
+                  <i data-knob="0" style="position: absolute; top: .15rem; left: .15rem; display: block; width: 1rem; height: 1rem; border-radius: 50%; background: var(--color-white); transition: transform var(--motion-fast) var(--ease-standard)"></i>
+                </span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-toggle="1" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 2.6rem; gap: .8rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">
+                <span style="display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border-radius: var(--radius-md); background: rgb(255 255 255 / 6%)"><span data-icon="mail" style="width: 1rem; height: 1rem"></span></span>
+                <span style="display: grid; gap: .2rem; min-width: 0">
+                  <strong style="font-size: .84rem; font-weight: 600">Resumo da semana</strong>
+                  <small style="color: var(--muted); font-size: .72rem">Domingo, por e-mail</small>
+                </span>
+                <span data-track="1" style="position: relative; display: block; width: 2.4rem; height: 1.3rem; border-radius: var(--radius-pill); background: rgb(255 255 255 / 12%); transition: background var(--motion-fast) var(--ease-standard)">
+                  <i data-knob="1" style="position: absolute; top: .15rem; left: .15rem; display: block; width: 1rem; height: 1rem; border-radius: 50%; background: var(--color-white); transition: transform var(--motion-fast) var(--ease-standard)"></i>
+                </span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-toggle="2" style="display: grid; width: 100%; grid-template-columns: 2.2rem minmax(0, 1fr) 2.6rem; gap: .8rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(23 25 29 / 72%); text-align: left; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">
+                <span style="display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border-radius: var(--radius-md); background: rgb(255 255 255 / 6%)"><span data-icon="alarm-clock" style="width: 1rem; height: 1rem"></span></span>
+                <span style="display: grid; gap: .2rem; min-width: 0">
+                  <strong style="font-size: .84rem; font-weight: 600">Véspera de prazo</strong>
+                  <small style="color: var(--muted); font-size: .72rem">18h do dia anterior</small>
+                </span>
+                <span data-track="2" style="position: relative; display: block; width: 2.4rem; height: 1.3rem; border-radius: var(--radius-pill); background: rgb(255 255 255 / 12%); transition: background var(--motion-fast) var(--ease-standard)">
+                  <i data-knob="2" style="position: absolute; top: .15rem; left: .15rem; display: block; width: 1rem; height: 1rem; border-radius: 50%; background: var(--color-white); transition: transform var(--motion-fast) var(--ease-standard)"></i>
+                </span>
+              </button>
+            </li>
+          </ul>
+        </section>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startFilter&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;todos&quot;,&quot;aula&quot;,&quot;encontro&quot;,&quot;prazo&quot;],&quot;default&quot;:&quot;todos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Filtro&quot;},&quot;showLembretes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Seções&quot;}}">
+class Component extends DCLogic {
+  state = { filter: "todos", slot: null, booked: null, reminders: [true, true, false] };
+
+  slotLabels = ["qua 16 · 11h00", "qua 16 · 15h30", "qui 17 · 09h00", "sex 18 · 14h00"];
+
+  renderVals() {
+    return {
+      showLembretes: this.props.showLembretes !== false,
+      toggleNav: () => this.setNav(!this.navOpen),
+      closeNav: () => this.setNav(false),
+      confirmSlot: () => { if (this.state.slot !== null) this.setState({ booked: this.state.slot }); }
+    };
+  }
+
+  setNav(open) {
+    const aside = document.querySelector('[data-r="sidebar"]');
+    const scrim = document.querySelector('[data-r="scrim"]');
+    if (aside) aside.setAttribute("data-open", open ? "true" : "false");
+    if (scrim) {
+      scrim.style.opacity = open ? "1" : "0";
+      scrim.style.pointerEvents = open ? "auto" : "none";
+    }
+    this.navOpen = open;
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const start = this.props.startFilter;
+    if (start && start !== "todos") this.setState({ filter: start });
+    this.paintIcons();
+    this.setupReveal();
+    this.setupSections();
+    this.setupSpotlight();
+    this.bindControls();
+    this.sync();
+  }
+
+  componentDidUpdate() {
+    this.paintIcons();
+    this.sync();
+  }
+
+  componentWillUnmount() {
+    if (this.observer) this.observer.disconnect();
+    if (this.sectionObserver) this.sectionObserver.disconnect();
+    if (this.onMove) window.removeEventListener("mousemove", this.onMove);
+  }
+
+  bindControls() {
+    document.querySelectorAll("[data-filter]").forEach((btn) => {
+      btn.onclick = () => {
+        const next = btn.getAttribute("data-filter");
+        this.setState({ filter: this.state.filter === next ? "todos" : next });
+      };
+    });
+    document.querySelectorAll("[data-slot]").forEach((btn) => {
+      btn.onclick = () => this.setState({ slot: Number(btn.getAttribute("data-slot")) });
+    });
+    document.querySelectorAll("[data-toggle]").forEach((btn) => {
+      btn.onclick = () => {
+        const i = Number(btn.getAttribute("data-toggle"));
+        this.setState((s) => {
+          const next = s.reminders.slice();
+          next[i] = !next[i];
+          return { reminders: next };
+        });
+      };
+    });
+  }
+
+  paintIcons(tries) {
+    const L = window.lucide;
+    if (!L || !L.icons) { if ((tries || 0) < 80) setTimeout(() => this.paintIcons((tries || 0) + 1), 120); return; }
+    const alias = { house: "House", "clock-3": "Clock3", "link-2": "Link2", "alarm-clock": "AlarmClock", "calendar-check": "CalendarCheck", "alert-triangle": "TriangleAlert" };
+    document.querySelectorAll("[data-icon]").forEach((el) => {
+      if (el.firstElementChild) return;
+      const raw = el.getAttribute("data-icon");
+      const pascal = raw.split("-").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+      const node = L.icons[alias[raw] || pascal] || L.icons[pascal] || L.icons[raw];
+      if (node) el.appendChild(L.createElement(node));
+    });
+  }
+
+  sync() {
+    const filter = this.state.filter;
+    document.querySelectorAll("[data-filter]").forEach((btn) => {
+      const on = btn.getAttribute("data-filter") === filter;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.style.borderColor = on ? "rgb(255 107 0 / 45%)" : "var(--border)";
+      btn.style.background = on ? "rgb(255 107 0 / 12%)" : "transparent";
+      btn.style.color = on ? "var(--accent)" : "var(--muted)";
+    });
+    let shown = 0;
+    document.querySelectorAll("[data-ev]").forEach((li) => {
+      const on = filter === "todos" || li.getAttribute("data-ev") === filter;
+      li.style.display = on ? "grid" : "none";
+      if (on) shown += 1;
+    });
+    const empty = document.querySelector("[data-empty]");
+    if (empty) empty.style.display = shown ? "none" : "block";
+
+    const booked = this.state.booked !== null;
+    const hours = 4.5 + (booked ? 0.5 : 0);
+    const pct = Math.round((hours / 8) * 100);
+    const gauge = document.querySelector("[data-gauge]");
+    if (gauge) gauge.style.background = "conic-gradient(from -90deg, var(--accent) " + pct + "%, rgb(255 255 255 / 8%) " + pct + "%)";
+    const pctEl = document.querySelector("[data-gauge-pct]");
+    if (pctEl) pctEl.textContent = (hours === 5 ? "5h" : "4h30");
+    const note = document.querySelector("[data-gauge-note]");
+    if (note) note.textContent = "faltam " + (hours === 5 ? "3h" : "3h30");
+
+    const chip = document.querySelector("[data-slot-chip]");
+    if (chip) {
+      chip.textContent = booked ? this.slotLabels[this.state.booked].replace(" · ", " · ") : "a marcar";
+      chip.style.color = booked ? "#C4B5FD" : "var(--muted)";
+    }
+
+    document.querySelectorAll("[data-slot]").forEach((btn) => {
+      const i = Number(btn.getAttribute("data-slot"));
+      const chosen = i === this.state.slot;
+      const isBooked = i === this.state.booked;
+      btn.setAttribute("aria-pressed", chosen ? "true" : "false");
+      btn.style.borderColor = isBooked ? "rgb(22 163 74 / 55%)" : chosen ? "rgb(124 92 252 / 65%)" : "var(--border)";
+      btn.style.background = isBooked ? "rgb(22 163 74 / 12%)" : chosen ? "rgb(124 92 252 / 16%)" : "rgb(23 25 29 / 82%)";
+    });
+
+    const confirm = document.querySelector("[data-confirm]");
+    const label = document.querySelector("[data-confirm-label]");
+    if (confirm) {
+      confirm.style.opacity = this.state.slot === null ? ".55" : "1";
+      confirm.disabled = this.state.slot === null;
+      confirm.style.cursor = this.state.slot === null ? "default" : "pointer";
+      confirm.style.background = booked && this.state.booked === this.state.slot ? "var(--color-success)" : "var(--accent)";
+    }
+    if (label) {
+      label.textContent = this.state.slot === null ? "Escolha um horário" : booked && this.state.booked === this.state.slot ? "Mentoria reservada" : "Reservar " + this.slotLabels[this.state.slot];
+    }
+    const cnote = document.querySelector("[data-confirm-note]");
+    if (cnote) cnote.textContent = booked ? "Remarcar ou cancelar até 6h antes." : "Você pode remarcar até 6h antes.";
+    const bcard = document.querySelector("[data-booked-card]");
+    if (bcard) bcard.style.display = booked ? "grid" : "none";
+    const bwhen = document.querySelector("[data-booked-when]");
+    if (bwhen && booked) bwhen.textContent = this.slotLabels[this.state.booked] + " · 30min";
+
+    document.querySelectorAll("[data-toggle]").forEach((btn) => {
+      const i = Number(btn.getAttribute("data-toggle"));
+      const on = this.state.reminders[i];
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.style.borderColor = on ? "rgb(255 107 0 / 40%)" : "var(--border)";
+      const track = btn.querySelector("[data-track]");
+      const knob = btn.querySelector("[data-knob]");
+      if (track) track.style.background = on ? "var(--accent)" : "rgb(255 255 255 / 12%)";
+      if (knob) knob.style.transform = on ? "translateX(1.1rem)" : "none";
+      const icon = btn.querySelector("[data-icon]");
+      if (icon) icon.style.color = on ? "var(--accent)" : "var(--muted)";
+    });
+  }
+
+  setupReveal() {
+    const targets = Array.from(document.querySelectorAll("[data-reveal]"));
+    if (!targets.length || this.reduced || typeof IntersectionObserver === "undefined") return;
+    targets.forEach((el, i) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(2rem) scale(.99)";
+      el.style.transition = "opacity 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms, transform 700ms cubic-bezier(.16,1,.3,1) " + i * 70 + "ms";
+    });
+    const show = (el) => { el.style.opacity = "1"; el.style.transform = "none"; };
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { show(e.target); this.observer.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -10% 0px", threshold: 0.06 });
+    targets.forEach((el) => this.observer.observe(el));
+    setTimeout(() => targets.forEach(show), 2800);
+  }
+
+  setupSections() {
+    const links = Array.from(document.querySelectorAll("[data-section-link]"));
+    const sections = Array.from(document.querySelectorAll("[data-section]"));
+    if (!links.length || !sections.length) return;
+    const mark = (id) => links.forEach((a) => {
+      const on = a.getAttribute("data-section-link") === id;
+      a.style.background = on ? "linear-gradient(120deg, rgb(255 107 0 / 20%), rgb(255 107 0 / 6%))" : "transparent";
+      a.style.color = on ? "var(--color-white)" : "var(--muted)";
+      a.style.boxShadow = on ? "inset 0 0 0 1px rgb(255 107 0 / 40%)" : "none";
+    });
+    mark("semana");
+    if (typeof IntersectionObserver === "undefined") return;
+    this.sectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) mark(visible.target.id);
+    }, { rootMargin: "-20% 0px -60%", threshold: [0, 0.25, 0.6] });
+    sections.forEach((s) => this.sectionObserver.observe(s));
+  }
+
+  setupSpotlight() {
+    if (this.reduced) return;
+    const hero = document.querySelector("[data-spotlight]");
+    if (!hero) return;
+    this.onMove = (event) => {
+      const r = hero.getBoundingClientRect();
+      if (event.clientY < r.top - 80 || event.clientY > r.bottom + 80) return;
+      hero.style.setProperty("--sx", Math.round(((event.clientX - r.left) / r.width) * 100) + "%");
+      hero.style.setProperty("--sy", Math.round(((event.clientY - r.top) / r.height) * 100) + "%");
+    };
+    window.addEventListener("mousemove", this.onMove, { passive: true });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/tokens/tokens.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/fonts/fonts.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/styles.css">
+<script src="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scrollbar-color: #343941 #101114; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--color-ink-950); color: var(--color-white); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--color-orange-400); }
+  [data-icon] > svg { width: 100%; height: 100%; display: block; }
+  textarea, input, button, select { font: inherit; color: inherit; }
+  input::placeholder, textarea::placeholder { color: rgb(255 255 255 / 34%); }
+  input:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @keyframes rail-in { from { transform: scaleY(0); } }
+  @keyframes sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(240%) skewX(-18deg); } }
+  @keyframes ambient-pulse { 0%, 100% { opacity: .22; transform: scale(.75); } 50% { opacity: 1; transform: scale(1.25); } }
+  @keyframes ambient-spin { to { transform: rotate(360deg); } }
+  @keyframes glow-breathe { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .78; transform: scale(1.12); } }
+  @keyframes grid-drift { to { background-position: 4rem 4rem, 4rem 4rem; } }
+  @keyframes word-up { from { opacity: 0; transform: translate3d(0, .7em, 0); filter: blur(6px); } }
+  @keyframes line-reveal { from { transform: scaleX(0); } }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(.6rem); } }
+  @keyframes wait-scan { 0%, 100% { opacity: .2; transform: translateX(-40%); } 50% { opacity: .75; transform: translateX(40%); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+
+  @media (max-width: 76rem) {
+    [data-r="atlas-grid"] { grid-template-columns: 1fr !important; }
+    [data-r="index"] { position: static !important; max-height: none !important; }
+  }
+  @media (max-width: 64rem) {
+    [data-r="sidebar"] { transform: translateX(-105%); box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 60%); }
+    [data-r="sidebar"][data-open="true"] { transform: translateX(0); }
+    [data-r="workspace"] { margin-inline-start: 0 !important; }
+    [data-r="menu"] { display: inline-grid !important; }
+    [data-r="scrim"] { display: block !important; }
+  }
+  @media (max-width: 58rem) {
+    [data-r="concept-top"] { grid-template-columns: 1fr !important; }
+    [data-r="head"] { grid-template-columns: 1fr !important; }
+    [data-r="ds-cols"] { grid-template-columns: 1fr !important; }
+    [data-r="back-index"] { display: inline-flex !important; }
+  }
+  @media (max-width: 48rem) {
+    [data-r="topbar"] { padding-inline: 12px !important; }
+    [data-r="crumb-root"], [data-r="avatar"], [data-r="route-pill"] { display: none !important; }
+    [data-r="head"] h1 { font-size: clamp(2.1rem, 9vw, 3rem) !important; }
+    [data-r="tabs"] { overflow-x: auto !important; }
+    [data-r="searchrow"] { grid-template-columns: 1fr !important; }
+    [data-r="swatches"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  }
+</style>
+</helmet>
+<div class="dark" style="position: relative; min-height: 100vh; overflow-x: hidden; background: var(--color-ink-950); color: var(--color-white)">
+  <div aria-hidden="true" style="position: fixed; z-index: 0; inset: 0; pointer-events: none">
+    <span style="position: absolute; left: 14%; top: -18rem; width: 46rem; height: 46rem; border-radius: 50%; background: radial-gradient(circle, rgb(255 107 0 / 13%), transparent 62%); filter: blur(1rem); animation: glow-breathe 15s ease-in-out infinite"></span>
+    <span style="position: absolute; right: -16rem; top: 34%; width: 42rem; height: 42rem; border-radius: 50%; background: radial-gradient(circle, rgb(124 92 252 / 11%), transparent 64%); filter: blur(1rem); animation: glow-breathe 19s ease-in-out -6s infinite"></span>
+    <span style="position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px); background-size: 4rem 4rem, 4rem 4rem; mask-image: radial-gradient(circle at 42% 14%, #000 0, transparent 68%); animation: grid-drift 28s linear infinite"></span>
+    <span style="position: absolute; inset: 0; background: radial-gradient(circle at 46% 22%, transparent 36%, rgb(8 9 11 / 76%) 100%)"></span>
+  </div>
+
+  <div data-r="scrim" onClick="{{ closeNav }}" aria-hidden="true" style="display: none; position: fixed; z-index: 45; inset: 0; background: rgb(8 9 11 / 62%); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity var(--motion-standard) var(--ease-standard)"></div>
+
+  <aside data-r="sidebar" style="position: fixed; z-index: 50; inset: 0 auto 0 0; display: flex; width: 16.5rem; flex-direction: column; padding: 24px 20px; background: linear-gradient(180deg, rgb(23 25 29 / 96%), rgb(16 17 20 / 96%)); backdrop-filter: blur(1.25rem); border-right: 1px solid var(--border); transition: transform var(--motion-standard) var(--ease-standard)">
+    <span aria-hidden="true" style="position: absolute; inset: 0 0 auto auto; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, rgb(255 107 0 / 55%) 22%, rgb(255 107 0 / 12%) 62%, transparent); transform-origin: top; animation: rail-in var(--motion-emphasis) var(--ease-emphasis) both"></span>
+    <a href="Inicio Aluno v2 Premium.dc.html" style="position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: 12px; color: var(--color-white)">
+      <span style="position: relative; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%)">
+        <img src="brand/logos-academy-symbol-dark.png" alt="" width="52" height="52" style="width: 26px; height: 26px; object-fit: contain">
+        <i aria-hidden="true" style="position: absolute; inset: -0.35rem; border: 1px dashed rgb(255 107 0 / 22%); border-radius: var(--radius-lg); animation: ambient-spin 28s linear infinite"></i>
+      </span>
+      <span style="display: grid; gap: 1px; text-transform: uppercase; letter-spacing: .16em">
+        <strong style="font-size: var(--text-xs); line-height: 1">Logos</strong>
+        <small style="color: var(--accent); font: 700 9px/1.2 var(--font-mono); letter-spacing: .28em">Academy</small>
+      </span>
+    </a>
+
+    <div style="position: relative; flex: 0 0 auto; margin: 40px 0 28px; padding: 14px 14px 14px 16px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg); background: linear-gradient(140deg, rgb(255 107 0 / 10%), rgb(124 92 252 / 7%))">
+      <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 1rem rgb(255 107 0 / 70%)"></span>
+      <span aria-hidden="true" style="position: absolute; inset: 0; width: 38%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 12%), transparent); animation: sheen 6.5s var(--ease-standard) infinite"></span>
+      <span style="display: inline-flex; align-items: center; gap: .4rem; font: 700 10px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--color-explorer)">
+        <i style="width: .4rem; height: .4rem; border-radius: 50%; background: var(--color-explorer); box-shadow: 0 0 .6rem var(--color-explorer)"></i> Explorer · ciclo 02
+      </span>
+      <strong style="display: block; max-width: 16ch; margin-top: 10px; font-size: var(--text-md); font-weight: 600; line-height: 1.3; letter-spacing: -.02em">Creative Studio</strong>
+      <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 11px">5 aulas liberadas até agora</small>
+    </div>
+
+    <nav style="display: grid; gap: 20px; min-height: 0; overflow-y: auto">
+      <div style="display: grid; gap: 6px">
+        <span style="display: block; margin: 0 12px 6px; font: 700 10px var(--font-mono); color: rgb(255 255 255 / 40%); letter-spacing: .12em; text-transform: uppercase">Meu espaço</span>
+        <a href="Inicio Aluno v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="house" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Início</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="Atividade v2 Premium.dc.html" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="clipboard-check" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Atividade</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="gauge" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Jornada</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="folder-kanban" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Projetos</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" aria-current="page" style="position: relative; display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; overflow: hidden; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); color: var(--color-white); background: linear-gradient(90deg, rgb(255 107 0 / 16%), rgb(255 107 0 / 3%))">
+          <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent); box-shadow: 0 0 .8rem var(--accent)"></span>
+          <span data-icon="library-big" style="width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent)"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm); font-weight: 600">Atlas</span><span style="border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-pill); padding: 2px 7px; color: var(--accent); font: 700 9px/1 var(--font-mono)">{{ totalReleased }}</span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="calendar-days" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Agenda</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+        <a href="#" style="display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border); padding-inline-start: 18px">
+          <span data-icon="user-round" style="width: 18px; height: 18px; flex: 0 0 auto"></span><span style="min-width: 0; flex: 1; font-size: var(--text-sm)">Perfil</span><span data-icon="chevron-right" style="width: 14px; height: 14px; opacity: .45"></span>
+        </a>
+      </div>
+    </nav>
+
+    <div style="display: flex; flex: 0 0 auto; gap: 12px; align-items: center; margin-top: auto; padding-top: 28px; color: rgb(255 255 255 / 66%)">
+      <span data-icon="lock" style="width: 20px; height: 20px; flex: 0 0 auto; color: var(--color-info)"></span>
+      <span style="display: block">
+        <strong style="display: block; color: var(--color-white); font-size: var(--text-xs)">Liberação por aula</strong>
+        <small style="display: block; margin-top: 4px; color: var(--muted); font-size: 11px">O Atlas cresce conforme você avança</small>
+      </span>
+    </div>
+  </aside>
+
+  <div data-r="workspace" style="position: relative; z-index: 1; min-width: 0; margin-inline-start: 16.5rem">
+    <header data-r="topbar" style="position: sticky; top: 0; z-index: 30; display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 16px; padding-inline: clamp(16px, 4vw, 40px); background: rgb(16 17 20 / 82%); border-bottom: 1px solid var(--border); backdrop-filter: blur(1rem)">
+      <div style="display: flex; min-width: 0; align-items: center; gap: 10px; font-size: var(--text-xs); color: var(--muted)">
+        <button type="button" data-r="menu" onClick="{{ toggleNav }}" aria-label="Abrir navegação" style="display: none; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer"><span data-icon="menu" style="width: 18px; height: 18px"></span></button>
+        <span data-r="crumb-root">Logos Academy</span>
+        <span data-icon="chevron-right" data-r="crumb-root" style="width: 14px; height: 14px"></span>
+        <strong style="color: var(--color-white)">Atlas</strong>
+        <span data-r="route-pill" style="display: inline-flex; align-items: center; gap: .45rem; margin-left: 8px; max-width: 26rem; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 5px 11px; font: 600 10px/1 var(--font-mono); letter-spacing: .04em; color: rgb(255 255 255 / 58%); white-space: nowrap; text-overflow: ellipsis">
+          <i style="width: .38rem; height: .38rem; flex: 0 0 auto; border-radius: 50%; background: var(--accent); box-shadow: 0 0 .6rem var(--accent); animation: ambient-pulse 2.4s ease-in-out infinite"></i>{{ routeLabel }}
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <button type="button" aria-label="Ativar tema claro" style="display: inline-grid; min-width: 44px; min-height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 5%); color: var(--color-white); cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent); color: var(--accent)">
+          <span data-icon="sun" style="width: 18px; height: 18px"></span>
+        </button>
+        <a href="#" data-r="avatar" aria-label="Abrir perfil de Marina Alves" style="display: inline-flex; min-height: 44px; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 4px 12px 4px 4px; background: rgb(255 255 255 / 4%); color: var(--color-white); transition: all var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent)">
+          <span style="display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: linear-gradient(140deg, var(--color-orange-500), var(--color-explorer)); color: var(--color-white); font: 700 11px var(--font-mono)">MA</span>
+          <span style="display: grid; gap: 1px; line-height: 1.1">
+            <strong style="font-size: 11px">Marina</strong>
+            <small style="color: var(--muted); font: 700 8px var(--font-mono); letter-spacing: .1em; text-transform: uppercase">Explorer</small>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main data-screen-label="Atlas" style="width: min(100%, 88rem); margin-inline: auto; padding: clamp(20px, 4vw, 44px) clamp(16px, 4vw, 40px) 96px">
+      <p aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%)">{{ liveMsg }}</p>
+
+      <section data-r="head" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(20px, 4vw, 48px); align-items: end; padding-bottom: clamp(20px, 3vw, 32px)">
+        <div style="min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: .5rem; border: 1px solid rgb(255 107 0 / 28%); border-radius: var(--radius-pill); padding: 6px 12px; background: rgb(255 107 0 / 8%); color: var(--accent); font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase">
+            <span data-icon="library-big" style="width: 13px; height: 13px"></span> central de conhecimento
+          </span>
+          <h1 style="margin: 18px 0 0; font-size: clamp(2.6rem, 6vw, 4.4rem); font-weight: 800; line-height: .95; letter-spacing: -.045em; animation: word-up var(--motion-emphasis) var(--ease-emphasis) both">Atlas</h1>
+          <span aria-hidden="true" style="display: block; width: 7rem; height: 3px; margin-top: 16px; border-radius: 2px; background: linear-gradient(90deg, var(--accent), rgb(255 107 0 / 0%)); transform-origin: left; animation: line-reveal var(--motion-emphasis) var(--ease-emphasis) 120ms both"></span>
+          <p style="max-width: 52ch; margin: 20px 0 0; color: rgb(255 255 255 / 76%); font-size: var(--text-lg); line-height: 1.55; text-wrap: pretty">Onde você volta para recuperar um conceito, reutilizar um prompt ou consultar um sistema visual. Cada material aparece aqui quando a aula que o apresenta é liberada.</p>
+        </div>
+        <div style="display: grid; gap: 10px; justify-items: start">
+          <div style="display: flex; align-items: baseline; gap: 10px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; background: linear-gradient(150deg, rgb(255 255 255 / 6%), rgb(255 255 255 / 2%))">
+            <strong style="font-size: var(--text-4xl); font-weight: 800; letter-spacing: -.04em; line-height: 1">{{ totalReleased }}</strong>
+            <span style="display: grid; gap: 2px">
+              <small style="color: var(--color-white); font-size: var(--text-xs); font-weight: 600">materiais liberados</small>
+              <small style="color: var(--muted); font: 600 10px var(--font-mono); letter-spacing: .08em; text-transform: uppercase">3 coleções</small>
+            </span>
+          </div>
+          <small style="display: inline-flex; align-items: center; gap: .45rem; color: var(--muted); font-size: 11px">
+            <span data-icon="lock" style="width: 12px; height: 12px"></span> {{ lockedCount }} liberações ainda por vir
+          </small>
+        </div>
+      </section>
+
+      <div data-r="tabs" role="tablist" aria-label="Coleções do Atlas" style="position: sticky; top: 72px; z-index: 20; display: flex; gap: 6px; margin-bottom: 20px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(16 17 20 / 88%); backdrop-filter: blur(1rem)">
+        <button type="button" role="tab" data-tab="conceitos" onClick="{{ goConceitos }}" style="display: inline-flex; min-height: 44px; flex: 1; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: var(--radius-md); background: transparent; color: var(--muted); cursor: pointer; font-size: var(--text-sm); font-weight: 600; transition: all var(--motion-fast) var(--ease-standard); white-space: nowrap">
+          <span data-icon="book-open-text" style="width: 16px; height: 16px"></span> Conceitos <small style="font: 700 10px var(--font-mono); opacity: .7">{{ nConc }}</small>
+        </button>
+        <button type="button" role="tab" data-tab="prompts" onClick="{{ goPrompts }}" style="display: inline-flex; min-height: 44px; flex: 1; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: var(--radius-md); background: transparent; color: var(--muted); cursor: pointer; font-size: var(--text-sm); font-weight: 600; transition: all var(--motion-fast) var(--ease-standard); white-space: nowrap">
+          <span data-icon="wand-sparkles" style="width: 16px; height: 16px"></span> Prompts <small style="font: 700 10px var(--font-mono); opacity: .7">{{ nProm }}</small>
+        </button>
+        <button type="button" role="tab" data-tab="design-systems" onClick="{{ goSystems }}" style="display: inline-flex; min-height: 44px; flex: 1; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: var(--radius-md); background: transparent; color: var(--muted); cursor: pointer; font-size: var(--text-sm); font-weight: 600; transition: all var(--motion-fast) var(--ease-standard); white-space: nowrap">
+          <span data-icon="palette" style="width: 16px; height: 16px"></span> Sistemas de Design <small style="font: 700 10px var(--font-mono); opacity: .7">{{ nSys }}</small>
+        </button>
+      </div>
+
+      <div data-r="atlas-grid" style="display: grid; grid-template-columns: 23rem minmax(0, 1fr); gap: clamp(16px, 2.4vw, 28px); align-items: start">
+        <div data-r="index" style="position: sticky; top: 9.5rem; display: grid; gap: 12px; min-width: 0; max-height: calc(100vh - 11rem); overflow: hidden auto; padding-right: 4px">
+          <div data-r="searchrow" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px">
+            <label style="position: relative; display: block; min-width: 0">
+              <span style="position: absolute; left: 12px; top: 50%; width: 16px; height: 16px; color: var(--muted); transform: translateY(-50%)" data-icon="search"></span>
+              <input type="search" value="{{ query }}" onChange="{{ onQuery }}" placeholder="{{ searchPlaceholder }}" aria-label="Buscar nesta coleção" style="width: 100%; min-height: 44px; padding: 0 12px 0 38px; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 4%); color: var(--color-white); font-size: var(--text-sm)">
+            </label>
+            <button type="button" onClick="{{ toggleFilters }}" aria-expanded="{{ filtersOpen }}" aria-label="Abrir filtros" style="display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; gap: 7px; padding-inline: 12px; border: 1px solid {{ filterEdge }}; border-radius: var(--radius-md); background: {{ filterFill }}; color: var(--color-white); cursor: pointer; font-size: var(--text-xs); font-weight: 600">
+              <span data-icon="sliders-horizontal" style="width: 16px; height: 16px"></span>{{ filterBadge }}
+            </button>
+          </div>
+
+          <sc-if value="{{ filtersOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; gap: 14px; border: 1px solid rgb(255 107 0 / 24%); border-radius: var(--radius-lg); padding: 16px; background: linear-gradient(160deg, rgb(255 107 0 / 8%), rgb(255 255 255 / 3%)); animation: fade-up var(--motion-standard) var(--ease-standard) both">
+              <div style="display: grid; gap: 8px">
+                <span style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Ciclo</span>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px">
+                  <sc-for list="{{ cycleChips }}" as="chip" hint-placeholder-count="2">
+                    <button type="button" onClick="{{ chip.onToggle }}" aria-pressed="{{ chip.on }}" style="display: inline-flex; min-height: 34px; align-items: center; padding-inline: 12px; border: 1px solid {{ chip.edge }}; border-radius: var(--radius-pill); background: {{ chip.fill }}; color: {{ chip.ink }}; cursor: pointer; font-size: var(--text-xs); font-weight: 600">{{ chip.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display: grid; gap: 8px">
+                <span style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Recurso</span>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px">
+                  <button type="button" onClick="{{ toggleVideoOnly }}" aria-pressed="{{ videoOnly }}" style="display: inline-flex; min-height: 34px; align-items: center; gap: 7px; padding-inline: 12px; border: 1px solid {{ videoEdge }}; border-radius: var(--radius-pill); background: {{ videoFill }}; color: {{ videoInk }}; cursor: pointer; font-size: var(--text-xs); font-weight: 600">
+                    <span data-icon="video" style="width: 14px; height: 14px"></span> {{ videoOnlyLabel }}
+                  </button>
+                </div>
+              </div>
+              <button type="button" onClick="{{ clearFilters }}" style="justify-self: start; min-height: 36px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; color: var(--muted); cursor: pointer; font-size: var(--text-xs); font-weight: 600" style-hover="color: var(--color-white); border-color: var(--accent)">Limpar filtros</button>
+            </div>
+          </sc-if>
+
+          <p style="margin: 0; color: var(--muted); font: 600 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase">{{ resultLabel }}</p>
+
+          <div role="list" style="display: grid; gap: 8px; min-width: 0">
+            <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
+              <button type="button" role="listitem" onClick="{{ it.onSelect }}" aria-current="{{ it.current }}" style="display: grid; gap: 9px; min-width: 0; padding: 14px; overflow: hidden; border: 1px solid {{ it.edge }}; border-radius: var(--radius-lg); background: {{ it.fill }}; color: var(--color-white); cursor: pointer; text-align: left; transition: border-color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 107 0 / 45%)">
+                <span style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+                  <strong style="min-width: 0; font-size: var(--text-sm); font-weight: 600; letter-spacing: -.01em">{{ it.title }}</strong>
+                  <small style="flex: 0 0 auto; color: {{ it.markInk }}; font: 700 9px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase">{{ it.mark }}</small>
+                </span>
+                <span style="display: block; color: rgb(255 255 255 / 64%); font-size: 12px; line-height: 1.5">{{ it.summary }}</span>
+                <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+                  <sc-for list="{{ it.tags }}" as="tg" hint-placeholder-count="2">
+                    <small style="border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 3px 8px; color: rgb(255 255 255 / 58%); font: 600 10px var(--font-mono)">{{ tg.t }}</small>
+                  </sc-for>
+                </span>
+                <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 3px; border-top: 1px solid rgb(255 255 255 / 7%); color: var(--muted); font-size: 11px">
+                  <span style="display: inline-flex; align-items: center; gap: 4px"><span data-icon="graduation-cap" style="width: 12px; height: 12px"></span>{{ it.lesson }}</span>
+                  <span style="display: inline-flex; align-items: center; gap: 4px"><span data-icon="clock-3" style="width: 12px; height: 12px"></span>{{ it.metaA }}</span>
+                  <span style="display: inline-flex; align-items: center; gap: 4px">{{ it.metaB }}</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; gap: 10px; justify-items: start; border: 1px dashed rgb(255 255 255 / 16%); border-radius: var(--radius-lg); padding: 20px; background: rgb(255 255 255 / 2%)">
+              <span data-icon="search-x" style="width: 20px; height: 20px; color: var(--muted)"></span>
+              <strong style="font-size: var(--text-sm)">Nada encontrado nesta coleção</strong>
+              <p style="margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55">Seus filtros continuam ativos. Limpe a busca para ver tudo o que já foi liberado.</p>
+              <button type="button" onClick="{{ clearQuery }}" style="min-height: 40px; padding-inline: 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; color: var(--color-white); cursor: pointer; font-size: var(--text-xs); font-weight: 600" style-hover="border-color: var(--accent); color: var(--accent)">Limpar busca</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showFutureNotice }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; gap: 11px; align-items: flex-start; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; background: rgb(255 255 255 / 3%)">
+              <span data-icon="lock" style="width: 15px; height: 15px; flex: 0 0 auto; margin-top: 2px; color: var(--color-info)"></span>
+              <span style="display: grid; gap: 5px">
+                <strong style="font-size: 12px; font-weight: 600">{{ futureLabel }}</strong>
+                <small style="color: var(--muted); font-size: 11px; line-height: 1.5">Os títulos aparecem quando a aula correspondente for liberada.</small>
+              </span>
+            </div>
+          </sc-if>
+        </div>
+
+        <article id="leitor" style="min-width: 0; border: 1px solid var(--border); border-radius: var(--radius-lg); background: linear-gradient(180deg, rgb(23 25 29 / 88%), rgb(16 17 20 / 88%)); overflow: hidden">
+          <a href="#leitor" data-r="back-index" style="display: none; align-items: center; gap: .5rem; min-height: 44px; padding-inline: 20px; border-bottom: 1px solid var(--border); color: var(--muted); font: 700 .68rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase">
+            <span data-icon="arrow-left" style="width: 14px; height: 14px"></span> Voltar ao índice
+          </a>
+
+          <sc-if value="{{ isConceitos }}" hint-placeholder-val="{{ true }}">
+            <div style="display: grid; gap: clamp(20px, 3vw, 32px); padding: clamp(20px, 3vw, 36px)">
+              <div data-r="concept-top" style="display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(18px, 2.4vw, 28px); align-items: start">
+                <div style="min-width: 0">
+                  <sc-if value="{{ hasVideo }}" hint-placeholder-val="{{ true }}">
+                    <div style="position: relative; min-height: 200px; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: radial-gradient(circle at 50% 42%, rgb(255 107 0 / 16%), rgb(10 11 13 / 96%) 70%)">
+                      <sc-if value="{{ videoPlaying }}" hint-placeholder-val="{{ false }}">
+                        <iframe src="{{ videoSrc }}" title="{{ videoTitle }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen="true" style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0"></iframe>
+                      </sc-if>
+                      <sc-if value="{{ videoIdle }}" hint-placeholder-val="{{ true }}">
+                        <button type="button" onClick="{{ playVideo }}" aria-label="{{ playLabel }}" style="position: absolute; inset: 0; display: grid; gap: 14px; place-content: center; justify-items: center; width: 100%; border: 0; background: transparent; color: var(--color-white); cursor: pointer">
+                          <span style="display: grid; width: 68px; height: 68px; place-items: center; border: 1px solid rgb(255 107 0 / 45%); border-radius: 50%; background: rgb(255 107 0 / 16%); box-shadow: 0 0 2.4rem rgb(255 107 0 / 30%)">
+                            <span data-icon="play" style="width: 26px; height: 26px; color: var(--accent)"></span>
+                          </span>
+                          <span style="display: grid; gap: 4px; justify-items: center">
+                            <strong style="font-size: var(--text-sm); font-weight: 600">Assistir ao vídeo · {{ videoDuration }}</strong>
+                            <small style="color: rgb(255 255 255 / 58%); font: 600 10px var(--font-mono); letter-spacing: .06em">o player só carrega depois deste clique</small>
+                          </span>
+                        </button>
+                      </sc-if>
+                      <span aria-hidden="true" style="position: absolute; inset: auto 0 0 0; height: 1px; background: linear-gradient(90deg, transparent, rgb(255 107 0 / 60%), transparent)"></span>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px">
+                      <button type="button" onClick="{{ toggleTranscript }}" aria-expanded="{{ transcriptOpen }}" style="display: inline-flex; min-height: 40px; align-items: center; gap: 8px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; color: var(--color-white); cursor: pointer; font-size: var(--text-xs); font-weight: 600" style-hover="border-color: var(--accent)">
+                        <span data-icon="captions" style="width: 15px; height: 15px"></span> {{ transcriptLabel }}
+                      </button>
+                      <a href="#" style="display: inline-flex; min-height: 40px; align-items: center; gap: 7px; color: var(--muted); font-size: var(--text-xs); font-weight: 600">Abrir no YouTube <span data-icon="external-link" style="width: 14px; height: 14px"></span></a>
+                    </div>
+                    <sc-if value="{{ transcriptOpen }}" hint-placeholder-val="{{ false }}">
+                      <p style="margin: 12px 0 0; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; background: rgb(255 255 255 / 3%); color: rgb(255 255 255 / 72%); font-size: 12px; line-height: 1.7; animation: fade-up var(--motion-fast) var(--ease-standard) both">{{ transcript }}</p>
+                    </sc-if>
+                  </sc-if>
+                  <sc-if value="{{ noVideo }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: relative; display: grid; gap: 14px; place-content: center; justify-items: center; min-height: 200px; aspect-ratio: 16 / 9; overflow: hidden; border: 1px dashed rgb(255 255 255 / 18%); border-radius: var(--radius-lg); background: rgb(255 255 255 / 3%); text-align: center">
+                      <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(124 92 252 / 16%), transparent); animation: wait-scan 4.5s ease-in-out infinite"></span>
+                      <span style="position: relative; display: grid; width: 56px; height: 56px; place-items: center; border: 1px solid rgb(124 92 252 / 40%); border-radius: 50%; background: rgb(124 92 252 / 12%)">
+                        <span data-icon="video-off" style="width: 22px; height: 22px; color: var(--color-explorer)"></span>
+                      </span>
+                      <span style="position: relative; display: grid; gap: 5px">
+                        <strong style="font-size: var(--text-sm); font-weight: 600">Vídeo em preparação</strong>
+                        <small style="color: var(--muted); font-size: 11px">O artigo completo já está disponível · {{ readTime }} de leitura</small>
+                      </span>
+                      <a href="#artigo" style="position: relative; display: inline-flex; min-height: 44px; align-items: center; padding-inline: 18px; border-radius: var(--radius-md); background: var(--accent); color: #FFFFFF; font-size: var(--text-sm); font-weight: 600">Começar pela leitura</a>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="display: grid; gap: 16px; min-width: 0">
+                  <div>
+                    <small style="display: block; color: var(--accent); font: 700 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase">{{ selLesson }}</small>
+                    <h2 style="margin: 10px 0 0; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; line-height: 1.1; letter-spacing: -.035em">{{ selTitle }}</h2>
+                    <p style="max-width: 46ch; margin: 12px 0 0; color: rgb(255 255 255 / 74%); font-size: var(--text-md); line-height: 1.6; text-wrap: pretty">{{ selSummary }}</p>
+                  </div>
+                  <div style="display: grid; gap: 10px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; background: rgb(255 255 255 / 3%)">
+                    <span style="display: flex; gap: 9px; align-items: flex-start; color: rgb(255 255 255 / 80%); font-size: 12px; line-height: 1.6">
+                      <span data-icon="target" style="width: 15px; height: 15px; flex: 0 0 auto; margin-top: 2px; color: var(--accent)"></span>
+                      <span><strong style="display: block; margin-bottom: 3px; color: var(--color-white); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase">Objetivo</strong>{{ selGoal }}</span>
+                    </span>
+                    <span style="display: flex; flex-wrap: wrap; gap: 8px 16px; padding-top: 10px; border-top: 1px solid rgb(255 255 255 / 7%); color: var(--muted); font-size: 11px">
+                      <span style="display: inline-flex; align-items: center; gap: 5px"><span data-icon="clock-3" style="width: 13px; height: 13px"></span>{{ readTime }} de leitura</span>
+                      <span style="display: inline-flex; align-items: center; gap: 5px"><span data-icon="layers" style="width: 13px; height: 13px"></span>{{ blockCount }} blocos</span>
+                    </span>
+                  </div>
+                  <div style="display: grid; gap: 8px">
+                    <span style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Conceitos relacionados</span>
+                    <div style="display: flex; flex-wrap: wrap; gap: 7px">
+                      <sc-for list="{{ related }}" as="rel" hint-placeholder-count="2">
+                        <button type="button" onClick="{{ rel.onSelect }}" style="display: inline-flex; min-height: 36px; align-items: center; gap: 7px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: rgb(255 255 255 / 4%); color: var(--color-white); cursor: pointer; font-size: var(--text-xs); font-weight: 600" style-hover="border-color: var(--accent); color: var(--accent)">
+                          {{ rel.title }} <span data-icon="arrow-right" style="width: 13px; height: 13px"></span>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="artigo" style="max-width: 75ch; min-width: 0; display: grid; gap: 20px; padding-top: clamp(16px, 2vw, 24px); border-top: 1px solid rgb(255 255 255 / 8%)">
+                <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="5">
+                  <sc-if value="{{ b.isHeading }}" hint-placeholder-val="{{ false }}">
+                    <h3 style="margin: 0; font-size: var(--text-xl); font-weight: 700; letter-spacing: -.025em; line-height: 1.2">{{ b.text }}</h3>
+                  </sc-if>
+                  <sc-if value="{{ b.isText }}" hint-placeholder-val="{{ true }}">
+                    <p style="margin: 0; color: rgb(255 255 255 / 80%); font-size: var(--text-md); line-height: 1.75; text-wrap: pretty">{{ b.text }}</p>
+                  </sc-if>
+                  <sc-if value="{{ b.isList }}" hint-placeholder-val="{{ false }}">
+                    <ul style="display: grid; gap: 10px; margin: 0; padding: 0; list-style: none">
+                      <sc-for list="{{ b.items }}" as="li" hint-placeholder-count="3">
+                        <li style="display: flex; gap: 11px; align-items: flex-start; color: rgb(255 255 255 / 78%); font-size: var(--text-md); line-height: 1.65">
+                          <span aria-hidden="true" style="flex: 0 0 auto; width: .42rem; height: .42rem; margin-top: .62rem; border-radius: 50%; background: var(--accent)"></span>{{ li.t }}
+                        </li>
+                      </sc-for>
+                    </ul>
+                  </sc-if>
+                  <sc-if value="{{ b.isCallout }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; gap: 13px; align-items: flex-start; border: 1px solid rgb(8 145 178 / 38%); border-radius: var(--radius-lg); padding: 16px 18px; background: rgb(8 145 178 / 10%)">
+                      <span data-icon="info" style="width: 17px; height: 17px; flex: 0 0 auto; margin-top: 3px; color: var(--color-info)"></span>
+                      <p style="margin: 0; color: rgb(255 255 255 / 86%); font-size: var(--text-sm); line-height: 1.65">{{ b.text }}</p>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ b.isImage }}" hint-placeholder-val="{{ false }}">
+                    <figure style="margin: 0; display: grid; gap: 9px">
+                      <div role="img" aria-label="{{ b.alt }}" style="display: grid; place-items: center; min-height: 13rem; border: 1px dashed rgb(255 255 255 / 16%); border-radius: var(--radius-lg); background: repeating-linear-gradient(135deg, rgb(255 255 255 / 4%) 0 10px, transparent 10px 20px)">
+                        <span style="display: grid; gap: 6px; justify-items: center; padding: 20px; text-align: center">
+                          <span data-icon="image" style="width: 22px; height: 22px; color: var(--muted)"></span>
+                          <small style="max-width: 34ch; color: var(--muted); font-size: 11px; line-height: 1.5">{{ b.alt }}</small>
+                        </span>
+                      </div>
+                      <figcaption style="color: var(--muted); font-size: 11px; line-height: 1.5">{{ b.caption }}</figcaption>
+                    </figure>
+                  </sc-if>
+                  <sc-if value="{{ b.isCode }}" hint-placeholder-val="{{ false }}">
+                    <pre style="margin: 0; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; background: rgb(8 9 11 / 80%); color: rgb(255 255 255 / 84%); font: 500 12px/1.8 var(--font-mono)">{{ b.text }}</pre>
+                  </sc-if>
+                  <sc-if value="{{ b.isQuote }}" hint-placeholder-val="{{ false }}">
+                    <blockquote style="position: relative; margin: 0; padding: 4px 0 4px 22px; color: var(--color-white); font-size: var(--text-lg); font-weight: 500; font-style: normal; line-height: 1.5; letter-spacing: -.015em">
+                      <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 3px; border-radius: 2px; background: linear-gradient(180deg, var(--accent), rgb(255 107 0 / 10%))"></span>{{ b.text }}
+                    </blockquote>
+                  </sc-if>
+                </sc-for>
+
+                <div style="display: grid; gap: 12px; border: 1px solid rgb(255 107 0 / 24%); border-radius: var(--radius-lg); padding: 20px; background: linear-gradient(150deg, rgb(255 107 0 / 9%), rgb(255 255 255 / 2%))">
+                  <strong style="font: 700 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent)">Em resumo</strong>
+                  <ul style="display: grid; gap: 9px; margin: 0; padding: 0; list-style: none">
+                    <sc-for list="{{ takeaways }}" as="tk" hint-placeholder-count="3">
+                      <li style="display: flex; gap: 10px; align-items: flex-start; color: rgb(255 255 255 / 84%); font-size: var(--text-sm); line-height: 1.6">
+                        <span data-icon="check" style="width: 15px; height: 15px; flex: 0 0 auto; margin-top: 2px; color: var(--accent)"></span>{{ tk.t }}
+                      </li>
+                    </sc-for>
+                  </ul>
+                </div>
+
+                <div style="display: grid; gap: 12px">
+                  <strong style="font: 700 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Perguntas de revisão</strong>
+                  <ol style="display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: q">
+                    <sc-for list="{{ questions }}" as="q" hint-placeholder-count="3">
+                      <li style="display: flex; gap: 11px; align-items: flex-start; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 13px 15px; background: rgb(255 255 255 / 3%); color: rgb(255 255 255 / 80%); font-size: var(--text-sm); line-height: 1.6">
+                        <span data-icon="circle-help" style="width: 15px; height: 15px; flex: 0 0 auto; margin-top: 2px; color: var(--color-explorer)"></span>{{ q.t }}
+                      </li>
+                    </sc-for>
+                  </ol>
+                </div>
+
+                <a href="Atividade v2 Premium.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; background: rgb(255 255 255 / 3%); transition: border-color var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent)">
+                  <span style="display: grid; gap: 4px">
+                    <small style="color: var(--muted); font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase">Onde você usa isso</small>
+                    <strong style="font-size: var(--text-sm); font-weight: 600">{{ activityLabel }}</strong>
+                  </span>
+                  <span style="display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: var(--text-sm); font-weight: 600">Abrir atividade <span data-icon="arrow-right" style="width: 15px; height: 15px"></span></span>
+                </a>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isPrompts }}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; gap: clamp(18px, 2.6vw, 28px); padding: clamp(20px, 3vw, 36px)">
+              <div style="display: grid; gap: 12px; max-width: 75ch">
+                <small style="color: var(--accent); font: 700 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase">{{ selLesson }}</small>
+                <h2 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; line-height: 1.1; letter-spacing: -.035em">{{ selTitle }}</h2>
+                <p style="margin: 0; color: rgb(255 255 255 / 76%); font-size: var(--text-md); line-height: 1.65; text-wrap: pretty">{{ selSummary }}</p>
+              </div>
+
+              <div data-r="ds-cols" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+                <div style="display: grid; gap: 8px; border: 1px solid rgb(22 163 74 / 32%); border-radius: var(--radius-lg); padding: 16px; background: rgb(22 163 74 / 8%)">
+                  <strong style="display: inline-flex; align-items: center; gap: 7px; font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #4ADE80"><span data-icon="check" style="width: 14px; height: 14px"></span> Quando usar</strong>
+                  <p style="margin: 0; color: rgb(255 255 255 / 82%); font-size: var(--text-sm); line-height: 1.6">{{ promptWhen }}</p>
+                </div>
+                <div style="display: grid; gap: 8px; border: 1px solid rgb(220 38 38 / 30%); border-radius: var(--radius-lg); padding: 16px; background: rgb(220 38 38 / 8%)">
+                  <strong style="display: inline-flex; align-items: center; gap: 7px; font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #F87171"><span data-icon="x" style="width: 14px; height: 14px"></span> Quando não usar</strong>
+                  <p style="margin: 0; color: rgb(255 255 255 / 82%); font-size: var(--text-sm); line-height: 1.6">{{ promptWhenNot }}</p>
+                </div>
+              </div>
+
+              <div style="display: grid; gap: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(8 9 11 / 72%)">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: rgb(255 255 255 / 3%)">
+                  <span style="display: inline-flex; align-items: center; gap: 8px; color: rgb(255 255 255 / 66%); font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase">
+                    <span data-icon="wand-sparkles" style="width: 14px; height: 14px; color: var(--accent)"></span> Template · {{ varCount }} variáveis
+                  </span>
+                  <button type="button" onClick="{{ copyPrompt }}" style="display: inline-flex; min-height: 40px; align-items: center; gap: 8px; padding-inline: 16px; border: 1px solid {{ copyEdge }}; border-radius: var(--radius-md); background: {{ copyFill }}; color: {{ copyInk }}; cursor: pointer; font-size: var(--text-sm); font-weight: 600; transition: all var(--motion-fast) var(--ease-standard)">
+                    <span data-icon="{{ copyIcon }}" style="width: 15px; height: 15px"></span> {{ copyLabel }}
+                  </button>
+                </div>
+                <pre style="margin: 0; overflow-x: auto; padding: 18px; color: rgb(255 255 255 / 88%); font: 500 12.5px/1.85 var(--font-mono); white-space: pre-wrap">{{ promptText }}</pre>
+              </div>
+
+              <div style="display: grid; gap: 12px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; background: rgb(255 255 255 / 3%)">
+                <button type="button" onClick="{{ toggleCustom }}" aria-expanded="{{ customOpen }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--color-white); cursor: pointer; text-align: left">
+                  <span style="display: grid; gap: 4px">
+                    <strong style="font-size: var(--text-md); font-weight: 600">Personalizar antes de copiar</strong>
+                    <small style="color: var(--muted); font-size: 11px">Preenchido no seu navegador · nada é salvo nem enviado a um modelo</small>
+                  </span>
+                  <span data-icon="chevron-down" data-chevron="custom" style="width: 18px; height: 18px; flex: 0 0 auto; color: var(--muted); transition: transform var(--motion-fast) var(--ease-standard)"></span>
+                </button>
+                <sc-if value="{{ customOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: grid; gap: 14px; padding-top: 4px; animation: fade-up var(--motion-standard) var(--ease-standard) both">
+                    <div style="display: grid; gap: 12px">
+                      <sc-for list="{{ promptVars }}" as="v" hint-placeholder-count="3">
+                        <label style="display: grid; gap: 6px; min-width: 0">
+                          <span style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px">
+                            <strong style="font: 700 11px var(--font-mono); color: var(--accent)">{{ v.key }}</strong>
+                            <small style="color: var(--muted); font-size: 11px">{{ v.hint }}</small>
+                          </span>
+                          <input type="text" value="{{ v.value }}" onChange="{{ v.onChange }}" placeholder="{{ v.placeholder }}" style="width: 100%; min-height: 44px; padding-inline: 13px; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgb(255 255 255 / 4%); color: var(--color-white); font-size: var(--text-sm)">
+                        </label>
+                      </sc-for>
+                    </div>
+                    <div style="display: grid; gap: 8px">
+                      <span style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Prévia preenchida</span>
+                      <pre style="margin: 0; overflow-x: auto; border: 1px solid rgb(255 107 0 / 24%); border-radius: var(--radius-md); padding: 16px; background: rgb(8 9 11 / 72%); color: rgb(255 255 255 / 86%); font: 500 12px/1.8 var(--font-mono); white-space: pre-wrap">{{ promptPreview }}</pre>
+                    </div>
+                    <button type="button" onClick="{{ copyFilled }}" style="justify-self: start; display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding-inline: 18px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: #FFFFFF; cursor: pointer; font-size: var(--text-sm); font-weight: 600" style-hover="background: var(--color-orange-400)">
+                      <span data-icon="copy" style="width: 15px; height: 15px"></span> Copiar prompt preenchido
+                    </button>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div data-r="ds-cols" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+                <div style="display: grid; gap: 10px; align-content: start; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; background: rgb(255 255 255 / 3%)">
+                  <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Anatomia do prompt</strong>
+                  <ul style="display: grid; gap: 10px; margin: 0; padding: 0; list-style: none">
+                    <sc-for list="{{ anatomy }}" as="a" hint-placeholder-count="4">
+                      <li style="display: grid; gap: 3px">
+                        <strong style="font-size: 12px; font-weight: 600">{{ a.label }}</strong>
+                        <small style="color: var(--muted); font-size: 11px; line-height: 1.55">{{ a.text }}</small>
+                      </li>
+                    </sc-for>
+                  </ul>
+                </div>
+                <div style="display: grid; gap: 12px; align-content: start">
+                  <div style="display: grid; gap: 7px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; background: rgb(255 255 255 / 3%)">
+                    <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Exemplo de entrada</strong>
+                    <p style="margin: 0; color: rgb(255 255 255 / 80%); font-size: 12px; line-height: 1.6">{{ exampleIn }}</p>
+                  </div>
+                  <div style="display: grid; gap: 7px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; background: rgb(255 255 255 / 3%)">
+                    <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Exemplo de saída</strong>
+                    <p style="margin: 0; color: rgb(255 255 255 / 80%); font-size: 12px; line-height: 1.6">{{ exampleOut }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 13px; align-items: flex-start; border: 1px solid rgb(217 119 6 / 36%); border-radius: var(--radius-lg); padding: 16px 18px; background: rgb(217 119 6 / 10%)">
+                <span data-icon="triangle-alert" style="width: 17px; height: 17px; flex: 0 0 auto; margin-top: 2px; color: #FBBF24"></span>
+                <span style="display: grid; gap: 4px">
+                  <strong style="font-size: var(--text-sm); font-weight: 600">Cuidados</strong>
+                  <p style="margin: 0; color: rgb(255 255 255 / 84%); font-size: 12px; line-height: 1.65">{{ promptCare }}</p>
+                </span>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isSystems }}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; gap: clamp(18px, 2.6vw, 30px); padding: clamp(20px, 3vw, 36px)">
+              <div style="display: grid; gap: 12px; max-width: 75ch">
+                <small style="color: var(--accent); font: 700 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase">{{ selLesson }}</small>
+                <h2 style="margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; line-height: 1.1; letter-spacing: -.035em">{{ selTitle }}</h2>
+                <p style="margin: 0; color: rgb(255 255 255 / 76%); font-size: var(--text-md); line-height: 1.65; text-wrap: pretty">{{ selSummary }}</p>
+              </div>
+
+              <div style="display: grid; gap: 10px">
+                <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Princípios</strong>
+                <div data-r="ds-cols" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+                  <sc-for list="{{ dsPrinciples }}" as="p" hint-placeholder-count="3">
+                    <div style="display: grid; gap: 6px; align-content: start; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 15px; background: rgb(255 255 255 / 3%)">
+                      <strong style="font-size: 12px; font-weight: 600">{{ p.label }}</strong>
+                      <small style="color: var(--muted); font-size: 11px; line-height: 1.55">{{ p.text }}</small>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="display: grid; gap: 10px">
+                <span style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px">
+                  <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Paleta</strong>
+                  <small style="color: var(--muted); font-size: 11px">Clique em uma cor para copiar o valor</small>
+                </span>
+                <div data-r="swatches" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+                  <sc-for list="{{ dsPalette }}" as="c" hint-placeholder-count="6">
+                    <button type="button" onClick="{{ c.onCopy }}" aria-label="{{ c.aria }}" style="display: grid; gap: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgb(255 255 255 / 3%); color: var(--color-white); cursor: pointer; text-align: left; transition: border-color var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--accent)">
+                      <span style="display: block; height: 4.2rem; background: {{ c.value }}"></span>
+                      <span style="display: grid; gap: 3px; padding: 11px 13px">
+                        <strong style="font-size: 12px; font-weight: 600">{{ c.name }}</strong>
+                        <small style="color: var(--accent); font: 600 10.5px var(--font-mono)">{{ c.value }}</small>
+                        <small style="color: var(--muted); font-size: 10.5px; line-height: 1.45">{{ c.role }}</small>
+                      </span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div data-r="ds-cols" style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 12px">
+                <div style="display: grid; gap: 14px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; background: rgb(255 255 255 / 3%)">
+                  <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Tipografia</strong>
+                  <sc-for list="{{ dsType }}" as="t" hint-placeholder-count="3">
+                    <div style="display: grid; gap: 5px; padding-bottom: 12px; border-bottom: 1px solid rgb(255 255 255 / 7%)">
+                      <span style="display: block; font-family: {{ t.family }}; font-size: {{ t.size }}; font-weight: {{ t.weight }}; letter-spacing: {{ t.tracking }}; line-height: 1.15; color: var(--color-white)">{{ t.sample }}</span>
+                      <small style="color: var(--muted); font: 600 10.5px var(--font-mono)">{{ t.spec }}</small>
+                      <small style="color: rgb(255 255 255 / 58%); font-size: 11px">{{ t.role }}</small>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display: grid; gap: 14px; align-content: start; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; background: rgb(255 255 255 / 3%)">
+                  <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Espaçamento e raio</strong>
+                  <div style="display: grid; gap: 8px">
+                    <sc-for list="{{ dsSpacing }}" as="s" hint-placeholder-count="4">
+                      <span style="display: flex; align-items: center; gap: 10px">
+                        <small style="flex: 0 0 4.2rem; color: var(--muted); font: 600 10.5px var(--font-mono)">{{ s.label }}</small>
+                        <i style="display: block; height: .55rem; width: {{ s.width }}; border-radius: 2px; background: linear-gradient(90deg, var(--accent), rgb(255 107 0 / 25%))"></i>
+                      </span>
+                    </sc-for>
+                  </div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 6px; border-top: 1px solid rgb(255 255 255 / 7%)">
+                    <sc-for list="{{ dsRadii }}" as="r" hint-placeholder-count="3">
+                      <span style="display: grid; gap: 5px; justify-items: center">
+                        <i style="display: block; width: 2.6rem; height: 2.6rem; border: 1px solid rgb(255 107 0 / 45%); border-radius: {{ r.value }}; background: rgb(255 107 0 / 10%)"></i>
+                        <small style="color: var(--muted); font: 600 10px var(--font-mono)">{{ r.label }}</small>
+                      </span>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: grid; gap: 10px">
+                <span style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px">
+                  <strong style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 52%)">Espécime vivo</strong>
+                  <small style="color: var(--muted); font-size: 11px">Componentes renderizados com os tokens deste sistema</small>
+                </span>
+                <div style="display: grid; gap: 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(16px, 2.4vw, 26px); background: {{ dsCanvas }}">
+                  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+                    <span style="display: inline-flex; min-height: 44px; align-items: center; padding-inline: 18px; border-radius: {{ dsRadius }}; background: {{ dsAccent }}; color: {{ dsOnAccent }}; font-size: var(--text-sm); font-weight: 600">{{ dsCtaLabel }}</span>
+                    <span style="display: inline-flex; min-height: 44px; align-items: center; padding-inline: 18px; border: 1px solid {{ dsLine }}; border-radius: {{ dsRadius }}; color: {{ dsInk }}; font-size: var(--text-sm); font-weight: 600">Ver detalhes</span>
+                    <span style="display: inline-flex; align-items: center; border-radius: var(--radius-pill); padding: 5px 12px; background: {{ dsBadgeFill }}; color: {{ dsBadgeInk }}; font: 700 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase">{{ dsBadgeLabel }}</span>
+                  </div>
+                  <div data-r="ds-cols" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px">
+                    <span style="display: grid; gap: 7px">
+                      <small style="color: {{ dsMuted }}; font-size: 11px; font-weight: 600">Campo</small>
+                      <span style="display: flex; align-items: center; min-height: 44px; padding-inline: 13px; border: 1px solid {{ dsLine }}; border-radius: {{ dsRadius }}; background: {{ dsField }}; color: {{ dsMuted }}; font-size: var(--text-sm)">Nome do projeto</span>
+                    </span>
+                    <span style="display: grid; gap: 7px; padding: 15px; border: 1px solid {{ dsLine }}; border-radius: {{ dsRadius }}; background: {{ dsCard }}">
+                      <strong style="color: {{ dsInk }}; font-size: var(--text-sm); font-weight: 700">Card editorial</strong>
+                      <small style="color: {{ dsMuted }}; font-size: 11px; line-height: 1.55">Organiza informação em blocos legíveis, sem decorar.</small>
+                    </span>
+                  </div>
+                  <span style="display: flex; gap: 11px; align-items: flex-start; border-left: 3px solid {{ dsAccent }}; border-radius: 2px; padding: 12px 14px; background: {{ dsCalloutFill }}">
+                    <small style="color: {{ dsInk }}; font-size: 12px; line-height: 1.6">{{ dsCalloutText }}</small>
+                  </span>
+                </div>
+              </div>
+
+              <div data-r="ds-cols" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+                <div style="display: grid; gap: 9px; align-content: start; border: 1px solid rgb(22 163 74 / 32%); border-radius: var(--radius-lg); padding: 16px; background: rgb(22 163 74 / 8%)">
+                  <strong style="display: inline-flex; align-items: center; gap: 7px; font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #4ADE80"><span data-icon="check" style="width: 14px; height: 14px"></span> Faça</strong>
+                  <ul style="display: grid; gap: 7px; margin: 0; padding: 0; list-style: none">
+                    <sc-for list="{{ dsDo }}" as="d" hint-placeholder-count="3">
+                      <li style="color: rgb(255 255 255 / 82%); font-size: 12px; line-height: 1.55">{{ d.t }}</li>
+                    </sc-for>
+                  </ul>
+                </div>
+                <div style="display: grid; gap: 9px; align-content: start; border: 1px solid rgb(220 38 38 / 30%); border-radius: var(--radius-lg); padding: 16px; background: rgb(220 38 38 / 8%)">
+                  <strong style="display: inline-flex; align-items: center; gap: 7px; font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #F87171"><span data-icon="x" style="width: 14px; height: 14px"></span> Evite</strong>
+                  <ul style="display: grid; gap: 7px; margin: 0; padding: 0; list-style: none">
+                    <sc-for list="{{ dsAvoid }}" as="d" hint-placeholder-count="3">
+                      <li style="color: rgb(255 255 255 / 82%); font-size: 12px; line-height: 1.55">{{ d.t }}</li>
+                    </sc-for>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </article>
+      </div>
+    </main>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;conceitos&quot;,&quot;prompts&quot;,&quot;design-systems&quot;],&quot;default&quot;:&quot;conceitos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Atlas&quot;},&quot;showFutureNotice&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Atlas&quot;}}">
+const CONCEPTS = [
+  {
+    id: "c1", title: "Hierarquia visual",
+    summary: "O que o leitor vê primeiro é uma decisão sua, não um acidente.",
+    tags: ["fundamentos", "layout"], cycle: "Ciclo 02", lesson: "Aula 03 · Composição",
+    video: "6:12", read: "8 min", videoId: "aqz-KE-bpKQ",
+    goal: "Saber ordenar título, imagem e apoio para que a mensagem principal chegue em menos de três segundos.",
+    transcript: "Todo cartaz responde uma pergunta antes de ser lido: o que eu olho primeiro? Nesta aula a gente separa tamanho, peso, contraste e posição, e testa cada decisão cobrindo o cartaz com a mão até sobrar só um elemento visível.",
+    activity: "Cartaz que orienta uma decisão · v02",
+    related: ["c2", "c3"],
+    blocks: [
+      { type: "text", text: "Hierarquia é a ordem em que o conteúdo é entregue. Ela existe mesmo quando ninguém decide — e nesse caso é o acaso que escolhe o que o leitor lê primeiro. Trabalhar hierarquia é assumir essa escolha." },
+      { type: "heading", text: "Quatro ferramentas, uma decisão" },
+      { type: "list", items: ["Tamanho: o maior elemento é lido primeiro, e só um pode ser o maior.", "Peso: negrito cria hierarquia sem ocupar mais espaço.", "Contraste: a diferença contra o fundo pesa mais do que a cor escolhida.", "Posição: o canto superior esquerdo já vem com atenção de graça."] },
+      { type: "callout", text: "Se três elementos disputam o primeiro lugar, nenhum ganha. Escolha um protagonista e rebaixe o resto de propósito." },
+      { type: "image", alt: "Duas versões do mesmo cartaz lado a lado: na primeira, título e data têm o mesmo tamanho; na segunda, o título domina e a data vira apoio.", caption: "Mesmo conteúdo, duas hierarquias. À direita, a decisão foi tomada." },
+      { type: "text", text: "Um teste rápido: reduza o cartaz a 10% do tamanho e olhe de longe. O que ainda for legível é a sua primeira camada. Se nada sobrar, não existe hierarquia — existe uma lista." },
+      { type: "code", text: "camada 1  título        48px / peso 800\ncamada 2  subtítulo     20px / peso 600\ncamada 3  data e local  14px / peso 500 / opacidade 70%" },
+      { type: "quote", text: "Hierarquia não é deixar algo bonito. É decidir o que o leitor pode perder sem perder a mensagem." }
+    ],
+    takeaways: ["Um cartaz tem um protagonista, não três.", "Contraste e tamanho carregam mais hierarquia do que cor.", "Se nada sobrevive ao teste de longe, a hierarquia não existe."],
+    questions: ["Qual é o único elemento que precisa ser lido em três segundos?", "O que você rebaixou de propósito na sua versão?", "A hierarquia continua legível em preto e branco?"]
+  },
+  {
+    id: "c2", title: "Contraste funcional",
+    summary: "Contraste não é estética: é a diferença que torna a leitura possível.",
+    tags: ["fundamentos", "cor"], cycle: "Ciclo 02", lesson: "Aula 04 · Cor aplicada",
+    video: "4:38", read: "6 min", videoId: "aqz-KE-bpKQ",
+    goal: "Verificar contraste de texto antes de escolher a paleta, e não depois de a peça estar pronta.",
+    transcript: "Contraste tem número. Texto corrido pede pelo menos 4,5 para 1 contra o fundo; título grande pode viver com 3 para 1. Nesta aula a gente mede antes de decidir a cor.",
+    activity: "Cartaz que orienta uma decisão · v02",
+    related: ["c1", "c3"],
+    blocks: [
+      { type: "text", text: "Cor bonita com contraste insuficiente é peça ilegível. A ordem correta é: primeiro garanta a diferença de luminosidade, depois escolha o matiz que você quer." },
+      { type: "list", items: ["Texto corrido: mínimo de 4,5 para 1 contra o fundo real.", "Título grande: 3 para 1 já resolve.", "Texto sobre foto sempre precisa de uma camada sólida por baixo."] },
+      { type: "callout", text: "Baixar a opacidade do texto é o jeito mais rápido de quebrar contraste sem perceber. Prefira uma cor mais clara ou mais escura com opacidade cheia." },
+      { type: "quote", text: "Se você precisa apertar os olhos para ler, a cor está decidindo no lugar do leitor." }
+    ],
+    takeaways: ["Meça contraste antes de escolher a paleta.", "Opacidade parcial em texto é dívida de legibilidade.", "Sobre foto, use uma base sólida."],
+    questions: ["Qual par de cores da sua peça tem o menor contraste?", "O texto sobre imagem tem base sólida?", "A peça funciona impressa em preto e branco?"]
+  },
+  {
+    id: "c3", title: "Tokens de design",
+    summary: "Por que um valor com nome vale mais do que um hex solto no arquivo.",
+    tags: ["sistemas", "código"], cycle: "Ciclo 02", lesson: "Aula 05 · Sistemas",
+    video: "", read: "7 min", videoId: "",
+    goal: "Transformar decisões repetidas em valores nomeados que o time inteiro consegue usar.",
+    transcript: "",
+    activity: "Cartaz que orienta uma decisão · v02",
+    related: ["c1", "c2"],
+    blocks: [
+      { type: "text", text: "Token é uma decisão com nome. Em vez de repetir #FF6B00 em vinte lugares, você declara que existe uma cor de ação e passa a usá-la pelo nome. Quando a decisão muda, muda em um lugar." },
+      { type: "heading", text: "O que merece virar token" },
+      { type: "list", items: ["O que aparece três vezes ou mais.", "O que você quer poder mudar de uma vez.", "O que precisa de significado, não só de valor."] },
+      { type: "code", text: "--accent: #FF6B00;   /* ação, seleção, progresso */\n--radius-lg: 14px;   /* cards e superfícies */\n--space-6: 24px;     /* respiro interno padrão */" },
+      { type: "callout", text: "Nome de token descreve função, não aparência. `--accent` sobrevive a uma troca de marca; `--laranja` não." },
+      { type: "quote", text: "Sem nome, uma decisão de design não é reutilizável — é uma coincidência." }
+    ],
+    takeaways: ["Token é decisão nomeada, não variável qualquer.", "Nomeie por função, nunca por cor.", "Três repetições já justificam um token."],
+    questions: ["Quais valores você repetiu mais de três vezes?", "Algum nome descreve aparência em vez de função?", "O que quebraria se a marca mudasse de cor amanhã?"]
+  },
+  {
+    id: "c4", title: "Prompt como briefing",
+    summary: "Tratar o modelo como um colaborador que precisa de contexto para acertar.",
+    tags: ["ia", "processo"], cycle: "Ciclo 01", lesson: "Aula 06 · Trabalhando com IA",
+    video: "5:20", read: "5 min", videoId: "aqz-KE-bpKQ",
+    goal: "Escrever pedidos que carregam objetivo, público, restrição e formato de saída.",
+    transcript: "Um prompt ruim não é curto: é sem contexto. Nesta aula a gente reescreve o mesmo pedido quatro vezes, adicionando objetivo, público, restrição e formato, e compara o que muda na resposta.",
+    activity: "Cartaz que orienta uma decisão · v02",
+    related: ["c1", "c3"],
+    blocks: [
+      { type: "text", text: "Você já sabe escrever briefing: é o que faz com qualquer pessoa que vai executar algo no seu lugar. Com um modelo, a diferença é que ele não vai te perguntar o que ficou faltando — ele vai preencher a lacuna sozinho." },
+      { type: "list", items: ["Objetivo: o que precisa acontecer depois que a peça é vista.", "Público: quem lê e o que essa pessoa já sabe.", "Restrição: formato, tom, limites, o que não fazer.", "Saída: em que forma você quer receber a resposta."] },
+      { type: "callout", text: "Se a resposta veio genérica, quase sempre falta público ou restrição — não falta tamanho de prompt." },
+      { type: "quote", text: "Um bom prompt é um briefing que você conseguiria entregar para um humano." }
+    ],
+    takeaways: ["Contexto vence comprimento.", "Falta de restrição é convite ao genérico.", "Peça o formato da saída explicitamente."],
+    questions: ["Seu último prompt dizia quem é o público?", "Que restrição estava implícita na sua cabeça e não no texto?", "Você pediu o formato da resposta?"]
+  }
+];
+
+const PROMPTS = [
+  {
+    id: "p1", title: "Briefing de cartaz",
+    summary: "Transforma um objetivo vago em um pedido executável, com público, restrição e formato de saída.",
+    tags: ["cartaz", "briefing"], cycle: "Ciclo 02", lesson: "Aula 03 · Composição", read: "6 min",
+    when: "Quando você tem uma intenção clara mas ainda não consegue descrever a peça que precisa.",
+    whenNot: "Quando a peça já existe e você quer crítica. Nesse caso use o prompt de revisão de layout.",
+    care: "O modelo não conhece seu contexto real: ele vai propor o que é plausível, não o que é verdadeiro. Confira dados, nomes e datas antes de usar qualquer texto gerado.",
+    template: "Você é um designer gráfico ajudando a planejar um cartaz.\n\nObjetivo: [objetivo]\nPúblico: [publico]\nRestrição: [restricao]\nTom: [tom]\n\nProponha três direções de cartaz. Para cada uma, entregue:\n1. a mensagem principal em uma frase;\n2. a hierarquia em três camadas;\n3. uma justificativa de por que essa direção serve ao objetivo.\n\nNão escreva o texto final do cartaz. Não sugira efeitos decorativos.",
+    vars: [
+      { key: "[objetivo]", hint: "o que precisa acontecer", placeholder: "fazer a turma escolher um horário de mentoria" },
+      { key: "[publico]", hint: "quem lê", placeholder: "alunos do ciclo 02, entre 17 e 24 anos" },
+      { key: "[restricao]", hint: "limites reais", placeholder: "A3 vertical, impressão em preto e branco" },
+      { key: "[tom]", hint: "como deve soar", placeholder: "direto, sem entusiasmo forçado" }
+    ],
+    anatomy: [
+      { label: "Papel", text: "Define o repertório que o modelo deve usar." },
+      { label: "Contexto em campos", text: "Cada linha é uma variável verificável, não um parágrafo." },
+      { label: "Pedido numerado", text: "Três entregas explícitas evitam resposta em bloco." },
+      { label: "Negativas", text: "O que não fazer corta o caminho mais óbvio e genérico." }
+    ],
+    exampleIn: "Objetivo: fazer a turma escolher um horário de mentoria. Público: alunos do ciclo 02. Restrição: A3 em preto e branco. Tom: direto.",
+    exampleOut: "Três direções, cada uma com mensagem principal, hierarquia em três camadas e justificativa — sem texto final e sem sugestão decorativa."
+  },
+  {
+    id: "p2", title: "Revisão crítica de layout",
+    summary: "Pede uma crítica estruturada da sua peça, focada em hierarquia e legibilidade.",
+    tags: ["revisão", "layout"], cycle: "Ciclo 02", lesson: "Aula 04 · Cor aplicada", read: "5 min",
+    when: "Quando a peça já está montada e você quer encontrar o problema antes do feedback do mentor.",
+    whenNot: "Quando você ainda não tomou nenhuma decisão. Crítica sem decisão vira lista de opinião.",
+    care: "A crítica do modelo é baseada na sua descrição, não na peça. Se você descrever errado, a crítica será coerente e inútil.",
+    template: "Você é um revisor de design rigoroso e específico.\n\nDescrição da peça: [descricao]\nDecisão que eu tomei: [decisao]\nO que me incomoda: [duvida]\n\nAponte no máximo três problemas, em ordem de gravidade. Para cada um: o que está errado, por que isso prejudica a leitura e uma correção concreta.\n\nNão elogie. Não reescreva a peça. Não sugira mais de uma correção por problema.",
+    vars: [
+      { key: "[descricao]", hint: "o que existe na peça", placeholder: "cartaz A3, título em duas linhas, foto ao centro, data no rodapé" },
+      { key: "[decisao]", hint: "sua escolha principal", placeholder: "coloquei a data como terceira camada" },
+      { key: "[duvida]", hint: "seu incômodo", placeholder: "acho que o título e a foto competem" }
+    ],
+    anatomy: [
+      { label: "Papel rigoroso", text: "Pede severidade explícita, senão a resposta elogia." },
+      { label: "Decisão declarada", text: "A crítica passa a avaliar sua escolha, não gosto." },
+      { label: "Limite de três", text: "Força priorização por gravidade." },
+      { label: "Proibição de elogio", text: "Remove o preenchimento simpático da resposta." }
+    ],
+    exampleIn: "Cartaz A3 com título em duas linhas, foto central e data no rodapé; a dúvida é competição entre título e foto.",
+    exampleOut: "Três problemas ordenados por gravidade, cada um com causa da falha de leitura e uma correção concreta."
+  },
+  {
+    id: "p3", title: "Extrair tokens de uma referência",
+    summary: "Converte uma referência visual que você admira em decisões nomeadas e reutilizáveis.",
+    tags: ["sistemas", "tokens"], cycle: "Ciclo 02", lesson: "Aula 05 · Sistemas", read: "4 min",
+    when: "Quando você quer aprender de uma referência sem copiá-la.",
+    whenNot: "Quando a referência é a identidade de uma marca que você não pode usar.",
+    care: "Extrair tokens é estudar decisão, não clonar peça. Não reproduza logo, tipografia proprietária ou composição alheia em trabalho seu.",
+    template: "Você é um designer de sistemas.\n\nReferência descrita: [referencia]\nUso pretendido: [uso]\n\nDevolva uma tabela de tokens com: nome funcional, valor aproximado e função. Cubra cor, tipografia, espaçamento e raio.\n\nNomeie por função, nunca por aparência. Aponte qual decisão da referência não deve ser reutilizada e por quê.",
+    vars: [
+      { key: "[referencia]", hint: "descreva o que você vê", placeholder: "site editorial escuro, laranja em ações, tipografia sem serifa pesada" },
+      { key: "[uso]", hint: "onde vai aplicar", placeholder: "painel de acompanhamento de projeto" }
+    ],
+    anatomy: [
+      { label: "Papel de sistemas", text: "Puxa vocabulário de tokens, não de estética." },
+      { label: "Uso pretendido", text: "Faz o modelo filtrar o que não serve ao seu caso." },
+      { label: "Saída tabular", text: "Formato explícito evita prosa." },
+      { label: "Regra de nomeação", text: "Garante nomes funcionais e duráveis." }
+    ],
+    exampleIn: "Referência: painel escuro com laranja em ações e tipografia sem serifa pesada. Uso: acompanhamento de projeto.",
+    exampleOut: "Tabela de tokens por função, mais um apontamento do que não deve ser reutilizado."
+  }
+];
+
+const SYSTEMS = [
+  {
+    id: "d1", title: "Editorial Noturno",
+    summary: "Superfície escura para leitura longa e painéis de acompanhamento, com laranja reservado a ação.",
+    tags: ["escuro", "painel"], cycle: "Ciclo 02", lesson: "Aula 05 · Sistemas", read: "9 min", colors: 6, comps: 7,
+    accent: "#FF6B00", onAccent: "#FFFFFF", canvas: "#101114", card: "#17191D", field: "rgb(255 255 255 / 5%)",
+    ink: "#FFFFFF", muted: "rgb(255 255 255 / 64%)", line: "rgb(255 255 255 / 16%)",
+    badgeFill: "rgb(124 92 252 / 18%)", badgeInk: "#B9A6FF", calloutFill: "rgb(255 107 0 / 10%)", radius: "10px",
+    cta: "Continuar projeto", badge: "Explorer", callout: "Use laranja apenas onde há ação, seleção ou progresso. Em superfície escura, ele já é forte o suficiente.",
+    principles: [
+      { label: "Escuro é foco", text: "A superfície recua para que texto e evidência avancem." },
+      { label: "Laranja é sinal", text: "Aparece em ação, seleção e progresso — nunca como preenchimento." },
+      { label: "Linha antes de sombra", text: "Hierarquia vem de borda e espaço, não de profundidade falsa." }
+    ],
+    palette: [
+      { name: "Ink 950", value: "#101114", role: "fundo da superfície" },
+      { name: "Ink 900", value: "#17191D", role: "cards e painéis" },
+      { name: "Branco", value: "#FFFFFF", role: "texto principal" },
+      { name: "Orange 500", value: "#FF6B00", role: "ação e progresso" },
+      { name: "Explorer", value: "#7C5CFC", role: "nível e categoria" },
+      { name: "Success", value: "#16A34A", role: "aprovação e estado ok" }
+    ],
+    type: [
+      { family: "var(--font-sans)", size: "2rem", weight: "800", tracking: "-.04em", sample: "Construa com ela", spec: "Inter 800 · 32/1.05", role: "títulos e números de destaque" },
+      { family: "var(--font-sans)", size: "1rem", weight: "400", tracking: "0", sample: "Texto de leitura longa, confortável em linha de até 75 caracteres.", spec: "Inter 400 · 16/1.7", role: "corpo editorial" },
+      { family: "var(--font-mono)", size: ".8rem", weight: "600", tracking: ".1em", sample: "CICLO 02 · AULA 05", spec: "JetBrains Mono 600 · 13/1.2", role: "rótulos, dados e código" }
+    ],
+    spacing: [
+      { label: "space-2", width: "8px" }, { label: "space-4", width: "16px" },
+      { label: "space-6", width: "24px" }, { label: "space-10", width: "40px" }
+    ],
+    radii: [{ label: "md 10", value: "10px" }, { label: "lg 14", value: "14px" }, { label: "pill", value: "999px" }],
+    doList: ["Reservar laranja para ação e progresso.", "Usar borda de 1px para separar superfícies.", "Manter texto em opacidade cheia."],
+    avoidList: ["Gradiente colorido como fundo de página.", "Texto cinza translúcido em corpo de leitura.", "Sombra pesada para simular elevação."]
+  },
+  {
+    id: "d2", title: "Feira Popular",
+    summary: "Sistema claro e alto-contraste para comunicação de rua: cartaz, panfleto e mural.",
+    tags: ["claro", "impresso"], cycle: "Ciclo 02", lesson: "Aula 03 · Composição", read: "7 min", colors: 5, comps: 6,
+    accent: "#D62828", onAccent: "#FFF8E7", canvas: "#FFF8E7", card: "#FFFFFF", field: "#FFFFFF",
+    ink: "#1B1B1B", muted: "#5A5248", line: "#1B1B1B",
+    badgeFill: "#FFD166", badgeInk: "#1B1B1B", calloutFill: "#FFE8A3", radius: "2px",
+    cta: "Garantir minha vaga", badge: "Sábado", callout: "Peça de rua é lida a três metros. Se o título não resolve a essa distância, o resto não importa.",
+    principles: [
+      { label: "Lido a três metros", text: "Tudo é dimensionado pela distância de leitura, não pela tela." },
+      { label: "Preto absoluto", text: "Borda grossa e tinta cheia sobrevivem à impressão barata." },
+      { label: "Uma cor de festa", text: "Vermelho chama; amarelo apoia; o resto é papel." }
+    ],
+    palette: [
+      { name: "Papel", value: "#FFF8E7", role: "fundo impresso" },
+      { name: "Tinta", value: "#1B1B1B", role: "texto e borda" },
+      { name: "Vermelho feira", value: "#D62828", role: "chamada principal" },
+      { name: "Amarelo", value: "#FFD166", role: "destaque secundário" },
+      { name: "Verde", value: "#2A7F62", role: "confirmação" }
+    ],
+    type: [
+      { family: "var(--font-sans)", size: "2.2rem", weight: "800", tracking: "-.03em", sample: "SÁBADO, 9H", spec: "Inter 800 · 35/1 caixa alta", role: "chamada de cartaz" },
+      { family: "var(--font-sans)", size: "1rem", weight: "600", tracking: "0", sample: "Praça central, entrada gratuita, leve sua caneca.", spec: "Inter 600 · 16/1.5", role: "informação essencial" },
+      { family: "var(--font-mono)", size: ".8rem", weight: "700", tracking: ".12em", sample: "R. DAS FLORES, 120", spec: "JetBrains Mono 700 · 13/1.3", role: "endereço e dados" }
+    ],
+    spacing: [
+      { label: "space-3", width: "12px" }, { label: "space-6", width: "24px" },
+      { label: "space-8", width: "32px" }, { label: "space-12", width: "48px" }
+    ],
+    radii: [{ label: "reto", value: "2px" }, { label: "md 8", value: "8px" }, { label: "pill", value: "999px" }],
+    doList: ["Dimensionar o título pela distância de leitura.", "Usar tinta cheia e borda grossa.", "Limitar a peça a três informações."],
+    avoidList: ["Texto claro sobre papel claro.", "Mais de duas cores de destaque.", "Tipografia fina em impressão barata."]
+  },
+  {
+    id: "d3", title: "Clínico Suíço",
+    summary: "Grade rígida e neutralidade total para relatório, tabela e documentação densa.",
+    tags: ["neutro", "documento"], cycle: "Ciclo 01", lesson: "Aula 06 · Trabalhando com IA", read: "6 min", colors: 5, comps: 6,
+    accent: "#2563EB", onAccent: "#FFFFFF", canvas: "#F5F6F7", card: "#FFFFFF", field: "#FFFFFF",
+    ink: "#101114", muted: "#505761", line: "#D5D8DC",
+    badgeFill: "#E3EAFB", badgeInk: "#1D4ED8", calloutFill: "#EDF2FD", radius: "6px",
+    cta: "Exportar relatório", badge: "Revisão", callout: "Neutralidade não é ausência de decisão: é a decisão de não competir com o dado.",
+    principles: [
+      { label: "A grade manda", text: "Alinhamento resolve hierarquia antes de qualquer cor." },
+      { label: "Cor só informa", text: "Azul marca estado e ação; nada mais recebe cor." },
+      { label: "Densidade legível", text: "Muito conteúdo por tela, com respiro constante entre blocos." }
+    ],
+    palette: [
+      { name: "Fundo", value: "#F5F6F7", role: "superfície de documento" },
+      { name: "Superfície", value: "#FFFFFF", role: "tabela e card" },
+      { name: "Texto", value: "#101114", role: "corpo e título" },
+      { name: "Engineer", value: "#2563EB", role: "ação e link" },
+      { name: "Borda", value: "#D5D8DC", role: "separação de dado" }
+    ],
+    type: [
+      { family: "var(--font-sans)", size: "1.7rem", weight: "700", tracking: "-.03em", sample: "Relatório de ciclo", spec: "Inter 700 · 27/1.15", role: "título de documento" },
+      { family: "var(--font-sans)", size: ".9rem", weight: "400", tracking: "0", sample: "Parágrafo denso, pensado para leitura em coluna estreita e revisão rápida.", spec: "Inter 400 · 14/1.6", role: "corpo de relatório" },
+      { family: "var(--font-mono)", size: ".8rem", weight: "500", tracking: ".02em", sample: "2026-09-17 · 14 itens", spec: "JetBrains Mono 500 · 13/1.5", role: "dado tabular" }
+    ],
+    spacing: [
+      { label: "space-1", width: "4px" }, { label: "space-2", width: "8px" },
+      { label: "space-4", width: "16px" }, { label: "space-6", width: "24px" }
+    ],
+    radii: [{ label: "sm 4", value: "4px" }, { label: "md 6", value: "6px" }, { label: "pill", value: "999px" }],
+    doList: ["Alinhar tudo a uma grade única.", "Usar azul apenas em ação e estado.", "Separar dado com borda fina."],
+    avoidList: ["Cor decorativa em cabeçalho de tabela.", "Centralizar texto longo.", "Mais de dois pesos tipográficos."]
+  }
+];
+
+const TABS = ["conceitos", "prompts", "design-systems"];
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: TABS.indexOf(props.defaultTab || "conceitos") >= 0 ? (props.defaultTab || "conceitos") : "conceitos",
+      query: "", filtersOpen: false, cycles: [], videoOnly: false,
+      selConc: "c1", selProm: "p1", selSys: "d1",
+      videoPlaying: false, transcriptOpen: false,
+      customOpen: false, varValues: {}, copyState: "idle", live: ""
+    };
+  }
+
+  collection(tab) {
+    if (tab === "prompts") return PROMPTS;
+    if (tab === "design-systems") return SYSTEMS;
+    return CONCEPTS;
+  }
+
+  selectedId() {
+    const t = this.state.tab;
+    return t === "prompts" ? this.state.selProm : t === "design-systems" ? this.state.selSys : this.state.selConc;
+  }
+
+  selected() {
+    const list = this.collection(this.state.tab);
+    return list.find((i) => i.id === this.selectedId()) || list[0];
+  }
+
+  filtered() {
+    const q = this.state.query.trim().toLowerCase();
+    const cycles = this.state.cycles;
+    return this.collection(this.state.tab).filter((i) => {
+      if (cycles.length && cycles.indexOf(i.cycle) < 0) return false;
+      if (this.state.videoOnly && this.state.tab === "conceitos" && !i.videoId) return false;
+      if (!q) return true;
+      const hay = (i.title + " " + i.summary + " " + i.tags.join(" ")).toLowerCase();
+      return hay.indexOf(q) >= 0;
+    });
+  }
+
+  setTab(tab) {
+    this.setState({ tab: tab, query: "", filtersOpen: false, videoPlaying: false, transcriptOpen: false, copyState: "idle" });
+  }
+
+  select(id) {
+    const t = this.state.tab;
+    const patch = { videoPlaying: false, transcriptOpen: false, copyState: "idle", customOpen: false, varValues: {} };
+    if (t === "prompts") patch.selProm = id;
+    else if (t === "design-systems") patch.selSys = id;
+    else patch.selConc = id;
+    this.setState(patch);
+  }
+
+  copy(text, msg) {
+    const done = () => {
+      this.setState({ copyState: "done", live: msg });
+      clearTimeout(this.copyTimer);
+      this.copyTimer = setTimeout(() => this.setState({ copyState: "idle" }), 2200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, () => this.setState({ copyState: "manual", live: "Não foi possível copiar. Selecione o texto do template manualmente." }));
+    } else {
+      this.setState({ copyState: "manual", live: "Não foi possível copiar. Selecione o texto do template manualmente." });
+    }
+  }
+
+  filledTemplate() {
+    const sel = this.selected();
+    let out = sel.template || "";
+    (sel.vars || []).forEach((v) => {
+      const val = this.state.varValues[v.key];
+      out = out.split(v.key).join(val && val.trim() ? val.trim() : v.key);
+    });
+    return out;
+  }
+
+  renderVals() {
+    const tab = this.state.tab;
+    const isC = tab === "conceitos", isP = tab === "prompts", isS = tab === "design-systems";
+    const sel = this.selected();
+    const list = this.filtered();
+    const selId = this.selectedId();
+    const total = CONCEPTS.length + PROMPTS.length + SYSTEMS.length;
+    const cycleNames = ["Ciclo 01", "Ciclo 02"];
+    const activeFilters = this.state.cycles.length + (this.state.videoOnly && isC ? 1 : 0);
+    const on = (b) => b ? "rgb(255 107 0 / 55%)" : "var(--border)";
+
+    const vals = {
+      showFutureNotice: this.props.showFutureNotice ?? true,
+      routeLabel: "/atlas?tab=" + tab + "&item=" + selId,
+      totalReleased: total,
+      lockedCount: 6,
+      nConc: CONCEPTS.length, nProm: PROMPTS.length, nSys: SYSTEMS.length,
+      isConceitos: isC, isPrompts: isP, isSystems: isS,
+      goConceitos: () => this.setTab("conceitos"),
+      goPrompts: () => this.setTab("prompts"),
+      goSystems: () => this.setTab("design-systems"),
+      query: this.state.query,
+      searchPlaceholder: isP ? "Buscar prompt ou problema" : isS ? "Buscar sistema ou uso" : "Buscar conceito ou ideia",
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      clearQuery: () => this.setState({ query: "" }),
+      filtersOpen: this.state.filtersOpen,
+      toggleFilters: () => this.setState({ filtersOpen: !this.state.filtersOpen }),
+      filterEdge: activeFilters ? "rgb(255 107 0 / 55%)" : "var(--border)",
+      filterFill: activeFilters ? "rgb(255 107 0 / 12%)" : "rgb(255 255 255 / 4%)",
+      filterBadge: activeFilters ? String(activeFilters) : "",
+      cycleChips: cycleNames.map((name) => {
+        const active = this.state.cycles.indexOf(name) >= 0;
+        return {
+          label: name, on: active, edge: on(active),
+          fill: active ? "rgb(255 107 0 / 14%)" : "rgb(255 255 255 / 4%)",
+          ink: active ? "var(--accent)" : "rgb(255 255 255 / 70%)",
+          onToggle: () => this.setState({ cycles: active ? this.state.cycles.filter((c) => c !== name) : this.state.cycles.concat([name]) })
+        };
+      }),
+      videoOnly: this.state.videoOnly,
+      videoOnlyLabel: "Com vídeo",
+      videoEdge: on(this.state.videoOnly),
+      videoFill: this.state.videoOnly ? "rgb(255 107 0 / 14%)" : "rgb(255 255 255 / 4%)",
+      videoInk: this.state.videoOnly ? "var(--accent)" : "rgb(255 255 255 / 70%)",
+      toggleVideoOnly: () => this.setState({ videoOnly: !this.state.videoOnly }),
+      clearFilters: () => this.setState({ cycles: [], videoOnly: false, query: "" }),
+      resultLabel: list.length + (list.length === 1 ? " material liberado" : " materiais liberados"),
+      isEmpty: list.length === 0,
+      futureLabel: isP ? "2 prompts serão liberados no ciclo 03" : isS ? "1 sistema será liberado no ciclo 03" : "3 conceitos serão liberados no ciclo 03",
+      items: list.map((i) => {
+        const current = i.id === selId;
+        return {
+          title: i.title, summary: i.summary, lesson: i.lesson,
+          tags: i.tags.map((t) => ({ t: t })),
+          current: current ? "true" : "false",
+          edge: current ? "rgb(255 107 0 / 50%)" : "var(--border)",
+          fill: current ? "linear-gradient(120deg, rgb(255 107 0 / 14%), rgb(255 255 255 / 3%))" : "rgb(255 255 255 / 3%)",
+          mark: isC ? (i.videoId ? "vídeo" : "leitura") : isP ? (i.vars.length + " vars") : (i.colors + " cores"),
+          markInk: isC && i.videoId ? "var(--accent)" : "rgb(255 255 255 / 45%)",
+          metaA: i.read,
+          metaB: isC ? (i.videoId ? "vídeo " + i.video : "somente leitura") : isP ? "copiável" : i.comps + " componentes",
+          onSelect: () => this.select(i.id)
+        };
+      }),
+      selTitle: sel.title, selSummary: sel.summary, selLesson: sel.cycle + " · " + sel.lesson,
+      readTime: sel.read,
+      liveMsg: this.state.live,
+      toggleNav: () => this.setNav(!this.navOpen),
+      closeNav: () => this.setNav(false)
+    };
+
+    if (isC) {
+      const hasVideo = Boolean(sel.videoId);
+      vals.hasVideo = hasVideo;
+      vals.noVideo = !hasVideo;
+      vals.videoIdle = hasVideo && !this.state.videoPlaying;
+      vals.videoPlaying = this.state.videoPlaying;
+      vals.videoDuration = sel.video;
+      vals.videoTitle = sel.title + " — vídeo da aula";
+      vals.playLabel = "Reproduzir vídeo de " + sel.title + ", " + sel.video;
+      vals.videoSrc = "https://www.youtube-nocookie.com/embed/" + sel.videoId + "?autoplay=1&rel=0&playsinline=1&cc_load_policy=1";
+      vals.playVideo = () => this.setState({ videoPlaying: true, live: "Player carregado. Reprodução iniciada." });
+      vals.transcriptOpen = this.state.transcriptOpen;
+      vals.transcriptLabel = this.state.transcriptOpen ? "Ocultar transcrição" : "Ver transcrição";
+      vals.toggleTranscript = () => this.setState({ transcriptOpen: !this.state.transcriptOpen });
+      vals.transcript = sel.transcript;
+      vals.selGoal = sel.goal;
+      vals.blockCount = sel.blocks.length;
+      vals.blocks = sel.blocks.map((b) => ({
+        isHeading: b.type === "heading", isText: b.type === "text", isList: b.type === "list",
+        isCallout: b.type === "callout", isImage: b.type === "image", isCode: b.type === "code",
+        isQuote: b.type === "quote",
+        text: b.text || "", alt: b.alt || "", caption: b.caption || "",
+        items: (b.items || []).map((t) => ({ t: t }))
+      }));
+      vals.takeaways = sel.takeaways.map((t) => ({ t: t }));
+      vals.questions = sel.questions.map((t) => ({ t: t }));
+      vals.related = sel.related.map((id) => {
+        const r = CONCEPTS.find((c) => c.id === id);
+        return { title: r.title, onSelect: () => this.select(id) };
+      });
+      vals.activityLabel = sel.activity;
+    }
+
+    if (isP) {
+      const st = this.state.copyState;
+      vals.promptWhen = sel.when;
+      vals.promptWhenNot = sel.whenNot;
+      vals.promptCare = sel.care;
+      vals.promptText = sel.template;
+      vals.varCount = sel.vars.length;
+      vals.anatomy = sel.anatomy;
+      vals.exampleIn = sel.exampleIn;
+      vals.exampleOut = sel.exampleOut;
+      vals.copyLabel = st === "done" ? "Prompt copiado" : st === "manual" ? "Selecione manualmente" : "Copiar prompt";
+      vals.copyIcon = st === "done" ? "check" : "copy";
+      vals.copyEdge = st === "done" ? "rgb(22 163 74 / 55%)" : "transparent";
+      vals.copyFill = st === "done" ? "rgb(22 163 74 / 16%)" : "var(--accent)";
+      vals.copyInk = st === "done" ? "#4ADE80" : "#FFFFFF";
+      vals.copyPrompt = () => this.copy(sel.template, "Prompt copiado para a área de transferência.");
+      vals.copyFilled = () => this.copy(this.filledTemplate(), "Prompt personalizado copiado para a área de transferência.");
+      vals.customOpen = this.state.customOpen;
+      vals.toggleCustom = () => this.setState({ customOpen: !this.state.customOpen });
+      vals.promptVars = sel.vars.map((v) => ({
+        key: v.key, hint: v.hint, placeholder: v.placeholder,
+        value: this.state.varValues[v.key] || "",
+        onChange: (e) => {
+          const next = Object.assign({}, this.state.varValues);
+          next[v.key] = e.target.value;
+          this.setState({ varValues: next });
+        }
+      }));
+      vals.promptPreview = this.filledTemplate();
+    }
+
+    if (isS) {
+      vals.dsPrinciples = sel.principles;
+      vals.dsPalette = sel.palette.map((c) => ({
+        name: c.name, value: c.value, role: c.role,
+        aria: "Copiar " + c.name + ", " + c.value,
+        onCopy: () => this.copy(c.value, c.name + " copiado: " + c.value)
+      }));
+      vals.dsType = sel.type;
+      vals.dsSpacing = sel.spacing;
+      vals.dsRadii = sel.radii;
+      vals.dsDo = sel.doList.map((t) => ({ t: t }));
+      vals.dsAvoid = sel.avoidList.map((t) => ({ t: t }));
+      vals.dsCanvas = sel.canvas; vals.dsCard = sel.card; vals.dsField = sel.field;
+      vals.dsAccent = sel.accent; vals.dsOnAccent = sel.onAccent; vals.dsInk = sel.ink;
+      vals.dsMuted = sel.muted; vals.dsLine = sel.line; vals.dsRadius = sel.radius;
+      vals.dsBadgeFill = sel.badgeFill; vals.dsBadgeInk = sel.badgeInk;
+      vals.dsCalloutFill = sel.calloutFill; vals.dsCalloutText = sel.callout;
+      vals.dsCtaLabel = sel.cta; vals.dsBadgeLabel = sel.badge;
+    }
+
+    return vals;
+  }
+
+  setNav(open) {
+    const aside = document.querySelector('[data-r="sidebar"]');
+    const scrim = document.querySelector('[data-r="scrim"]');
+    if (aside) aside.setAttribute("data-open", open ? "true" : "false");
+    if (scrim) {
+      scrim.style.opacity = open ? "1" : "0";
+      scrim.style.pointerEvents = open ? "auto" : "none";
+    }
+    this.navOpen = open;
+  }
+
+  componentDidMount() {
+    this.paintIcons();
+    this.syncTabs();
+  }
+
+  componentDidUpdate() {
+    this.paintIcons();
+    this.syncTabs();
+  }
+
+  componentWillUnmount() { clearTimeout(this.copyTimer); }
+
+  syncTabs() {
+    document.querySelectorAll("[data-tab]").forEach((btn) => {
+      const active = btn.getAttribute("data-tab") === this.state.tab;
+      btn.setAttribute("aria-selected", active ? "true" : "false");
+      btn.style.background = active ? "linear-gradient(120deg, rgb(255 107 0 / 20%), rgb(255 107 0 / 6%))" : "transparent";
+      btn.style.borderColor = active ? "rgb(255 107 0 / 42%)" : "transparent";
+      btn.style.color = active ? "var(--color-white)" : "var(--muted)";
+    });
+    const chev = document.querySelector('[data-chevron="custom"]');
+    if (chev) chev.style.transform = this.state.customOpen ? "rotate(180deg)" : "none";
+  }
+
+  paintIcons(tries) {
+    const L = window.lucide;
+    if (!L || !L.icons) { if ((tries || 0) < 80) setTimeout(() => this.paintIcons((tries || 0) + 1), 120); return; }
+    const alias = { house: "House", "clock-3": "Clock3", "link-2": "Link2", "triangle-alert": "TriangleAlert", "search-x": "SearchX", "external-link": "ExternalLink" };
+    document.querySelectorAll("[data-icon]").forEach((el) => {
+      const raw = el.getAttribute("data-icon");
+      if (el.firstElementChild && el.getAttribute("data-painted") === raw) return;
+      const pascal = raw.split("-").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+      const node = L.icons[alias[raw] || pascal] || L.icons[pascal] || L.icons[raw];
+      if (node) {
+        el.innerHTML = "";
+        el.appendChild(L.createElement(node));
+        el.setAttribute("data-painted", raw);
+      }
+    });
+  }
+}
+
+</script>
+</body>
+</html>

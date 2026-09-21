@@ -1,0 +1,19 @@
+/* Logos Academy — brand fonts. Variable woff2, "latin" subset (covers ASCII
+   + all pt-BR accents U+00C0–U+00FF + typographic punctuation U+2000–206F).
+   Source: @fontsource-variable/inter@5.2.6, @fontsource-variable/jetbrains-mono@5.2.6 */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(./inter-latin-wght-normal.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url(./jetbrains-mono-latin-wght-normal.woff2) format('woff2');
+}

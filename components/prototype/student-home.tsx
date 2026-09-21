@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
-import { MagneticAction } from "@/components/academy";
+import { GlowField, MagneticAction, Ticker, WordReveal } from "@/components/academy";
 import type { MeProfile, StudentHome as StudentHomeDto } from "@/specs/api.contracts";
 import { useLiveApi } from "./live-api";
 import { EmptyState, ErrorState, LoadingState } from "./state-lab";
@@ -61,6 +61,13 @@ export function StudentHome() {
   const percentage = total ? Math.round((completed / total) * 100) : 0;
   const projectHref = data.currentProject ? `/projetos/${data.currentProject.id}` : "/projetos";
   const firstName = profile?.displayName.trim().split(/\s+/u)[0];
+  const tickerItems = [
+    "Centro de missão · sistema ativo",
+    data.currentProject ? `Ciclo ${String(data.currentProject.cyclePosition).padStart(2, "0")}` : "Em preparação",
+    `${completed}/${total} evidências`,
+    `${percentage}% concluído`,
+    "Rota 01 — 03",
+  ];
   const stages = [
     { id: "explorar", number: "01", label: "Explorar", detail: "Entenda o conceito e reconheça o desafio.", state: completed > 0 ? "complete" : "current" },
     { id: "construir", number: "02", label: "Construir", detail: "Transforme decisões em uma evidência concreta.", state: completed > 0 && completed < total ? "current" : completed === total && total > 0 ? "complete" : "upcoming" },
@@ -83,13 +90,13 @@ export function StudentHome() {
 
   return (
     <div className={styles.home}>
-      <div className={styles.ambient} aria-hidden="true"><i /><i /><i /><i /></div>
+      <div className={styles.glowLayer} aria-hidden="true"><GlowField /></div>
 
       <motion.header className={styles.header} initial={reduceMotion ? false : "hidden"} animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}>
         <motion.div className={styles.headerCopy} variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: entrance } } }}>
           <span className={styles.eyebrow}><Radio size={13} /> Centro de missão · sistema ativo</span>
           <p className={styles.greeting}>{firstName ? `Bem-vindo de volta, ${firstName}.` : "Bem-vindo de volta ao seu estúdio."}</p>
-          <h1>Construa algo que você consiga <em>explicar.</em></h1>
+          <WordReveal as="h1">Construa algo que você consiga explicar.</WordReveal>
         </motion.div>
         <motion.div className={styles.headerStats} variants={{ hidden: { opacity: 0, x: 16 }, visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: entrance } } }} aria-label="Resumo e atalhos do ciclo">
           <Link href={projectHref} className={styles.statCard} aria-label="Abrir projeto atual">
@@ -100,7 +107,7 @@ export function StudentHome() {
           <Link href={actionHref} className={styles.statCard} aria-label="Abrir evidência atual">
             <span className={styles.statIcon}><Layers3 /></span>
             <span className={styles.statCopy}><small>Evidências</small><strong>{completed}/{total}</strong><em>{total ? `${Math.max(total - completed, 0)} restante(s)` : "Nenhuma liberada"}</em></span>
-            <span className={styles.miniBars} aria-hidden="true">{Array.from({ length: Math.max(total, 4) }, (_, index) => <i key={index} data-filled={index < completed} />)}</span>
+            <span className={styles.miniBars} aria-hidden="true">{Array.from({ length: Math.max(total, 4) }, (_, index) => <i key={index} data-filled={index < completed} style={{ "--bar-i": index } as CSSProperties} />)}</span>
           </Link>
           <Link href="/jornada" className={styles.statCard} aria-label="Abrir progresso da jornada">
             <span className={styles.statIcon}><CircleGauge /></span>
@@ -119,6 +126,7 @@ export function StudentHome() {
         transition={{ duration: reduceMotion ? 0 : 0.65, delay: 0.12, ease: entrance }}
         aria-labelledby="mission-title"
       >
+        <span className={styles.missionBeam} aria-hidden="true" />
         <motion.div className={styles.map} style={reduceMotion ? undefined : { x, y }} aria-hidden="true">
           <svg viewBox="0 0 1100 560" preserveAspectRatio="xMidYMid slice">
             <path className={styles.mapOrbit} d="M-40 430 C190 80 490 60 700 260 S1010 520 1170 140" />
@@ -127,6 +135,9 @@ export function StudentHome() {
             <path className={styles.mapPulse} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
             <circle cx="735" cy="275" r="9" className={styles.mapPoint} />
             <circle cx="735" cy="275" r="24" className={styles.mapPointRing} />
+            <g className={styles.mapOrbitDot} style={{ transformOrigin: "735px 275px" } as CSSProperties}>
+              <circle cx="735" cy="261" r="3" className={styles.mapOrbitPoint} />
+            </g>
           </svg>
         </motion.div>
         <div className={styles.missionCopy}>
@@ -135,7 +146,7 @@ export function StudentHome() {
           <h2 id="mission-title">{action.label}</h2>
           <p>{actionCopy[action.kind]}</p>
           <div className={styles.progressCopy}><span>{data.currentProject ? `${completed} de ${total} evidências concluídas` : "Preparando seu primeiro projeto"}</span><strong>{percentage}%</strong></div>
-          <div className={styles.progressTrack} aria-label={`${percentage}% concluído`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}><motion.i initial={reduceMotion ? false : { scaleX: 0 }} animate={{ scaleX: percentage / 100 }} transition={{ duration: reduceMotion ? 0 : 0.9, delay: 0.42, ease: entrance }} /></div>
+          <div className={styles.progressTrack} aria-label={`${percentage}% concluído`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}><motion.i initial={reduceMotion ? false : { scaleX: 0 }} animate={{ scaleX: percentage / 100 }} transition={{ duration: reduceMotion ? 0 : 0.52, delay: 0.42, ease: entrance }} /></div>
           <div className={styles.actions}>
             <MagneticAction><Link href={actionHref} className={styles.primaryAction}>Continuar missão <ArrowRight /></Link></MagneticAction>
             <Link href={projectHref} className={styles.secondaryAction}><FolderKanban /> Abrir projeto</Link>
@@ -148,7 +159,7 @@ export function StudentHome() {
         <div className={styles.sectionHeading}><div><span>Mapa de construção</span><h2 id="route-title">Do conceito à evidência.</h2></div><small>Rota 01 — 03</small></div>
         <ol className={styles.route}>
           {stages.map((stage, index) => <motion.li key={stage.id} data-state={stage.state} initial={reduceMotion ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.7 }} transition={{ duration: reduceMotion ? 0 : 0.42, delay: index * 0.09, ease: entrance }}>
-            <Link className={styles.routeLink} href={stage.id === "explorar" ? "/glossario" : stage.id === "construir" ? actionHref : projectHref}>
+            <Link className={styles.routeLink} href={stage.id === "explorar" ? "/atlas?tab=conceitos" : stage.id === "construir" ? actionHref : projectHref}>
               <span className={styles.routeNode}>{stage.state === "complete" ? <Check size={15} /> : stage.number}</span>
               <span className={styles.routeCopy}><small>{stage.state === "complete" ? "Percorrido" : stage.state === "current" ? "Você está aqui" : "A seguir"}</small><strong>{stage.label}</strong><em>{stage.detail}</em></span>
             </Link>
@@ -158,6 +169,7 @@ export function StudentHome() {
 
       <div className={styles.lowerGrid}>
         <section className={styles.radar} aria-labelledby="radar-title">
+          <span className={styles.radarSweep} aria-hidden="true" />
           <div className={styles.sectionHeading}><div><span>Radar de atenção</span><h2 id="radar-title">Sinais do estúdio</h2></div><i className={styles.liveDot}>ao vivo</i></div>
           <div className={styles.signalList}>
             {data.pendingMakeupCount > 0 && <Signal href={activityHref} icon={<Wrench />} eyebrow="Prioridade alta" title="Reposição pendente" detail={`${data.pendingMakeupCount} item(ns) precisam ser regularizados.`} tone="warning" index={0} reduceMotion={Boolean(reduceMotion)} />}
@@ -172,6 +184,10 @@ export function StudentHome() {
           {data.recentFeedback ? <div className={styles.logEntry}><time dateTime={data.recentFeedback.reviewedAt}>{new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(data.recentFeedback.reviewedAt))}</time><span><strong>{data.recentFeedback.decision === "approved" ? "Evidência reconhecida" : "Nova direção registrada"}</strong><small>Revisão de {data.recentFeedback.reviewerName}</small></span><i data-approved={data.recentFeedback.decision === "approved"}>{data.recentFeedback.decision === "approved" ? "aprovada" : "revisar"}</i></div> : <div className={styles.emptyLog}><span>00</span><p>Seu registro começa quando a primeira evidência recebe uma revisão.</p></div>}
           <Link href="/projetos" className={styles.logLink}>Consultar arquivo de projetos <ArrowRight /></Link>
         </section>
+      </div>
+
+      <div className={styles.tickerRail}>
+        <Ticker items={tickerItems} />
       </div>
     </div>
   );
