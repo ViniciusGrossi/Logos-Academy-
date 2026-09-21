@@ -86,6 +86,9 @@ class Store implements ActivitySubmissionFilesStore {
   async fileMetadata(): Promise<never> {
     throw new AppError("FORBIDDEN", "Arquivo indisponível.", "request");
   }
+  async adminFileMetadata(): Promise<never> {
+    throw new AppError("FORBIDDEN", "Arquivo indisponível.", "request");
+  }
   async createSignedUploadUrl() {
     return {
       signedUrl: "https://storage.example/upload",

@@ -27,6 +27,14 @@ export type InternalFile = Readonly<{
   file: UploadedFile;
   storagePath: string;
 }>;
+/** SR-A7 (Release 2): actor mínimo aceito tanto por aluno quanto por admin. */
+export type FileActor = Readonly<{ tenantId: string; userId: string }>;
+/** SR-A7 (Release 2): metadados suficientes para assinar o download como admin. */
+export type AdminFileTarget = Readonly<{
+  storagePath: string;
+  filename: string;
+  contentType: string;
+}>;
 export interface ActivitySubmissionFilesStore {
   getProfile(
     actor: StudentActor,
@@ -69,6 +77,12 @@ export interface ActivitySubmissionFilesStore {
     fileId: string,
     requestId: string,
   ): Promise<InternalFile>;
+  /** SR-A7 (Release 2): admin do mesmo tenant abrindo o anexo de uma entrega. */
+  adminFileMetadata(
+    actor: FileActor,
+    fileId: string,
+    requestId: string,
+  ): Promise<AdminFileTarget>;
   createSignedUploadUrl(
     path: string,
     requestId: string,
@@ -215,6 +229,37 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
       },
       requestId,
     ) as Promise<InternalFile>;
+  }
+  async adminFileMetadata(
+    actor: FileActor,
+    fileId: string,
+    requestId: string,
+  ): Promise<AdminFileTarget> {
+    const result = (await this.rpc(
+      "admin_file_download_target",
+      {
+        p_tenant_id: actor.tenantId,
+        p_actor_user_id: actor.userId,
+        p_file_id: fileId,
+      },
+      requestId,
+    )) as Record<string, unknown>;
+    if (
+      typeof result.storagePath !== "string" ||
+      typeof result.filename !== "string" ||
+      typeof result.contentType !== "string"
+    ) {
+      throw new AppError(
+        "INTERNAL_ERROR",
+        "Metadados de arquivo inválidos.",
+        requestId,
+      );
+    }
+    return {
+      storagePath: result.storagePath,
+      filename: result.filename,
+      contentType: result.contentType,
+    };
   }
   async createSignedUploadUrl(
     path: string,

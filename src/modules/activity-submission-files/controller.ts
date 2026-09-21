@@ -22,4 +22,28 @@ export async function activityController<T>(request: Request, operation: (servic
   }
 }
 
+/**
+ * SR-A7 (Release 2): GET /api/files/:fileId/download-url aceita o aluno dono do
+ * arquivo (fluxo atual, ownership validada na RPC) ou um admin do mesmo tenant
+ * (nova RPC admin_file_download_target). Nenhum outro endpoint de arquivo muda:
+ * as demais operações continuam exclusivas do aluno via activityController.
+ */
+export async function fileDownloadController(request: Request, fileId: string): Promise<NextResponse> {
+  const requestId = crypto.randomUUID();
+  try {
+    const server = await createSupabaseServerClient();
+    const { data: { user } } = await server.auth.getUser();
+    if (!user?.email) throw new AppError("UNAUTHENTICATED", "Sessão obrigatória.", requestId);
+    const context = await new IdentityService(new IdentityRepository(server)).requireAuthenticated(user.id, requestId);
+    const service = new ActivitySubmissionFilesService(new ActivitySubmissionFilesRepository(server));
+    const data = context.role === "admin"
+      ? await service.adminDownload({ tenantId: context.tenantId, userId: context.userId }, fileId, requestId)
+      : await service.download({ tenantId: context.tenantId, userId: context.userId, email: user.email, role: "student" }, fileId, requestId);
+    return NextResponse.json({ ok: true, data });
+  } catch (error: unknown) {
+    const appError = asApiError(error, requestId, "Não foi possível concluir a operação.");
+    return NextResponse.json(toApiResult(appError), { status: statusFor(appError.code) });
+  }
+}
+
 function statusFor(code: AppError["code"]): number { return ({ UNAUTHENTICATED: 401, FORBIDDEN: 403, NOT_FOUND: 404, VALIDATION_ERROR: 400, CONFLICT: 409, RATE_LIMITED: 429, INTERNAL_ERROR: 500 })[code]; }

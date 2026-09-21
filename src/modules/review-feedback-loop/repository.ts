@@ -2,16 +2,20 @@ import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-import type { ActivityCriterion, Page, ReviewDetail, ReviewQueueSubmission, SubmissionDetail } from "@/specs/api.contracts";
+import type { ActivityCriterion, ActivityRequirement, AdminSubmissionWorkspace, Page, ReviewDetail, ReviewQueueSubmission, SubmissionDetail } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
 import { mapRpcError } from "@/src/lib/supabase/rpc-error";
-import type { PublishReviewInput, ReviewQueueQuery } from "@/src/modules/review-feedback-loop/schema";
+import type { PublishReviewInput, ReviewQueueQuery, StudentSubmissionsQuery } from "@/src/modules/review-feedback-loop/schema";
 
 export type AdminActor = Readonly<{ tenantId: string; userId: string; role: "admin" }>;
 export interface ReviewFeedbackStore {
   page(actor: AdminActor, query: ReviewQueueQuery, requestId: string): Promise<Page<ReviewQueueSubmission>>;
   publish(actor: AdminActor, input: PublishReviewInput, requestId: string): Promise<ReviewDetail>;
+  /** SR-A5 (Release 2): workspace único de revisão. */
+  workspace(actor: AdminActor, submissionId: string, requestId: string): Promise<AdminSubmissionWorkspace>;
+  /** SR-A6 (Release 2): entregas do aluno na ficha administrativa. */
+  studentSubmissions(actor: AdminActor, query: StudentSubmissionsQuery, requestId: string): Promise<Page<ReviewQueueSubmission>>;
 }
 
 export class ReviewFeedbackRepository implements ReviewFeedbackStore {
@@ -50,6 +54,27 @@ export class ReviewFeedbackRepository implements ReviewFeedbackStore {
     }, requestId), requestId);
   }
 
+  async workspace(actor: AdminActor, submissionId: string, requestId: string): Promise<AdminSubmissionWorkspace> {
+    return parseWorkspace(await this.rpc("admin_submission_workspace", {
+      p_tenant_id: actor.tenantId,
+      p_actor_user_id: actor.userId,
+      p_submission_id: submissionId,
+      p_encryption_key: this.encryptionKey(),
+    }, requestId), requestId);
+  }
+
+  async studentSubmissions(actor: AdminActor, query: StudentSubmissionsQuery, requestId: string): Promise<Page<ReviewQueueSubmission>> {
+    const result = await this.rpc("admin_student_submissions_page", {
+      p_tenant_id: actor.tenantId,
+      p_actor_user_id: actor.userId,
+      p_student_profile_id: query.studentId,
+      p_encryption_key: this.encryptionKey(),
+      p_cursor: query.cursor ?? null,
+      p_limit: query.limit,
+    }, requestId);
+    return parsePage(result, requestId);
+  }
+
   private async rpc(name: string, parameters: Record<string, unknown>, requestId: string): Promise<unknown> {
     const { data, error } = await this.client.schema("logos_academy" as "public").rpc(name as never, parameters as never);
     if (error || data === null) {
@@ -70,10 +95,57 @@ function parsePage(value: unknown, requestId: string): Page<ReviewQueueSubmissio
 }
 
 function parseQueueSubmission(value: unknown, requestId: string): ReviewQueueSubmission {
-  if (!isRecord(value) || !Array.isArray(value.criteria)) {
+  if (!isRecord(value) || !Array.isArray(value.criteria) || !(typeof value.dueAt === "string" || value.dueAt === null)) {
     throw new AppError("INTERNAL_ERROR", "Rubrica da entrega inv\u00e1lida.", requestId);
   }
-  return { ...parseSubmission(value, requestId), criteria: value.criteria.map((criterion) => parseActivityCriterion(criterion, requestId)) };
+  return {
+    ...parseSubmission(value, requestId),
+    criteria: value.criteria.map((criterion) => parseActivityCriterion(criterion, requestId)),
+    student: parseStudentRef(value.student, requestId),
+    activity: parseActivityRef(value.activity, requestId),
+    classSummary: parseClassSummaryRef(value.classSummary ?? null, requestId),
+    dueAt: value.dueAt,
+  };
+}
+
+function parseStudentRef(value: unknown, requestId: string): ReviewQueueSubmission["student"] {
+  if (!isRecord(value) || !isUuid(value.id) || typeof value.displayName !== "string") {
+    throw new AppError("INTERNAL_ERROR", "Aluno da entrega inv\u00e1lido.", requestId);
+  }
+  return { id: value.id, displayName: value.displayName };
+}
+
+function parseActivityRef(value: unknown, requestId: string): ReviewQueueSubmission["activity"] {
+  if (!isRecord(value) || typeof value.title !== "string" || !isPositiveInteger(value.lessonPosition) || !isPositiveInteger(value.cyclePosition)) {
+    throw new AppError("INTERNAL_ERROR", "Atividade da entrega inv\u00e1lida.", requestId);
+  }
+  return { title: value.title, lessonPosition: value.lessonPosition, cyclePosition: value.cyclePosition };
+}
+
+function parseClassSummaryRef(value: unknown, requestId: string): ReviewQueueSubmission["classSummary"] {
+  if (value === null) return null;
+  if (!isRecord(value) || !isUuid(value.id) || typeof value.name !== "string") {
+    throw new AppError("INTERNAL_ERROR", "Turma da entrega inv\u00e1lida.", requestId);
+  }
+  return { id: value.id, name: value.name };
+}
+
+function parseWorkspace(value: unknown, requestId: string): AdminSubmissionWorkspace {
+  if (!isRecord(value) || !Array.isArray(value.requirements) || !Array.isArray(value.previousVersions)) {
+    throw new AppError("INTERNAL_ERROR", "Workspace de revis\u00e3o inv\u00e1lido.", requestId);
+  }
+  return {
+    ...parseQueueSubmission(value, requestId),
+    requirements: value.requirements.map((requirement) => parseRequirement(requirement, requestId)),
+    previousVersions: value.previousVersions.map((submission) => parseSubmission(submission, requestId)),
+  };
+}
+
+function parseRequirement(value: unknown, requestId: string): ActivityRequirement {
+  if (!isRecord(value) || !isUuid(value.id) || !isKind(value.kind) || typeof value.label !== "string" || typeof value.required !== "boolean" || !isPositiveInteger(value.position)) {
+    throw new AppError("INTERNAL_ERROR", "Requisito da atividade inv\u00e1lido.", requestId);
+  }
+  return { id: value.id, kind: value.kind, label: value.label, required: value.required, position: value.position };
 }
 
 function parseActivityCriterion(value: unknown, requestId: string): ActivityCriterion {

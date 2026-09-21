@@ -15,6 +15,7 @@ import {
 } from "@/src/modules/activity-submission-files/schema";
 import type {
   ActivitySubmissionFilesStore,
+  FileActor,
   StudentActor,
 } from "@/src/modules/activity-submission-files/repository";
 
@@ -175,6 +176,28 @@ export class ActivitySubmissionFilesService {
     );
     const url = await this.repository.createSignedDownloadUrl(
       file.storagePath,
+      requestId,
+    );
+    return { signedDownloadUrl: url.signedUrl, expiresAt: url.expiresAt };
+  }
+  /** SR-A7 (Release 2): admin do mesmo tenant abrindo o anexo de uma entrega. */
+  async adminDownload(
+    actor: FileActor,
+    fileId: unknown,
+    requestId: string,
+  ): Promise<{ signedDownloadUrl: string; expiresAt: string }> {
+    const parsedFileId = parse(
+      FilePathSchema,
+      { fileId },
+      requestId,
+    ).fileId;
+    const target = await this.repository.adminFileMetadata(
+      actor,
+      parsedFileId,
+      requestId,
+    );
+    const url = await this.repository.createSignedDownloadUrl(
+      target.storagePath,
       requestId,
     );
     return { signedDownloadUrl: url.signedUrl, expiresAt: url.expiresAt };

@@ -1,15 +1,19 @@
 import type {
   ActivityDetail,
+  AdminStudentAttendanceEntry,
+  AdminSubmissionWorkspace,
   AttendanceEntry,
   ClassSummary,
   ConsentRecord,
   ConceptDetail,
   ConceptSummary,
+  CurriculumOption,
   EnrollmentSummary,
   LibraryResourceDetail,
   LibraryResourceSummary,
   MeProfile,
   Page,
+  PendingMakeup,
   ProjectDetail,
   ProjectSummary,
   ReviewDetail,
@@ -41,6 +45,9 @@ const ids = {
   designSystem: "00000000-0000-4000-8000-000000000038",
   session: "00000000-0000-4000-8000-000000000009",
   review: "00000000-0000-4000-8000-000000000010",
+  attendanceMarina: "00000000-0000-4000-8000-000000000041",
+  attendanceCaio: "00000000-0000-4000-8000-000000000042",
+  curriculum: "00000000-0000-4000-8000-000000000043",
 };
 
 const sessions: readonly SessionSummary[] = Array.from(
@@ -353,6 +360,8 @@ const libraryResources: readonly LibraryResourceDetail[] = [
   },
 ];
 let attendance: readonly AttendanceEntry[] = students.map((student) => ({
+  attendanceId:
+    student.id === ids.marina ? ids.attendanceMarina : ids.attendanceCaio,
   enrollmentId:
     student.id === ids.marina
       ? ids.enrollment
@@ -362,6 +371,10 @@ let attendance: readonly AttendanceEntry[] = students.map((student) => ({
   privateNote: null,
   makeup: null,
 }));
+
+const curricula: readonly CurriculumOption[] = [
+  { id: ids.curriculum, name: "Explorer", version: "v1", status: "active" },
+];
 
 const review: ReviewDetail = {
   id: ids.review,
@@ -383,6 +396,57 @@ let submissionVersion = 2;
 
 function page<T>(items: readonly T[]): Page<T> {
   return { items, nextCursor: null };
+}
+
+/** SR-A4/SR-A5/SR-A6 (Release 2): contexto legível para fila e workspace de revisão. */
+function reviewQueueSubmission(): ReviewQueueSubmission {
+  const detail = activity();
+  const history = detail.submissionHistory;
+  const submission = "items" in history ? history.items[0] : history[0];
+  return {
+    ...submission!,
+    criteria: detail.criteria,
+    student: { id: ids.marina, displayName: "Marina Alves" },
+    activity: {
+      title: detail.title,
+      lessonPosition: detail.lessonPosition,
+      cyclePosition: 2,
+    },
+    classSummary: { id: ids.class, name: classSummary.name },
+    dueAt: detail.dueAt,
+  };
+}
+
+/** SR-A5 (Release 2): workspace único de revisão. */
+function adminSubmissionWorkspace(): AdminSubmissionWorkspace {
+  return {
+    ...reviewQueueSubmission(),
+    requirements: activity().requirements,
+    previousVersions: [],
+  };
+}
+
+/** SR-A2 (Release 2): falta sem reposição concluída. */
+function pendingMakeup(): PendingMakeup {
+  const caio = attendance[1]!;
+  return {
+    attendanceId: caio.attendanceId,
+    enrollmentId: caio.enrollmentId,
+    studentId: ids.caio,
+    studentName: "Caio Mendes",
+    classId: ids.class,
+    className: classSummary.name,
+    session: sessions[3]!,
+    status: "excused_absence",
+  };
+}
+
+/** SR-A6 (Release 2): frequência do aluno na ficha administrativa. */
+function adminAttendance(): readonly AdminStudentAttendanceEntry[] {
+  return attendance.map((entry, index) => ({
+    ...entry,
+    session: sessions[index] ?? sessions[0]!,
+  }));
 }
 function activity(assignmentId = ids.assignment): ActivityDetail {
   const seededPosition = positionForAssignmentId(assignmentId);
@@ -1004,13 +1068,10 @@ export async function demoApi<T>(
     } as T;
   if (method === "POST" && pathname.endsWith("/release"))
     return { assignmentIds: [ids.assignment], releasedAt: now } as T;
-  if (method === "GET" && pathname === "/api/admin/reviews") {
-    const history = activity().submissionHistory;
-    const submission = "items" in history ? history.items[0] : history[0];
-    return page([
-      { ...submission!, criteria: activity().criteria },
-    ] as readonly ReviewQueueSubmission[]) as T;
-  }
+  if (method === "GET" && pathname === "/api/admin/reviews")
+    return page([reviewQueueSubmission()]) as T;
+  if (method === "GET" && /^\/api\/admin\/submissions\/[^/]+$/.test(pathname))
+    return adminSubmissionWorkspace() as T;
   if (
     method === "POST" &&
     pathname.includes("/submissions/") &&
@@ -1020,6 +1081,20 @@ export async function demoApi<T>(
       ...review,
       decision: stringValue(body, "decision", review.decision),
     } as T;
+  if (method === "GET" && pathname === "/api/admin/makeups")
+    return page([pendingMakeup()]) as T;
+  if (method === "GET" && pathname === "/api/admin/curricula")
+    return curricula as T;
+  if (
+    method === "GET" &&
+    /^\/api\/admin\/students\/[^/]+\/submissions$/.test(pathname)
+  )
+    return page([reviewQueueSubmission()]) as T;
+  if (
+    method === "GET" &&
+    /^\/api\/admin\/students\/[^/]+\/attendance$/.test(pathname)
+  )
+    return page(adminAttendance()) as T;
   if (method === "POST" && pathname === "/api/admin/students/invite")
     return {
       studentId: ids.caio,
@@ -1267,6 +1342,9 @@ function inputEntries(
         ? item.status
         : "present";
     return {
+      attendanceId:
+        attendance[index]?.attendanceId ??
+        (index === 0 ? ids.attendanceMarina : ids.attendanceCaio),
       enrollmentId: stringValue(
         item,
         "enrollmentId",
