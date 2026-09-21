@@ -15,3 +15,6 @@ supabase/.temp/
 # review/screenshot junk
 artifacts/
 --full-page
+
+# Cache de build antigo do Atlas (chega a 100+ MB; o GitHub recusa)
+.next-stale-atlas/
