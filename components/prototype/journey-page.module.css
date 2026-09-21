@@ -21,6 +21,7 @@
   background-size: auto, 4rem 4rem, 4rem 4rem, auto;
   color: var(--journey-ink);
   box-shadow: 0 2rem 6rem color-mix(in srgb, var(--color-academy-ink) 20%, transparent);
+  container: journey / inline-size;
 }
 
 .journey[data-current-track="builder"] { --track-color: var(--color-academy-orange); }
@@ -74,7 +75,7 @@
 .hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(25rem, .95fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
   gap: clamp(2rem, 5vw, 4.5rem);
   align-items: center;
   overflow: hidden;
@@ -116,12 +117,13 @@
 .hero h1 {
   max-width: 14ch;
   margin: 0;
-  font-size: clamp(2.65rem, 5.4vw, 5rem);
+  font-size: clamp(2rem, 6.2cqi, 4rem);
   font-weight: 620;
   line-height: .94;
   letter-spacing: -.055em;
   text-wrap: balance;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  hyphens: manual;
 }
 
 .hero h1 em {
@@ -146,7 +148,7 @@
   max-width: 58ch;
   margin: 1.2rem 0 0;
   color: var(--journey-muted);
-  font-size: .95rem;
+  font-size: clamp(.85rem, 1.5cqi, .95rem);
   line-height: 1.65;
   text-wrap: pretty;
 }
@@ -278,10 +280,8 @@
   z-index: 4;
   left: var(--node-x);
   top: var(--node-y);
-  display: flex;
-  max-width: 9rem;
-  align-items: center;
-  gap: .55rem;
+  display: grid;
+  place-items: center;
   color: var(--journey-ink);
   text-decoration: none;
   transform: translate(-50%, -50%);
@@ -301,9 +301,20 @@
 }
 
 .mapNode svg { position: static; width: .9rem; height: .9rem; }
-.mapNode > span { display: grid; gap: .2rem; min-width: 0; }
+.mapNode > span {
+  position: absolute;
+  left: calc(100% + .5rem);
+  top: 50%;
+  display: grid;
+  gap: .2rem;
+  width: max-content;
+  max-width: min(9rem, 22cqi);
+  transform: translateY(-50%);
+}
+
+.mapNode[data-align="end"] > span { right: calc(100% + .5rem); left: auto; text-align: right; }
 .mapNode small { color: var(--journey-muted); font: 750 .52rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
-.mapNode strong { font-size: .68rem; line-height: 1.25; text-wrap: balance; }
+.mapNode strong { font-size: .68rem; line-height: 1.25; overflow-wrap: break-word; text-wrap: balance; }
 
 .mapNode[data-state="complete"] > i { border-color: color-mix(in srgb, var(--color-academy-success) 70%, transparent); color: var(--color-academy-success); }
 .mapNode[data-state="current"] > i { border-color: var(--color-academy-orange); color: var(--color-academy-orange); animation: node-signal 2.6s ease-in-out infinite; }
@@ -326,11 +337,11 @@
   background: var(--journey-surface-soft);
 }
 
-.levels { display: grid; grid-template-columns: minmax(15rem, .58fr) minmax(0, 1.42fr); gap: 2rem; padding: clamp(1.25rem, 3vw, 2.2rem); }
+.levels { display: grid; grid-template-columns: minmax(0, .58fr) minmax(0, 1.42fr); gap: 2rem; padding: clamp(1.25rem, 3vw, 2.2rem); }
 .sectionIntro { align-self: center; }
 .sectionIntro h2,
 .sectionHeading h2,
-.footerPanel h2 { margin: .65rem 0 0; font-size: clamp(1.55rem, 2.8vw, 2.45rem); font-weight: 620; line-height: 1.04; letter-spacing: -.045em; }
+.footerPanel h2 { margin: .65rem 0 0; font-size: clamp(1.4rem, 3.4cqi, 2.3rem); font-weight: 620; line-height: 1.04; letter-spacing: -.045em; }
 .sectionIntro p { max-width: 42ch; margin: .8rem 0 0; color: var(--journey-muted); font-size: .8rem; line-height: 1.6; }
 
 .levelRail {
@@ -417,7 +428,7 @@
 .projectMeta span { color: var(--color-academy-orange); }
 .projectMeta small { color: var(--journey-muted); }
 .projectBody { align-items: flex-start; margin-top: .75rem; }
-.projectBody h3 { margin: 0; font-size: clamp(1.05rem, 1.8vw, 1.4rem); letter-spacing: -.03em; }
+.projectBody h3 { margin: 0; font-size: clamp(1rem, 2.2cqi, 1.35rem); letter-spacing: -.03em; }
 .projectBody p { max-width: 58ch; margin: .4rem 0 0; color: var(--journey-muted); font-size: .73rem; line-height: 1.5; }
 .projectArrow { width: 1rem; flex: 0 0 auto; margin-top: .2rem; color: var(--journey-muted); }
 .projectCard:hover .projectArrow { color: var(--color-academy-orange); transform: translateX(.2rem); }
@@ -476,15 +487,30 @@
 :global(html:not(.dark)) .routeSection,
 :global(html:not(.dark)) .footerPanel { box-shadow: var(--shadow-soft); }
 
-@media (max-width: 72rem) {
+/* Outer chrome still follows the viewport: it reacts to the shell, not to the content box. */
+@media (max-width: 52rem) {
+  .journey { margin: calc(var(--spacing-unit) * -2); padding: 1.25rem; }
+}
+
+@media (max-width: 38rem) {
+  .journey { margin: 0; padding: .75rem; border-radius: 1rem .3rem 1rem 1rem; }
+}
+
+/*
+  Everything below reacts to the width .journey actually gets. The viewport is a poor
+  proxy here: the fixed 16.5rem sidebar plus the page-frame padding mean a 1320px window
+  leaves the page roughly 57rem of usable width, so viewport breakpoints of 72rem/52rem
+  never fired while the hero columns were already collapsing.
+*/
+@container journey (max-width: 62rem) {
   .hero { grid-template-columns: 1fr; }
   .hero h1 { max-width: 17ch; }
   .mapPanel { max-width: 47rem; }
   .levels { grid-template-columns: 1fr; }
+  .sectionIntro { align-self: start; }
 }
 
-@media (max-width: 52rem) {
-  .journey { margin: calc(var(--spacing-unit) * -2); padding: 1.25rem; }
+@container journey (max-width: 46rem) {
   .hero { padding: 1.5rem; }
   .mapCanvas { min-height: 18rem; }
   .levelRail { grid-template-columns: 1fr; }
@@ -497,10 +523,9 @@
   .footerPanel { align-items: flex-start; flex-direction: column; }
 }
 
-@media (max-width: 38rem) {
-  .journey { margin: 0; padding: .75rem; border-radius: 1rem .3rem 1rem 1rem; }
+@container journey (max-width: 34rem) {
   .hero { gap: 1.5rem; padding: 1.15rem; }
-  .hero h1 { font-size: clamp(2.4rem, 13vw, 3.6rem); }
+  .hero h1 { font-size: clamp(2rem, 11cqi, 3.4rem); max-width: none; }
   .heroFacts { align-items: stretch; flex-direction: column; }
   .heroFacts > span { width: 100%; }
   .heroActions { align-items: stretch; flex-direction: column; }

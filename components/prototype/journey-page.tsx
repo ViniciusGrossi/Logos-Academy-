@@ -57,10 +57,10 @@ const TRACKS = [
 ] as const;
 
 const MAP_POSITIONS = [
-  { x: "8%", y: "72%" },
-  { x: "35%", y: "30%" },
-  { x: "65%", y: "55%" },
-  { x: "91%", y: "18%" },
+  { x: "10%", y: "74%" },
+  { x: "35%", y: "32%" },
+  { x: "62%", y: "56%" },
+  { x: "88%", y: "22%" },
 ] as const;
 
 function isComplete(project: ProjectSummary) {
@@ -147,8 +147,9 @@ export function JourneyPage() {
               <path className={styles.mapRouteProgress} pathLength="100" strokeDasharray={`${journeyPercentage} 100`} d="M42 210 C132 72 208 76 254 98 S365 202 438 142 S545 42 598 54" />
             </svg>
             {data.projects.map((project, index) => {
-              const position = MAP_POSITIONS[index] ?? { x: `${8 + index * 27}%`, y: "50%" };
+              const position = MAP_POSITIONS[index] ?? { x: `${10 + index * 26}%`, y: "50%" };
               const state = projectState(project, index, activeIndex);
+              const align = Number.parseFloat(position.x) > 55 ? "end" : "start";
               const style = { "--node-x": position.x, "--node-y": position.y } as MapNodeStyle;
               return (
                 <Link
@@ -156,6 +157,7 @@ export function JourneyPage() {
                   href={`/projetos/${project.id}`}
                   className={styles.mapNode}
                   data-state={state}
+                  data-align={align}
                   style={style}
                   aria-label={`Ciclo ${project.cyclePosition}: ${project.title}`}
                 >
