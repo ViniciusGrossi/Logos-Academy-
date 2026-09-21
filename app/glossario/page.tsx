@@ -1,4 +1,5 @@
-import { AppShell } from "@/components/prototype/app-shell";
-import { ConceptLibrary } from "@/components/student/concept-library";
+import { permanentRedirect } from "next/navigation";
 
-export default function GlossaryPage(){return <AppShell><ConceptLibrary /></AppShell>;}
+export default function GlossaryPage() {
+  permanentRedirect("/atlas?tab=conceitos");
+}
