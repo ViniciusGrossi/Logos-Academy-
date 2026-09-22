@@ -1,6 +1,9 @@
 "use client";
 
+import type { PointerEvent as ReactPointerEvent } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import {
   ArrowRight,
   BadgeCheck,
@@ -29,8 +32,13 @@ type Journey = {
 };
 
 type TrackKey = "explorer" | "builder" | "engineer";
-type RouteState = "complete" | "current" | "upcoming";
-type MapNodeStyle = React.CSSProperties & { "--node-x": string; "--node-y": string };
+type RouteState = "complete" | "current" | "available" | "upcoming";
+type MapNodeStyle = React.CSSProperties & { "--node-x": string; "--node-y": string; "--node-delay": string };
+
+const REVEAL_VARIANTS = {
+  hidden: { opacity: 0, y: 28, scale: 0.985 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.58, ease: [0.22, 1, 0.36, 1] as const } },
+};
 
 const TRACKS = [
   {
@@ -69,8 +77,9 @@ function isComplete(project: ProjectSummary) {
 
 function projectState(project: ProjectSummary, index: number, activeIndex: number): RouteState {
   if (isComplete(project)) return "complete";
+  if (project.status === "locked") return "upcoming";
   if (index === activeIndex) return "current";
-  return "upcoming";
+  return "available";
 }
 
 export function resolveTrack(curriculumName: string): TrackKey {
@@ -80,6 +89,11 @@ export function resolveTrack(curriculumName: string): TrackKey {
   return "explorer";
 }
 
+export function percentage(value: number, total: number) {
+  if (total <= 0) return 0;
+  return Math.min(100, Math.max(0, Math.round((value / total) * 100)));
+}
+
 function trackStatus(index: number, currentIndex: number) {
   if (index < currentIndex) return "preservado";
   if (index === currentIndex) return "em curso";
@@ -87,8 +101,38 @@ function trackStatus(index: number, currentIndex: number) {
 }
 
 export function JourneyPage() {
-  const enrollmentId = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).get("enrollmentId");
+  const enrollmentId = useSearchParams().get("enrollmentId");
   const { data, error, loading, reload } = useLiveApi<Journey>(enrollmentId ? `/api/student/journey?enrollmentId=${enrollmentId}` : "/api/student/journey");
+  const reduceMotion = useReducedMotion();
+  const mapX = useMotionValue(0);
+  const mapY = useMotionValue(0);
+  const mapSpringX = useSpring(mapX, { stiffness: 90, damping: 28, mass: 0.7 });
+  const mapSpringY = useSpring(mapY, { stiffness: 90, damping: 28, mass: 0.7 });
+
+  function moveGlow(event: ReactPointerEvent<HTMLDivElement>) {
+    if (reduceMotion || event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const style = event.currentTarget.style;
+    style.setProperty("--spot-x", `${event.clientX - bounds.left}px`);
+    style.setProperty("--spot-y", `${event.clientY - bounds.top}px`);
+    style.setProperty("--spot-o", "1");
+  }
+
+  function leaveGlow(event: ReactPointerEvent<HTMLDivElement>) {
+    event.currentTarget.style.setProperty("--spot-o", "0");
+  }
+
+  function moveMap(event: ReactPointerEvent<HTMLDivElement>) {
+    if (reduceMotion || event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    mapX.set(((event.clientX - bounds.left) / bounds.width - 0.5) * 16);
+    mapY.set(((event.clientY - bounds.top) / bounds.height - 0.5) * 12);
+  }
+
+  function resetMap() {
+    mapX.set(0);
+    mapY.set(0);
+  }
 
   if (loading) return <LoadingState layout="journey" />;
   if (error) return <ErrorState layout="journey" retry={reload} message={error.message} />;
@@ -96,20 +140,24 @@ export function JourneyPage() {
 
   const activeIndex = data.projects.findIndex((project) => project.status === "in_progress" && !isComplete(project));
   const activeProject = activeIndex >= 0 ? data.projects[activeIndex] : undefined;
-  const sessionsPercentage = data.sessionsTotal ? Math.round((data.sessionsCompleted / data.sessionsTotal) * 100) : 0;
+  const sessionsPercentage = percentage(data.sessionsCompleted, data.sessionsTotal);
   const completedProjects = data.projects.filter(isComplete).length;
   const completedActivities = data.projects.reduce((total, project) => total + project.completedActivityCount, 0);
   const activityCount = data.projects.reduce((total, project) => total + project.activityCount, 0);
-  const journeyPercentage = activityCount ? Math.round((completedActivities / activityCount) * 100) : 0;
+  const journeyPercentage = percentage(completedActivities, activityCount);
+  const reachedIndex = activeIndex >= 0 ? activeIndex : Math.max(0, completedProjects - 1);
+  const trailTarget = MAP_POSITIONS[Math.min(reachedIndex, MAP_POSITIONS.length - 1)] ?? MAP_POSITIONS[0];
+  const trailProgress = data.projects.length ? Math.round(Number.parseFloat(trailTarget.x)) : 0;
   const currentTrack = resolveTrack(data.enrollment.curriculumName);
   const currentTrackIndex = TRACKS.findIndex((track) => track.key === currentTrack);
   const currentTrackLabel = TRACKS[currentTrackIndex]?.label ?? "Explorer";
 
   return (
-    <div className={styles.journey} data-current-track={currentTrack}>
+    <div className={styles.journey} data-current-track={currentTrack} onPointerMove={moveGlow} onPointerLeave={leaveGlow}>
       <div className={styles.ambient} aria-hidden="true"><i /><i /><i /></div>
+      <div className={styles.spotlight} aria-hidden="true" />
 
-      <header className={styles.hero}>
+      <motion.header className={styles.hero} initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>
         <div className={styles.heroCopy}>
           <span className={styles.signalLabel}><Radar size={14} /> Trilha Youth · nível {String(currentTrackIndex + 1).padStart(2, "0")}</span>
           <p className={styles.kicker}>{data.enrollment.curriculumName}</p>
@@ -136,46 +184,45 @@ export function JourneyPage() {
           </div>
         </div>
 
-        <div className={styles.mapPanel} aria-label={`Mapa da jornada com ${journeyPercentage}% das evidências concluídas`}>
-          <div className={styles.mapHeading}>
+        <figure className={styles.mapPanel}>
+          <figcaption className={styles.mapHeading}>
             <span>Mapa da trilha</span>
             <strong>{journeyPercentage}%</strong>
-          </div>
-          <div className={styles.mapCanvas}>
+          </figcaption>
+          <div className={styles.mapCanvas} onPointerMove={moveMap} onPointerLeave={resetMap}>
+            <motion.div className={styles.mapParallax} style={reduceMotion ? undefined : { x: mapSpringX, y: mapSpringY, scale: 1.04 }}>
             <svg viewBox="0 0 640 270" preserveAspectRatio="none" aria-hidden="true">
               <path className={styles.mapRouteBase} pathLength="100" d="M42 210 C132 72 208 76 254 98 S365 202 438 142 S545 42 598 54" />
-              <path className={styles.mapRouteProgress} pathLength="100" strokeDasharray={`${journeyPercentage} 100`} d="M42 210 C132 72 208 76 254 98 S365 202 438 142 S545 42 598 54" />
+              <path className={styles.mapRouteProgress} pathLength="100" strokeDasharray={`${trailProgress} 100`} d="M42 210 C132 72 208 76 254 98 S365 202 438 142 S545 42 598 54" />
+              <path className={styles.mapRouteTracer} pathLength="100" d="M42 210 C132 72 208 76 254 98 S365 202 438 142 S545 42 598 54" />
             </svg>
             {data.projects.map((project, index) => {
               const position = MAP_POSITIONS[index] ?? { x: `${10 + index * 26}%`, y: "50%" };
               const state = projectState(project, index, activeIndex);
               const align = Number.parseFloat(position.x) > 55 ? "end" : "start";
-              const style = { "--node-x": position.x, "--node-y": position.y } as MapNodeStyle;
-              return (
-                <Link
-                  key={project.id}
-                  href={`/projetos/${project.id}`}
-                  className={styles.mapNode}
-                  data-state={state}
-                  data-align={align}
-                  style={style}
-                  aria-label={`Ciclo ${project.cyclePosition}: ${project.title}`}
-                >
-                  <i>{state === "complete" ? <Check /> : state === "upcoming" ? <LockKeyhole /> : <CircleDotDashed />}</i>
-                  <span><small>Ciclo {String(project.cyclePosition).padStart(2, "0")}</small><strong>{project.title}</strong></span>
-                </Link>
+              const style = { "--node-x": position.x, "--node-y": position.y, "--node-delay": `${180 + index * 110}ms` } as MapNodeStyle;
+              const node = <>
+                <i>{state === "complete" ? <Check /> : state === "upcoming" ? <LockKeyhole /> : <CircleDotDashed />}</i>
+                <span><small>Ciclo {String(project.cyclePosition).padStart(2, "0")}</small><strong>{project.title}</strong></span>
+              </>;
+              return project.status === "locked" ? (
+                <span key={project.id} className={styles.mapNode} data-state={state} data-align={align} style={style} aria-label={`Ciclo ${project.cyclePosition}: ${project.title}, bloqueado`}>{node}</span>
+              ) : (
+                <Link key={project.id} href={`/projetos/${project.id}`} className={styles.mapNode} data-state={state} data-align={align} style={style} aria-current={state === "current" ? "step" : undefined} aria-label={`Ciclo ${project.cyclePosition}: ${project.title}`}>{node}</Link>
               );
             })}
+            </motion.div>
           </div>
           <div className={styles.mapFooter}>
             <span><i data-tone="done" /> concluído</span>
             <span><i data-tone="current" /> agora</span>
+            <span><i data-tone="available" /> disponível</span>
             <span><i data-tone="future" /> próximo</span>
           </div>
-        </div>
-      </header>
+        </figure>
+      </motion.header>
 
-      <section className={styles.levels} aria-labelledby="levels-title">
+      <motion.section className={styles.levels} aria-labelledby="levels-title" variants={REVEAL_VARIANTS} initial={reduceMotion ? false : "hidden"} whileInView="visible" viewport={{ once: true, amount: 0.22 }}>
         <div className={styles.sectionIntro}>
           <span className={styles.signalLabel}>Progressão Youth</span>
           <h2 id="levels-title">Três níveis, uma construção contínua.</h2>
@@ -196,7 +243,7 @@ export function JourneyPage() {
             );
           })}
         </ol>
-      </section>
+      </motion.section>
 
       <section className={styles.routeSection} aria-labelledby="route-title">
         <div className={styles.sectionHeading}>
@@ -209,16 +256,19 @@ export function JourneyPage() {
             <ol className={styles.route}>
               {data.projects.map((project, index) => {
                 const state = projectState(project, index, activeIndex);
-                const percentage = project.activityCount ? Math.round((project.completedActivityCount / project.activityCount) * 100) : 0;
+                const projectPercentage = percentage(project.completedActivityCount, project.activityCount);
+                const card = <>
+                  <div className={styles.projectMeta}><span>Ciclo {String(project.cyclePosition).padStart(2, "0")}</span><small>{state === "complete" ? "Evidência preservada" : state === "current" ? "Construção em curso" : state === "available" ? "Disponível" : "Próxima estação"}</small></div>
+                  <div className={styles.projectBody}><div><h3>{project.title}</h3><p>{state === "complete" ? "Este ciclo já compõe seu arquivo de formação." : state === "current" ? "Continue a atividade que move este projeto agora." : state === "available" ? "Este ciclo está disponível para continuar sua construção." : "O destino está visível; os detalhes abrem no momento certo."}</p></div>{state !== "upcoming" && <ArrowRight className={styles.projectArrow} />}</div>
+                  {state !== "upcoming" && <>
+                    <div className={styles.projectProgress}><span><Layers3 size={14} /> {project.completedActivityCount}/{project.activityCount} evidências</span><strong>{projectPercentage}%</strong></div>
+                    <div className={styles.track} role="progressbar" aria-label={`${projectPercentage}% de ${project.title} concluído`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={projectPercentage}><i style={{ transform: `scaleX(${projectPercentage / 100})` }} /></div>
+                  </>}
+                </>;
                 return (
                   <li key={project.id} data-state={state}>
                     <span className={styles.node}>{state === "complete" ? <Check size={16} /> : state === "upcoming" ? <LockKeyhole size={14} /> : <CircleDotDashed size={17} />}</span>
-                    <Link href={`/projetos/${project.id}`} className={styles.projectCard} aria-label={`Abrir projeto ${project.title}`}>
-                      <div className={styles.projectMeta}><span>Ciclo {String(project.cyclePosition).padStart(2, "0")}</span><small>{state === "complete" ? "Evidência preservada" : state === "current" ? "Construção em curso" : "Próxima estação"}</small></div>
-                      <div className={styles.projectBody}><div><h3>{project.title}</h3><p>{state === "complete" ? "Este ciclo já compõe seu arquivo de formação." : state === "current" ? "Continue a atividade que move este projeto agora." : "O destino está visível; os detalhes abrem no momento certo."}</p></div><ArrowRight className={styles.projectArrow} /></div>
-                      <div className={styles.projectProgress}><span><Layers3 size={14} /> {project.completedActivityCount}/{project.activityCount} evidências</span><strong>{percentage}%</strong></div>
-                      <div className={styles.track} role="progressbar" aria-label={`${percentage}% de ${project.title} concluído`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}><i style={{ transform: `scaleX(${percentage / 100})` }} /></div>
-                    </Link>
+                    {project.status === "locked" ? <div className={styles.projectCard} aria-disabled="true">{card}</div> : <Link href={`/projetos/${project.id}`} className={styles.projectCard} aria-current={state === "current" ? "step" : undefined} aria-label={`Abrir projeto ${project.title}`}>{card}</Link>}
                   </li>
                 );
               })}
@@ -227,8 +277,8 @@ export function JourneyPage() {
             <div className={styles.emptyRoute}><FolderKanban /><p>Os ciclos da sua formação aparecerão aqui quando forem liberados.</p></div>
           )}
 
-          <aside className={styles.rhythmPanel} aria-label="Ritmo da jornada">
-            <div className={styles.rhythmGauge} style={{ "--journey-progress": `${sessionsPercentage * 3.6}deg` } as React.CSSProperties}>
+          <motion.aside className={styles.rhythmPanel} aria-label="Ritmo da jornada" initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.97 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.58, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}>
+            <div className={styles.rhythmGauge} role="progressbar" aria-label="Progresso dos encontros presenciais" aria-valuemin={0} aria-valuemax={100} aria-valuenow={sessionsPercentage} style={{ "--journey-target": `${sessionsPercentage * 3.6}deg` } as React.CSSProperties}>
               <span><strong>{sessionsPercentage}%</strong><small>presencial</small></span>
             </div>
             <div>
@@ -242,14 +292,14 @@ export function JourneyPage() {
               <div><dt>Nível atual</dt><dd>{currentTrackLabel}</dd></div>
             </dl>
             <Link href="/agenda">Abrir Agenda <ArrowRight /></Link>
-          </aside>
+          </motion.aside>
         </div>
       </section>
 
-      <section className={styles.footerPanel}>
+      <motion.section className={styles.footerPanel} variants={REVEAL_VARIANTS} initial={reduceMotion ? false : "hidden"} whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
         <div><span className={styles.signalLabel}>Arquivo de formação</span><h2>Sua jornada continua legível depois da entrega.</h2><p>Projetos, versões e decisões formam um registro cumulativo do que você construiu e já consegue explicar.</p></div>
         <Link href={`/projetos${enrollmentId ? `?enrollmentId=${enrollmentId}` : ""}`}><FolderKanban /> Abrir arquivo de projetos <ArrowRight /></Link>
-      </section>
+      </motion.section>
     </div>
   );
 }

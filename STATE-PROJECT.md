@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-20
+date: 2026-09-21
 fase_atual: "12"
-etapa_atual: "Atlas ampliado com leitura progressiva, referências visuais e conceito de RAG; pronto para gate visual"
+etapa_atual: "Jornada premium remodelada e validada; aguardando gate visual humano"
 produto_tipo: "saas-premium"
-proximo_passo: "Realizar gate visual humano do Atlas premium em 1440, 768 e 375 px; após aprovação, consolidar a página"
+proximo_passo: "Realizar gate visual humano da Jornada em 1440, 768 e 375 px; após aprovação, consolidar a página"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -34,12 +34,15 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [ ] `student-journey-premium`: fusão da Jornada real com a direção premium implementada e validada; aguardando gate visual humano.
 - [ ] `student-knowledge-atlas`: versão premium implementada e validada em 1440/768/375, tema claro/escuro e movimento reduzido; aguardando gate visual humano.
 - [x] `explorer-activity-system-v2`: implementação local concluída, gate visual aprovado e migrations aplicadas de forma controlada no Supabase.
 - [x] `student-activity-workbench`: Mesa de Atividade Explorer v2 validada em 1440/768/375, tema claro/escuro e movimento reduzido; gate visual aprovado.
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-09-21] Jornada premium reconstruída com hero orientado à ação, mapa SVG dos quatro projetos reais, visão Explorer/Builder/Engineer, rota de construção e ritmo presencial. Projetos bloqueados não expõem acesso nem métricas, estados disponível/atual/concluído/próximo têm sinais coerentes, microtextos respeitam 11 px e a chegada do conteúdo preserva movimento reduzido. Validada em 1440/768/375, claro/escuro, teclado, sticky e sem overflow; TypeScript, lint focalizado, testes e detector Impeccable passaram.
 
 - [2026-09-20] Referência visual de RAG corrigida: conectores agora pertencem ao nó de destino por meio do componente interno reutilizável `FlowSequence`, evitando setas soltas, texto comprimido ou contato com bordas quando um fluxo cresce ou quebra linha. O beacon decorativo sem função do mapa foi removido para não parecer um quarto estado. Browser confirmou o RAG em 1440 e 375 px sem overflow; TypeScript, lint focalizado e testes do Atlas passaram.
 
@@ -184,7 +187,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Sync Requests Pendentes
 
-(nenhum — RPCs transacionais aprovadas por Vinicius em 2026-09-05.)
+- [ ] Expor `trackKey`/nível tipado em `GET /api/student/journey`; a interface atual infere Explorer, Builder ou Engineer pelo nome do currículo. Não bloqueia o gate atual, mas deve ser sincronizado em spec e contrato antes de novas nomenclaturas entrarem em produção.
 
 ## Bloqueios
 
@@ -194,6 +197,10 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - Git: o projeto vive dentro do repo do vault (sem `.git` próprio) e ~40 arquivos versionáveis seguem untracked (`docs/`, `specs/`, `supabase/migrations/`, `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`). Commits anteriores só rastrearam `app/` e `src/`. Regularizar antes do deploy (ADR-035: repo GitHub dedicado via `git init` na subpasta).
 
 ## Lições
+
+- [2026-09-21] Nunca manter duas instâncias de `next dev` do mesmo projeto compartilhando `.next`: concorrência no cache do Webpack pode produzir módulos client indefinidos (`Cannot read properties of undefined (reading 'call')`). Para recuperar, encerrar as instâncias concorrentes e iniciar uma única sessão de desenvolvimento.
+
+- [2026-09-21] Uma visão multi-trilha pode mostrar o horizonte sem fabricar progresso: a Jornada usa dados reais para projetos, evidências e presença, e conteúdo editorial estático apenas para explicar Explorer, Builder e Engineer. Estados bloqueados mostram somente o destino futuro, sem revelar métricas ou links antes da liberação.
 
 - [2026-09-20] Indicadores em SVG devem normalizar o percurso pelo número real de estados. No mapa do Atlas, `pathLength="3"` garante um segmento por aba e evita que mudanças no desenho da curva deixem sobra no último estado.
 
