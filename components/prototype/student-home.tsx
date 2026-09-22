@@ -132,14 +132,18 @@ export function StudentHome() {
         <span className={styles.missionBeam} aria-hidden="true" />
         <div className={styles.map} aria-hidden="true">
           <svg viewBox="0 0 1100 560" preserveAspectRatio="xMidYMid slice">
-            <path className={styles.mapOrbit} d="M-40 430 C190 80 490 60 700 260 S1010 520 1170 140" />
-            <path className={styles.mapOrbitMuted} d="M-80 500 C210 210 410 205 620 320 S950 445 1180 220" />
-            <path className={styles.mapRoute} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
-            <path className={styles.mapPulse} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
-            <circle cx="735" cy="275" r="9" className={styles.mapPoint} />
-            <circle cx="735" cy="275" r="24" className={styles.mapPointRing} />
-            <g className={styles.mapOrbitDot} style={{ transformOrigin: "735px 275px" } as CSSProperties}>
-              <circle cx="735" cy="261" r="3" className={styles.mapOrbitPoint} />
+            <g className={styles.mapDepthFar}>
+              <path className={styles.mapOrbit} d="M-40 430 C190 80 490 60 700 260 S1010 520 1170 140" />
+              <path className={styles.mapOrbitMuted} d="M-80 500 C210 210 410 205 620 320 S950 445 1180 220" />
+            </g>
+            <g className={styles.mapFocus}>
+              <path className={styles.mapRoute} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
+              <path className={styles.mapPulse} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
+              <circle cx="735" cy="275" r="9" className={styles.mapPoint} />
+              <circle cx="735" cy="275" r="24" className={styles.mapPointRing} />
+              <g className={styles.mapOrbitDot} style={{ transformOrigin: "735px 275px" } as CSSProperties}>
+                <circle cx="735" cy="261" r="3" className={styles.mapOrbitPoint} />
+              </g>
             </g>
           </svg>
         </div>
