@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, CalendarCheck2, ClipboardCheck, FolderKanban, Search, ShieldCheck, UserRound, UsersRound } from "lucide-react";
 import { type FormEvent, useDeferredValue, useMemo, useState } from "react";
-import type { ConsentRecord, EnrollmentSummary, GuardianRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
-import { apiMutation } from "@/components/prototype/live-api";
+import type { CompletionCheck, ConsentRecord, EnrollmentSummary, GuardianRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
+import { apiMutation, apiQuery } from "@/components/prototype/live-api";
 import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, SpotlightCard, StateScene, StatusBadge } from "@/components/academy";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
@@ -120,7 +120,7 @@ export function AdminStudentDetail({ studentId }: { studentId: string }) {
           <TabsTrigger className={styles.tabTrigger} value="guardian">Responsável e consentimento</TabsTrigger>
         </TabsList>
         <TabsContent className={styles.tabPanel} value="overview"><StudentOverview student={student} guardian={guardian} consent={consent} /></TabsContent>
-        <TabsContent className={styles.tabPanel} value="enrollments"><EnrollmentList enrollments={enrollments} /></TabsContent>
+        <TabsContent className={styles.tabPanel} value="enrollments"><EnrollmentList enrollments={enrollments} reload={reload} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="submissions"><StudentSubmissions studentId={student.id} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="attendance"><StudentAttendance studentId={student.id} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="projects"><ProjectList projects={projects} /></TabsContent>
@@ -171,9 +171,17 @@ function StudentOverview({ student, guardian, consent }: { student: StudentSumma
   );
 }
 
-function EnrollmentList({ enrollments }: { enrollments: readonly EnrollmentSummary[] }) {
+function EnrollmentList({ enrollments, reload }: { enrollments: readonly EnrollmentSummary[]; reload: () => Promise<void> }) {
   if (!enrollments.length) return <StateScene state="empty" title="Nenhuma matrícula" description="Este aluno ainda não iniciou um percurso na Academy." />;
-  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Matrículas</h2><p>Turma e produto individual convivem sem misturar dados pessoais.</p></div><UsersRound aria-hidden="true" /></div><div className={styles.paperBody}><DataList items={[...enrollments]} ariaLabel="Matrículas do aluno" renderItem={(enrollment) => <div className={styles.rowLink}><span className={styles.rowIdentity}><span className={styles.avatar}>{enrollment.kind === "class" ? "T" : "I"}</span><span className={styles.rowCopy}><strong>{enrollment.curriculumName}</strong><small>{enrollment.kind === "class" ? "Turma" : "Individual"}</small></span></span><span className={styles.rowMeta}><strong>{enrollment.activatedAt ? `Ativada em ${formatDate(enrollment.activatedAt)}` : "Aguardando ativação"}</strong><small>{enrollment.completedAt ? `Concluída em ${formatDate(enrollment.completedAt)}` : "Percurso em andamento"}</small></span><span className={styles.rowSignals}><StatusBadge tone={enrollment.status === "active" ? "success" : enrollment.status === "paused" ? "warning" : "neutral"}>{enrollment.status}</StatusBadge></span></div>} /></div></section>;
+  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Matrículas</h2><p>Turma e produto individual convivem sem misturar dados pessoais.</p></div><UsersRound aria-hidden="true" /></div><div className={styles.paperBody}>{enrollments.map((enrollment) => <EnrollmentLifecycle key={enrollment.id} enrollment={enrollment} reload={reload} />)}</div></section>;
+}
+
+function EnrollmentLifecycle({ enrollment, reload }: { enrollment: EnrollmentSummary; reload: () => Promise<void> }) {
+  const [pending, setPending] = useState(false); const [notice, setNotice] = useState<string | null>(null); const [check, setCheck] = useState<CompletionCheck | null>(null);
+  async function changeStatus(status: "active" | "paused" | "cancelled") { setPending(true); setNotice(null); try { await apiMutation(`/api/admin/enrollments/${enrollment.id}`, "PATCH", { status }); await reload(); setNotice("Status da matrícula atualizado."); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível atualizar a matrícula."); } finally { setPending(false); } }
+  async function inspectCompletion() { setPending(true); setNotice(null); try { setCheck(await apiQuery<CompletionCheck>(`/api/admin/enrollments/${enrollment.id}/completion`)); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível conferir a conclusão."); } finally { setPending(false); } }
+  async function complete() { setPending(true); setNotice(null); try { await apiMutation(`/api/admin/enrollments/${enrollment.id}/complete`, "POST", {}); await reload(); setNotice("Matrícula concluída."); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível concluir a matrícula."); } finally { setPending(false); } }
+  return <article className={styles.attendanceRow}><div className={styles.rowIdentity}><span className={styles.avatar}>{enrollment.kind === "class" ? "T" : "I"}</span><span className={styles.rowCopy}><strong>{enrollment.curriculumName}</strong><small>{enrollment.kind === "class" ? "Turma" : "Individual"} · {enrollment.completedAt ? `concluída em ${formatDate(enrollment.completedAt)}` : "percurso em andamento"}</small></span></div><div className={styles.formActions}><StatusBadge tone={enrollment.status === "active" ? "success" : enrollment.status === "paused" ? "warning" : "neutral"}>{enrollment.status}</StatusBadge>{enrollment.status !== "completed" && <><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void changeStatus(enrollment.status === "paused" ? "active" : "paused")}>{enrollment.status === "paused" ? "Reativar" : "Pausar"}</button><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void inspectCompletion()}>Conferir conclusão</button></>} </div>{check && <div className={check.eligible ? styles.notice : styles.warning}><strong>{check.eligible ? "Pronta para conclusão" : "Conclusão bloqueada"}</strong><p>{check.blockers.length ? check.blockers.join(" · ") : "Todos os requisitos foram atendidos."}</p>{check.eligible && <button type="button" className={styles.toolbarAction} disabled={pending} onClick={() => void complete()}>Concluir matrícula</button>}</div>}{notice && <p className={styles.notice} role="status">{notice}</p>}</article>;
 }
 
 function ProjectList({ projects }: { projects: readonly ProjectSummary[] }) {
