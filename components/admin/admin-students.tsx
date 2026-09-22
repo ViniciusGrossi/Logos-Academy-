@@ -9,6 +9,7 @@ import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, Spotlight
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
 import { useAdminStudent, useAdminStudentAttendance, useAdminStudentSubmissions, useAdminStudents } from "./admin-data";
+import { InviteStudentSheet } from "./admin-operations-sheets";
 import { hasStudentRisk, matchesRisk, type RiskFilter } from "./admin-utils";
 import styles from "./admin-experience.module.css";
 
@@ -34,6 +35,7 @@ export function AdminStudents() {
         title="Cada aluno, um percurso visível."
         description="Encontre rapidamente quem precisa de acompanhamento sem perder o contexto da turma, das evidências e da frequência presencial."
         marker="até 6 por turma"
+        action={<InviteStudentSheet afterSave={reload} />}
       />
       <MetricStrip metrics={[
         { id: "visible", label: "Alunos encontrados", value: String(data?.items.length ?? 0), detail: "na consulta atual" },

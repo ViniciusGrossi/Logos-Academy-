@@ -7,6 +7,7 @@ import type {
   EnrollmentSummary,
   GuardianRecord,
   AdminStudentAttendanceEntry,
+  CurriculumOption,
   Page,
   ProjectSummary,
   ReviewQueueSubmission,
@@ -57,6 +58,10 @@ export function useAdminClasses(status: ClassSummary["status"] | "all") {
     return `/api/admin/classes?${params}`;
   }, [status]);
   return useLiveApi<Page<ClassSummary>>(query);
+}
+
+export function useAdminCurricula() {
+  return useLiveApi<readonly CurriculumOption[]>("/api/admin/curricula");
 }
 
 export function useAdminClass(classId: string | undefined) {

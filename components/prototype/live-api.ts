@@ -29,9 +29,9 @@ export async function apiQuery<T>(url: string): Promise<T> {
   return result.data;
 }
 
-export async function apiMutation<T>(url: string, method: "POST" | "PUT" | "PATCH" | "DELETE", body: unknown): Promise<T> {
+export async function apiMutation<T>(url: string, method: "POST" | "PUT" | "PATCH" | "DELETE", body: unknown, options?: { headers?: Record<string, string> }): Promise<T> {
   if (isDemoMode()) return demoApi<T>(url, method, isJsonObject(body) ? body : undefined);
-  const response = await fetch(url, { method, credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const response = await fetch(url, { method, credentials: "same-origin", headers: { "content-type": "application/json", ...options?.headers }, body: JSON.stringify(body) });
   const result: unknown = await response.json();
   if (!response.ok || !isSuccess<T>(result)) throw new Error(isFailure(result) ? result.error.message : "Não foi possível salvar.");
   return result.data;
