@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Send } from "lucide-react";
+import Link from "next/link";
+import { ArrowUpRight, Check, Send } from "lucide-react";
 import type { CriterionReview, Page, ReviewQueueSubmission } from "@/specs/api.contracts";
 import { apiMutation, useLiveApi } from "./live-api";
 import { EmptyState, ErrorState, LoadingState } from "./state-lab";
@@ -37,7 +38,7 @@ export function ReviewQueue() {
   return <>
     <header className="admin-header"><div><span className="meta-label">Feedback pedagógico</span><h1>Revisões para concluir.</h1></div></header>
     <section className="operation-panel"><div className="queue-list">{data.items.map((submission) => <article className="work-sheet" key={submission.id}>
-      <span className="meta-label">Atividade {submission.assignmentId.slice(0, 8)} · versão {submission.version}</span><h2>Entrega enviada</h2><p>{submission.items.map((item) => item.textValue ?? item.urlValue ?? "Arquivo").join(" · ") || "Sem itens legíveis."}</p>
+      <span className="meta-label">{submission.student.displayName} · {submission.activity.title} · versão {submission.version}</span><h2>Entrega enviada</h2><p>{submission.items.map((item) => item.textValue ?? item.urlValue ?? "Arquivo").join(" · ") || "Sem itens legíveis."}</p><Link href={`/admin/revisoes/${submission.id}`} className="text-action">Abrir workspace <ArrowUpRight /></Link>
       <div className="review-criteria" aria-label="Critérios de avaliação">{submission.criteria.map((criterion) => <fieldset key={criterion.id}><legend>{criterion.label}</legend><small>{criterion.description}</small><div><button type="button" className={results[submission.id]?.[criterion.id] === "met" ? "is-selected" : ""} onClick={() => setResults((current) => ({ ...current, [submission.id]: { ...current[submission.id], [criterion.id]: "met" } }))}>Atendeu</button><button type="button" className={results[submission.id]?.[criterion.id] === "needs_adjustment" ? "is-selected" : ""} onClick={() => setResults((current) => ({ ...current, [submission.id]: { ...current[submission.id], [criterion.id]: "needs_adjustment" } }))}>Ajustar</button></div></fieldset>)}</div>
       <label className="floating-field"><span>Feedback para o aluno</span><textarea value={feedback[submission.id] ?? ""} onChange={(event) => setFeedback((current) => ({ ...current, [submission.id]: event.target.value }))} placeholder="Reconheça a decisão, indique o próximo passo." /></label>
       <button className="button-primary" onClick={() => void review(submission)}>Publicar feedback <Send /></button>

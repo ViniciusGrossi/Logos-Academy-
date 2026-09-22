@@ -6,8 +6,10 @@ import type {
   ConsentRecord,
   EnrollmentSummary,
   GuardianRecord,
+  AdminStudentAttendanceEntry,
   Page,
   ProjectSummary,
+  ReviewQueueSubmission,
   SessionSummary,
   StudentSummary,
 } from "@/specs/api.contracts";
@@ -38,6 +40,14 @@ export function useAdminStudents(search: string) {
 
 export function useAdminStudent(studentId: string | undefined) {
   return useLiveApi<StudentDetailData>(studentId ? `/api/admin/students/${studentId}` : null);
+}
+
+export function useAdminStudentSubmissions(studentId: string | undefined) {
+  return useLiveApi<Page<ReviewQueueSubmission>>(studentId ? `/api/admin/students/${studentId}/submissions?limit=30` : null);
+}
+
+export function useAdminStudentAttendance(studentId: string | undefined) {
+  return useLiveApi<Page<AdminStudentAttendanceEntry>>(studentId ? `/api/admin/students/${studentId}/attendance?limit=30` : null);
 }
 
 export function useAdminClasses(status: ClassSummary["status"] | "all") {

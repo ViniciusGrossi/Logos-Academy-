@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpenText, CalendarDays, ChevronRight, CircleUserRound, ClipboardCheck, FolderKanban, Gauge, Home, LogOut, Menu, Moon, ShieldCheck, Sun, UserRound, UsersRound, X } from "lucide-react";
+import { BookOpenText, CalendarDays, ChevronRight, CircleUserRound, ClipboardCheck, FolderKanban, Gauge, Home, LogOut, Menu, Moon, ShieldCheck, Sun, UserRound, UsersRound, Wrench, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MeProfile } from "@/specs/api.contracts";
 import { CinematicPage } from "@/components/academy";
@@ -25,6 +25,8 @@ const adminNav = [
   { href: "/admin", label: "Visão geral", icon: Gauge },
   { href: "/admin/alunos", label: "Alunos", icon: UsersRound },
   { href: "/admin/turmas", label: "Turmas", icon: CalendarDays },
+  { href: "/admin/revisoes", label: "Revisões", icon: ClipboardCheck },
+  { href: "/admin/reposicoes", label: "Reposições", icon: Wrench },
 ] as const;
 
 const allNav = [...studentNav, ...adminNav];

@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, FolderKanban, Search, ShieldCheck, UserRound, UsersRound } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CalendarCheck2, ClipboardCheck, FolderKanban, Search, ShieldCheck, UserRound, UsersRound } from "lucide-react";
 import { type FormEvent, useDeferredValue, useMemo, useState } from "react";
 import type { ConsentRecord, EnrollmentSummary, GuardianRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
 import { apiMutation } from "@/components/prototype/live-api";
 import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, SpotlightCard, StateScene, StatusBadge } from "@/components/academy";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
-import { useAdminStudent, useAdminStudents } from "./admin-data";
+import { useAdminStudent, useAdminStudentAttendance, useAdminStudentSubmissions, useAdminStudents } from "./admin-data";
 import { hasStudentRisk, matchesRisk, type RiskFilter } from "./admin-utils";
 import styles from "./admin-experience.module.css";
 
@@ -112,16 +112,38 @@ export function AdminStudentDetail({ studentId }: { studentId: string }) {
         <TabsList variant="line" className={styles.tabsList} aria-label="Seções do aluno">
           <TabsTrigger className={styles.tabTrigger} value="overview">Visão geral</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="enrollments">Matrículas</TabsTrigger>
+          <TabsTrigger className={styles.tabTrigger} value="submissions">Entregas</TabsTrigger>
+          <TabsTrigger className={styles.tabTrigger} value="attendance">Frequência</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="projects">Projetos</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="guardian">Responsável e consentimento</TabsTrigger>
         </TabsList>
         <TabsContent className={styles.tabPanel} value="overview"><StudentOverview student={student} guardian={guardian} consent={consent} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="enrollments"><EnrollmentList enrollments={enrollments} /></TabsContent>
+        <TabsContent className={styles.tabPanel} value="submissions"><StudentSubmissions studentId={student.id} /></TabsContent>
+        <TabsContent className={styles.tabPanel} value="attendance"><StudentAttendance studentId={student.id} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="projects"><ProjectList projects={projects} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="guardian"><ConsentPanel studentId={student.id} guardian={guardian} consent={consent} reload={reload} /></TabsContent>
       </Tabs>
     </div>
   );
+}
+
+function StudentSubmissions({ studentId }: { studentId: string }) {
+  const { data, error, loading, reload } = useAdminStudentSubmissions(studentId);
+  if (loading) return <StateScene state="loading" title="Lendo entregas" description="Carregando versões, atividade e estado de revisão." />;
+  if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
+  const items = data?.items ?? [];
+  if (!items.length) return <StateScene state="empty" title="Nenhuma entrega enviada" description="As evidências publicadas pelo aluno aparecerão aqui." />;
+  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Entregas e versões</h2><p>Cada linha preserva a atividade, a versão submetida e o estado de feedback.</p></div><ClipboardCheck aria-hidden="true" /></div><DataList items={[...items]} ariaLabel="Entregas do aluno" renderItem={(submission) => <Link className={styles.rowLink} href={`/admin/revisoes/${submission.id}`}><span className={styles.rowIdentity}><span className={styles.avatar}>V{submission.version}</span><span className={styles.rowCopy}><strong>{submission.activity.title}</strong><small>Ciclo {submission.activity.cyclePosition} · aula {submission.activity.lessonPosition}</small></span></span><span className={styles.rowMeta}><strong>{submission.submittedAt ? `Enviada em ${formatDate(submission.submittedAt)}` : "Rascunho"}</strong><small>{submission.items.length} item(ns) · {submission.isLate ? "fora do prazo" : "no prazo"}</small></span><span className={styles.rowSignals}><StatusBadge tone={submission.review?.decision === "approved" ? "success" : submission.review ? "warning" : "neutral"}>{submission.review?.decision === "approved" ? "Aprovada" : submission.review ? "Ajustes pedidos" : "Aguardando"}</StatusBadge><ArrowUpRight className={styles.rowArrow} /></span></Link>} /></section>;
+}
+
+function StudentAttendance({ studentId }: { studentId: string }) {
+  const { data, error, loading, reload } = useAdminStudentAttendance(studentId);
+  if (loading) return <StateScene state="loading" title="Lendo frequência" description="Reunindo encontro original, status e eventual reposição." />;
+  if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
+  const items = data?.items ?? [];
+  if (!items.length) return <StateScene state="empty" title="Nenhuma chamada registrada" description="A frequência aparecerá após os encontros concluídos." />;
+  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Histórico de presença</h2><p>As ausências permanecem visíveis mesmo depois de recompostas.</p></div><CalendarCheck2 aria-hidden="true" /></div><DataList items={items.map((entry) => ({ ...entry, id: entry.attendanceId }))} ariaLabel="Frequência do aluno" renderItem={(entry) => <div className={styles.rowLink}><span className={styles.rowIdentity}><span className={styles.avatar}>{String(entry.session.lessonPosition).padStart(2, "0")}</span><span className={styles.rowCopy}><strong>{entry.session.lessonTitle}</strong><small>{formatDate(entry.session.startsAt)}</small></span></span><span className={styles.rowMeta}><strong>{entry.makeup ? `Reposta em ${formatDate(entry.makeup.completedAt)}` : "Registro original"}</strong><small>{entry.privateNote || "Sem observação privada"}</small></span><span className={styles.rowSignals}><StatusBadge tone={entry.status === "present" ? "success" : entry.makeup ? "warning" : "danger"}>{entry.status === "present" ? "Presente" : entry.makeup ? "Falta reposta" : entry.status === "absent" ? "Falta" : "Justificada"}</StatusBadge></span></div>} /></section>;
 }
 
 function StudentOverview({ student, guardian, consent }: { student: StudentSummary; guardian: GuardianRecord; consent: ConsentRecord }) {
