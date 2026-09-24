@@ -19,12 +19,7 @@
   padding: clamp(1.25rem, 3.5vw, 3.5rem);
   border: 1px solid var(--journey-line);
   border-radius: 1.6rem .4rem 1.6rem 1.6rem;
-  background:
-    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--track-color) 13%, transparent), transparent 28rem),
-    linear-gradient(color-mix(in srgb, var(--journey-ink) 2.5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--journey-ink) 2.5%, transparent) 1px, transparent 1px),
-    var(--journey-bg);
-  background-size: auto, 4rem 4rem, 4rem 4rem, auto;
+  background: var(--obsidian-field);
   color: var(--journey-ink);
   box-shadow: 0 2rem 6rem color-mix(in srgb, var(--color-academy-ink) 20%, transparent);
   container: journey / inline-size;
@@ -102,7 +97,7 @@
   padding: clamp(1.5rem, 4vw, 3.5rem);
   border: 1px solid var(--journey-line);
   border-radius: 1.45rem .35rem 1.45rem 1.45rem;
-  background: color-mix(in srgb, var(--journey-surface) 76%, transparent);
+  background: var(--obsidian-card), color-mix(in srgb, var(--journey-surface) 76%, transparent);
   box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--color-academy-ink) 28%, transparent);
   transition: border-color 180ms ease, box-shadow 320ms var(--ease-standard);
 }
@@ -299,10 +294,11 @@
   position: relative;
   min-height: 20rem;
   overflow: hidden;
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--journey-ink) 4%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--journey-ink) 4%, transparent) 1px, transparent 1px);
-  background-size: 2rem 2rem;
+  /* Sideral: só dentro de canvas de mapa, onde há nós e rota. Campo estelar escasso,
+     sem roxo — o roxo é a cor da trilha Explorer e não pode virar cenário. */
+  background-image: var(--sidereal-stars);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 .mapCanvas svg { position: absolute; inset: 1rem; width: calc(100% - 2rem); height: calc(100% - 2rem); }
@@ -393,7 +389,7 @@
   margin-top: 1rem;
   border: 1px solid var(--journey-line);
   border-radius: 1.15rem .3rem 1.15rem 1.15rem;
-  background: var(--journey-surface-soft);
+  background: var(--obsidian-card), var(--journey-surface-soft);
   transition: border-color 180ms ease, box-shadow 320ms var(--ease-standard);
 }
 

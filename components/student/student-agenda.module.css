@@ -25,12 +25,8 @@
   padding: clamp(1.4rem, 3.5vw, 3.5rem);
   overflow: hidden;
   border-radius: 1.8rem .35rem 1.8rem 1.8rem;
-  background:
-    radial-gradient(circle at 82% 10%, rgb(255 107 0 / 10%), transparent 26rem),
-    linear-gradient(rgb(255 255 255 / 2%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 2%) 1px, transparent 1px),
-    var(--agenda-ink);
-  background-size: auto, 4rem 4rem, 4rem 4rem, auto;
+  /* Obsidiana: luz direcional no canto superior esquerdo, escurecendo até o oposto. */
+  background: var(--obsidian-field);
   color: var(--agenda-paper);
   /* Números de horário e contagem não podem tremer entre estados. */
   font-variant-numeric: tabular-nums;
@@ -47,9 +43,10 @@
 
 /* ---------- Próximo encontro ---------- */
 
-.nextField { position: relative; display: grid; min-height: 29rem; grid-template-columns: minmax(0, 1fr) auto; align-items: end; padding: clamp(1.5rem, 4vw, 3.5rem); overflow: hidden; border: 1px solid var(--agenda-line); border-radius: 1.5rem .35rem 1.5rem 1.5rem; background: linear-gradient(125deg, rgb(19 23 31 / 92%), rgb(19 23 31 / 72%)); box-shadow: 0 2rem 5rem rgb(0 0 0 / 18%); isolation: isolate; animation: revealUp 700ms 80ms var(--ease-entrance) both; }
+.nextField { position: relative; display: grid; min-height: 29rem; grid-template-columns: minmax(0, 1fr) auto; align-items: end; padding: clamp(1.5rem, 4vw, 3.5rem); overflow: hidden; border: 1px solid var(--agenda-line); border-radius: 1.5rem .35rem 1.5rem 1.5rem; background: radial-gradient(130% 95% at 4% -10%, var(--obsidian-light), transparent 52%), linear-gradient(158deg, color-mix(in srgb, var(--agenda-panel) 92%, var(--color-academy-paper)) 0%, var(--agenda-panel) 44%, color-mix(in srgb, var(--agenda-panel) 84%, #000) 100%); box-shadow: 0 2rem 5rem rgb(0 0 0 / 18%); isolation: isolate; animation: revealUp 700ms 80ms var(--ease-entrance) both; }
 .nextField::after { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(22rem circle at var(--spot-x, 72%) var(--spot-y, 38%), rgb(255 107 0 / 11%), transparent 70%); content: ""; transition: background-position var(--duration-standard) var(--ease-standard); }
-.fieldGrid { position: absolute; inset: 0; z-index: -2; opacity: .65; background-image: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px); background-size: 3.5rem 3.5rem; mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent); }
+/* Veios de fratura: três segmentos, ancorados na borda, mascarados antes do texto. */
+.fieldGrid { position: absolute; inset: 0; z-index: -2; background: var(--obsidian-vein); mask-image: var(--vein-mask), linear-gradient(to left, #000 0 38%, transparent 76%); mask-composite: intersect; mask-size: 100% 100%; mask-repeat: no-repeat; -webkit-mask-composite: source-in; }
 .orbit { position: absolute; top: -2rem; right: 0; width: min(57%, 48rem); height: calc(100% + 2rem); pointer-events: none; }
 .orbit svg { width: 100%; height: 100%; overflow: visible; }
 .orbitGhost, .orbitTrack { fill: none; stroke-linecap: round; }
@@ -96,7 +93,7 @@
 
 /* ---------- Superfícies compartilhadas ---------- */
 
-.calendarFrame, .sessionInspector, .presenceArc, .historyPanel, .makeupRoute, .weekBoard, .upcoming, .comingSoon { border: 1px solid var(--agenda-line); background: var(--agenda-surface); backdrop-filter: blur(.7rem); }
+.calendarFrame, .sessionInspector, .presenceArc, .historyPanel, .makeupRoute, .weekBoard, .upcoming, .comingSoon { border: 1px solid var(--agenda-line); background: var(--obsidian-card), var(--agenda-surface); backdrop-filter: blur(.7rem); }
 .frameHead { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
 .frameHead h2 { margin: .55rem 0 0; font-size: clamp(1.45rem, 2vw, 2rem); letter-spacing: -.035em; }
 .panelEmpty { margin: 0; padding: 2.5rem 1rem; border: 1px dashed var(--agenda-line); border-radius: var(--radius-lg); color: var(--agenda-muted); font-size: .8rem; text-align: center; }
@@ -125,7 +122,7 @@
 .boardDay[data-today="true"] { background: rgb(255 107 0 / 9%); box-shadow: inset 0 0 0 1px rgb(255 107 0 / 30%); }
 .boardDay[data-today="true"] b, .boardDay[data-today="true"] i { color: var(--agenda-ink-orange); }
 .boardHour { grid-column: 1; align-self: start; padding-top: .3rem; color: var(--agenda-muted); font: 700 .58rem/1 var(--font-mono); text-align: right; }
-.boardCell { border-radius: var(--radius-sm); background: rgb(255 255 255 / 2%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 3%); }
+.boardCell { border-radius: var(--radius-sm); background: rgb(255 255 255 / 2%); box-shadow: inset 0 0 0 1px var(--agenda-line); }
 
 .boardBlock { position: relative; z-index: 1; display: grid; align-content: center; gap: .25rem; margin: 0; padding: .6rem .7rem; overflow: hidden; border: 1px solid var(--tone, var(--agenda-orange)); border-radius: var(--radius-md); background: color-mix(in srgb, var(--tone, var(--agenda-orange)) 16%, transparent); color: var(--agenda-paper); text-align: left; cursor: pointer; transition: transform var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) ease, box-shadow var(--duration-standard) ease; }
 .boardBlock strong { font-size: .76rem; line-height: 1.25; letter-spacing: -.01em; }
@@ -359,11 +356,9 @@
   --agenda-paper: var(--color-academy-ink);
   --agenda-muted: var(--color-academy-muted);
   --agenda-line: color-mix(in srgb, var(--color-academy-ink) 14%, transparent);
-  background: radial-gradient(circle at 82% 10%, rgb(255 107 0 / 10%), transparent 26rem), linear-gradient(rgb(16 17 20 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(16 17 20 / 3%) 1px, transparent 1px), var(--agenda-ink);
 }
 :global(html:not(.dark)) .nextField { background: linear-gradient(125deg, rgb(255 255 255 / 94%), rgb(255 255 255 / 78%)); box-shadow: var(--shadow-elevated); }
 :global(html:not(.dark)) .calendarFrame, :global(html:not(.dark)) .sessionInspector, :global(html:not(.dark)) .presenceArc, :global(html:not(.dark)) .historyPanel, :global(html:not(.dark)) .makeupRoute, :global(html:not(.dark)) .weekBoard, :global(html:not(.dark)) .upcoming { box-shadow: var(--shadow-soft); }
-:global(html:not(.dark)) .fieldGrid, :global(html:not(.dark)) .boardCell { background-image: linear-gradient(rgb(16 17 20 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(16 17 20 / 4%) 1px, transparent 1px); }
 :global(html:not(.dark)) .boardCell, :global(html:not(.dark)) .upcomingList li, :global(html:not(.dark)) .cadence, :global(html:not(.dark)) .soonPreview, :global(html:not(.dark)) .soonReminders, :global(html:not(.dark)) .makeupRoute li { background: rgb(16 17 20 / 3%); }
 :global(html:not(.dark)) .cadenceTrack { --cadence-empty: rgb(16 17 20 / 12%); }
 :global(html:not(.dark)) .dateMonolith { background: rgb(255 255 255 / 78%); }

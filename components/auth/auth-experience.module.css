@@ -31,12 +31,10 @@
 .grid {
   position: absolute;
   inset: 0;
-  opacity: .42;
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--auth-paper) 4%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--auth-paper) 4%, transparent) 1px, transparent 1px);
-  background-size: 4rem 4rem;
-  mask-image: radial-gradient(circle at 50% 52%, #000 0 46%, transparent 82%);
+  /* Pauta de bancada: um eixo, no ritmo do corpo. Desvanece nas pontas. */
+  background-image: linear-gradient(var(--texture-rule-on-ink) 1px, transparent 1px);
+  background-size: 100% var(--texture-step);
+  mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 74%, transparent);
 }
 
 .pointerLight {
@@ -290,9 +288,9 @@
   min-width: 0;
   padding: clamp(1.4rem, 3vw, 2.25rem) clamp(1.25rem, 3.5vw, 2.6rem) clamp(1.25rem, 2.5vw, 2rem);
   background:
-    linear-gradient(color-mix(in srgb, var(--auth-ink) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(var(--texture-rule-on-paper) 1px, transparent 1px),
     var(--auth-paper);
-  background-size: 100% 2rem;
+  background-size: 100% var(--texture-step);
   color: var(--auth-ink);
 }
 
@@ -454,10 +452,8 @@
   overflow: hidden;
   border-left: 1px solid color-mix(in srgb, var(--auth-paper) 12%, transparent);
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--auth-paper) 3%, transparent) 1px, transparent 1px),
-    linear-gradient(color-mix(in srgb, var(--auth-paper) 3%, transparent) 1px, transparent 1px),
+    radial-gradient(120% 90% at 6% -8%, var(--obsidian-light), transparent 54%),
     var(--auth-raised);
-  background-size: 2.25rem 2.25rem;
   color: var(--auth-paper);
 }
 
@@ -646,10 +642,9 @@
 .formWrap {
   padding: 1.35rem 1.55rem 1.15rem;
   background:
-    linear-gradient(color-mix(in srgb, var(--auth-paper) 3%, transparent) 1px, transparent 1px),
-    linear-gradient(115deg, color-mix(in srgb, var(--auth-paper) 5%, transparent), transparent 42%),
+    linear-gradient(var(--texture-rule-on-ink) 1px, transparent 1px),
     transparent;
-  background-size: 100% 2rem, 100% 100%, 100% 100%;
+  background-size: 100% var(--texture-step);
   color: var(--auth-paper);
 }
 

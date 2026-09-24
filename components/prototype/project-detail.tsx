@@ -93,7 +93,6 @@ export function ProjectDetailPage() {
 
     {active && <section className={styles.focus} aria-labelledby="focus-title" onPointerMove={moveFocusGrid}>
       <div className={styles.focusField} aria-hidden="true"><span /><span /><span /><i /></div>
-      <div className={styles.focusCursorGrid} aria-hidden="true" />
       <div className={styles.focusCopy}>
         <div className={styles.focusMeta}><span>Próxima evidência</span><small>Aula {String(active.lessonPosition).padStart(2, "0")}</small></div>
         <span className={styles.status} data-status={active.status}>{statusCopy[active.status]}</span>

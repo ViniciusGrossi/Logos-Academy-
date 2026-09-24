@@ -473,7 +473,6 @@ export function ActivityDetail() {
           event.currentTarget.style.setProperty("--grid-y", "36%");
         }}
       >
-        <div className={styles.hoverGrid} aria-hidden="true" />
         <CoreWires />
         <div className={styles.heroCopy}>
           <span className={styles.heroMeta}>

@@ -42,44 +42,110 @@
   --spacing-reading: 68ch;
 }
 
+/*
+  Textura de superfície. Dois materiais, nenhum padrão repetido:
+
+  · OBSIDIANA — material de campo e de painel. Luz direcional de cima à esquerda,
+    escurecimento tonal até o canto oposto, veios de fratura escassos. Só neutro:
+    não gasta laranja (ação) nem roxo (trilha Explorer).
+  · PAUTA — superfície de leitura e escrita. Um eixo, passo no ritmo do corpo.
+
+  Os tokens são invariantes de tema por design: quem muda é a superfície, não o html.
+*/
 :root {
-  --card: var(--color-academy-paper);
-  --card-foreground: var(--color-academy-ink);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: var(--color-academy-orange);
-  --primary-foreground: var(--color-academy-ink);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: var(--color-academy-muted);
-  --accent: var(--color-academy-orange-soft);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: var(--color-academy-line);
-  --input: var(--color-academy-line);
-  --ring: var(--color-academy-orange);
-  --radius: 0.625rem;
+  /* Preto de campo. Único lugar para ajustar o quanto a página é escura. */
+  --obsidian-deep: #07080a;
+  --obsidian-light: rgb(255 255 255 / 5%);
+  /* Campo completo: uma receita, idêntica em toda página. Sem luz colorida —
+     laranja é sinal de ação e roxo é trilha; nenhum dos dois pode virar cenário. */
+  --obsidian-field:
+    radial-gradient(120% 80% at 6% -6%, var(--obsidian-light), transparent 54%),
+    linear-gradient(158deg,
+      color-mix(in srgb, var(--obsidian-deep) 88%, var(--color-academy-paper)) 0%,
+      var(--obsidian-deep) 46%,
+      color-mix(in srgb, var(--obsidian-deep) 84%, #000) 100%);
+  /* Luz de card: mais contida que a de campo. A página é a bancada; o card é a peça
+     em cima dela, então recebe menos luz, senão os dois competem e some a separação. */
+  --obsidian-card-light: rgb(255 255 255 / 6%);
+  --obsidian-card: radial-gradient(130% 95% at 4% -10%, var(--obsidian-card-light), transparent 52%);
+  --obsidian-vein: rgb(255 255 255 / 9%);
+  --obsidian-sheen: rgb(255 255 255 / 4%);
+  /* Veios da obsidiana como MÁSCARA, não imagem: a cor vem do token e segue o tema. */
+  --vein-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%201200%20700'%20preserveAspectRatio%3D'none'%3E%3Cg%20fill%3D'none'%20stroke%3D'white'%20stroke-width%3D'1.2'%3E%3Cpath%20d%3D'M-20%20500%20L240%20392%20L336%20428%20L610%20280'%2F%3E%3Cpath%20d%3D'M240%20392%20L192%20552'%2F%3E%3Cpath%20d%3D'M610%20280%20L940%20192%20L1220%20236'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  /* Campo estelar do tratamento sideral. Só entra em canvas de mapa. */
+  --sidereal-stars:
+    radial-gradient(1.4px 1.4px at 12% 22%, color-mix(in srgb, var(--color-academy-paper) 72%, transparent), transparent),
+    radial-gradient(1px 1px at 34% 62%, color-mix(in srgb, var(--color-academy-paper) 44%, transparent), transparent),
+    radial-gradient(1.5px 1.5px at 57% 16%, color-mix(in srgb, var(--color-academy-paper) 60%, transparent), transparent),
+    radial-gradient(1px 1px at 74% 48%, color-mix(in srgb, var(--color-academy-paper) 38%, transparent), transparent),
+    radial-gradient(1.2px 1.2px at 88% 26%, color-mix(in srgb, var(--color-academy-paper) 54%, transparent), transparent),
+    radial-gradient(1px 1px at 44% 86%, color-mix(in srgb, var(--color-academy-paper) 34%, transparent), transparent),
+    radial-gradient(1.3px 1.3px at 21% 74%, color-mix(in srgb, var(--color-academy-paper) 46%, transparent), transparent),
+    radial-gradient(1px 1px at 66% 78%, color-mix(in srgb, var(--color-academy-paper) 30%, transparent), transparent),
+    radial-gradient(1.1px 1.1px at 94% 62%, color-mix(in srgb, var(--color-academy-paper) 42%, transparent), transparent),
+    radial-gradient(1.2px 1.2px at 7% 48%, color-mix(in srgb, var(--color-academy-paper) 38%, transparent), transparent),
+    radial-gradient(1px 1px at 49% 38%, color-mix(in srgb, var(--color-academy-paper) 26%, transparent), transparent),
+    radial-gradient(1.3px 1.3px at 80% 8%, color-mix(in srgb, var(--color-academy-paper) 50%, transparent), transparent);
+  --texture-step: 2rem;
+  --texture-rule-on-paper: color-mix(in srgb, var(--color-academy-ink) 3.5%, transparent);
+  --texture-rule-on-ink: color-mix(in srgb, var(--color-academy-paper) 5%, transparent);
+}
+
+/* Em superfície clara a obsidiana vira pedra clara: a luz continua vindo do mesmo
+   canto, mas o veio precisa ser escuro para existir. */
+html:not(.dark) {
   --background: var(--color-academy-canvas);
   --foreground: var(--color-academy-ink);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --card: var(--color-academy-paper);
+  --card-foreground: var(--color-academy-ink);
+  --popover: var(--color-academy-paper);
+  --popover-foreground: var(--color-academy-ink);
+  --primary: var(--color-academy-ink);
+  --primary-foreground: var(--color-academy-paper);
+  --secondary: var(--color-academy-soft);
+  --secondary-foreground: var(--color-academy-ink);
+  --muted: var(--color-academy-soft);
+  --muted-foreground: var(--color-academy-muted);
+  --accent: var(--color-academy-soft);
+  --accent-foreground: var(--color-academy-ink);
+  --destructive: var(--color-academy-error);
+  --border: var(--color-academy-line);
+  --input: color-mix(in srgb, var(--color-academy-ink) 22%, transparent);
+  --ring: var(--color-academy-orange);
+  --chart-1: color-mix(in srgb, var(--color-academy-ink) 22%, transparent);
+  --chart-2: color-mix(in srgb, var(--color-academy-ink) 38%, transparent);
+  --chart-3: color-mix(in srgb, var(--color-academy-ink) 54%, transparent);
+  --chart-4: color-mix(in srgb, var(--color-academy-ink) 70%, transparent);
+  --chart-5: var(--color-academy-ink);
+  /* A sidebar é escura nos dois temas por decisão de design (DESIGN.md §5):
+     "Sidebar escura fixa no desktop". Aqui ela não inverte. */
+  --sidebar: var(--color-academy-ink);
+  --sidebar-foreground: var(--color-academy-paper);
+  --sidebar-primary: var(--color-academy-orange);
+  --sidebar-primary-foreground: var(--color-academy-ink);
+  --sidebar-accent: color-mix(in srgb, var(--color-academy-paper) 8%, transparent);
+  --sidebar-accent-foreground: var(--color-academy-paper);
+  --sidebar-border: color-mix(in srgb, var(--color-academy-paper) 12%, transparent);
+  --sidebar-ring: var(--color-academy-orange);
+
+  --obsidian-deep: var(--color-academy-canvas);
+  --obsidian-light: rgb(255 255 255 / 65%);
+  --obsidian-card-light: rgb(255 255 255 / 45%);
+  --obsidian-vein: rgb(16 17 20 / 7%);
+  --obsidian-sheen: rgb(255 255 255 / 45%);
 }
+
 
 * { border-color: var(--border); }
 html { background: var(--background); }
-body { margin: 0; font-family: var(--font-sans); }
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--obsidian-field);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
 button, a, input, textarea, summary { transition: transform 150ms var(--ease-standard), color 150ms var(--ease-standard), background-color 150ms var(--ease-standard), border-color 150ms var(--ease-standard), box-shadow 150ms var(--ease-standard); }
 button:active, a:active { transform: translateY(0.0625rem); }
 :focus-visible { outline: 0.1875rem solid var(--color-academy-orange); outline-offset: 0.1875rem; }
@@ -164,7 +230,9 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .skip-link { position: fixed; inset: var(--spacing-unit) auto auto var(--spacing-unit); z-index: 100; translate: 0 -150%; padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4); background: var(--color-academy-orange); color: var(--color-academy-ink); border-radius: var(--radius-md); }
   .skip-link:focus { translate: 0; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-  .academy-shell { min-height: 100vh; background: var(--background); color: var(--foreground); }
+  /* O canvas global herda a mesma obsidiana do Atlas. O shell permanece
+     transparente para que nenhuma rota volte a cobrir o material padrão. */
+  .academy-shell { min-height: 100vh; background: transparent; color: var(--foreground); }
   /* Sidebar — tratamento do protótipo "v2 Premium": gradiente de profundidade, trilho
      luminoso na borda, marca com anel orbital, cartão-tese com varredura e itens de
      navegação que deslizam no hover e carregam selo de pendência. */
@@ -216,7 +284,7 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .side-status span, .side-status small { display: block; }
   .side-status strong { color: var(--color-academy-paper); font-size: calc(var(--spacing-unit) * 3); }
   .side-status small { font-size: calc(var(--spacing-unit) * 2.75); margin-top: var(--spacing-unit); }
-  .academy-workspace { min-width: 0; margin-inline-start: var(--spacing-sidebar); }
+  .academy-workspace { min-width: 0; min-height: 100vh; margin-inline-start: var(--spacing-sidebar); background: transparent; }
   .topbar { position: sticky; top: 0; z-index: 30; display: flex; min-height: calc(var(--spacing-unit) * 18); align-items: center; justify-content: space-between; gap: calc(var(--spacing-unit) * 4); padding-inline: clamp(calc(var(--spacing-unit) * 4), 4vw, calc(var(--spacing-unit) * 10)); background: color-mix(in srgb, var(--background) 94%, transparent); border-bottom: 1px solid var(--border); backdrop-filter: blur(calc(var(--spacing-unit) * 3)); }
   .breadcrumb { display: flex; min-width: 0; align-items: center; gap: calc(var(--spacing-unit) * 2); font-size: calc(var(--spacing-unit) * 3); color: var(--muted-foreground); }
   .breadcrumb svg { width: calc(var(--spacing-unit) * 3.5); }
@@ -229,7 +297,7 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .role-switch:hover { background: var(--card); color: var(--foreground); }
   .avatar { display: inline-grid; min-width: var(--spacing-control); min-height: var(--spacing-control); place-items: center; color: var(--color-academy-orange); }
   .menu-button { display: none; }
-  .page-frame { width: min(100%, var(--spacing-content)); margin-inline: auto; padding: clamp(calc(var(--spacing-unit) * 6), 5vw, calc(var(--spacing-unit) * 14)) clamp(calc(var(--spacing-unit) * 4), 4vw, calc(var(--spacing-unit) * 10)) calc(var(--spacing-unit) * 20); }
+  .page-frame { width: min(100%, var(--spacing-content)); margin-inline: auto; padding: clamp(calc(var(--spacing-unit) * 6), 5vw, calc(var(--spacing-unit) * 14)) clamp(calc(var(--spacing-unit) * 4), 4vw, calc(var(--spacing-unit) * 10)) calc(var(--spacing-unit) * 20); background: transparent; }
   .state-selector { display: flex; flex-wrap: wrap; gap: var(--spacing-unit); width: fit-content; margin-inline-start: auto; margin-bottom: calc(var(--spacing-unit) * 6); padding: var(--spacing-unit); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--card); }
   .state-selector a { display: inline-flex; min-height: calc(var(--spacing-unit) * 8); align-items: center; padding-inline: calc(var(--spacing-unit) * 3); border-radius: calc(var(--radius-md) - var(--spacing-unit)); font-size: calc(var(--spacing-unit) * 3); color: var(--muted-foreground); }
   .state-selector a:hover, .state-selector a.active { background: var(--foreground); color: var(--background); }
@@ -254,20 +322,6 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .progress-copy { display: flex; justify-content: space-between; gap: calc(var(--spacing-unit) * 4); margin-top: calc(var(--spacing-unit) * 8); margin-bottom: calc(var(--spacing-unit) * 2); font-size: calc(var(--spacing-unit) * 3); color: var(--muted-foreground); }
   [data-slot="progress"] { height: calc(var(--spacing-unit) * 2); background: var(--color-academy-soft); }
   [data-slot="progress-indicator"] { background: var(--color-academy-orange); transition: transform 500ms var(--ease-standard); }
-  .construction-map { position: relative; min-width: 0; padding: clamp(calc(var(--spacing-unit) * 6), 4vw, calc(var(--spacing-unit) * 10)); overflow: hidden; background: var(--color-academy-ink); color: var(--color-academy-paper); }
-  .map-grid { position: absolute; inset: 0; opacity: .1; background-image: linear-gradient(color-mix(in srgb, var(--color-academy-paper) 45%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--color-academy-paper) 45%, transparent) 1px, transparent 1px); background-size: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 8); }
-  .map-title { position: relative; font-family: var(--font-mono); font-size: calc(var(--spacing-unit) * 2.75); text-transform: uppercase; letter-spacing: .08em; color: color-mix(in srgb, var(--color-academy-paper) 66%, transparent); }
-  .construction-map ol { position: relative; display: grid; gap: calc(var(--spacing-unit) * 4); margin: calc(var(--spacing-unit) * 6) 0 0; padding: 0; list-style: none; }
-  .construction-map li { display: flex; min-width: 0; align-items: center; gap: calc(var(--spacing-unit) * 4); }
-  .construction-map li:nth-child(even) { margin-inline-start: calc(var(--spacing-unit) * 7); }
-  .construction-map li:hover { transform: translateX(var(--spacing-unit)); }
-  .checkpoint-code { display: grid; width: calc(var(--spacing-unit) * 11); height: calc(var(--spacing-unit) * 11); flex: 0 0 auto; place-items: center; border: 1px solid color-mix(in srgb, var(--color-academy-paper) 25%, transparent); border-radius: var(--radius-md); font: 700 calc(var(--spacing-unit) * 2.75) var(--font-mono); }
-  .current .checkpoint-code { background: var(--color-academy-orange); color: var(--color-academy-ink); border-color: var(--color-academy-orange); }
-  .done .checkpoint-code { color: var(--color-academy-success); }
-  .checkpoint-code svg { width: calc(var(--spacing-unit) * 4); }
-  .construction-map li > span:last-child { min-width: 0; }
-  .construction-map strong, .construction-map small { display: block; }
-  .construction-map small { margin-top: var(--spacing-unit); color: color-mix(in srgb, var(--color-academy-paper) 58%, transparent); }
   .evidence-section { margin-top: calc(var(--spacing-unit) * 12); }
   .section-heading { display: flex; min-width: 0; align-items: end; justify-content: space-between; gap: calc(var(--spacing-unit) * 6); }
   .section-heading h2 { margin-block: calc(var(--spacing-unit) * 2) 0; font-size: calc(var(--spacing-unit) * 7); letter-spacing: -.025em; }
@@ -459,7 +513,6 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .sidebar-backdrop { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--color-academy-ink) 56%, transparent); }
   .academy-workspace { margin-inline-start: 0; }
   .mission-rail, .activity-layout, .admin-layout { grid-template-columns: 1fr; }
-  .construction-map { min-height: calc(var(--spacing-unit) * 76); }
   .student-intro { align-items: start; flex-direction: column; }
 }
 
@@ -489,7 +542,7 @@ button:active, a:active { transform: translateY(0.0625rem); }
 
 @media (prefers-reduced-motion: reduce) {
   .neon-edge:hover::before, .neon-edge-admin:hover::before { animation: none; }
-  .construction-map li:nth-child(even), .construction-map li:hover, .button-primary:hover, .button-secondary:hover, .icon-button:hover, .back-link:hover { transform: none; }
+  .button-primary:hover, .button-secondary:hover, .icon-button:hover, .back-link:hover { transform: none; }
   .smooth-caret { animation: none; opacity: 1; }
   .neon-edge::before, .neon-edge-admin::before { animation: none; background-position: center; }
 }
@@ -584,7 +637,7 @@ button:active, a:active { transform: translateY(0.0625rem); }
     top: var(--glow-y);
     width: var(--glow-size);
     height: var(--glow-size);
-    background: radial-gradient(circle, color-mix(in srgb, var(--glow-color) 55%, transparent), transparent 70%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--glow-color) 7%, transparent), transparent 70%);
     border-radius: 50%;
     filter: blur(2rem);
     opacity: .42;
@@ -592,19 +645,11 @@ button:active, a:active { transform: translateY(0.0625rem); }
     animation: glow-breathe var(--glow-dur, 15s) ease-in-out infinite;
     animation-delay: var(--glow-delay, 0s);
   }
-  .glow-field__grid {
-    position: absolute;
-    inset: -1px;
-    background-image: linear-gradient(color-mix(in srgb, var(--color-academy-ink) 6%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--color-academy-ink) 6%, transparent) 1px, transparent 1px);
-    background-size: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 8);
-    animation: grid-drift 24s linear infinite;
-  }
   @keyframes glow-breathe { 0%, 100% { opacity: .42; transform: translate(-50%, -50%) scale(1); } 50% { opacity: .70; transform: translate(-50%, -50%) scale(1.08); } }
   /* Sidebar: trilho que se desenha na entrada, anel orbital da marca e varredura do cartao-tese. */
   @keyframes rail-in { from { transform: scaleY(0); } to { transform: scaleY(1); } }
   @keyframes ambient-spin { to { transform: rotate(360deg); } }
   @keyframes sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(240%) skewX(-18deg); } }
-  @keyframes grid-drift { to { background-position: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 8); } }
 
   .ticker { position: relative; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); }
   .ticker__track { display: flex; width: max-content; gap: calc(var(--spacing-unit) * 10); animation: ticker-scroll var(--ticker-dur, 22s) linear infinite; }
@@ -808,7 +853,6 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .spotlight-card::before { display: none; }
   .spotlight-card.has-beam::after { animation: none; }
   .glow-field__orb { animation: none; opacity: .5; }
-  .glow-field__grid { animation: none; }
   .ticker__track { animation: none; }
   .word-reveal__word { transform: none !important; opacity: 1 !important; transition: none !important; }
   .state-scene-premium--loading::after,

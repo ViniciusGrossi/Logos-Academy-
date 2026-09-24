@@ -19,12 +19,7 @@
   padding: clamp(1.25rem, 3.5vw, 3.5rem);
   border: 1px solid rgb(255 255 255 / 8%);
   border-radius: 1.6rem .35rem 1.6rem 1.6rem;
-  background:
-    radial-gradient(circle at 73% 20%, rgb(255 107 0 / 9%), transparent 25rem),
-    linear-gradient(rgb(255 255 255 / 2.2%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 2.2%) 1px, transparent 1px),
-    var(--home-ink);
-  background-size: auto, 4rem 4rem, 4rem 4rem, auto;
+  background: var(--obsidian-field);
   color: var(--home-paper);
   box-shadow: 0 2rem 6rem rgb(16 17 20 / 18%);
 }
@@ -42,7 +37,7 @@
 .header h1 em { color: var(--home-orange); font-style: normal; }
 /* word-up -> WordReveal (primitivo) só aceita string; a última palavra ("explicar.") herda o destaque via :last-child. */
 .header h1 :global(.word-reveal__word):last-child { color: var(--home-orange); }
-.headerStats { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(10rem, 1fr)); align-self: end; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1rem .25rem 1rem 1rem; background: rgb(20 24 32 / 62%); backdrop-filter: blur(1rem); }
+.headerStats { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(10rem, 1fr)); align-self: end; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1rem .25rem 1rem 1rem; background: var(--obsidian-card), rgb(20 24 32 / 62%); backdrop-filter: blur(1rem); }
 .statCard { position: relative; display: grid; min-width: 0; grid-template-columns: 2.25rem minmax(0, 1fr); grid-template-rows: 1fr auto; gap: .75rem; align-items: start; padding: 1rem; border-left: 1px solid rgb(255 255 255 / 8%); color: var(--home-paper); text-decoration: none; transition: background-color 180ms ease, transform 360ms var(--ease-standard); }
 .statCard:first-child { border-left: 0; }
 .statCard:hover, .statCard:focus-visible { z-index: 1; background: rgb(255 107 0 / 8%); outline: 1px solid rgb(255 107 0 / 40%); outline-offset: -1px; transform: translateY(-2px); }
@@ -117,7 +112,7 @@
 .signalOrbit { position: absolute; inset: -.6rem; animation: orbit 9s linear infinite; }
 .signalOrbit b { position: absolute; left: 50%; top: -.18rem; width: .36rem; height: .36rem; border-radius: 50%; background: var(--home-orange); box-shadow: 0 0 .7rem var(--home-orange); }
 
-.routeSection, .radar, .log { position: relative; isolation: isolate; margin-top: 1rem; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1.15rem .3rem 1.15rem 1.15rem; background: rgb(20 24 32 / 54%); backdrop-filter: blur(1rem); }
+.routeSection, .radar, .log { position: relative; isolation: isolate; margin-top: 1rem; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1.15rem .3rem 1.15rem 1.15rem; background: var(--obsidian-card), rgb(20 24 32 / 54%); backdrop-filter: blur(1rem); }
 .routeSection { padding: clamp(1.25rem, 3vw, 2rem); }
 .sectionHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 .sectionHeading span { color: var(--home-orange); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
@@ -180,11 +175,7 @@
   --home-paper: #15171c;
   --home-muted: rgb(21 23 28 / 62%);
   border-color: rgb(21 23 28 / 12%);
-  background:
-    radial-gradient(circle at 73% 20%, rgb(255 107 0 / 13%), transparent 25rem),
-    linear-gradient(rgb(21 23 28 / 4.5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(21 23 28 / 4.5%) 1px, transparent 1px),
-    var(--home-ink);
+  background: var(--obsidian-field);
   box-shadow: 0 2rem 6rem rgb(16 17 20 / 12%);
 }
 

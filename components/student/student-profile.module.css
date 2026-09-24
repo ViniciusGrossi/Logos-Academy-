@@ -21,8 +21,7 @@
   padding: clamp(1.4rem, 3.5vw, 3.5rem);
   overflow: hidden;
   border-radius: 1.8rem .35rem 1.8rem 1.8rem;
-  background: linear-gradient(rgb(255 255 255 / 2%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 2%) 1px, transparent 1px), radial-gradient(circle at 15% 18%, rgb(255 107 0 / 9%), transparent 28rem), var(--profile-ink);
-  background-size: 4rem 4rem, 4rem 4rem, auto, auto;
+  background: var(--obsidian-field);
   color: var(--profile-paper);
   font-variant-numeric: tabular-nums;
 }
@@ -59,7 +58,7 @@
 
 .passport { position: sticky; top: 6rem; display: flex; flex-direction: column; padding: clamp(1.2rem, 2.5vw, 2rem); overflow: hidden; border: 1px solid rgb(255 107 0 / 28%); border-radius: var(--profile-cut); background: linear-gradient(145deg, rgb(24 28 37 / 96%), rgb(11 14 19 / 98%)); box-shadow: 0 2rem 5rem rgb(16 17 20 / 22%); isolation: isolate; animation: riseIn 700ms 80ms var(--ease-entrance) both; }
 .passport::after { position: absolute; right: -8rem; bottom: -9rem; z-index: -1; width: 24rem; aspect-ratio: 1; border: 1px dashed rgb(255 107 0 / 18%); border-radius: 50%; content: ""; }
-.passportGrid { position: absolute; inset: 0; z-index: -2; opacity: .55; background-image: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px); background-size: 2.5rem 2.5rem; mask-image: linear-gradient(145deg, black, transparent 72%); }
+.passportGrid { position: absolute; inset: 0; z-index: -2; background: var(--obsidian-vein); mask-image: var(--vein-mask), linear-gradient(200deg, #000 0 30%, transparent 68%); mask-composite: intersect; mask-size: 100% 100%; mask-repeat: no-repeat; -webkit-mask-composite: source-in; }
 .passportHeader { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1rem; border-bottom: 1px solid var(--profile-line); }
 .passportHeader span { display: flex; align-items: center; gap: .45rem; color: var(--profile-ink-orange); font: 800 .63rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
 .passportHeader small { color: var(--profile-muted); font: 700 .56rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
@@ -103,7 +102,7 @@
 
 /* ---------- Mesa de registro ---------- */
 
-.recordDesk { border: 1px solid var(--profile-line); border-radius: var(--profile-cut-left); background: var(--profile-surface); backdrop-filter: blur(.8rem); animation: riseIn 700ms 140ms var(--ease-entrance) both; }
+.recordDesk { border: 1px solid var(--profile-line); border-radius: var(--profile-cut-left); background: var(--obsidian-card), var(--profile-surface); backdrop-filter: blur(.8rem); animation: riseIn 700ms 140ms var(--ease-entrance) both; }
 .deskHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: clamp(1.25rem, 2.5vw, 2rem); border-bottom: 1px solid var(--profile-line); }
 .deskHeader h2 { max-width: 18ch; margin: .65rem 0 0; font-size: clamp(1.7rem, 3vw, 2.7rem); line-height: 1; letter-spacing: -.045em; }
 .profileForm { display: grid; gap: 1.25rem; padding: clamp(1.25rem, 2.5vw, 2rem); }
@@ -144,7 +143,7 @@
 
 /* ---------- Completar registro ---------- */
 
-.registry { padding: clamp(1.25rem, 2.5vw, 1.8rem); border: 1px solid var(--profile-line); border-radius: var(--profile-cut-left); background: var(--profile-surface); backdrop-filter: blur(.8rem); }
+.registry { padding: clamp(1.25rem, 2.5vw, 1.8rem); border: 1px solid var(--profile-line); border-radius: var(--profile-cut-left); background: var(--obsidian-card), var(--profile-surface); backdrop-filter: blur(.8rem); }
 .registryHead { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--profile-line); }
 .registryHead h2 { margin: .5rem 0 0; font-size: 1.35rem; letter-spacing: -.035em; }
 .registryGauge { position: relative; display: grid; width: 4.6rem; aspect-ratio: 1; flex: 0 0 auto; place-items: center; border-radius: 50%; background: conic-gradient(var(--profile-orange) var(--registry), var(--profile-line) 0); }
@@ -167,7 +166,7 @@
 
 /* ---------- Portfólio ---------- */
 
-.works { padding: clamp(1.25rem, 2.8vw, 2rem); border: 1px solid var(--profile-line); border-radius: var(--profile-cut); background: var(--profile-surface); backdrop-filter: blur(.8rem); }
+.works { padding: clamp(1.25rem, 2.8vw, 2rem); border: 1px solid var(--profile-line); border-radius: var(--profile-cut); background: var(--obsidian-card), var(--profile-surface); backdrop-filter: blur(.8rem); }
 .worksHead { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
 .worksHead h2 { margin: .5rem 0 0; font-size: clamp(1.5rem, 2.4vw, 2.2rem); letter-spacing: -.04em; }
 .filterGroup { display: flex; flex-wrap: wrap; gap: .3rem; padding: .25rem; border: 1px solid var(--profile-line); border-radius: var(--radius-pill); }
@@ -199,7 +198,7 @@
 
 /* ---------- Em breve (sem backend) ---------- */
 
-.comingSoon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2.5rem); align-items: center; padding: clamp(1.25rem, 3vw, 2rem); border: 1px dashed var(--profile-line); border-radius: var(--profile-cut); background: var(--profile-surface); backdrop-filter: blur(.8rem); }
+.comingSoon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2.5rem); align-items: center; padding: clamp(1.25rem, 3vw, 2rem); border: 1px dashed var(--profile-line); border-radius: var(--profile-cut); background: var(--obsidian-card), var(--profile-surface); backdrop-filter: blur(.8rem); }
 .soonCopy h2 { margin: .6rem 0 .45rem; font-size: 1.5rem; letter-spacing: -.035em; }
 .soonCopy p { max-width: 52ch; margin: 0; color: var(--profile-muted); font-size: .8rem; line-height: 1.6; }
 .soonLabel { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .6rem; border: 1px solid var(--profile-line); border-radius: var(--radius-pill); color: var(--profile-muted); font: 800 .55rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
@@ -305,13 +304,11 @@
   --profile-paper: var(--color-academy-ink);
   --profile-muted: var(--color-academy-muted);
   --profile-line: color-mix(in srgb, var(--color-academy-ink) 14%, transparent);
-  background: linear-gradient(rgb(16 17 20 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(16 17 20 / 3%) 1px, transparent 1px), radial-gradient(circle at 15% 18%, rgb(255 107 0 / 9%), transparent 28rem), var(--profile-ink);
 }
 :global(html:not(.dark)) .passport { background: linear-gradient(145deg, rgb(255 255 255 / 96%), rgb(246 247 249 / 98%)); box-shadow: var(--shadow-elevated); }
 :global(html:not(.dark)) .recordDesk, :global(html:not(.dark)) .registry, :global(html:not(.dark)) .works, :global(html:not(.dark)) .comingSoon { box-shadow: var(--shadow-soft); }
 :global(html:not(.dark)) .portrait i { border-color: var(--color-academy-paper); }
 :global(html:not(.dark)) .passport::after { border-color: rgb(255 107 0 / 22%); }
-:global(html:not(.dark)) .passportGrid { background-image: linear-gradient(rgb(16 17 20 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(16 17 20 / 4%) 1px, transparent 1px); }
 :global(html:not(.dark)) .machineCode i { background: rgb(16 17 20 / 34%); }
 :global(html:not(.dark)) .passportSeal { background: rgb(255 255 255 / 86%); }
 :global(html:not(.dark)) .inputShell, :global(html:not(.dark)) .githubField, :global(html:not(.dark)) .soonHandle { background: rgb(255 255 255 / 68%); }

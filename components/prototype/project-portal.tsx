@@ -89,7 +89,6 @@ export function ProjectPortal() {
 
     {active && <section className={styles.activeProject} aria-labelledby="active-project-title" onPointerMove={moveFocusField} onPointerLeave={resetFocusField}>
       <div className={styles.blueprint} aria-hidden="true"><span /><span /><span /><i /></div>
-      <div className={styles.cursorGrid} aria-hidden="true" />
       <svg className={styles.elasticMesh} aria-hidden="true" viewBox="0 0 600 420" preserveAspectRatio="none">
         {[60, 120, 180, 240, 300, 360].map((y) => <path key={`h-${y}`} d={`M0 ${y} Q150 ${y - 18} 300 ${y} T600 ${y}`} />)}
         {[70, 150, 230, 310, 390, 470, 550].map((x) => <path key={`v-${x}`} d={`M${x} 0 Q${x + 18} 105 ${x} 210 T${x} 420`} />)}
