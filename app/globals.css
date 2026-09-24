@@ -432,6 +432,7 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .close-menu, .menu-button { display: inline-grid; }
   .sidebar-backdrop { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--color-academy-ink) 56%, transparent); }
   .academy-workspace { margin-inline-start: 0; }
+  .cinematic-page::before { inset-inline-start: 0; }
   .mission-rail, .activity-layout, .admin-layout { grid-template-columns: 1fr; }
   .construction-map { min-height: calc(var(--spacing-unit) * 76); }
   .student-intro { align-items: start; flex-direction: column; }
@@ -488,6 +489,40 @@ button:active, a:active { transform: translateY(0.0625rem); }
     isolation: isolate;
   }
 
+  /* Campo ambiental compartilhado do Atlas: dá continuidade às páginas sem
+     transformar superfícies de leitura em um painel escuro. */
+  .cinematic-page::before,
+  .cinematic-page::after {
+    position: fixed;
+    z-index: -1;
+    content: "";
+    pointer-events: none;
+  }
+
+  .cinematic-page::before {
+    inset: calc(var(--spacing-unit) * 18) 0 0 var(--spacing-sidebar);
+    opacity: .72;
+    background:
+      radial-gradient(circle at 72% 18%, color-mix(in srgb, var(--color-academy-orange) 10%, transparent), transparent 27rem),
+      radial-gradient(circle at 12% 76%, color-mix(in srgb, var(--color-academy-orange) 5%, transparent), transparent 23rem),
+      linear-gradient(color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px);
+    background-size: auto, auto, 2rem 2rem, 2rem 2rem;
+    mask-image: linear-gradient(to bottom, black, transparent 88%);
+  }
+
+  .cinematic-page::after {
+    top: clamp(13rem, 25vh, 22rem);
+    right: -18rem;
+    width: min(70vw, 70rem);
+    height: 1px;
+    opacity: .5;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-academy-orange) 58%, transparent), transparent);
+    box-shadow: 0 0 1.2rem color-mix(in srgb, var(--color-academy-orange) 24%, transparent);
+    transform: rotate(-12deg);
+    animation: atlas-field-drift 18s var(--ease-standard) infinite alternate;
+  }
+
   .cinematic-page__rule {
     position: absolute;
     inset: calc(var(--spacing-unit) * -8) auto auto 0;
@@ -495,6 +530,11 @@ button:active, a:active { transform: translateY(0.0625rem); }
     height: 1px;
     background: var(--color-academy-orange);
     pointer-events: none;
+  }
+
+  @keyframes atlas-field-drift {
+    from { translate: -4% 0; opacity: .28; }
+    to { translate: 4% 1.4rem; opacity: .62; }
   }
 
   .spotlight-card {
@@ -789,6 +829,7 @@ button:active, a:active { transform: translateY(0.0625rem); }
   .state-scene-premium--loading::after,
   .state-scene-premium--loading .state-scene-premium__icon svg,
   .state-scene-premium__skeleton > * { animation: none; }
+  .cinematic-page::after { animation: none; opacity: .34; }
   :is(a, button, [role="button"]):hover .destination-cue svg,
   .avatar:hover { transform: none; }
 }
