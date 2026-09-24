@@ -503,8 +503,8 @@ function ConceptReader({
           <p>{detail.body}</p>
         </section>
       </div>
-      <RelatedItems
-        label="Continue conectando"
+      <ConceptConstellation
+        center={detail.title}
         items={detail.relatedConcepts}
         onOpen={onOpenRelated}
       />
@@ -645,8 +645,20 @@ function ReaderHeading({
   );
 }
 
+/**
+ * Player do Atlas. Fachada: o iframe do YouTube só entra depois do clique.
+ *
+ * A composição separa as zonas de propósito. Miniatura do YouTube é arte que grita
+ * (tipografia própria, rosto, cor saturada); deitar nosso título em cima dela foi o
+ * que deixava o bloco ilegível. Agora o metadado mora em barras nossas — uma acima,
+ * uma abaixo — e a arte fica inteira no meio, com o play sozinho no centro.
+ */
 function LazyVideo({ detail }: { detail: ConceptDetail }) {
   const [playing, setPlaying] = useState(false);
+  // maxresdefault é 1280x720 (16:9 real). hqdefault é 480x360 (4:3) e precisa ser
+  // cortado para caber, o que amassava a imagem. Nem todo vídeo tem maxres: cai no
+  // mqdefault, que é 16:9 e sempre existe.
+  const [thumbQuality, setThumbQuality] = useState<"maxresdefault" | "mqdefault">("maxresdefault");
   const videoId = youtubeIdFromUrl(detail.videoUrl);
   const title = detail.videoTitle ?? `Vídeo sobre ${detail.title}`;
 
@@ -662,38 +674,56 @@ function LazyVideo({ detail }: { detail: ConceptDetail }) {
     );
   }
 
+  const duration = detail.videoDurationMinutes;
+
   return (
-    <div className={styles.videoFrame}>
-      {playing ? (
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&cc_load_policy=1`}
-          title={title}
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowFullScreen
-        />
-      ) : (
-        <button type="button" className={styles.videoPoster} onClick={() => setPlaying(true)}>
-          <Image
-            className={styles.videoPosterImage}
-            src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
-            alt=""
-            fill
-            sizes="(max-width: 840px) 100vw, 460px"
-          />
-          <span className={styles.videoPosterShade} aria-hidden="true" />
-          <span className={styles.playButton}><Play aria-hidden="true" /></span>
-          <span className={styles.videoPosterCopy}>
-            <strong>{title}</strong>
-            <small>{detail.videoDurationMinutes ?? 0} min · carregado somente ao reproduzir</small>
-          </span>
-        </button>
-      )}
-      {!playing && (
-        <a href={detail.videoUrl} target="_blank" rel="noreferrer">
-          Abrir no YouTube <ExternalLink aria-hidden="true" />
+    <figure className={styles.videoFrame}>
+      <div className={styles.videoTopBar}>
+        <span className={styles.videoKind}>
+          <Video aria-hidden="true" /> Vídeo{duration ? ` · ${duration} min` : ""}
+        </span>
+        <a
+          className={styles.videoExternal}
+          href={detail.videoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Abrir no YouTube"
+        >
+          <ExternalLink aria-hidden="true" />
+          <span className={styles.srOnly}>Abrir no YouTube</span>
         </a>
-      )}
-    </div>
+      </div>
+
+      <div className={styles.videoStage}>
+        {playing ? (
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&iv_load_policy=3&cc_load_policy=1&color=white`}
+            title={title}
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+          />
+        ) : (
+          <button type="button" className={styles.videoPoster} onClick={() => setPlaying(true)}>
+            <Image
+              className={styles.videoPosterImage}
+              src={`https://i.ytimg.com/vi/${videoId}/${thumbQuality}.jpg`}
+              alt=""
+              fill
+              sizes="(max-width: 840px) 100vw, 460px"
+              onError={() => setThumbQuality("mqdefault")}
+            />
+            <span className={styles.videoPosterShade} aria-hidden="true" />
+            <span className={styles.playButton} aria-hidden="true"><Play /></span>
+            <span className={styles.srOnly}>Assistir: {title}</span>
+          </button>
+        )}
+      </div>
+
+      <figcaption className={styles.videoMeta}>
+        <strong>{title}</strong>
+        <small>{playing ? "Reproduzindo no player do YouTube" : "O vídeo só é carregado quando você toca em reproduzir"}</small>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -860,6 +890,82 @@ function SafeSpecimen({ name, index }: { name: string; index: number }) {
   if (/navega/.test(normalized)) return <nav className={styles.demoNav} aria-label="Exemplo de navegação"><span data-active="true">Visão</span><span>Tokens</span><span>Uso</span></nav>;
   if (/contexto|callout|alerta/.test(normalized)) return <div className={styles.demoCallout}><Sparkles /><span>Contraste indica a próxima decisão.</span></div>;
   return <div className={styles.demoEditorial}><small>0{index + 1} · direção</small><strong>{name}</strong><span>Mensagem principal com espaço para respirar.</span></div>;
+}
+
+/**
+ * Constelação de conceitos: o conceito aberto no centro, os relacionados em órbita.
+ * Hub-e-raios com dado real (`ConceptDetail.relatedConcepts`) — não é diagrama decorativo.
+ * O pulso que percorre cada aresta usa o mesmo `stroke-dasharray` da rota da Jornada,
+ * em vez de trazer uma biblioteca de animação nova.
+ */
+function ConceptConstellation({
+  center,
+  items,
+  onOpen,
+}: {
+  center: string;
+  items: readonly { id: string; title: string; summary: string }[];
+  onOpen: (id: string) => void;
+}) {
+  if (items.length === 0) return null;
+
+  // A caixa é larga, então a órbita começa na horizontal (0°) e não no topo:
+  // com 2 relacionados isso dá esquerda/direita em vez de uma linha vertical,
+  // que desperdiçaria a largura e cruzaria o rótulo do centro.
+  const nodes = items.map((item, index) => {
+    const angle = (index / items.length) * Math.PI * 2;
+    return {
+      ...item,
+      x: 50 + Math.cos(angle) * 30,
+      y: 50 + Math.sin(angle) * 32,
+    };
+  });
+
+  return (
+    <section className={styles.constellation} aria-labelledby="constellation-title">
+      <div className={styles.constellationHead}>
+        <span className={styles.signalLabel}>Continue conectando</span>
+        <strong id="constellation-title">A partir de {center}</strong>
+        <small>{items.length} {items.length === 1 ? "conceito liberado se conecta" : "conceitos liberados se conectam"} a este.</small>
+      </div>
+
+      <div className={styles.constellationCanvas}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          {nodes.map((node, index) => (
+            <g key={node.id}>
+              <line className={styles.edge} x1="50" y1="50" x2={node.x} y2={node.y} />
+              <line
+                className={styles.edgePulse}
+                x1="50"
+                y1="50"
+                x2={node.x}
+                y2={node.y}
+                style={{ animationDelay: `${index * 0.9}s` } as React.CSSProperties}
+              />
+            </g>
+          ))}
+        </svg>
+
+        <span className={styles.constellationCore} aria-hidden="true">
+          <i />
+          <b>{center}</b>
+        </span>
+
+        {nodes.map((node) => (
+          <button
+            key={node.id}
+            type="button"
+            className={styles.constellationNode}
+            style={{ left: `${node.x}%`, top: `${node.y}%` } as React.CSSProperties}
+            onClick={() => onOpen(node.id)}
+          >
+            <strong>{node.title}</strong>
+            <small>{node.summary}</small>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function RelatedItems({

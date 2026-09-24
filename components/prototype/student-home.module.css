@@ -19,12 +19,7 @@
   padding: clamp(1.25rem, 3.5vw, 3.5rem);
   border: 1px solid rgb(255 255 255 / 8%);
   border-radius: 1.6rem .35rem 1.6rem 1.6rem;
-  background:
-    radial-gradient(circle at 73% 20%, rgb(255 107 0 / 9%), transparent 25rem),
-    linear-gradient(rgb(255 255 255 / 2.2%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 2.2%) 1px, transparent 1px),
-    var(--home-ink);
-  background-size: auto, 4rem 4rem, 4rem 4rem, auto;
+  background: var(--obsidian-field);
   color: var(--home-paper);
   box-shadow: 0 2rem 6rem rgb(16 17 20 / 18%);
 }
@@ -42,7 +37,7 @@
 .header h1 em { color: var(--home-orange); font-style: normal; }
 /* word-up -> WordReveal (primitivo) só aceita string; a última palavra ("explicar.") herda o destaque via :last-child. */
 .header h1 :global(.word-reveal__word):last-child { color: var(--home-orange); }
-.headerStats { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(10rem, 1fr)); align-self: end; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1rem .25rem 1rem 1rem; background: rgb(20 24 32 / 62%); backdrop-filter: blur(1rem); }
+.headerStats { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(10rem, 1fr)); align-self: end; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1rem .25rem 1rem 1rem; background: var(--obsidian-card), rgb(20 24 32 / 62%); backdrop-filter: blur(1rem); }
 .statCard { position: relative; display: grid; min-width: 0; grid-template-columns: 2.25rem minmax(0, 1fr); grid-template-rows: 1fr auto; gap: .75rem; align-items: start; padding: 1rem; border-left: 1px solid rgb(255 255 255 / 8%); color: var(--home-paper); text-decoration: none; transition: background-color 180ms ease, transform 360ms var(--ease-standard); }
 .statCard:first-child { border-left: 0; }
 .statCard:hover, .statCard:focus-visible { z-index: 1; background: rgb(255 107 0 / 8%); outline: 1px solid rgb(255 107 0 / 40%); outline-offset: -1px; transform: translateY(-2px); }
@@ -61,13 +56,24 @@
 .progressRing { position: absolute; right: .75rem; bottom: .75rem; display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; background: conic-gradient(var(--home-orange) var(--progress), rgb(255 255 255 / 10%) 0); }
 .progressRing::after { width: 1.45rem; height: 1.45rem; border-radius: 50%; background: var(--home-raised); content: ""; }
 
-.mission { --home-spot-x: 50%; --home-spot-y: 50%; position: relative; isolation: isolate; min-height: 31rem; margin-top: clamp(1.5rem, 3vw, 2.7rem); overflow: hidden; border: 1px solid rgb(255 255 255 / 14%); border-radius: 1.5rem .35rem 1.5rem 1.5rem; background: linear-gradient(110deg, rgb(15 18 25 / 96%) 0 44%, rgb(15 18 25 / 63%) 67%, rgb(15 18 25 / 74%)); box-shadow: 0 2rem 5rem rgb(0 0 0 / 28%), inset 0 1px rgb(255 255 255 / 6%); }
+.mission { --home-spot-x: 50%; --home-spot-y: 50%; --px: 0; --py: 0; position: relative; isolation: isolate; min-height: 31rem; margin-top: clamp(1.5rem, 3vw, 2.7rem); overflow: hidden; border: 1px solid rgb(255 255 255 / 14%); border-radius: 1.5rem .35rem 1.5rem 1.5rem; background: linear-gradient(110deg, rgb(15 18 25 / 96%) 0 44%, rgb(15 18 25 / 63%) 67%, rgb(15 18 25 / 74%)); box-shadow: 0 2rem 5rem rgb(0 0 0 / 28%), inset 0 1px rgb(255 255 255 / 6%); }
 .mission::before { position: absolute; z-index: 1; inset: 0; background: radial-gradient(22rem circle at var(--home-spot-x) var(--home-spot-y), rgb(255 107 0 / 12%), transparent 70%); content: ""; pointer-events: none; }
 .mission::after { position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--home-orange) 20% 46%, transparent 78%); content: ""; }
 /* Halo de Prioridade (SpotlightCard.beam, design-system): reservado à próxima missão — cópia local do padrão global
    porque @keyframes/animation-name são escopados pelo CSS Modules e não alcançam o keyframe global do primitivo. */
 .missionBeam { position: absolute; z-index: 4; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none; background: conic-gradient(from var(--mission-beam-angle, 0deg), transparent 0deg, rgb(255 107 0 / 70%) 40deg, transparent 100deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: mission-beam-rotate 3.2s linear infinite; }
-.map { position: absolute; inset: -2rem -2rem -2rem 30%; opacity: .9; will-change: transform; }
+/* Parallax multi-depth. Cinco camadas, deslocamento em px por unidade de --px/--py:
+   órbitas de fundo -26 (dentro do mapa) · mapa 58 · rota+foco +32 (dentro do mapa) · cópia -26 · sinal 66.
+   As três camadas do mapa também giram, com origens diferentes: o grupo do foco gira em torno do próprio
+   ponto de posição atual, então a rota balança sem que o ponto saia de cima dela. */
+/* Sangria do mapa (-5.5rem) tem de superar curso + rotação (≈58px + ≈11px) ou o deslocamento mostra a borda.
+   Sinais opostos dão profundidade; durações diferentes por camada (520–1100ms, expo-out) dão o arrasto
+   solto — cada camada persegue o cursor no seu próprio tempo em vez de todas andarem juntas. */
+.map { position: absolute; inset: -5.5rem -5.5rem -5.5rem 24%; opacity: .9; will-change: transform; transform: translate3d(calc(var(--px, 0) * 58px), calc(var(--py, 0) * 38px), 0) rotate(calc(var(--px, 0) * 1.4deg)); transition: transform 800ms var(--ease-entrance); }
+/* Profundidade interna do mapa: as órbitas de fundo derivam ao contrário e mais devagar; a rota e o
+   ponto de posição atual viajam juntos (senão o ponto desgruda da linha) e mais rápido. */
+.mapDepthFar { transform-box: view-box; transform-origin: 550px 280px; will-change: transform; transform: translate3d(calc(var(--px, 0) * -26px), calc(var(--py, 0) * -17px), 0) rotate(calc(var(--px, 0) * -.8deg)); transition: transform 1200ms var(--ease-entrance); }
+.mapFocus { transform-box: view-box; transform-origin: 735px 275px; will-change: transform; transform: translate3d(calc(var(--px, 0) * 32px), calc(var(--py, 0) * 21px), 0) rotate(calc(var(--px, 0) * .9deg)); transition: transform 560ms var(--ease-entrance); }
 .map svg { width: 100%; height: 100%; overflow: visible; }
 .mapOrbit, .mapOrbitMuted, .mapRoute, .mapPulse { fill: none; vector-effect: non-scaling-stroke; }
 .mapOrbit { stroke: rgb(255 107 0 / 30%); stroke-width: 1; stroke-dasharray: 2 9 48 14; }
@@ -79,7 +85,7 @@
 /* orbit (T3, assinatura pontual "no mapa"): ponto que gira ao redor da posição atual na rota. */
 .mapOrbitDot { animation: orbit 9s linear infinite; }
 .mapOrbitPoint { fill: var(--home-orange); filter: drop-shadow(0 0 .5rem var(--home-orange)); }
-.missionCopy { position: relative; z-index: 3; display: flex; width: min(54%, 38rem); min-height: 31rem; flex-direction: column; justify-content: center; padding: clamp(1.5rem, 4vw, 3.5rem); }
+.missionCopy { position: relative; z-index: 3; display: flex; width: min(54%, 38rem); min-height: 31rem; flex-direction: column; justify-content: center; padding: clamp(1.5rem, 4vw, 3.5rem); will-change: transform; transform: translate3d(calc(var(--px, 0) * -26px), calc(var(--py, 0) * -17px), 0); transition: transform 1000ms var(--ease-entrance); }
 .missionMeta { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(255 255 255 / 11%); color: var(--home-muted); font: 750 .58rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
 .missionMeta span:first-child { color: var(--home-orange); }
 .actionKind { margin-top: 1.6rem; color: var(--home-orange); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
@@ -98,10 +104,15 @@
 .primaryAction:hover svg, .secondaryAction:hover svg { transform: translateX(.2rem); }
 .secondaryAction { border: 1px solid rgb(255 255 255 / 16%); color: var(--home-paper); }
 .primaryAction:focus-visible, .secondaryAction:focus-visible { outline: 3px solid rgb(255 107 0 / 36%); outline-offset: 3px; }
-.missionSignal { position: absolute; z-index: 3; right: 8%; top: 48%; display: grid; justify-items: center; gap: .6rem; color: var(--home-orange); font: 800 .52rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
-.missionSignal svg { width: 1.1rem; filter: drop-shadow(0 0 .8rem var(--home-orange)); animation: ambient-pulse 2.8s ease-in-out infinite; }
+.missionSignal { position: absolute; z-index: 3; right: 11%; top: 48%; display: grid; justify-items: center; gap: .6rem; color: var(--home-orange); font: 800 .52rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; will-change: transform; transform: translate3d(calc(var(--px, 0) * 66px), calc(var(--py, 0) * 44px), 0); transition: transform 640ms var(--ease-entrance); }
+/* Símbolo "posição atual" — cópia fiel do protótipo: badge 3.4rem + anel tracejado girando + ponto em órbita, crosshair 1.2rem no centro. */
+.signalBadge { position: relative; display: grid; width: 3.4rem; height: 3.4rem; place-items: center; border: 1px solid rgb(255 107 0 / 35%); border-radius: 50%; background: rgb(255 107 0 / 7%); }
+.missionSignal svg { width: 1.2rem; height: 1.2rem; filter: drop-shadow(0 0 .8rem var(--home-orange)); animation: ambient-pulse 2.8s ease-in-out infinite; }
+.signalRing { position: absolute; inset: -.6rem; border-radius: 50%; border: 1px dashed rgb(255 107 0 / 30%); animation: ambient-spin 14s linear infinite; }
+.signalOrbit { position: absolute; inset: -.6rem; animation: orbit 9s linear infinite; }
+.signalOrbit b { position: absolute; left: 50%; top: -.18rem; width: .36rem; height: .36rem; border-radius: 50%; background: var(--home-orange); box-shadow: 0 0 .7rem var(--home-orange); }
 
-.routeSection, .radar, .log { position: relative; isolation: isolate; margin-top: 1rem; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1.15rem .3rem 1.15rem 1.15rem; background: rgb(20 24 32 / 54%); backdrop-filter: blur(1rem); }
+.routeSection, .radar, .log { position: relative; isolation: isolate; margin-top: 1rem; overflow: hidden; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1.15rem .3rem 1.15rem 1.15rem; background: var(--obsidian-card), rgb(20 24 32 / 54%); backdrop-filter: blur(1rem); }
 .routeSection { padding: clamp(1.25rem, 3vw, 2rem); }
 .sectionHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 .sectionHeading span { color: var(--home-orange); font: 800 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
@@ -164,11 +175,7 @@
   --home-paper: #15171c;
   --home-muted: rgb(21 23 28 / 62%);
   border-color: rgb(21 23 28 / 12%);
-  background:
-    radial-gradient(circle at 73% 20%, rgb(255 107 0 / 13%), transparent 25rem),
-    linear-gradient(rgb(21 23 28 / 4.5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(21 23 28 / 4.5%) 1px, transparent 1px),
-    var(--home-ink);
+  background: var(--obsidian-field);
   box-shadow: 0 2rem 6rem rgb(16 17 20 / 12%);
 }
 
@@ -204,6 +211,7 @@
 @keyframes point-ring { from { opacity: .8; transform: scale(.55); } to { opacity: 0; transform: scale(1.5); } }
 @keyframes current-node { 0%, 100% { box-shadow: 0 0 0 .25rem rgb(255 107 0 / 5%), 0 0 .8rem rgb(255 107 0 / 18%); } 50% { box-shadow: 0 0 0 .5rem rgb(255 107 0 / 9%), 0 0 1.4rem rgb(255 107 0 / 38%); } }
 @keyframes ambient-pulse { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.2); } }
+@keyframes ambient-spin { to { transform: rotate(360deg); } }
 @keyframes bar-grow { from { transform: scaleX(0); } }
 @keyframes orbit { to { transform: rotate(-360deg); } }
 @keyframes caret-blink { 50% { opacity: .15; } }
@@ -231,9 +239,11 @@
   .headerStats { width: 100%; grid-template-columns: repeat(3, 1fr); }
   .statCard { min-width: 0; }
   .mission { min-height: 38rem; }
-  .map { inset: 42% -8rem -4rem 8%; opacity: .72; }
+  .map { inset: 42% -8rem -4rem 8%; opacity: .72; transform: translate3d(calc(var(--px, 0) * 26px), calc(var(--py, 0) * 12px), 0) rotate(calc(var(--px, 0) * .6deg)); }
+  .mapDepthFar { transform: translate3d(calc(var(--px, 0) * -12px), calc(var(--py, 0) * -7px), 0); }
+  .mapFocus { transform: translate3d(calc(var(--px, 0) * 15px), calc(var(--py, 0) * 9px), 0); }
   .missionCopy { width: 100%; min-height: auto; justify-content: flex-start; padding: 1.5rem; }
-  .missionSignal { right: 12%; top: auto; bottom: 18%; }
+  .missionSignal { right: 12%; top: auto; bottom: 18%; transform: translate3d(calc(var(--px, 0) * 24px), calc(var(--py, 0) * 16px), 0); }
   .lowerGrid { grid-template-columns: 1fr; }
 }
 
@@ -267,8 +277,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .header::after, .mapPulse, .mapPoint, .mapPointRing, .missionSignal svg, .route li[data-state="current"] .routeNode, .liveDot::before,
-  .missionBeam, .mapOrbitDot, .actionKind::after, .radarSweep, .miniBars i { animation: none; }
-  .map { transform: none !important; }
+  .missionBeam, .mapOrbitDot, .actionKind::after, .radarSweep, .miniBars i, .signalRing, .signalOrbit { animation: none; }
+  .map, .mapDepthFar, .mapFocus, .missionCopy, .missionSignal { transform: none !important; }
   .route li:hover .routeNode, .route li:focus-visible .routeNode, .signal:hover, .signal:focus-visible { transform: none; }
   .actionKind::after { opacity: 1; }
   .miniBars i { transform: none; }

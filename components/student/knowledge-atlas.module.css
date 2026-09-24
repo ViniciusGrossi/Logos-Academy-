@@ -20,11 +20,7 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-academy-paper) 14%, transparent);
   border-radius: var(--radius-xl);
-  background:
-    linear-gradient(color-mix(in srgb, var(--color-academy-paper) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--color-academy-paper) 5%, transparent) 1px, transparent 1px),
-    var(--color-academy-ink);
-  background-size: 2rem 2rem, 2rem 2rem, auto;
+  background: var(--obsidian-field);
   color: var(--color-academy-paper);
 }
 
@@ -244,7 +240,7 @@
 
 .tab:hover {
   border-color: color-mix(in srgb, var(--color-academy-orange) 24%, var(--border));
-  background: var(--atlas-surface);
+  background: var(--obsidian-card), var(--atlas-surface);
   color: var(--atlas-ink);
   transform: translateY(-1px);
 }
@@ -293,7 +289,7 @@
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  background: var(--atlas-surface);
+  background: var(--obsidian-card), var(--atlas-surface);
 }
 
 .mapCopy {
@@ -330,10 +326,10 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--color-academy-paper) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--color-academy-paper) 5%, transparent) 1px, transparent 1px);
-  background-size: 1.5rem 1.5rem;
+  /* Sideral: só em canvas de mapa, onde há nós e arestas. */
+  background-image: var(--sidereal-stars);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   pointer-events: none;
 }
 
@@ -400,7 +396,7 @@
   overflow: clip;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  background: var(--atlas-surface);
+  background: var(--obsidian-card), var(--atlas-surface);
   box-shadow: 0 1.5rem 4rem rgb(16 17 20 / 7%);
 }
 
@@ -424,7 +420,7 @@
   padding: 0 .85rem;
   border: 1px solid var(--border);
   border-radius: .85rem;
-  background: var(--atlas-surface);
+  background: var(--obsidian-card), var(--atlas-surface);
   color: var(--atlas-muted);
 }
 
@@ -519,7 +515,7 @@
 
 .resourceItem:hover {
   border-color: color-mix(in srgb, var(--color-academy-orange) 32%, var(--border));
-  background: var(--atlas-surface);
+  background: var(--obsidian-card), var(--atlas-surface);
   box-shadow: 0 .5rem 1.35rem rgb(16 17 20 / 6%);
 }
 
@@ -549,7 +545,7 @@
   place-items: center;
   border: 1px solid var(--border);
   border-radius: .65rem;
-  background: var(--atlas-surface);
+  background: var(--obsidian-card), var(--atlas-surface);
   font: 700 .63rem/1 var(--font-mono);
 }
 
@@ -618,7 +614,7 @@
   position: relative;
   min-width: 0;
   background:
-    linear-gradient(color-mix(in srgb, var(--atlas-ink) 3.5%, transparent) 1px, transparent 1px),
+    linear-gradient(var(--texture-rule-on-paper) 1px, transparent 1px),
     var(--atlas-surface);
   background-size: 100% 2rem;
 }
@@ -704,8 +700,7 @@
   margin: 1.5rem 0 2.5rem;
 }
 
-.videoPlaceholder,
-.videoFrame {
+.videoPlaceholder {
   min-width: 0;
   min-height: 13rem;
   aspect-ratio: 16 / 9;
@@ -714,10 +709,8 @@
   border-radius: 1rem;
   background:
     radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--color-academy-orange) 12%, transparent), transparent 34%),
-    linear-gradient(color-mix(in srgb, var(--color-academy-paper) 6%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--color-academy-paper) 6%, transparent) 1px, transparent 1px),
+    radial-gradient(130% 95% at 4% -10%, var(--obsidian-light), transparent 52%),
     var(--color-academy-ink);
-  background-size: auto, 1.5rem 1.5rem, 1.5rem 1.5rem, auto;
   color: var(--color-academy-paper);
 }
 
@@ -749,62 +742,144 @@
 .videoPlaceholder a { min-height: 2.75rem; display: inline-flex; align-items: center; margin-top: .4rem; padding: 0 1rem; border: 1px solid color-mix(in srgb, var(--color-academy-paper) 20%, transparent); border-radius: .7rem; color: var(--color-academy-paper); font-weight: 700; }
 .videoPlaceholder a:hover { border-color: var(--color-academy-orange); color: var(--color-academy-orange); transform: translateY(-1px); }
 
+/* ---------- Player do Atlas ----------
+   Três zonas: barra nossa, arte do YouTube inteira, barra nossa. O metadado nunca
+   deita sobre a miniatura — miniatura de YouTube é arte que grita, e texto por cima
+   dela vira ruído. O laranja fica só no play, que é a única ação. */
 .videoFrame {
   position: relative;
   display: flex;
+  min-width: 0;
   flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-academy-paper) 14%, transparent);
+  border-radius: 1rem .3rem 1rem 1rem;
+  background:
+    radial-gradient(130% 95% at 4% -10%, var(--obsidian-light), transparent 52%),
+    var(--color-academy-ink);
+  color: var(--color-academy-paper);
 }
 
-.videoFrame iframe { width: 100%; height: 100%; min-height: 13rem; border: 0; }
-.videoFrame > a { position: absolute; right: .65rem; bottom: .65rem; display: inline-flex; min-height: 2.75rem; align-items: center; gap: .35rem; padding: 0 .8rem; border-radius: var(--radius-md); background: rgb(16 17 20 / 88%); color: var(--color-academy-paper); font-size: .7rem; font-weight: 700; }
-.videoFrame > a svg { width: .85rem; }
+.videoTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .6rem .7rem .6rem .9rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-academy-paper) 10%, transparent);
+}
+.videoKind {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  color: color-mix(in srgb, var(--color-academy-paper) 62%, transparent);
+  font: 700 .6rem/1 var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.videoKind svg { width: .85rem; color: var(--color-academy-orange); }
+.videoExternal {
+  display: grid;
+  width: 2rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: color-mix(in srgb, var(--color-academy-paper) 55%, transparent);
+  transition: color var(--duration-fast) var(--ease-standard),
+              border-color var(--duration-fast) var(--ease-standard),
+              background-color var(--duration-fast) var(--ease-standard);
+}
+.videoExternal svg { width: .9rem; }
+.videoExternal:hover {
+  border-color: color-mix(in srgb, var(--color-academy-paper) 16%, transparent);
+  background: color-mix(in srgb, var(--color-academy-paper) 6%, transparent);
+  color: var(--color-academy-paper);
+}
+.videoExternal:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-academy-orange) 45%, transparent);
+  outline-offset: 2px;
+}
+
+.videoStage { position: relative; aspect-ratio: 16 / 9; min-height: 11rem; overflow: hidden; }
+.videoStage iframe { display: block; width: 100%; height: 100%; border: 0; }
 
 .videoPoster {
-  position: relative;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 13rem;
+  position: absolute;
+  inset: 0;
+  display: grid;
   overflow: hidden;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  place-items: center;
   border: 0;
   background: transparent;
   color: var(--color-academy-paper);
   cursor: pointer;
 }
-
-.videoPoster:focus-visible { outline-offset: -.25rem; }
+.videoPoster:focus-visible { outline: 3px solid color-mix(in srgb, var(--color-academy-orange) 55%, transparent); outline-offset: -3px; }
 
 .videoPosterImage {
   z-index: 0;
   object-fit: cover;
-  filter: saturate(.72) contrast(1.08) brightness(.62);
-  transform: scale(1.025);
+  filter: saturate(.8) brightness(.58);
+  transform: scale(1.02);
   transition: filter 420ms var(--ease-standard), transform 620ms var(--ease-entrance);
 }
 
+/* Vinheta: escurece as bordas e o centro o bastante para o play ter contraste em
+   qualquer miniatura, sem apagar a arte. */
 .videoPosterShade {
   position: absolute;
   z-index: 1;
   inset: 0;
   background:
-    linear-gradient(90deg, rgb(8 9 11 / 88%) 0%, rgb(8 9 11 / 52%) 58%, rgb(8 9 11 / 70%) 100%),
-    linear-gradient(0deg, rgb(8 9 11 / 72%), transparent 62%);
+    radial-gradient(38% 38% at 50% 50%, rgb(8 9 11 / 74%), transparent 74%),
+    linear-gradient(0deg, rgb(8 9 11 / 58%), transparent 40%),
+    rgb(8 9 11 / 26%);
 }
 
-.videoPoster:hover .videoPosterImage { filter: saturate(.9) contrast(1.05) brightness(.74); transform: scale(1.055); }
-.videoPoster:hover .playButton { background: var(--color-academy-orange-hover); transform: scale(1.06); }
-.playButton,
-.videoPosterCopy { position: relative; z-index: 2; }
-.videoPoster span:last-child { text-align: left; }
-.videoPoster strong,
-.videoPoster small { display: block; }
-.videoPoster strong { max-width: 20ch; font-size: 1rem; }
-.videoPoster small { margin-top: .35rem; color: color-mix(in srgb, var(--color-academy-paper) 64%, transparent); font-size: .72rem; }
-.playButton { display: grid; width: 3.75rem; aspect-ratio: 1; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--color-academy-orange); color: var(--color-academy-ink); box-shadow: 0 0 0 .65rem color-mix(in srgb, var(--color-academy-orange) 10%, transparent); }
-.playButton svg { width: 1.2rem; fill: currentColor; }
+.playButton {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 4.25rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-academy-orange);
+  color: var(--color-academy-ink);
+  box-shadow: 0 0 0 .55rem color-mix(in srgb, var(--color-academy-orange) 14%, transparent),
+              0 1rem 2.5rem rgb(8 9 11 / 45%);
+  transition: transform var(--duration-standard) var(--ease-entrance),
+              background-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-standard) var(--ease-standard);
+}
+.playButton svg { width: 1.35rem; margin-left: .12rem; fill: currentColor; }
+.videoPoster:hover .videoPosterImage { filter: saturate(.95) brightness(.7); transform: scale(1.05); }
+.videoPoster:hover .playButton {
+  background: var(--color-academy-orange-hover);
+  box-shadow: 0 0 0 .85rem color-mix(in srgb, var(--color-academy-orange) 16%, transparent),
+              0 1.2rem 3rem rgb(8 9 11 / 50%);
+  transform: scale(1.06);
+}
+.videoPoster:active .playButton { transform: scale(1); }
+
+.videoMeta {
+  display: grid;
+  gap: .25rem;
+  margin: 0;
+  padding: .85rem .9rem .95rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-academy-paper) 10%, transparent);
+}
+.videoMeta strong { font-size: .88rem; line-height: 1.35; letter-spacing: -.01em; }
+.videoMeta small { color: color-mix(in srgb, var(--color-academy-paper) 58%, transparent); font-size: .7rem; line-height: 1.45; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .videoPosterImage, .playButton { transition: none; }
+  .videoPoster:hover .videoPosterImage { transform: none; }
+  .videoPoster:hover .playButton { transform: none; }
+}
 
 .conceptBrief {
   display: grid;
@@ -1024,7 +1099,7 @@
   margin-top: 1rem;
   border: 1px solid var(--border);
   border-radius: .95rem;
-  background: var(--atlas-surface);
+  background: var(--obsidian-card), var(--atlas-surface);
 }
 
 .customizer summary {
@@ -1119,6 +1194,121 @@
 .demoEditorial small { color: var(--specimen-accent); font: 700 .6rem/1.3 var(--font-mono); text-transform: uppercase; }
 .demoEditorial strong { max-width: 14ch; font-size: 1.2rem; line-height: 1.05; }
 .demoEditorial span { max-width: 24ch; color: var(--atlas-muted); font-size: .7rem; }
+
+/* ---------- Constelação de conceitos ----------
+   Hub-e-raios sobre superfície sideral: é canvas de mapa com nós e arestas, que é
+   a única casa do sideral. O laranja fica só no centro ("você está aqui"); os
+   relacionados são neutros, senão o sinal de posição se dissolve. */
+.constellation { margin-top: 2.5rem; padding-top: 1.4rem; border-top: 1px solid var(--border); }
+.constellationHead { display: grid; gap: .3rem; margin-bottom: 1.1rem; }
+.constellationHead strong { font-size: 1.05rem; letter-spacing: -.02em; }
+.constellationHead small { color: var(--atlas-muted); font-size: .74rem; }
+
+.constellationCanvas {
+  position: relative;
+  min-height: 21rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) .3rem var(--radius-lg) var(--radius-lg);
+  background: var(--obsidian-field);
+  background-size: 100% 100%, auto, auto;
+  background-repeat: no-repeat;
+}
+.constellationCanvas > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.edge, .edgePulse { stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.edge { stroke: color-mix(in srgb, var(--color-academy-paper) 22%, transparent); stroke-width: 1; }
+/* Mesmo pulso de traçado da rota da Jornada — padrão da casa, não import novo. */
+.edgePulse {
+  stroke: var(--color-academy-orange);
+  stroke-width: 1.5;
+  stroke-dasharray: 20 80;
+  filter: drop-shadow(0 0 .4rem color-mix(in srgb, var(--color-academy-orange) 45%, transparent));
+  animation: edge-travel 3.4s linear infinite;
+}
+@keyframes edge-travel { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+
+.constellationCore {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: .5rem;
+  width: max-content;
+  max-width: 11rem;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.constellationCore i {
+  display: block;
+  width: 1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-academy-orange);
+  box-shadow: 0 0 0 .45rem color-mix(in srgb, var(--color-academy-orange) 12%, transparent), 0 0 1.1rem var(--color-academy-orange);
+}
+.constellationCore b {
+  color: var(--color-academy-paper);
+  font: 800 .6rem/1.3 var(--font-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.constellationNode {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: .2rem;
+  width: max-content;
+  max-width: min(13rem, 29%);
+  padding: .6rem .8rem;
+  border: 1px solid color-mix(in srgb, var(--color-academy-paper) 16%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-academy-ink) 78%, transparent);
+  color: var(--color-academy-paper);
+  text-align: left;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              background-color var(--duration-fast) var(--ease-standard),
+              transform var(--duration-standard) var(--ease-entrance);
+}
+.constellationNode strong { font-size: .8rem; letter-spacing: -.01em; }
+.constellationNode small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--color-academy-paper) 62%, transparent);
+  font-size: .68rem;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.constellationNode:hover {
+  border-color: color-mix(in srgb, var(--color-academy-orange) 50%, transparent);
+  background: color-mix(in srgb, var(--color-academy-ink) 90%, transparent);
+  transform: translate(-50%, calc(-50% - 2px));
+}
+.constellationNode:active { transform: translate(-50%, -50%); }
+.constellationNode:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-academy-orange) 45%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 52rem) {
+  /* Abaixo daqui a órbita comprime os rótulos: vira lista, que é o mesmo dado em pilha. */
+  .constellationCanvas { min-height: 0; border: 0; border-radius: 0; background: none; }
+  .constellationCanvas > svg, .constellationCore { display: none; }
+  .constellationCanvas { display: grid; gap: .45rem; }
+  .constellationNode { position: static; max-width: none; width: 100%; transform: none; }
+  .constellationNode:hover, .constellationNode:active { transform: none; }
+  .constellationNode small { -webkit-line-clamp: 3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edgePulse { animation: none; opacity: .5; }
+}
 
 .related { margin-top: 2.5rem; padding-top: 1.4rem; border-top: 1px solid var(--border); }
 .related > span { color: var(--atlas-muted); font: 700 .64rem/1.3 var(--font-mono); letter-spacing: .07em; text-transform: uppercase; }

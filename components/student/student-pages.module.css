@@ -13,7 +13,7 @@
 .concept small { margin-top: .25rem; color: var(--muted, #6d727b); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 30ch; }
 .concept svg { width: 1rem; transition: transform .25s ease, color .25s ease; }
 .concept:hover svg, .concept[data-active="true"] svg { color: var(--academy-orange, #ff6b00); transform: translateX(3px); }
-.reader { position: relative; padding: clamp(1.5rem,4vw,4rem); background-image: linear-gradient(rgba(16,17,20,.035) 1px,transparent 1px); background-size: 100% 2rem; }
+.reader { position: relative; padding: clamp(1.5rem,4vw,4rem); background-image: linear-gradient(var(--texture-rule-on-paper) 1px,transparent 1px); background-size: 100% var(--texture-step); }
 .readerMeta { display: flex; align-items: center; gap: .75rem; color: var(--academy-orange, #ff6b00); text-transform: uppercase; letter-spacing: .13em; font: 700 .7rem/1.3 ui-monospace, monospace; }
 .reader h2 { margin: 1.4rem 0 .7rem; max-width: 15ch; font-size: clamp(2.4rem,4vw,4.7rem); line-height: .95; letter-spacing: -.055em; }
 .readerLead { max-width: 54ch; margin: 0 0 2.5rem; color: var(--muted, #5e636b); font-size: 1.05rem; line-height: 1.7; }

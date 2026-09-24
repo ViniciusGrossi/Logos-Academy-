@@ -2,7 +2,18 @@ import { describe, expect, it } from "vitest";
 import type { ReviewDetail, StudentHome } from "@/specs/api.contracts";
 import { mapRpcError } from "@/src/lib/supabase/rpc-error";
 import { ConceptsQuerySchema, JourneyQuerySchema, PathIdSchema } from "@/src/modules/admissions/schema";
+import { percentage, resolveTrack } from "@/components/prototype/journey-page";
 describe("student-home-journey-concepts", () => {
+  it("normaliza o nível e mantém percentuais visuais entre zero e cem", () => {
+    expect(resolveTrack("Youth Builder")).toBe("builder");
+    expect(resolveTrack("Youth Engineer")).toBe("engineer");
+    expect(resolveTrack("Youth Explorer")).toBe("explorer");
+    expect(percentage(12, 16)).toBe(75);
+    expect(percentage(20, 16)).toBe(100);
+    expect(percentage(-1, 16)).toBe(0);
+    expect(percentage(1, 0)).toBe(0);
+  });
+
   it("valida jornada e conceitos paginados antes das RPCs", () => {
     expect(() => JourneyQuerySchema.parse({ enrollmentId: "x" })).toThrow();
     expect(() => ConceptsQuerySchema.parse({ limit: 101 })).toThrow();

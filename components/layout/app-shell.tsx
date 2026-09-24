@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpenText, CalendarDays, ChevronRight, CircleUserRound, ClipboardCheck, FolderKanban, Gauge, Home, LogOut, Menu, Moon, ShieldCheck, Sun, UserRound, UsersRound, X } from "lucide-react";
+import { ArrowRight, BookOpenText, CalendarDays, ChevronRight, CircleUserRound, ClipboardCheck, FolderKanban, Gauge, Home, LogOut, Menu, Moon, ShieldCheck, Sun, UserRound, UsersRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { MeProfile } from "@/specs/api.contracts";
+import type { AdminDashboard, MeProfile, StudentHome } from "@/specs/api.contracts";
 import { CinematicPage } from "@/components/academy";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLiveApi } from "@/components/prototype/live-api";
@@ -29,6 +29,8 @@ const adminNav = [
 
 const allNav = [...studentNav, ...adminNav];
 
+type NavBadge = { value: string; hint: string };
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -36,10 +38,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [dark, setDark] = useState(false);
   const { data: profile } = useLiveApi<MeProfile>("/api/me");
   const adminContext = pathname.startsWith("/admin");
+  // Os contadores da navegação saem de dados reais; um papel sem acesso à rota
+  // simplesmente não recebe dado e o item fica sem selo.
+  const { data: studentPulse } = useLiveApi<StudentHome>("/api/student/home");
+  const { data: adminPulse } = useLiveApi<AdminDashboard>(profile?.role === "admin" ? "/api/admin/dashboard" : null);
+  const pendingKind = studentPulse?.primaryAction.kind;
+  const navBadges: Record<string, NavBadge | undefined> = {
+    "/atividade": pendingKind && pendingKind !== "none" && pendingKind !== "setup_github" ? { value: "1", hint: "uma ação aguardando você" } : undefined,
+    "/projetos": studentPulse?.currentProject ? { value: "1", hint: "um projeto em construção" } : undefined,
+    "/agenda": studentPulse && studentPulse.pendingMakeupCount > 0 ? { value: String(studentPulse.pendingMakeupCount), hint: `${studentPulse.pendingMakeupCount} reposição pendente` } : undefined,
+    "/perfil": profile && profile.role === "student" && !profile.githubUsername ? { value: "!", hint: "vínculo do GitHub pendente" } : undefined,
+    "/admin": adminPulse && adminPulse.awaitingReviewCount > 0 ? { value: String(adminPulse.awaitingReviewCount), hint: `${adminPulse.awaitingReviewCount} aguardando revisão` } : undefined,
+  };
   const navGroups = [
     { label: "Meu espaço", items: studentNav },
     { label: "Gestão", items: adminNav },
   ];
+  const thesisProgress = adminContext ? 4 : studentPulse?.currentProject ? Math.min(4, studentPulse.currentProject.cyclePosition) : 1;
   const current = [...allNav]
     .sort((left, right) => right.href.length - left.href.length)
     .find((item) => pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`)))?.label ?? "Início";
@@ -74,24 +89,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="academy-shell">
       <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
       <aside className={`academy-sidebar ${menuOpen ? "is-open" : ""}`} aria-label="Navegação principal">
+        <span className="sidebar-rail" aria-hidden="true" />
         <div className="sidebar-head">
           <Link href="/" className="brand-link" aria-label="Logos Academy, início">
-            <Image src="/brand/logos-academy-symbol-dark.png" alt="" width={52} height={52} priority />
+            <span className="brand-mark">
+              <Image src="/brand/logos-academy-symbol-dark.png" alt="" width={52} height={52} priority />
+              <i aria-hidden="true" />
+            </span>
             <span className="brand-wordmark"><strong>Logos</strong><small>Academy</small></span>
           </Link>
           <button type="button" className="close-menu" onClick={() => setMenuOpen(false)} aria-label="Fechar navegação"><X /></button>
         </div>
         <div className="sidebar-thesis">
-          <span>{adminContext ? "Operação · ao vivo" : "Explorer · ciclo atual"}</span>
+          <span className="thesis-sheen" aria-hidden="true" />
+          <span className="thesis-label"><i aria-hidden="true" />{adminContext ? "Operação · ao vivo" : "Explorer · ciclo atual"}</span>
           <strong>{adminContext ? "Enxergue o risco antes que ele vire atraso." : "Construa algo que você consiga explicar."}</strong>
+          <span className="thesis-steps" aria-hidden="true">{[0, 1, 2, 3].map((step) => <i key={step} data-filled={step < thesisProgress} />)}</span>
         </div>
         <nav className="side-nav">
           {navGroups.map(({ label: groupLabel, items }) => <div key={groupLabel} className="side-nav__group">
             <span className="side-nav__label">{groupLabel}</span>
             {items.map(({ href, label, icon: Icon }) => {
               const active = pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+              const badge = navBadges[href];
               return <Link key={href} href={href} className={active ? "active" : ""} aria-current={active ? "page" : undefined}>
-                <Icon aria-hidden="true" /><span>{label}</span><ChevronRight className="nav-arrow" aria-hidden="true" />
+                <span className="nav-bar" aria-hidden="true" />
+                <Icon className="nav-icon" aria-hidden="true" />
+                <span className="nav-label">{label}</span>
+                {badge
+                  ? <span className="nav-badge">{badge.value}<span className="sr-only"> · {badge.hint}</span></span>
+                  : active
+                    ? <ArrowRight className="nav-arrow" aria-hidden="true" />
+                    : <ChevronRight className="nav-arrow" aria-hidden="true" />}
               </Link>;
             })}
           </div>)}

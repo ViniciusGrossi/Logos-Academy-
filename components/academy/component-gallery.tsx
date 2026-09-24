@@ -14,7 +14,7 @@ export function ComponentGallery() {
     <CinematicPage className="component-gallery">
       <PageHeader eyebrow="Laboratório de componentes" title="Cinema de Evidências" description="Estados, movimento e densidade compartilhados por toda a plataforma." marker="v0.8" />
       <div style={{ position: "relative", minHeight: "12rem", overflow: "hidden", borderRadius: "var(--radius-xl)", border: "1px solid var(--border)" }}>
-        <GlowField grid />
+        <GlowField />
         <div style={{ position: "relative", padding: "calc(var(--spacing-unit) * 7)" }}>
           <WordReveal amplitudePx={4} staggerMs={70}>
             Primitivos vivos da Home Premium

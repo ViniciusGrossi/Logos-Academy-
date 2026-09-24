@@ -11,27 +11,7 @@
   padding: clamp(1.25rem, 3.5vw, 3.5rem);
   border: 1px solid var(--line);
   border-radius: 1.6rem 0.35rem 1.6rem 1.6rem;
-  background:
-    radial-gradient(
-      circle at 78% 8%,
-      color-mix(in srgb, var(--color-academy-orange) 12%, transparent),
-      transparent 24rem
-    ),
-    linear-gradient(
-      color-mix(in srgb, var(--ink) 4%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--ink) 4%, transparent) 1px,
-      transparent 1px
-    ),
-    var(--surface);
-  background-size:
-    auto,
-    4rem 4rem,
-    4rem 4rem,
-    auto;
+  background: var(--obsidian-field);
   color: var(--ink);
   box-shadow: var(--shadow-soft);
 }
@@ -260,21 +240,6 @@
 }
 .hero:hover::after {
   transform: scaleX(0.72);
-}
-.hoverGrid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgb(255 255 255 / 9%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 9%) 1px, transparent 1px);
-  background-size: 2.15rem 2.15rem;
-  mask-image: radial-gradient(
-    13rem circle at var(--grid-x) var(--grid-y),
-    #000,
-    transparent 75%
-  );
-  opacity: 0.72;
-  pointer-events: none;
 }
 .heroCircuits {
   position: absolute;

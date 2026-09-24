@@ -14,7 +14,7 @@ import {
   Radio,
   Wrench,
 } from "lucide-react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { GlowField, MagneticAction, Ticker, WordReveal } from "@/components/academy";
 import type { MeProfile, StudentHome as StudentHomeDto } from "@/specs/api.contracts";
@@ -44,10 +44,6 @@ export function StudentHome() {
   const { data, error, loading, reload } = useLiveApi<StudentHomeDto>("/api/student/home");
   const { data: profile } = useLiveApi<MeProfile>("/api/me");
   const reduceMotion = useReducedMotion();
-  const mapX = useMotionValue(0);
-  const mapY = useMotionValue(0);
-  const x = useSpring(mapX, { stiffness: 90, damping: 28, mass: 0.7 });
-  const y = useSpring(mapY, { stiffness: 90, damping: 28, mass: 0.7 });
 
   if (loading) return <LoadingState layout="home" />;
   if (error) return <ErrorState layout="home" retry={reload} message={error.message} />;
@@ -61,12 +57,15 @@ export function StudentHome() {
   const percentage = total ? Math.round((completed / total) * 100) : 0;
   const projectHref = data.currentProject ? `/projetos/${data.currentProject.id}` : "/projetos";
   const firstName = profile?.displayName.trim().split(/\s+/u)[0];
+  const remaining = Math.max(total - completed, 0);
   const tickerItems = [
     "Centro de missão · sistema ativo",
-    data.currentProject ? `Ciclo ${String(data.currentProject.cyclePosition).padStart(2, "0")}` : "Em preparação",
-    `${completed}/${total} evidências`,
-    `${percentage}% concluído`,
-    "Rota 01 — 03",
+    data.currentProject ? `Ciclo ${String(data.currentProject.cyclePosition).padStart(2, "0")} em construção` : "Preparando seu próximo ciclo",
+    remaining === 0 ? "Ciclo completo · evidências no lugar" : remaining === 1 ? "1 evidência até fechar o ciclo" : `${remaining} evidências até fechar o ciclo`,
+    `${percentage}% da jornada percorrida`,
+    "Toda evidência é uma decisão que você consegue defender",
+    data.recentFeedback ? `Feedback de ${data.recentFeedback.reviewerName} esperando sua leitura` : "Radar limpo · foco na missão atual",
+    "Explorar · Construir · Explicar",
   ];
   const stages = [
     { id: "explorar", number: "01", label: "Explorar", detail: "Entenda o conceito e reconheça o desafio.", state: completed > 0 ? "complete" : "current" },
@@ -74,18 +73,22 @@ export function StudentHome() {
     { id: "explicar", number: "03", label: "Explicar", detail: "Defenda escolhas, incorpore feedback e preserve.", state: total > 0 && completed === total ? "current" : "upcoming" },
   ] as const;
 
+  // Parallax multi-depth (protótipo premium): --px/--py -1..1 dirigem cada camada em profundidade própria via CSS.
   function moveMap(event: ReactPointerEvent<HTMLElement>) {
     if (reduceMotion || event.pointerType === "touch") return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    mapX.set(((event.clientX - bounds.left) / bounds.width - 0.5) * 18);
-    mapY.set(((event.clientY - bounds.top) / bounds.height - 0.5) * 14);
-    event.currentTarget.style.setProperty("--home-spot-x", `${event.clientX - bounds.left}px`);
-    event.currentTarget.style.setProperty("--home-spot-y", `${event.clientY - bounds.top}px`);
+    const el = event.currentTarget;
+    const bounds = el.getBoundingClientRect();
+    const px = Math.max(-1, Math.min(1, (event.clientX - (bounds.left + bounds.width / 2)) / (bounds.width / 2)));
+    const py = Math.max(-1, Math.min(1, (event.clientY - (bounds.top + bounds.height / 2)) / (bounds.height / 2)));
+    el.style.setProperty("--px", px.toFixed(3));
+    el.style.setProperty("--py", py.toFixed(3));
+    el.style.setProperty("--home-spot-x", `${event.clientX - bounds.left}px`);
+    el.style.setProperty("--home-spot-y", `${event.clientY - bounds.top}px`);
   }
 
-  function resetMap() {
-    mapX.set(0);
-    mapY.set(0);
+  function resetMap(event: ReactPointerEvent<HTMLElement>) {
+    event.currentTarget.style.setProperty("--px", "0");
+    event.currentTarget.style.setProperty("--py", "0");
   }
 
   return (
@@ -127,19 +130,23 @@ export function StudentHome() {
         aria-labelledby="mission-title"
       >
         <span className={styles.missionBeam} aria-hidden="true" />
-        <motion.div className={styles.map} style={reduceMotion ? undefined : { x, y }} aria-hidden="true">
+        <div className={styles.map} aria-hidden="true">
           <svg viewBox="0 0 1100 560" preserveAspectRatio="xMidYMid slice">
-            <path className={styles.mapOrbit} d="M-40 430 C190 80 490 60 700 260 S1010 520 1170 140" />
-            <path className={styles.mapOrbitMuted} d="M-80 500 C210 210 410 205 620 320 S950 445 1180 220" />
-            <path className={styles.mapRoute} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
-            <path className={styles.mapPulse} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
-            <circle cx="735" cy="275" r="9" className={styles.mapPoint} />
-            <circle cx="735" cy="275" r="24" className={styles.mapPointRing} />
-            <g className={styles.mapOrbitDot} style={{ transformOrigin: "735px 275px" } as CSSProperties}>
-              <circle cx="735" cy="261" r="3" className={styles.mapOrbitPoint} />
+            <g className={styles.mapDepthFar}>
+              <path className={styles.mapOrbit} d="M-40 430 C190 80 490 60 700 260 S1010 520 1170 140" />
+              <path className={styles.mapOrbitMuted} d="M-80 500 C210 210 410 205 620 320 S950 445 1180 220" />
+            </g>
+            <g className={styles.mapFocus}>
+              <path className={styles.mapRoute} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
+              <path className={styles.mapPulse} d="M55 440 C210 390 248 205 410 236 S610 430 735 275 S924 165 1060 102" />
+              <circle cx="735" cy="275" r="9" className={styles.mapPoint} />
+              <circle cx="735" cy="275" r="24" className={styles.mapPointRing} />
+              <g className={styles.mapOrbitDot} style={{ transformOrigin: "735px 275px" } as CSSProperties}>
+                <circle cx="735" cy="261" r="3" className={styles.mapOrbitPoint} />
+              </g>
             </g>
           </svg>
-        </motion.div>
+        </div>
         <div className={styles.missionCopy}>
           <div className={styles.missionMeta}><span>Próximo movimento</span><span>{data.currentProject?.title ?? "Jornada individual"}</span></div>
           <span className={styles.actionKind}>{action.kind.replaceAll("_", " ")}</span>
@@ -152,7 +159,14 @@ export function StudentHome() {
             <Link href={projectHref} className={styles.secondaryAction}><FolderKanban /> Abrir projeto</Link>
           </div>
         </div>
-        <div className={styles.missionSignal} aria-hidden="true"><Crosshair /><span>posição atual</span></div>
+        <div className={styles.missionSignal} aria-hidden="true">
+          <span className={styles.signalBadge}>
+            <Crosshair />
+            <i className={styles.signalRing} />
+            <i className={styles.signalOrbit}><b /></i>
+          </span>
+          <span>posição atual</span>
+        </div>
       </motion.section>
 
       <section className={styles.routeSection} aria-labelledby="route-title">

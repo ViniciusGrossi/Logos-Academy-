@@ -37,9 +37,20 @@ function resetProjectCard(event: ReactPointerEvent<HTMLAnchorElement>) {
 
 function moveFocusField(event: ReactPointerEvent<HTMLElement>) {
   if (event.pointerType === "touch") return;
-  const bounds = event.currentTarget.getBoundingClientRect();
-  event.currentTarget.style.setProperty("--focus-x", `${event.clientX - bounds.left}px`);
-  event.currentTarget.style.setProperty("--focus-y", `${event.clientY - bounds.top}px`);
+  const el = event.currentTarget;
+  const bounds = el.getBoundingClientRect();
+  el.style.setProperty("--focus-x", `${event.clientX - bounds.left}px`);
+  el.style.setProperty("--focus-y", `${event.clientY - bounds.top}px`);
+  // Parallax multi-profundidade (protótipo premium): --px/--py -1..1 dirigem cada camada em sua profundidade.
+  const px = Math.max(-1, Math.min(1, (event.clientX - (bounds.left + bounds.width / 2)) / (bounds.width / 2)));
+  const py = Math.max(-1, Math.min(1, (event.clientY - (bounds.top + bounds.height / 2)) / (bounds.height / 2)));
+  el.style.setProperty("--px", px.toFixed(3));
+  el.style.setProperty("--py", py.toFixed(3));
+}
+
+function resetFocusField(event: ReactPointerEvent<HTMLElement>) {
+  event.currentTarget.style.setProperty("--px", "0");
+  event.currentTarget.style.setProperty("--py", "0");
 }
 
 export function ProjectPortal() {
@@ -67,7 +78,7 @@ export function ProjectPortal() {
       <div>
         <span className={styles.eyebrow}><Radio size={13} /> Acervo operacional · sincronizado</span>
         <p>Projetos e evidências</p>
-        <h1>Seu trabalho deixa <em>rastros.</em></h1>
+        <h1><span>Seu</span> <span>trabalho</span> <span>deixa</span> <em>rastros.</em></h1>
       </div>
       <div className={styles.headerIndex}>
         <span><i><FolderKanban /></i><small>Ciclos</small><strong>{String(projects.length).padStart(2, "0")}</strong><b aria-hidden="true">{projects.map((project) => <em key={project.id} data-active={project.status !== "locked"} />)}</b></span>
@@ -76,9 +87,8 @@ export function ProjectPortal() {
       </div>
     </header>
 
-    {active && <section className={styles.activeProject} aria-labelledby="active-project-title" onPointerMove={moveFocusField}>
+    {active && <section className={styles.activeProject} aria-labelledby="active-project-title" onPointerMove={moveFocusField} onPointerLeave={resetFocusField}>
       <div className={styles.blueprint} aria-hidden="true"><span /><span /><span /><i /></div>
-      <div className={styles.cursorGrid} aria-hidden="true" />
       <svg className={styles.elasticMesh} aria-hidden="true" viewBox="0 0 600 420" preserveAspectRatio="none">
         {[60, 120, 180, 240, 300, 360].map((y) => <path key={`h-${y}`} d={`M0 ${y} Q150 ${y - 18} 300 ${y} T600 ${y}`} />)}
         {[70, 150, 230, 310, 390, 470, 550].map((x) => <path key={`v-${x}`} d={`M${x} 0 Q${x + 18} 105 ${x} 210 T${x} 420`} />)}
@@ -101,6 +111,35 @@ export function ProjectPortal() {
       </div>
     </section>}
 
+    <section className={styles.flow} aria-labelledby="flow-title">
+      <div className={styles.flowSpec} role="img" aria-label="Uma peça sai de construção, entra em revisão e termina publicada no portfólio">
+        <div className={styles.specTop}><span className={styles.specTag}><i aria-hidden="true" /> ciclo de publicação</span><b className={styles.specBadge} aria-hidden="true">status</b></div>
+        <div className={styles.specStage} aria-hidden="true"><i className={styles.specThumb} /><i className={styles.specLive}>no portfólio</i></div>
+        <div className={styles.specBarTrack} aria-hidden="true"><i className={styles.specBar} /></div>
+        <div className={styles.specRows} aria-hidden="true">
+          <span><b>1</b><i /></span>
+          <span className={styles.specRow2}><b>2</b><i /></span>
+          <span className={styles.specRow3}><b>3</b><i /></span>
+        </div>
+        <div className={styles.specCaptions} aria-hidden="true">
+          <span className={styles.specCapA}><strong>A peça existe, mas ainda é rascunho</strong><small>Construindo</small></span>
+          <span className={styles.specCapB}><strong>O mentor lê e pede um ajuste</strong><small>Em revisão</small></span>
+          <span className={styles.specCapC}><strong>Evidência completa, peça no portfólio</strong><small>Publicado</small></span>
+        </div>
+      </div>
+      <div className={styles.flowGuide}>
+        <span className={styles.eyebrow}><CircleDotDashed size={13} /> Como um projeto anda</span>
+        <h2 id="flow-title">Ideia vira evidência que você <em>consegue defender.</em></h2>
+        <p>Cada peça sai de ideia, passa por construção e revisão, e só entra no acervo quando é aprovada. Nada aqui é maquete: é o que você construiu.</p>
+        <ol className={styles.flowSteps}>
+          <li><span>01</span><div><strong>Ideia</strong><small>Anotada, ainda sem arquivo</small></div></li>
+          <li><span>02</span><div><strong>Construindo</strong><small>A peça ganha forma</small></div></li>
+          <li><span>03</span><div><strong>Revisão</strong><small>O mentor lê e pede o ajuste</small></div></li>
+          <li><span>04</span><div><strong>Publicado</strong><small>Evidência completa, no portfólio</small></div></li>
+        </ol>
+      </div>
+    </section>
+
     <section className={styles.cycles} aria-labelledby="cycles-title">
       <div className={styles.sectionHeading}><div><span>Mapa de projetos</span><h2 id="cycles-title">Ciclos da formação</h2></div><small>{overall}% do acervo construído</small></div>
       <div className={styles.projectGrid}>
@@ -108,6 +147,7 @@ export function ProjectPortal() {
           const progress = percentage(project);
           const Icon = project.status === "approved" ? Check : project.status === "locked" ? LockKeyhole : CircleDotDashed;
           return <Link href={`/projetos/${project.id}`} className={styles.projectCard} data-state={project.status} key={project.id} style={{ "--card-index": index } as CSSProperties} onPointerMove={moveProjectCard} onPointerLeave={resetProjectCard}>
+            <i className={styles.sheen} aria-hidden="true" />
             <div className={styles.cardTop}><span className={styles.cardNumber}>{String(project.cyclePosition).padStart(2, "0")}</span><span className={styles.cardState}><Icon /> {stateCopy[project.status]}</span></div>
             <div className={styles.cardGraphic} aria-hidden="true"><i style={{ "--card-progress": `${progress * 3.6}deg` } as CSSProperties} /><span>{progress}</span></div>
             <h3>{project.title}</h3>
