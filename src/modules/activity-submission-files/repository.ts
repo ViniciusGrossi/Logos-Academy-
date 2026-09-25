@@ -280,17 +280,22 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
     }
     const { data, error } = await this.server
       .from("users")
-      .select("id, display_name, student_profiles(github_username)")
+      .select("id, display_name")
       .eq("id", actor.userId)
       .eq("tenant_id", actor.tenantId)
       .is("deleted_at", null)
       .maybeSingle();
     if (error || !data || typeof data.display_name !== "string")
       throw new AppError("FORBIDDEN", "Perfil indisponível.", requestId);
-    const profiles = Array.isArray(data.student_profiles)
-      ? data.student_profiles
-      : [];
-    const profile = profiles[0];
+    const { data: profile, error: profileError } = await this.server
+      .from("student_profiles")
+      .select("github_username")
+      .eq("user_id", actor.userId)
+      .eq("tenant_id", actor.tenantId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (profileError)
+      throw new AppError("FORBIDDEN", "Perfil indispon\u00edvel.", requestId);
     return {
       id: data.id,
       displayName: data.display_name,
