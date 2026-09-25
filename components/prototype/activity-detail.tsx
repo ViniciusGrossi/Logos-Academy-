@@ -21,16 +21,20 @@ import {
   ExternalLink,
   FileText,
   GitBranch,
+  Image as ImageIcon,
   Lightbulb,
   Link2,
   LockKeyhole,
   MessageSquareText,
   PackageCheck,
   Paperclip,
+  Presentation,
   RotateCcw,
   Send,
   Sparkles,
+  UploadCloud,
   Wrench,
+  X,
 } from "lucide-react";
 import type {
   ActivityCriterion,
@@ -54,6 +58,33 @@ import styles from "./activity-detail.module.css";
 
 type RequirementValue = { value: string; fileId?: string; filename?: string };
 type Notice = { tone: "success" | "error"; text: string };
+/** Transferência em curso: só uma por vez, porque o formulário trava enquanto envia. */
+type Transfer = {
+  requirementId: string;
+  name: string;
+  size: number;
+  /** 0–1 enquanto o navegador reporta bytes; null quando o progresso não é medível. */
+  progress: number | null;
+};
+type FileMeta = { size?: number; extension: string; previewUrl?: string };
+type FileError = { message: string; retryable: boolean };
+
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+/** Espelha o enum de contentType aceito em UploadInputSchema. */
+const UPLOAD_TYPES: Record<string, string> = {
+  pdf: "application/pdf",
+  txt: "text/plain",
+  md: "text/markdown",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+};
+const UPLOAD_ACCEPT = Object.keys(UPLOAD_TYPES)
+  .map((extension) => `.${extension}`)
+  .join(",");
 
 const statusCopy: Record<AssignmentStatus, { label: string; note: string }> = {
   locked: {
@@ -99,7 +130,13 @@ export function ActivityDetail() {
   const [values, setValues] = useState<Record<string, RequirementValue>>({});
   const [message, setMessage] = useState<Notice | null>(null);
   const [saving, setSaving] = useState(false);
-  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [transfer, setTransfer] = useState<Transfer | null>(null);
+  const [fileMeta, setFileMeta] = useState<Record<string, FileMeta>>({});
+  const [fileErrors, setFileErrors] = useState<Record<string, FileError>>({});
+  const uploadingId = transfer?.requirementId ?? null;
+  /** Guarda o último arquivo escolhido por requisito para o botão de tentar de novo. */
+  const pendingFiles = useRef<Record<string, File>>({});
+  const previewUrls = useRef<Record<string, string>>({});
   const [olderHistory, setOlderHistory] = useState<readonly SubmissionDetail[]>(
     [],
   );
@@ -226,6 +263,13 @@ export function ActivityDetail() {
     return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
   }, [hasUnsavedChanges]);
 
+  useEffect(() => {
+    const urls = previewUrls.current;
+    return () => {
+      for (const url of Object.values(urls)) URL.revokeObjectURL(url);
+    };
+  }, []);
+
   if ((home.loading && !requestedAssignmentId) || detail.loading)
     return <LoadingState layout="activity" />;
   if (!requestedAssignmentId && home.error)
@@ -301,13 +345,74 @@ export function ActivityDetail() {
     }
   }
 
+  function setFileError(requirementId: string, error: FileError | null) {
+    setFileErrors((current) => {
+      const next = { ...current };
+      if (error) next[requirementId] = error;
+      else delete next[requirementId];
+      return next;
+    });
+  }
+
+  function releasePreview(requirementId: string) {
+    const url = previewUrls.current[requirementId];
+    if (!url) return;
+    URL.revokeObjectURL(url);
+    delete previewUrls.current[requirementId];
+  }
+
+  function detachFile(requirementId: string) {
+    setValues((current) => ({ ...current, [requirementId]: { value: "" } }));
+    setFileMeta((current) => {
+      const next = { ...current };
+      delete next[requirementId];
+      return next;
+    });
+    setFileError(requirementId, null);
+    releasePreview(requirementId);
+    delete pendingFiles.current[requirementId];
+  }
+
   async function upload(
     requirement: ActivityRequirement,
     file: File | undefined,
   ) {
     if (!file) return;
-    setUploadingId(requirement.id);
+    const extension = fileExtension(file.name);
+    const contentType = uploadContentType(file.name);
+    // Recusa aqui o que o backend recusaria: a mensagem chega ao lado do campo,
+    // em vez de voltar como erro genérico depois de subir o arquivo inteiro.
+    if (!contentType) {
+      setFileError(requirement.id, {
+        message: `Formato .${extension || "desconhecido"} não é aceito. Use PDF, imagem, texto, documento ou apresentação.`,
+        retryable: false,
+      });
+      return;
+    }
+    if (file.size === 0) {
+      setFileError(requirement.id, {
+        message: "Este arquivo está vazio.",
+        retryable: false,
+      });
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setFileError(requirement.id, {
+        message: `${formatBytes(file.size)} excede o limite de 20 MB.`,
+        retryable: false,
+      });
+      return;
+    }
+    pendingFiles.current[requirement.id] = file;
+    setFileError(requirement.id, null);
     setMessage(null);
+    // Sem PUT no modo demonstração não há bytes para medir: o anel gira indeterminado.
+    setTransfer({
+      requirementId: requirement.id,
+      name: file.name,
+      size: file.size,
+      progress: isDemoMode() ? null : 0,
+    });
     try {
       const prepared = await apiMutation<{
         file: UploadedFile;
@@ -315,22 +420,35 @@ export function ActivityDetail() {
       }>("/api/files/upload-url", "POST", {
         assignmentId: activity.assignmentId,
         filename: file.name,
-        contentType: file.type,
+        contentType,
         sizeBytes: file.size,
       });
-      if (!isDemoMode()) {
-        const response = await fetch(prepared.signedUploadUrl, {
-          method: "PUT",
-          headers: { "content-type": file.type },
-          body: file,
-        });
-        if (!response.ok) throw new Error("Não foi possível enviar o arquivo.");
-      }
+      if (!isDemoMode())
+        await putWithProgress(
+          prepared.signedUploadUrl,
+          file,
+          contentType,
+          (ratio) =>
+            setTransfer((current) =>
+              current?.requirementId === requirement.id
+                ? { ...current, progress: ratio }
+                : current,
+            ),
+        );
       const finalized = await apiMutation<UploadedFile>(
         `/api/files/${prepared.file.id}/finalize`,
         "POST",
         {},
       );
+      releasePreview(requirement.id);
+      const previewUrl = isImageFile(extension)
+        ? URL.createObjectURL(file)
+        : undefined;
+      if (previewUrl) previewUrls.current[requirement.id] = previewUrl;
+      setFileMeta((current) => ({
+        ...current,
+        [requirement.id]: { size: file.size, extension, previewUrl },
+      }));
       setValues((current) => ({
         ...current,
         [requirement.id]: {
@@ -339,20 +457,23 @@ export function ActivityDetail() {
           filename: file.name,
         },
       }));
+      delete pendingFiles.current[requirement.id];
       setMessage({
         tone: "success",
         text: `${file.name} está pronto para entrar nesta versão.`,
       });
     } catch (cause) {
-      setMessage({
-        tone: "error",
-        text:
+      setFileError(requirement.id, {
+        message:
           cause instanceof Error
             ? cause.message
             : "Não foi possível anexar o arquivo.",
+        retryable: true,
       });
     } finally {
-      setUploadingId(null);
+      setTransfer((current) =>
+        current?.requirementId === requirement.id ? null : current,
+      );
     }
   }
 
@@ -815,7 +936,11 @@ export function ActivityDetail() {
                   key={requirement.id}
                   requirement={requirement}
                   entry={values[requirement.id]}
-                  uploading={uploadingId === requirement.id}
+                  transfer={
+                    transfer?.requirementId === requirement.id ? transfer : null
+                  }
+                  meta={fileMeta[requirement.id]}
+                  error={fileErrors[requirement.id]}
                   disabled={saving || Boolean(uploadingId)}
                   onChange={(entry) =>
                     setValues((current) => ({
@@ -825,11 +950,12 @@ export function ActivityDetail() {
                   }
                   onUpload={(file) => void upload(requirement, file)}
                   onOpenFile={(fileId) => void openFileById(fileId)}
-                  onRemove={() =>
-                    setValues((current) => ({
-                      ...current,
-                      [requirement.id]: { value: "" },
-                    }))
+                  onRemove={() => detachFile(requirement.id)}
+                  onRetry={() =>
+                    void upload(
+                      requirement,
+                      pendingFiles.current[requirement.id],
+                    )
                   }
                 />
               ))}
@@ -1063,21 +1189,27 @@ function SupportDetail({
 function RequirementField({
   requirement,
   entry,
-  uploading,
+  transfer,
+  meta,
+  error,
   disabled,
   onChange,
   onUpload,
   onOpenFile,
   onRemove,
+  onRetry,
 }: {
   requirement: ActivityRequirement;
   entry: RequirementValue | undefined;
-  uploading: boolean;
+  transfer: Transfer | null;
+  meta: FileMeta | undefined;
+  error: FileError | undefined;
   disabled: boolean;
   onChange: (entry: RequirementValue) => void;
   onUpload: (file: File | undefined) => void;
   onOpenFile: (fileId: string) => void;
   onRemove: () => void;
+  onRetry: () => void;
 }) {
   const label = `${requirement.label}${requirement.required ? " *" : " · opcional"}`;
   const fieldId = `requirement-${requirement.id}`;
@@ -1087,54 +1219,22 @@ function RequirementField({
     (requirement.kind === "file" ? !entry?.fileId : !entry?.value.trim());
   if (requirement.kind === "file")
     return (
-      <div className={styles.fileFieldShell}>
-        <label
-          className={styles.fileField}
-          data-attached={Boolean(entry?.fileId)}
-        >
-          <span>
-            {entry?.fileId ? <Check /> : <Paperclip />}
-            {label}
-          </span>
-          <strong aria-live="polite">
-            {uploading
-              ? "Enviando arquivo…"
-              : (entry?.filename ?? "Selecione a evidência do seu processo")}
-          </strong>
-          <small id={helperId}>
-            PDF, imagem, texto, documento ou apresentação · até 20 MB
-          </small>
-          <input
-            id={fieldId}
-            type="file"
-            required={requirement.required && !entry?.fileId}
-            aria-invalid={invalid}
-            aria-describedby={helperId}
-            disabled={disabled}
-            accept=".pdf,.txt,.md,.png,.jpg,.jpeg,.webp,.docx,.pptx"
-            onChange={(event) => onUpload(event.target.files?.[0])}
-          />
-        </label>
-        {entry?.fileId && (
-          <div className={styles.fileActions}>
-            <button
-              type="button"
-              className={styles.fileRemove}
-              disabled={disabled}
-              onClick={onRemove}
-            >
-              Remover do rascunho
-            </button>
-            <button
-              type="button"
-              className={styles.fileOpen}
-              onClick={() => onOpenFile(entry.fileId!)}
-            >
-              Abrir arquivo anexado <ExternalLink aria-hidden="true" />
-            </button>
-          </div>
-        )}
-      </div>
+      <FileRequirementField
+        requirement={requirement}
+        entry={entry}
+        transfer={transfer}
+        meta={meta}
+        error={error}
+        disabled={disabled}
+        invalid={invalid}
+        label={label}
+        fieldId={fieldId}
+        helperId={helperId}
+        onUpload={onUpload}
+        onOpenFile={onOpenFile}
+        onRemove={onRemove}
+        onRetry={onRetry}
+      />
     );
   const isText = requirement.kind === "text";
   const Icon = isText ? FileText : Link2;
@@ -1193,6 +1293,214 @@ function RequirementField({
       </small>
     </label>
   );
+}
+
+/**
+ * Área de soltura com estados: vazia, arrastando, enviando, anexada e com erro.
+ * O input cobre a zona inteira com opacity 0 — assim o clique em qualquer ponto
+ * abre o seletor, o arquivo solto cai direto nele (o navegador dispara change) e
+ * a validação nativa de campo obrigatório continua com um alvo focável.
+ */
+function FileRequirementField({
+  requirement,
+  entry,
+  transfer,
+  meta,
+  error,
+  disabled,
+  invalid,
+  label,
+  fieldId,
+  helperId,
+  onUpload,
+  onOpenFile,
+  onRemove,
+  onRetry,
+}: {
+  requirement: ActivityRequirement;
+  entry: RequirementValue | undefined;
+  transfer: Transfer | null;
+  meta: FileMeta | undefined;
+  error: FileError | undefined;
+  disabled: boolean;
+  invalid: boolean;
+  label: string;
+  fieldId: string;
+  helperId: string;
+  onUpload: (file: File | undefined) => void;
+  onOpenFile: (fileId: string) => void;
+  onRemove: () => void;
+  onRetry: () => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+  const attached = Boolean(entry?.fileId);
+  const filename = transfer?.name ?? entry?.filename ?? "";
+  const extension = meta?.extension ?? fileExtension(filename);
+  const size = transfer?.size ?? meta?.size;
+  const errorId = `${fieldId}-error`;
+  // Arrastar vence tudo: é retorno da interação em curso, não do estado salvo.
+  // O tom de erro só toma a zona quando não há anexo — um arquivo recusado não
+  // invalida o que já está preso ali; a mensagem abaixo basta.
+  const state = transfer
+    ? "uploading"
+    : dragging
+      ? "dragging"
+      : attached
+        ? "attached"
+        : error
+          ? "error"
+          : "idle";
+
+  return (
+    <div className={styles.fileFieldShell} data-attached={attached}>
+      <span className={styles.fileLabel}>
+        {attached ? <Check /> : <Paperclip />}
+        {label}
+      </span>
+      <div
+        className={styles.dropzone}
+        data-state={state}
+        onDragEnter={() => !disabled && setDragging(true)}
+        onDragOver={(event) => event.preventDefault()}
+        onDragLeave={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+            setDragging(false);
+        }}
+        onDrop={() => setDragging(false)}
+      >
+        <input
+          id={fieldId}
+          className={styles.dropzoneInput}
+          type="file"
+          required={requirement.required && !attached}
+          aria-invalid={invalid}
+          // O texto de restrições só existe no estado vazio; o de erro, quando há erro.
+          aria-describedby={
+            [!transfer && !attached ? helperId : null, error ? errorId : null]
+              .filter(Boolean)
+              .join(" ") || undefined
+          }
+          disabled={disabled}
+          accept={UPLOAD_ACCEPT}
+          onChange={(event) => {
+            onUpload(event.target.files?.[0]);
+            // Permite reescolher o mesmo arquivo depois de um erro.
+            event.target.value = "";
+          }}
+        />
+
+        {transfer ? (
+          <div className={styles.uploadingState} aria-live="polite">
+            <UploadRing progress={transfer.progress} />
+            <strong>{transfer.name}</strong>
+            <small>
+              {transfer.progress === null
+                ? "Enviando…"
+                : `${Math.round(transfer.progress * 100)}% de ${formatBytes(transfer.size)}`}
+            </small>
+          </div>
+        ) : attached ? (
+          <figure className={styles.fileCard}>
+            <div className={styles.filePreview} data-image={Boolean(meta?.previewUrl)}>
+              {meta?.previewUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- blob local do arquivo escolhido, sem otimização possível
+                <img src={meta.previewUrl} alt="" />
+              ) : (
+                <FileGlyph extension={extension} />
+              )}
+            </div>
+            <figcaption>
+              <strong title={filename}>{filename}</strong>
+              <small>
+                {[extension.toUpperCase(), size ? formatBytes(size) : null]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </small>
+            </figcaption>
+            <div className={styles.fileCardActions}>
+              <button
+                type="button"
+                className={styles.fileOpen}
+                onClick={() => onOpenFile(entry!.fileId!)}
+              >
+                Abrir <ExternalLink aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className={styles.fileDetach}
+                disabled={disabled}
+                onClick={onRemove}
+                title="Remover do rascunho"
+              >
+                <X aria-hidden="true" />
+                <span className={styles.srOnly}>Remover do rascunho</span>
+              </button>
+            </div>
+            <span className={styles.fileSwap}>
+              Clique ou solte outro arquivo para substituir
+            </span>
+          </figure>
+        ) : (
+          <div className={styles.emptyState}>
+            <span className={styles.dropIcon}>
+              <UploadCloud aria-hidden="true" />
+            </span>
+            <strong>
+              {dragging
+                ? "Solte o arquivo aqui"
+                : "Arraste a evidência ou clique para escolher"}
+            </strong>
+            <small id={helperId}>
+              PDF, imagem, texto, documento ou apresentação · até 20 MB
+            </small>
+          </div>
+        )}
+      </div>
+      {error && (
+        <p className={styles.fileError} id={errorId} role="alert">
+          <AlertTriangle aria-hidden="true" />
+          <span>{error.message}</span>
+          {error.retryable && (
+            <button type="button" disabled={disabled} onClick={onRetry}>
+              <RotateCcw aria-hidden="true" />
+              Tentar novamente
+            </button>
+          )}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Anel de progresso: determinado quando o navegador reporta bytes, girando quando não. */
+function UploadRing({ progress }: { progress: number | null }) {
+  const circumference = 2 * Math.PI * 20;
+  return (
+    <svg
+      className={styles.uploadRing}
+      viewBox="0 0 48 48"
+      data-indeterminate={progress === null}
+      aria-hidden="true"
+    >
+      <circle className={styles.uploadRingTrack} cx="24" cy="24" r="20" />
+      <circle
+        className={styles.uploadRingValue}
+        cx="24"
+        cy="24"
+        r="20"
+        strokeDasharray={circumference}
+        strokeDashoffset={
+          progress === null ? circumference * 0.72 : circumference * (1 - progress)
+        }
+      />
+    </svg>
+  );
+}
+
+function FileGlyph({ extension }: { extension: string }) {
+  if (isImageFile(extension)) return <ImageIcon aria-hidden="true" />;
+  if (extension === "pptx") return <Presentation aria-hidden="true" />;
+  return <FileText aria-hidden="true" />;
 }
 
 function HistoryVersion({
@@ -1412,4 +1720,61 @@ function formatTime(value: Date): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(value);
+}
+
+function fileExtension(filename: string): string {
+  const dot = filename.lastIndexOf(".");
+  return dot < 0 ? "" : filename.slice(dot + 1).toLowerCase();
+}
+
+/**
+ * O navegador nem sempre preenche file.type (.md e .webp costumam vir vazios em
+ * alguns sistemas), e o backend só aceita o enum de UploadInputSchema. A extensão
+ * é a fonte de verdade: o que não estiver no mapa é recusado antes de subir.
+ */
+function uploadContentType(filename: string): string | null {
+  return UPLOAD_TYPES[fileExtension(filename)] ?? null;
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const kilobytes = bytes / 1024;
+  if (kilobytes < 1024) return `${Math.round(kilobytes)} KB`;
+  const megabytes = kilobytes / 1024;
+  return `${megabytes.toFixed(1).replace(".", ",")} MB`;
+}
+
+function isImageFile(extension: string): boolean {
+  return ["png", "jpg", "jpeg", "webp"].includes(extension);
+}
+
+/**
+ * fetch não expõe progresso de envio; XHR expõe. É o mesmo PUT na URL assinada,
+ * só que reportando bytes enviados para o anel de progresso.
+ */
+function putWithProgress(
+  url: string,
+  file: File,
+  contentType: string,
+  onProgress: (ratio: number) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("PUT", url);
+    request.setRequestHeader("content-type", contentType);
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) onProgress(event.loaded / event.total);
+    });
+    request.addEventListener("load", () => {
+      if (request.status >= 200 && request.status < 300) resolve();
+      else reject(new Error("Não foi possível enviar o arquivo."));
+    });
+    request.addEventListener("error", () =>
+      reject(new Error("A conexão caiu durante o envio.")),
+    );
+    request.addEventListener("abort", () =>
+      reject(new Error("Envio interrompido.")),
+    );
+    request.send(file);
+  });
 }
