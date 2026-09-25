@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowRight, BookOpenText, CalendarDays, ChevronRight, CircleUserRound, ClipboardCheck, FolderKanban, Gauge, Home, LogOut, Menu, Moon, ShieldCheck, Sun, UserRound, UsersRound, X } from "lucide-react";
+import { ArrowRight, BookOpenText, CalendarDays, ChevronRight, CircleUserRound, ClipboardCheck, FolderKanban, Gauge, Home, LogOut, Menu, ShieldCheck, UserRound, UsersRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AdminDashboard, MeProfile, StudentHome } from "@/specs/api.contracts";
 import { CinematicPage } from "@/components/academy";
+import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLiveApi } from "@/components/prototype/live-api";
 import { createSupabaseBrowserClient } from "@/src/lib/supabase/browser";
@@ -30,6 +31,10 @@ const adminNav = [
 const allNav = [...studentNav, ...adminNav];
 
 type NavBadge = { value: string; hint: string };
+
+type ThemeTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => void;
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -70,9 +75,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   function toggleTheme() {
     const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    window.localStorage.setItem("academy-theme", next ? "dark" : "light");
+    const applyTheme = () => {
+      setDark(next);
+      document.documentElement.classList.toggle("dark", next);
+      window.localStorage.setItem("academy-theme", next ? "dark" : "light");
+    };
+    const transitionDocument = document as ThemeTransitionDocument;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion || !transitionDocument.startViewTransition) {
+      applyTheme();
+      return;
+    }
+
+    transitionDocument.startViewTransition(applyTheme);
   }
 
   async function signOut() {
@@ -135,7 +151,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="top-actions">
             {profile?.role === "admin" && <Link className="role-switch" href={adminContext ? "/" : "/admin"}>{adminContext ? "Ver como aluno" : "Abrir gestão"}</Link>}
             <Tooltip>
-              <TooltipTrigger asChild><button type="button" className="icon-button" onClick={toggleTheme} aria-label={dark ? "Ativar tema claro" : "Ativar tema escuro"}>{dark ? <Sun /> : <Moon />}</button></TooltipTrigger>
+              <TooltipTrigger asChild><AnimatedThemeToggle isDark={dark} onToggle={toggleTheme} /></TooltipTrigger>
               <TooltipContent side="bottom">{dark ? "Usar tema claro" : "Usar tema escuro"}</TooltipContent>
             </Tooltip>
             <Link className="avatar" href="/perfil" aria-label={profile ? `Abrir perfil de ${profile.displayName}` : "Abrir perfil"}><CircleUserRound /></Link>

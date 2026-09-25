@@ -148,6 +148,30 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* A troca de tema nasce no controle do topo e revela a nova superfície em vez
+   de substituir todas as cores no mesmo frame. Navegadores sem View Transitions
+   mantêm o comportamento funcional anterior. */
+::view-transition-old(root) {
+  animation: none;
+}
+
+::view-transition-new(root) {
+  animation: academy-theme-reveal 620ms var(--ease-entrance) both;
+}
+
+@keyframes academy-theme-reveal {
+  from { clip-path: circle(0 at calc(100% - 7.25rem) 2.25rem); opacity: .72; }
+  to { clip-path: circle(150% at calc(100% - 7.25rem) 2.25rem); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
 button, a, input, textarea, summary { transition: transform 150ms var(--ease-standard), color 150ms var(--ease-standard), background-color 150ms var(--ease-standard), border-color 150ms var(--ease-standard), box-shadow 150ms var(--ease-standard); }
 button:active, a:active { transform: translateY(0.0625rem); }
 :focus-visible { outline: 0.1875rem solid var(--color-academy-orange); outline-offset: 0.1875rem; }

@@ -9,10 +9,10 @@ const IdentityRowSchema = z.object({
   tenant_id: z.string().uuid(),
   auth_user_id: z.string().uuid(),
   access_enabled: z.boolean(),
-  tenant_memberships: z.preprocess(
-    (value) => (Array.isArray(value) ? value : value == null ? [] : [value]),
-    z.array(z.object({ role: z.enum(["admin", "student"]) })),
-  ),
+});
+
+const MembershipRowSchema = z.object({
+  role: z.enum(["admin", "student"]),
 });
 
 export class IdentityRepository {
@@ -26,7 +26,7 @@ export class IdentityRepository {
     const { data, error } = await this.client
       .schema("logos_academy")
       .from("users")
-      .select("id, tenant_id, auth_user_id, access_enabled, tenant_memberships!inner(role)")
+      .select("id, tenant_id, auth_user_id, access_enabled")
       .eq("auth_user_id", authUserId)
       .is("deleted_at", null)
       .maybeSingle();
@@ -37,7 +37,20 @@ export class IdentityRepository {
     if (!data) return null;
 
     const row = IdentityRowSchema.parse(data);
-    const membership = row.tenant_memberships[0];
+    const { data: membershipData, error: membershipError } = await this.client
+      .schema("logos_academy")
+      .from("tenant_memberships")
+      .select("role")
+      .eq("tenant_id", row.tenant_id)
+      .eq("user_id", row.id)
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    if (membershipError) {
+      throw new AppError("INTERNAL_ERROR", "NÃ£o foi possÃ­vel resolver a sessÃ£o.", requestId);
+    }
+
+    const membership = membershipData ? MembershipRowSchema.parse(membershipData) : null;
     if (!row.access_enabled || !membership) return null;
 
     return IdentityContextSchema.parse({
