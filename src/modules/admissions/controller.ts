@@ -18,7 +18,7 @@ export async function inviteController(request: Request): Promise<NextResponse> 
     if (!user) throw new AppError("UNAUTHENTICATED", "Sessão obrigatória.", requestId);
     const context = await new IdentityService(new IdentityRepository(server)).requireAdmin(user.id, requestId);
     const key = request.headers.get("idempotency-key") ?? "";
-    const result = await new AdmissionsInvitationService(new AdmissionsAdminAdapter()).invite(context, await request.json(), key, requestId);
+    const result = await new AdmissionsInvitationService(new AdmissionsAdminAdapter(new URL(request.url).origin)).invite(context, await request.json(), key, requestId);
     return NextResponse.json({ ok: true, data: result });
   } catch (error: unknown) {
     const appError = asApiError(error, requestId, "Não foi possível concluir a operação.");

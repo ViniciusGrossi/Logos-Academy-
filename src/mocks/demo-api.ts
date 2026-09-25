@@ -930,6 +930,20 @@ export async function demoApi<T>(
           : true,
       ),
     ) as T;
+  if (method === "GET" && pathname === "/api/admin/students/invite/options")
+    return {
+      curricula: [{ id: "00000000-0000-4000-8000-000000000040", name: "Explorer", version: "2026.1" }],
+      classes: [{
+        id: classSummary.id,
+        name: classSummary.name,
+        curriculumId: "00000000-0000-4000-8000-000000000040",
+        curriculumName: classSummary.curriculumName,
+        startsOn: classSummary.startsOn,
+        status: classSummary.status === "planned" ? "planned" : "active",
+        occupiedSeats: classSummary.activeStudentCount,
+        capacity: 6,
+      }],
+    } as T;
   if (method === "GET" && /^\/api\/admin\/students\/[^/]+$/.test(pathname))
     return studentDetail(pathname.split("/").at(-1) ?? ids.marina) as T;
   if (method === "PUT" && pathname.endsWith("/consent")) {

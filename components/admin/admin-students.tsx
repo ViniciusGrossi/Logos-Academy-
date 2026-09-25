@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, FolderKanban, GraduationCap, Search, ShieldCheck, UserRound, UsersRound } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, FolderKanban, GraduationCap, Search, ShieldCheck, UserRound, UserRoundPlus, UsersRound } from "lucide-react";
 import { type FormEvent, useDeferredValue, useMemo, useState } from "react";
 import type { CompletionCheck, ConsentRecord, EnrollmentSummary, GuardianRecord, PresentationRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
 import { apiMutation } from "@/components/prototype/live-api";
@@ -9,6 +9,7 @@ import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, Spotlight
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
+import { AdminInviteStudent } from "./admin-invite-student";
 import { useAdminStudent, useAdminStudents, useEnrollmentCompletion } from "./admin-data";
 import { hasStudentRisk, matchesRisk, type RiskFilter } from "./admin-utils";
 import styles from "./admin-experience.module.css";
@@ -19,6 +20,7 @@ function studentTone(student: StudentSummary): "warning" | "success" {
 
 export function AdminStudents() {
   const [search, setSearch] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
   const deferredSearch = useDeferredValue(search);
   const [risk, setRisk] = useState<RiskFilter>("all");
   const { data, error, loading, reload } = useAdminStudents(deferredSearch);
@@ -35,6 +37,7 @@ export function AdminStudents() {
         title="Cada aluno, um percurso visível."
         description="Encontre rapidamente quem precisa de acompanhamento sem perder o contexto da turma, das evidências e da frequência presencial."
         marker="até 6 por turma"
+        action={<MagneticAction><button type="button" className={styles.toolbarAction} onClick={() => setInviteOpen(true)}><UserRoundPlus size={17} aria-hidden="true" /> Convidar aluno</button></MagneticAction>}
       />
       <MetricStrip metrics={[
         { id: "visible", label: "Alunos encontrados", value: String(data?.items.length ?? 0), detail: "na consulta atual" },
@@ -81,6 +84,7 @@ export function AdminStudents() {
           )} />
         </SpotlightCard>
       )}
+      <AdminInviteStudent open={inviteOpen} onOpenChange={setInviteOpen} onCreated={reload} />
     </div>
   );
 }

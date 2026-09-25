@@ -19,7 +19,7 @@ const isLocalDemo = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 const copy = {
   login: { step: "Acesso ao estúdio", title: "Continue sua jornada.", intro: "Entre para retomar sua missão e transformar o próximo conceito em evidência." },
-  activate: { step: "Primeiro acesso", title: "Prepare seu espaço.", intro: "Crie uma senha segura para ativar o acesso recebido pela Logos Academy." },
+  activate: { step: "Convite confirmado", title: "Crie seu acesso.", intro: "Confira o e-mail do convite e defina a senha que protegerá seu passaporte na Logos Academy." },
   recover: { step: "Recuperar acesso", title: "Volte à construção.", intro: "Receba um link seguro no seu e-mail ou defina uma nova senha após abrir o link." },
 } satisfies Record<AuthMode, { step: string; title: string; intro: string }>;
 
@@ -92,15 +92,20 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
     if (!updateMode) return;
     try {
       const client = createSupabaseBrowserClient();
-      void client.auth.getSession().then(({ data }) => {
-        setSessionReady(Boolean(data.session));
-        if (!data.session) setError("Abra novamente o link seguro enviado pela Logos Academy.");
-      }).catch((cause: unknown) => setError(authErrorMessage(cause)));
+      const applySession = (session: Awaited<ReturnType<typeof client.auth.getSession>>["data"]["session"]) => {
+        setSessionReady(Boolean(session));
+        if (mode === "activate") setEmail(session?.user.email ?? "");
+        if (!session) setError("Abra novamente o link seguro enviado pela Logos Academy.");
+        else setError(null);
+      };
+      void client.auth.getSession().then(({ data }) => applySession(data.session)).catch((cause: unknown) => setError(authErrorMessage(cause)));
+      const { data: listener } = client.auth.onAuthStateChange((_event, session) => applySession(session));
+      return () => listener.subscription.unsubscribe();
     } catch (cause) {
       setSessionReady(false);
       setError(authErrorMessage(cause));
     }
-  }, [updateMode]);
+  }, [mode, updateMode]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,6 +136,17 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
       if (password !== confirmation) throw new Error("As senhas não coincidem.");
       const result = await client.auth.updateUser({ password });
       if (result.error) throw result.error;
+      if (mode === "activate") {
+        const activation = await fetch("/api/auth/activate", { method: "POST", credentials: "same-origin" });
+        const body: unknown = await activation.json().catch(() => null);
+        if (!activation.ok) {
+          const detail = typeof body === "object" && body && "error" in body ? body.error : null;
+          const activationMessage = typeof detail === "object" && detail && "message" in detail && typeof detail.message === "string"
+            ? detail.message
+            : "Não foi possível ativar sua matrícula.";
+          throw new Error(activationMessage);
+        }
+      }
       setMessage(mode === "activate" ? "Acesso ativado. Seu estúdio está pronto." : "Senha atualizada com sucesso.");
       window.setTimeout(() => { router.replace("/"); router.refresh(); }, 700);
     } catch (cause) {
@@ -138,7 +154,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
     } finally { setPending(false); }
   }
 
-  const action = mode === "login" ? "Entrar no estúdio" : updateMode ? "Salvar nova senha" : "Enviar link seguro";
+  const action = mode === "login" ? "Entrar no estúdio" : mode === "activate" ? "Ativar meu acesso" : updateMode ? "Salvar nova senha" : "Enviar link seguro";
   return <MotionConfig reducedMotion="user"><main className={styles.scene}>
     <MissionField activeStage={activeStage} />
     <header className={styles.topbar}>
@@ -158,6 +174,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
           <div className={styles.step}>{copy[mode].step}</div><h2>{copy[mode].title}</h2><p className={styles.intro}>{copy[mode].intro}</p>
         <form className={styles.form} onSubmit={submit}>
           {(mode === "login" || !updateMode) && <SmoothInput label="E-mail" helper="Use o endereço cadastrado na matrícula" icon={<Mail size={18} />} type="email" value={email} autoComplete="email" required onFocus={() => setActiveStage(1)} onChange={(event) => setEmail(event.target.value)} />}
+          {mode === "activate" && updateMode && <SmoothInput label="E-mail do convite" helper="Este endereço foi validado pelo convite e não pode ser alterado aqui" icon={<Mail size={18} />} type="email" value={email} autoComplete="email" readOnly onFocus={() => setActiveStage(1)} />}
           {(mode === "login" || updateMode) && <PasswordInput value={password} onChange={setPassword} onFocus={() => setActiveStage(2)} label={mode === "login" ? "Senha" : "Nova senha"} />}
           {updateMode && <><PasswordMeter value={password} /><PasswordInput value={confirmation} onChange={setConfirmation} label="Confirmar senha" helper="Repita exatamente a senha acima" /></>}
           {error && <div className={styles.status} data-error="true" role="alert">{error}</div>}

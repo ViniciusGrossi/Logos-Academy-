@@ -15,6 +15,8 @@ export class AdmissionsAdminAdapter {
   private readonly env = getAdminSupabaseEnv();
   private readonly client: SupabaseClient = createClient(this.env.NEXT_PUBLIC_SUPABASE_URL, this.env.SUPABASE_SECRET_KEY, { auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false } });
 
+  constructor(private readonly siteOrigin?: string) {}
+
   async invite(actor: TenantActor, input: InviteStudentInput, idempotencyKey: string, requestId: string): Promise<InviteResult> {
     const payloadHash = createHash("sha256").update(canonical(input)).digest();
     const claim = await this.rpc("claim_student_invitation", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash }, requestId);
@@ -23,7 +25,11 @@ export class AdmissionsAdminAdapter {
     let invitationSentAt = readString(claim, "invitationSentAt");
     let createdHere = false;
     if (!authUserId || !invitationSentAt) {
-      const invited = await this.client.auth.admin.inviteUserByEmail(input.email);
+      const redirectTo = this.siteOrigin ? new URL("/ativar", this.siteOrigin).toString() : undefined;
+      const invited = await this.client.auth.admin.inviteUserByEmail(
+        input.email,
+        redirectTo ? { redirectTo } : undefined,
+      );
       if (invited.error || !invited.data.user) throw new AppError("INTERNAL_ERROR", "Não foi possível enviar o convite.", requestId);
       authUserId = invited.data.user.id; invitationSentAt = new Date().toISOString(); createdHere = true;
       await this.rpc("bind_student_invitation_auth", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId, p_invitation_sent_at: invitationSentAt }, requestId);
