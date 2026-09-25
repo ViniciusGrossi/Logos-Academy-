@@ -568,7 +568,7 @@ function activity(assignmentId = ids.assignment): ActivityDetail {
     portfolioEvidence: "A versão final do cartaz com o registro da decisão.",
     toolHint: "Canva ou Figma; câmera do celular como backup.",
     project: activityProject(),
-    concepts,
+    concepts: concepts.slice(0, 2),
     requirements: [
       {
         id: textItem.requirementId,
@@ -746,7 +746,8 @@ function projectActivities(cyclePosition: number): ProjectDetail["activities"] {
     return {
       assignmentId: assignmentIdForPosition(position),
       lessonPosition: position,
-      title: seed.title,
+      title:
+        position === 7 ? "Cartaz que orienta uma decisão" : seed.title,
       status,
       latestVersion:
         position === 7 ? submissionVersion : status === "approved" ? 1 : null,

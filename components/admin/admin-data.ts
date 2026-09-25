@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type {
   ClassSummary,
+  CompletionCheck,
   ConsentRecord,
   EnrollmentSummary,
   GuardianRecord,
@@ -53,3 +54,6 @@ export function useAdminClass(classId: string | undefined) {
   return useLiveApi<ClassDetailData>(classId ? `/api/admin/classes/${classId}` : null);
 }
 
+export function useEnrollmentCompletion(enrollmentId: string | undefined) {
+  return useLiveApi<CompletionCheck>(enrollmentId ? `/api/admin/enrollments/${enrollmentId}/completion` : null);
+}

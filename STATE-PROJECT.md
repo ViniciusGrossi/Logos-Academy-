@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-21
+date: 2026-09-25
 fase_atual: "12"
-etapa_atual: "Jornada premium remodelada e validada; aguardando gate visual humano"
+etapa_atual: "Superfície administrativa de Formação implementada; aguardando gate visual humano das páginas do aluno e ensaio ponta-a-ponta com aluno real"
 produto_tipo: "saas-premium"
-proximo_passo: "Realizar gate visual humano da Jornada em 1440, 768 e 375 px; após aprovação, consolidar a página"
+proximo_passo: "Criar turma-piloto Explorer v2 com aluno de teste e rodar o ensaio ponta-a-ponta fora do modo demo (convite → ativação → liberação → entrega com anexo → correção → reentrega → projeto aprovado → apresentação → conclusão); em paralelo, gate visual humano das páginas do aluno em 1440, 768 e 375 px"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -19,7 +19,7 @@ gates:
   fase_10: pass
   fase_11: pass
   fase_12: pass
-features: { draft: 0, approved: 14, built: 14, reviewed: 12 }
+features: { draft: 0, approved: 14, built: 14, reviewed: 10 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08
@@ -34,13 +34,21 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [ ] `student-visual-system-rounding-orbit`: raios sistêmicos e campo orbital compartilhado implementados e validados; aguardando gate visual humano.
 - [ ] `student-journey-premium`: fusão da Jornada real com a direção premium implementada e validada; aguardando gate visual humano.
 - [ ] `student-knowledge-atlas`: versão premium implementada e validada em 1440/768/375, tema claro/escuro e movimento reduzido; aguardando gate visual humano.
+- [ ] `student-activity-editorial-redesign`: abertura compacta, orientação recolhível e construção priorizada implementadas; aguardando gate visual humano.
 - [x] `explorer-activity-system-v2`: implementação local concluída, gate visual aprovado e migrations aplicadas de forma controlada no Supabase.
 - [x] `student-activity-workbench`: Mesa de Atividade Explorer v2 validada em 1440/768/375, tema claro/escuro e movimento reduzido; gate visual aprovado.
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-09-25] Aba **Formação** criada em `/admin/alunos/[studentId]`, fechando a única superfície da spec `projects-portfolio-completion` que nunca havia sido construída: checklist dos cinco requisitos (`CompletionCheck`), lista de bloqueios antes da confirmação, registro de apresentação (Demo Day ou substitutiva, data/hora e nota contextual) e confirmação de conclusão — ambos em Dialog, reaproveitando o `Sheet` (Radix Dialog) já instalado. Matrícula concluída fica somente-leitura. As três rotas (`GET /completion`, `POST /presentation`, `POST /complete`), os RPCs e o mock de demo já existiam; faltava apenas o consumo. Novo teste `src/tests/projects-portfolio-completion.test.ts` cobre o contrato do check e a conversão `datetime-local` → ISO exigida pelo Zod. TypeScript, ESLint e 76 testes passaram. Produção não foi alterada.
+
+- [2026-09-24] Remodelação editorial da Atividade concluída localmente: hero e percurso foram compactados, circuitos e loops ornamentais removidos, feedback e navegação ganharam leitura direta e a orientação virou um disclosure nativo antes da mesa de versão. A superfície raiz agora reutiliza o mesmo campo de obsidiana responsivo das demais páginas estudantis. O progresso considera apenas entregáveis obrigatórios; campos ficam bloqueados durante persistência, anexo pode ser removido do rascunho e navegações alertam sobre alterações não salvas. A demo foi alinhada ao título e aos conceitos reais da atividade. Browser validou desktop e 375 px sem overflow ou erros de console; proteção de rascunho foi exercitada; TypeScript, lint sem erros e 73 testes passaram. Produção não foi alterada.
+
+- [2026-09-24] Sistema visual das páginas do aluno corrigido na origem: o token canônico `--radius` passou a alimentar corretamente os raios derivados do Tailwind/Shadcn, restaurando cantos arredondados em todos os controles. O `CinematicPage` ganhou um campo orbital SVG compartilhado, responsivo e com movimento reduzido, atravessando os espaços entre cards sem competir com o conteúdo. Início, Atividade, Jornada, Projetos, Atlas, Agenda e Perfil foram verificados em runtime sem overflow ou erros de console; TypeScript, lint, 73 testes e build passaram.
 
 - [2026-09-21] Jornada premium reconstruída com hero orientado à ação, mapa SVG dos quatro projetos reais, visão Explorer/Builder/Engineer, rota de construção e ritmo presencial. Projetos bloqueados não expõem acesso nem métricas, estados disponível/atual/concluído/próximo têm sinais coerentes, microtextos respeitam 11 px e a chegada do conteúdo preserva movimento reduzido. Validada em 1440/768/375, claro/escuro, teclado, sticky e sem overflow; TypeScript, lint focalizado, testes e detector Impeccable passaram.
 
@@ -191,12 +199,20 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Bloqueios
 
-- Migrations `0045_project_living_dossier.sql` e `0046_activity_workbench_context.sql` estão somente no repositório local; aplicar no Supabase, nesta ordem, antes de publicar o novo frontend.
+- Nenhum aluno real percorreu o fluxo completo: `reviews`, `uploaded_files`, `presentation_records` e `completion_records` estão com zero linhas e `project_records.approved` = 0 em produção. Correção, anexo, apresentação e conclusão nunca foram exercitados fora do modo demo.
+- As duas matrículas existentes rodam Explorer v1; o sistema Explorer v2 (16 atividades, 32 templates) está no banco sem nenhuma turma usando. Criar turma-piloto antes de validar o currículo novo.
+- `logos_academy.approve_project` (migration 0009) é código morto: nenhuma rota, tela ou função do banco a chama — a aprovação real acontece pelo trigger `activity_assignments_sync_project`. Decidir entre remover ou expor como fallback manual.
+- `python [SKILL_ROOT]/scripts/validate.py` do CLAUDE.md não existe (`~/.claude/skills/logos/` só tem `agents/`, `phases/`, `references/`, `SKILL.md`). O gate de specs da fase 2 não tem como rodar — mesma classe de deriva do ADR-022.
 - Fase 12 — `npm audit` ainda reporta 2 vulnerabilidades altas em PostCSS transitivo do Next 15 e 1 crítica/4 moderadas no toolchain Vitest/Vite. A correção automática exige `npm audit fix --force` (Next 16 + Vitest 5), uma atualização major que requer aprovação explícita e validação completa antes de novo deploy.
 - Registro vivo de ADRs expõe apenas ADR-030, embora o playbook cite ADR-025–031; não numerar ADR global até o checkpoint corrigir a deriva.
-- Git: o projeto vive dentro do repo do vault (sem `.git` próprio) e ~40 arquivos versionáveis seguem untracked (`docs/`, `specs/`, `supabase/migrations/`, `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`). Commits anteriores só rastrearam `app/` e `src/`. Regularizar antes do deploy (ADR-035: repo GitHub dedicado via `git init` na subpasta).
+- Git: verificado em 2026-09-25 — o projeto TEM repo próprio (`.git` na pasta do projeto, remote `origin` → `ViniciusGrossi/Logos-Academy-`, 30 commits, HEAD `c5bc4e4`). `docs/`, `specs/`, `supabase/migrations/`, `PRODUCT.md`, `DESIGN.md` e `ARCHITECTURE.md` estão versionados. Working tree com 11 entradas sujas (10 modificados do redesign + `coach-mat.png` e o novo teste untracked). Push para o GitHub exige aprovação explícita separada. O bloqueio anterior ("sem `.git` próprio, ~40 arquivos untracked") era STATE desatualizado.
+- Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-09-25] Diagnóstico de "o fluxo não fecha" precisa seguir o gatilho, não só a função com nome óbvio. A conclusão anterior de que o projeto nunca chegava a `approved` estava errada: `admin_publish_review` dispara `activity_assignments_sync_project` → `private.sync_project_record_from_assignment`, que aprova o `project_records` do ciclo quando a atividade aprovada é a última aula. Quem estava sem uso era a `approve_project`, e o furo real era de UI, não de banco. Corolário: `specs/registry.json` marcando `built: true` não prova superfície existente — a feature tinha rotas, RPCs e mock prontos e nenhuma tela.
+
+- [2026-09-24] Tokens derivados em `@theme inline` precisam de um token-base resolvido no runtime. Sem `--radius`, o navegador descartava silenciosamente os `border-radius` derivados em todas as páginas; corrigir o token compartilhado é mais seguro do que aplicar raios isolados componente a componente.
 
 - [2026-09-21] Nunca manter duas instâncias de `next dev` do mesmo projeto compartilhando `.next`: concorrência no cache do Webpack pode produzir módulos client indefinidos (`Cannot read properties of undefined (reading 'call')`). Para recuperar, encerrar as instâncias concorrentes e iniciar uma única sessão de desenvolvimento.
 
@@ -236,3 +252,11 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [2026-09-05] Grants amplos para schema customizado não podem reabrir escritas operacionais: reaplicar revogações backend-only após o grant e cobrir o limite com pgTAP.
 - [2026-09-07] Regex de data não valida o calendário: datas impossíveis precisam de round-trip UTC antes de alcançar uma RPC, para retornarem 400 em vez de erro interno.
 - [2026-09-08] Um projeto Vercel legado marcado como `Other` pode construir Next.js, mas empacotar middleware de forma incompatível; `vercel.json` com `framework: "nextjs"` versiona e aplica o override por deploy.
+
+## Avaliação consultiva — Atividade (2026-09-24)
+
+- Revisão solicitada pelo usuário: código atual, protótipo `Atividade v2 Premium.dc.html` e sessão autenticada em 1440×900, 768×1024 e 375×812. Nenhuma entrega enviada ou código de aplicação alterado; gates e próximo passo mantidos.
+- Relatório: `C:/Users/everex/.codex/.chatgpt-projects/g-p-6a8a5a550a58819188163b85928ca0dd/AVALIACAO_PAGINA_ATIVIDADES_LOGOS_ACADEMY.md`.
+- Achados para priorização, ainda não implementados: ausência de proteção de alterações não salvas; feedback de operações restrito ao formulário editável; campos editáveis durante salvamento; prontidão que mistura obrigatórios/opcionais; concorrência/remoção de uploads; navegação muito pequena e longa abertura antes da construção.
+- Demonstração mistura detalhe legado de cartaz com título de vídeo no percurso v2 e conceitos genéricos, incluindo RAG. Origem confirmada nas fixtures; não extrapolar para dados reais do Supabase.
+- Recomendações de composição e motion são propostas de revisão, não aprovação de nova direção visual nem autorização de deploy.

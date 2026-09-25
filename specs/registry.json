@@ -14,15 +14,20 @@
       "wave": 1,
       "built": true,
       "reviewed": true,
-      "dependencies": ["platform-security-foundation"]
+      "dependencies": [
+        "platform-security-foundation"
+      ]
     },
     "admissions-classes-calendar": {
       "spec": "docs/specs/admissions-classes-calendar.md",
       "status": "approved",
       "wave": 1,
       "built": true,
-      "reviewed": true,
-      "dependencies": ["platform-security-foundation", "curriculum-bootstrap"]
+      "reviewed": false,
+      "dependencies": [
+        "platform-security-foundation",
+        "curriculum-bootstrap"
+      ]
     },
     "sessions-attendance-release": {
       "spec": "docs/specs/sessions-attendance-release.md",
@@ -30,7 +35,9 @@
       "wave": 2,
       "built": true,
       "reviewed": true,
-      "dependencies": ["admissions-classes-calendar"]
+      "dependencies": [
+        "admissions-classes-calendar"
+      ]
     },
     "student-home-journey-concepts": {
       "spec": "docs/specs/student-home-journey-concepts.md",
@@ -38,7 +45,10 @@
       "wave": 2,
       "built": true,
       "reviewed": true,
-      "dependencies": ["curriculum-bootstrap", "sessions-attendance-release"]
+      "dependencies": [
+        "curriculum-bootstrap",
+        "sessions-attendance-release"
+      ]
     },
     "activity-submission-files": {
       "spec": "docs/specs/activity-submission-files.md",
@@ -46,7 +56,10 @@
       "wave": 3,
       "built": true,
       "reviewed": true,
-      "dependencies": ["sessions-attendance-release", "platform-security-foundation"]
+      "dependencies": [
+        "sessions-attendance-release",
+        "platform-security-foundation"
+      ]
     },
     "review-feedback-loop": {
       "spec": "docs/specs/review-feedback-loop.md",
@@ -54,15 +67,20 @@
       "wave": 4,
       "built": true,
       "reviewed": true,
-      "dependencies": ["activity-submission-files"]
+      "dependencies": [
+        "activity-submission-files"
+      ]
     },
     "projects-portfolio-completion": {
       "spec": "docs/specs/projects-portfolio-completion.md",
       "status": "approved",
       "wave": 5,
       "built": true,
-      "reviewed": true,
-      "dependencies": ["sessions-attendance-release", "review-feedback-loop"]
+      "reviewed": false,
+      "dependencies": [
+        "sessions-attendance-release",
+        "review-feedback-loop"
+      ]
     },
     "admin-dashboard": {
       "spec": "docs/specs/admin-dashboard.md",
@@ -70,7 +88,10 @@
       "wave": 5,
       "built": true,
       "reviewed": true,
-      "dependencies": ["sessions-attendance-release", "review-feedback-loop"]
+      "dependencies": [
+        "sessions-attendance-release",
+        "review-feedback-loop"
+      ]
     },
     "frontend-premium-phase8": {
       "spec": "docs/specs/frontend-premium-phase8.md",
@@ -78,7 +99,11 @@
       "wave": 1,
       "built": true,
       "reviewed": true,
-      "dependencies": ["student-home-journey-concepts", "projects-portfolio-completion", "admin-dashboard"]
+      "dependencies": [
+        "student-home-journey-concepts",
+        "projects-portfolio-completion",
+        "admin-dashboard"
+      ]
     },
     "integrations-mvp-phase9": {
       "spec": "docs/specs/integrations-mvp-phase9.md",
@@ -87,7 +112,9 @@
       "scope": "fase-9-integracoes",
       "built": true,
       "reviewed": true,
-      "dependencies": ["platform-security-foundation"]
+      "dependencies": [
+        "platform-security-foundation"
+      ]
     },
     "e2e-acceptance": {
       "spec": "docs/specs/e2e-acceptance.md",
@@ -97,7 +124,11 @@
       "note": "Endurecimento adversarial + WCAG + E2E + LGPD. Não é feature de backend/frontend — executado na Fase 10, não bloqueia gates das fases 7/8.",
       "built": false,
       "reviewed": false,
-      "dependencies": ["student-home-journey-concepts", "projects-portfolio-completion", "admin-dashboard"]
+      "dependencies": [
+        "student-home-journey-concepts",
+        "projects-portfolio-completion",
+        "admin-dashboard"
+      ]
     },
     "auth-estudio-vivo": {
       "spec": "docs/specs/auth-estudio-vivo.md",
@@ -106,7 +137,9 @@
       "scope": "milestone-visual-auth-2026-v4",
       "built": true,
       "reviewed": true,
-      "dependencies": ["frontend-premium-phase8"]
+      "dependencies": [
+        "frontend-premium-phase8"
+      ]
     },
     "student-experience-elevation": {
       "spec": "docs/specs/student-experience-elevation.md",
@@ -115,7 +148,11 @@
       "scope": "milestone-visual-product-2026",
       "built": false,
       "reviewed": false,
-      "dependencies": ["auth-estudio-vivo", "student-home-journey-concepts", "projects-portfolio-completion"]
+      "dependencies": [
+        "auth-estudio-vivo",
+        "student-home-journey-concepts",
+        "projects-portfolio-completion"
+      ]
     },
     "project-living-dossier": {
       "spec": "docs/specs/project-living-dossier.md",
@@ -124,7 +161,10 @@
       "scope": "student-project-detail",
       "built": true,
       "reviewed": false,
-      "dependencies": ["student-experience-elevation", "projects-portfolio-completion"]
+      "dependencies": [
+        "student-experience-elevation",
+        "projects-portfolio-completion"
+      ]
     },
     "student-activity-workbench": {
       "spec": "docs/specs/student-activity-workbench.md",
@@ -133,7 +173,11 @@
       "scope": "student-activity-detail",
       "built": true,
       "reviewed": false,
-      "dependencies": ["student-experience-elevation", "activity-submission-files", "project-living-dossier"]
+      "dependencies": [
+        "student-experience-elevation",
+        "activity-submission-files",
+        "project-living-dossier"
+      ]
     },
     "student-knowledge-atlas": {
       "spec": "docs/specs/student-knowledge-atlas.md",
@@ -142,7 +186,10 @@
       "scope": "student-glossary",
       "built": false,
       "reviewed": false,
-      "dependencies": ["student-experience-elevation", "student-home-journey-concepts"]
+      "dependencies": [
+        "student-experience-elevation",
+        "student-home-journey-concepts"
+      ]
     },
     "explorer-activity-system-v2": {
       "spec": "docs/specs/explorer-activity-system-v2.md",
@@ -151,7 +198,11 @@
       "scope": "curriculum-activity-review-system",
       "built": false,
       "reviewed": false,
-      "dependencies": ["student-activity-workbench", "activity-submission-files", "review-feedback-loop"]
+      "dependencies": [
+        "student-activity-workbench",
+        "activity-submission-files",
+        "review-feedback-loop"
+      ]
     }
   }
 }

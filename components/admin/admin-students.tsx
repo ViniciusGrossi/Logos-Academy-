@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, FolderKanban, Search, ShieldCheck, UserRound, UsersRound } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, FolderKanban, GraduationCap, Search, ShieldCheck, UserRound, UsersRound } from "lucide-react";
 import { type FormEvent, useDeferredValue, useMemo, useState } from "react";
-import type { ConsentRecord, EnrollmentSummary, GuardianRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
+import type { CompletionCheck, ConsentRecord, EnrollmentSummary, GuardianRecord, PresentationRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
 import { apiMutation } from "@/components/prototype/live-api";
 import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, SpotlightCard, StateScene, StatusBadge } from "@/components/academy";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
-import { useAdminStudent, useAdminStudents } from "./admin-data";
+import { useAdminStudent, useAdminStudents, useEnrollmentCompletion } from "./admin-data";
 import { hasStudentRisk, matchesRisk, type RiskFilter } from "./admin-utils";
 import styles from "./admin-experience.module.css";
 
@@ -113,11 +114,13 @@ export function AdminStudentDetail({ studentId }: { studentId: string }) {
           <TabsTrigger className={styles.tabTrigger} value="overview">Visão geral</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="enrollments">Matrículas</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="projects">Projetos</TabsTrigger>
+          <TabsTrigger className={styles.tabTrigger} value="formacao">Formação</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="guardian">Responsável e consentimento</TabsTrigger>
         </TabsList>
         <TabsContent className={styles.tabPanel} value="overview"><StudentOverview student={student} guardian={guardian} consent={consent} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="enrollments"><EnrollmentList enrollments={enrollments} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="projects"><ProjectList projects={projects} /></TabsContent>
+        <TabsContent className={styles.tabPanel} value="formacao"><FormacaoPanel enrollments={enrollments} reload={reload} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="guardian"><ConsentPanel studentId={student.id} guardian={guardian} consent={consent} reload={reload} /></TabsContent>
       </Tabs>
     </div>
@@ -210,3 +213,109 @@ function ConsentPanel({ studentId, guardian, consent, reload }: { studentId: str
 function Fact({ label, value }: { label: string; value: string }) { return <div className={styles.fact}><span>{label}</span><strong>{value}</strong></div>; }
 function Field({ label, name, type = "text", defaultValue, required = false }: { label: string; name: string; type?: string; defaultValue: string; required?: boolean }) { return <label className={styles.formField}><span className={styles.label}>{label}</span><input className={styles.field} name={name} type={type} defaultValue={defaultValue} required={required} /></label>; }
 function formatDate(value: string) { return new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date(value)); }
+
+const COMPLETION_CHECKS: readonly (readonly [keyof CompletionCheck, string])[] = [
+  ["attendanceComplete", "16 encontros com presença ou reposição"],
+  ["projectsComplete", "4 projetos aprovados"],
+  ["reflectionComplete", "Reflexão da Aula 16 aprovada"],
+  ["presentationComplete", "Apresentação registrada"],
+  ["noPendingRevisions", "Nenhuma correção pendente"],
+];
+
+function FormacaoPanel({ enrollments, reload }: { enrollments: readonly EnrollmentSummary[]; reload: () => Promise<void> }) {
+  if (!enrollments.length) return <StateScene state="empty" title="Nenhuma matrícula para concluir" description="A formação aparece quando o aluno inicia um percurso." />;
+  return <div className={styles.stack}>{enrollments.map((enrollment) => <EnrollmentCompletion key={enrollment.id} enrollment={enrollment} reload={reload} />)}</div>;
+}
+
+function EnrollmentCompletion({ enrollment, reload }: { enrollment: EnrollmentSummary; reload: () => Promise<void> }) {
+  const { data, error, loading, reload: reloadCheck } = useEnrollmentCompletion(enrollment.id);
+  const [pending, setPending] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [presentationOpen, setPresentationOpen] = useState(false);
+  const [completeOpen, setCompleteOpen] = useState(false);
+  const completed = Boolean(enrollment.completedAt);
+
+  async function refresh() { await reloadCheck(); await reload(); }
+
+  async function registerPresentation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setPending(true); setNotice(null);
+    const form = new FormData(event.currentTarget);
+    const note = String(form.get("contextualNote") ?? "").trim();
+    try {
+      await apiMutation<PresentationRecord>(`/api/admin/enrollments/${enrollment.id}/presentation`, "POST", {
+        kind: String(form.get("kind")), performedAt: new Date(String(form.get("performedAt"))).toISOString(),
+        ...(note ? { contextualNote: note } : {}),
+      });
+      setPresentationOpen(false); setNotice("Apresentação registrada."); await refresh();
+    } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível registrar a apresentação."); }
+    finally { setPending(false); }
+  }
+
+  async function complete() {
+    setPending(true); setNotice(null);
+    try { await apiMutation<CompletionCheck>(`/api/admin/enrollments/${enrollment.id}/complete`, "POST", {}); setCompleteOpen(false); setNotice("Conclusão confirmada."); await refresh(); }
+    catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível confirmar a conclusão."); }
+    finally { setPending(false); }
+  }
+
+  return (
+    <section className={styles.paper}>
+      <div className={styles.paperHeader}>
+        <div><h2>{enrollment.curriculumName}</h2><p>{completed ? `Formação concluída em ${formatDate(enrollment.completedAt!)}.` : "Elegibilidade derivada de encontros, projetos, reflexão da Aula 16 e apresentação."}</p></div>
+        <GraduationCap aria-hidden="true" />
+      </div>
+      <div className={styles.paperBody}>
+        {loading && <StateScene state="loading" title="Conferindo requisitos" description="Somando presença, projetos e apresentação." />}
+        {error && <p className={styles.danger} role="alert">{error.message}</p>}
+        {data && <>
+          <StatusBadge tone={completed ? "success" : data.eligible ? "success" : "warning"}>{completed ? "Concluída" : data.eligible ? "Elegível para conclusão" : "Requisitos pendentes"}</StatusBadge>
+          <div className={styles.factGrid}>
+            {COMPLETION_CHECKS.map(([key, label]) => (
+              <div className={styles.fact} key={key}>
+                <span>{label}</span>
+                <StatusBadge tone={data[key] ? "success" : "warning"}>{data[key] ? "Cumprido" : "Pendente"}</StatusBadge>
+              </div>
+            ))}
+          </div>
+          {data.blockers.length > 0 && <div className={styles.warning}><strong>Bloqueios</strong><ul>{data.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}</ul></div>}
+          {notice && <p className={styles.notice} role="status">{notice}</p>}
+          {!completed && <div className={styles.formActions}>
+            <button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => { setNotice(null); setPresentationOpen(true); }}>Registrar apresentação</button>
+            <MagneticAction><button type="button" className={styles.toolbarAction} disabled={pending || !data.eligible} onClick={() => { setNotice(null); setCompleteOpen(true); }}>Confirmar conclusão</button></MagneticAction>
+          </div>}
+        </>}
+      </div>
+
+      <Sheet open={presentationOpen} onOpenChange={setPresentationOpen}>
+        <SheetContent className={styles.paperBody} aria-describedby={undefined}>
+          <SheetHeader><SheetTitle>Registrar apresentação</SheetTitle><SheetDescription>Demo Day ou apresentação substitutiva. O registro é append-only.</SheetDescription></SheetHeader>
+          <form className={styles.form} onSubmit={registerPresentation}>
+            <label className={styles.formField}><span className={styles.label}>Formato</span>
+              <select className={styles.select} name="kind" defaultValue="demo_day"><option value="demo_day">Demo Day</option><option value="substitute">Apresentação substitutiva</option></select>
+            </label>
+            <Field label="Data e hora" name="performedAt" type="datetime-local" defaultValue={localNow()} required />
+            <label className={styles.formField}><span className={styles.label}>Nota contextual (opcional)</span><textarea className={styles.textarea} name="contextualNote" placeholder="Contexto pedagógico da apresentação" /></label>
+            {notice && <p className={styles.notice} role="status">{notice}</p>}
+            <div className={styles.formActions}><button className={styles.toolbarAction} disabled={pending}>{pending ? "Registrando…" : "Registrar"}</button></div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={completeOpen} onOpenChange={setCompleteOpen}>
+        <SheetContent className={styles.paperBody} aria-describedby={undefined}>
+          <SheetHeader><SheetTitle>Confirmar conclusão</SheetTitle><SheetDescription>Emite o registro de conclusão da formação. Não é reversível.</SheetDescription></SheetHeader>
+          {data?.blockers.length ? (
+            <div className={styles.warning}><strong>Resolva antes de confirmar</strong><ul>{data.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}</ul></div>
+          ) : <p className={styles.notice}>Todos os requisitos estão cumpridos para {enrollment.curriculumName}.</p>}
+          {notice && <p className={styles.danger} role="alert">{notice}</p>}
+          <div className={styles.formActions}>
+            <button type="button" className={styles.secondaryAction} onClick={() => setCompleteOpen(false)}>Cancelar</button>
+            <button type="button" className={styles.toolbarAction} disabled={pending || !data?.eligible} onClick={() => void complete()}>{pending ? "Confirmando…" : "Confirmar conclusão"}</button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </section>
+  );
+}
+
+function localNow() { return new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16); }

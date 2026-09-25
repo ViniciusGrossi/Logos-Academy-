@@ -45,7 +45,11 @@ describe("provider de demonstração", () => {
         }[];
       }>("/api/student/projects/00000000-0000-4000-8000-000000000011", "GET"),
       demoApi<{
-        project: { activities: readonly unknown[] };
+        title: string;
+        project: {
+          activities: readonly { lessonPosition: number; title: string }[];
+        };
+        concepts: readonly unknown[];
         requirements: readonly { kind: string }[];
         latestSubmission: { isDraft: boolean; items: readonly unknown[] };
         submissionHistory: { items: readonly { review: unknown }[] };
@@ -78,6 +82,11 @@ describe("provider de demonstração", () => {
       ),
     ).toBe(true);
     expect(activity.project.activities).toHaveLength(4);
+    expect(
+      activity.project.activities.find((item) => item.lessonPosition === 7)
+        ?.title,
+    ).toBe(activity.title);
+    expect(activity.concepts).toHaveLength(2);
     expect(
       activity.requirements.map((requirement) => requirement.kind),
     ).toEqual(["text", "file", "external_link", "github_repository"]);
