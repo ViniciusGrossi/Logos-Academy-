@@ -21,6 +21,7 @@ export function CinematicPage({ children, className }: { children: ReactNode; cl
   const pathname = usePathname();
   const reduceMotion = useReducedMotion();
   const pageRef = useRef<HTMLDivElement>(null);
+  const studentSurface = !pathname.startsWith("/admin");
 
   useEffect(() => {
     if (reduceMotion || !pageRef.current) return;
@@ -45,6 +46,18 @@ export function CinematicPage({ children, className }: { children: ReactNode; cl
         exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
         transition={{ duration: reduceMotion ? 0 : 0.26, ease: entrance }}
       >
+        {studentSurface && (
+          <div className="cinematic-page__field" aria-hidden="true">
+            <svg viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice">
+              <path className="cinematic-page__orbit cinematic-page__orbit--wide" pathLength="100" d="M-90 530C170 255 410 190 655 260s370 25 640-215" />
+              <path className="cinematic-page__orbit cinematic-page__orbit--inner" pathLength="100" d="M80 680C270 420 445 350 650 392s350-10 530-250" />
+              <path className="cinematic-page__signal" pathLength="100" d="M-90 530C170 255 410 190 655 260s370 25 640-215" />
+            </svg>
+            <i className="cinematic-page__beacon cinematic-page__beacon--one" />
+            <i className="cinematic-page__beacon cinematic-page__beacon--two" />
+            <i className="cinematic-page__beacon cinematic-page__beacon--three" />
+          </div>
+        )}
         <span className="cinematic-page__rule" aria-hidden="true" />
         {children}
       </motion.div>

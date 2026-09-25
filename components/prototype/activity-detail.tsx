@@ -45,7 +45,6 @@ import type {
   UploadedFile,
 } from "@/specs/api.contracts";
 import { isDemoMode } from "@/src/mocks/demo-api";
-import { MagneticAction } from "@/components/academy";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,7 +54,6 @@ import styles from "./activity-detail.module.css";
 
 type RequirementValue = { value: string; fileId?: string; filename?: string };
 type Notice = { tone: "success" | "error"; text: string };
-type CircuitTarget = { x: number; y: number };
 
 const statusCopy: Record<AssignmentStatus, { label: string; note: string }> = {
   locked: {
@@ -107,13 +105,10 @@ export function ActivityDetail() {
   );
   const [historyCursor, setHistoryCursor] = useState<string | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [activeSection, setActiveSection] = useState("orientacao");
-  const [circuitTarget, setCircuitTarget] = useState<CircuitTarget | null>(
-    null,
-  );
-  const workbenchRef = useRef<HTMLDivElement>(null);
-  const submitActionRef = useRef<HTMLButtonElement>(null);
+  const [activeSection, setActiveSection] = useState("construcao");
+  const [orientationOpen, setOrientationOpen] = useState(false);
   const hydratedAssignment = useRef<string | null>(null);
+  const savedValuesKey = useRef("");
   const sectionLock = useRef<string | null>(null);
 
   const initialHistory = historyItems(detail.data?.submissionHistory);
@@ -145,7 +140,9 @@ export function ActivityDetail() {
     if (!detail.data || hydratedAssignment.current === detail.data.assignmentId)
       return;
     const source = restorationSource(detail.data, reviewedSubmission);
-    setValues(valuesFromItems(source?.items ?? []));
+    const restoredValues = valuesFromItems(source?.items ?? []);
+    setValues(restoredValues);
+    savedValuesKey.current = stableValuesKey(restoredValues);
     setMessage(null);
     hydratedAssignment.current = detail.data.assignmentId;
   }, [detail.data, reviewedSubmission]);
@@ -187,50 +184,6 @@ export function ActivityDetail() {
     return () => observer.disconnect();
   }, [detail.data]);
 
-  useEffect(() => {
-    const workbench = workbenchRef.current;
-    const submitAction = submitActionRef.current;
-    if (!workbench || !submitAction) return;
-
-    const updateCircuitTarget = () => {
-      const workbenchBounds = workbench.getBoundingClientRect();
-      const actionBounds = submitAction.getBoundingClientRect();
-      if (!workbenchBounds.width || !workbenchBounds.height) return;
-
-      setCircuitTarget({
-        // The wires meet the visible left edge of the action, instead of
-        // disappearing beneath its label.
-        x: Math.round(
-          ((actionBounds.left - workbenchBounds.left + 14) /
-            workbenchBounds.width) *
-            1200,
-        ),
-        y: Math.round(
-          ((actionBounds.top + actionBounds.height / 2 - workbenchBounds.top) /
-            workbenchBounds.height) *
-            1000,
-        ),
-      });
-    };
-
-    updateCircuitTarget();
-    window.addEventListener("resize", updateCircuitTarget);
-    const observer =
-      typeof ResizeObserver === "undefined"
-        ? null
-        : new ResizeObserver(updateCircuitTarget);
-    observer?.observe(workbench);
-    observer?.observe(submitAction);
-    return () => {
-      window.removeEventListener("resize", updateCircuitTarget);
-      observer?.disconnect();
-    };
-  }, [
-    detail.data?.assignmentId,
-    detail.data?.status,
-    detail.data?.requirements.length,
-  ]);
-
   const draftItems = useMemo<SubmissionItemInput[]>(() => {
     const items: SubmissionItemInput[] = [];
     for (const requirement of detail.data?.requirements ?? []) {
@@ -258,6 +211,20 @@ export function ActivityDetail() {
     }
     return items;
   }, [detail.data, values]);
+  const valuesKey = stableValuesKey(values);
+  const hasUnsavedChanges =
+    hydratedAssignment.current === detail.data?.assignmentId &&
+    valuesKey !== savedValuesKey.current;
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeLeaving);
+    return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
+  }, [hasUnsavedChanges]);
 
   if ((home.loading && !requestedAssignmentId) || detail.loading)
     return <LoadingState layout="activity" />;
@@ -284,6 +251,12 @@ export function ActivityDetail() {
   const criterionResults = new Map(
     latestReview?.criteria.map((item) => [item.criterionId, item]),
   );
+  const requiredRequirements = activity.requirements.filter(
+    (requirement) => requirement.required,
+  );
+  const requiredCompleted = requiredRequirements.filter((requirement) =>
+    draftItems.some((item) => item.requirementId === requirement.id),
+  ).length;
 
   async function save(submit: boolean) {
     if (submit && missing.length > 0) {
@@ -295,6 +268,7 @@ export function ActivityDetail() {
     }
     setSaving(true);
     setMessage(null);
+    const persistedValuesKey = valuesKey;
     try {
       const draft = await apiMutation<{ id: string; version?: number }>(
         `/api/student/activities/${activity.assignmentId}/draft`,
@@ -308,6 +282,7 @@ export function ActivityDetail() {
           { expectedDraftId: draft.id },
         );
       await detail.reload();
+      savedValuesKey.current = persistedValuesKey;
       const savedAt = formatTime(new Date());
       setMessage({
         tone: "success",
@@ -431,8 +406,8 @@ export function ActivityDetail() {
     }
   }
 
-  const completion = activity.requirements.length
-    ? Math.round((draftItems.length / activity.requirements.length) * 100)
+  const completion = requiredRequirements.length
+    ? Math.round((requiredCompleted / requiredRequirements.length) * 100)
     : 100;
   function activateSection(section: string) {
     sectionLock.current = section;
@@ -441,39 +416,28 @@ export function ActivityDetail() {
       sectionLock.current = null;
     }, 700);
   }
+  function protectNavigation(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (
+      hasUnsavedChanges &&
+      !window.confirm(
+        "Você tem alterações não salvas. Deseja sair e descartar essas mudanças?",
+      )
+    )
+      event.preventDefault();
+  }
 
   return (
-    <div ref={workbenchRef} className={styles.workbench}>
-      <CircuitField target={circuitTarget} />
+    <div className={styles.workbench}>
       <Link
         href={project ? `/projetos/${project.id}` : "/projetos"}
         className={styles.back}
+        onClick={protectNavigation}
       >
         <ArrowLeft />
         Voltar ao projeto
       </Link>
 
-      <header
-        className={styles.hero}
-        style={{ "--grid-x": "78%", "--grid-y": "36%" } as CSSProperties}
-        onPointerMove={(event) => {
-          if (event.pointerType !== "mouse") return;
-          const bounds = event.currentTarget.getBoundingClientRect();
-          event.currentTarget.style.setProperty(
-            "--grid-x",
-            `${event.clientX - bounds.left}px`,
-          );
-          event.currentTarget.style.setProperty(
-            "--grid-y",
-            `${event.clientY - bounds.top}px`,
-          );
-        }}
-        onPointerLeave={(event) => {
-          event.currentTarget.style.setProperty("--grid-x", "78%");
-          event.currentTarget.style.setProperty("--grid-y", "36%");
-        }}
-      >
-        <CoreWires />
+      <header className={styles.hero}>
         <div className={styles.heroCopy}>
           <span className={styles.heroMeta}>
             {project
@@ -483,10 +447,6 @@ export function ActivityDetail() {
           <h1>{activity.title}</h1>
           <p>{activity.objective}</p>
           <div className={styles.heroTelemetry}>
-            <span>
-              <CircleDot />
-              Núcleo ativo
-            </span>
             <span>v{String(version).padStart(2, "0")}</span>
             <span>{statusCopy[activity.status].label}</span>
           </div>
@@ -534,7 +494,10 @@ export function ActivityDetail() {
                     {locked && <LockKeyhole aria-label="Bloqueada" />}
                   </div>
                 ) : (
-                  <Link href={`/atividade?assignmentId=${item.assignmentId}`}>
+                  <Link
+                    href={`/atividade?assignmentId=${item.assignmentId}`}
+                    onClick={protectNavigation}
+                  >
                     {content}
                     <ArrowRight aria-hidden="true" />
                   </Link>
@@ -574,37 +537,52 @@ export function ActivityDetail() {
 
       <nav className={styles.sectionNav} aria-label="Seções da atividade">
         <a
-          href="#orientacao"
-          onClick={() => activateSection("orientacao")}
-          aria-current={activeSection === "orientacao" ? "location" : undefined}
-        >
-          01 · Orientação
-        </a>
-        <a
           href="#construcao"
           onClick={() => activateSection("construcao")}
           aria-current={activeSection === "construcao" ? "location" : undefined}
         >
-          02 · Construção
+          Construção
+        </a>
+        <a
+          href="#orientacao"
+          onClick={() => {
+            setOrientationOpen(true);
+            activateSection("orientacao");
+          }}
+          aria-current={activeSection === "orientacao" ? "location" : undefined}
+        >
+          Orientação
         </a>
         <a
           href="#qualidade"
           onClick={() => activateSection("qualidade")}
           aria-current={activeSection === "qualidade" ? "location" : undefined}
         >
-          03 · Qualidade
+          Qualidade
         </a>
         <a
           href="#historico"
           onClick={() => activateSection("historico")}
           aria-current={activeSection === "historico" ? "location" : undefined}
         >
-          04 · Histórico
+          Histórico
         </a>
       </nav>
 
-      <main className={styles.mainColumn}>
-        <section id="orientacao" className={styles.brief}>
+      <div className={styles.mainColumn}>
+        <details
+          id="orientacao"
+          className={styles.brief}
+          open={orientationOpen}
+          onToggle={(event) => setOrientationOpen(event.currentTarget.open)}
+        >
+          <summary className={styles.briefSummary}>
+            <span>
+              <strong>Orientação completa</strong>
+              <small>{activity.instructions}</small>
+            </span>
+            <ChevronDown aria-hidden="true" />
+          </summary>
           <div className={styles.briefLead}>
             <span className={styles.eyebrow}>Por que isso importa</span>
             <p>{activity.context ?? activity.objective}</p>
@@ -690,7 +668,7 @@ export function ActivityDetail() {
               {activity.continuityGuidance}
             </span>
           </footer>
-        </section>
+        </details>
 
         {isLocked ? (
           <section id="construcao" className={styles.statePanel}>
@@ -704,6 +682,7 @@ export function ActivityDetail() {
               <Link
                 href={`/atividade?assignmentId=${activeProjectActivity.assignmentId}`}
                 className={styles.secondaryAction}
+                onClick={protectNavigation}
               >
                 Voltar à atividade atual <ArrowRight />
               </Link>
@@ -735,6 +714,7 @@ export function ActivityDetail() {
               <Link
                 href={`/projetos/${project.id}`}
                 className={styles.secondaryAction}
+                onClick={protectNavigation}
               >
                 Ver no projeto <ArrowRight />
               </Link>
@@ -775,7 +755,7 @@ export function ActivityDetail() {
               <div className={styles.iterationGauge}>
                 <span>{completion}%</span>
                 <small>
-                  {draftItems.length}/{activity.requirements.length} evidências
+                  {requiredCompleted}/{requiredRequirements.length} obrigatórios
                 </small>
               </div>
             </div>
@@ -791,13 +771,25 @@ export function ActivityDetail() {
             >
               <div>
                 <span>01</span>
-                <strong>Leia o ajuste</strong>
-                <small>Use o feedback como alvo da versão.</small>
+                <strong>
+                  {activity.status === "revision_requested"
+                    ? "Leia o retorno"
+                    : "Entenda o objetivo"}
+                </strong>
+                <small>
+                  {activity.status === "revision_requested"
+                    ? "Use o feedback como alvo da versão."
+                    : "Confira o resultado esperado antes de começar."}
+                </small>
               </div>
               <div>
                 <span>02</span>
                 <strong>Registre a decisão</strong>
-                <small>Explique o que mudou e por quê.</small>
+                <small>
+                  {activity.status === "revision_requested"
+                    ? "Explique o que mudou e por quê."
+                    : "Explique a escolha que orientou sua construção."}
+                </small>
               </div>
               <div>
                 <span>03</span>
@@ -808,12 +800,12 @@ export function ActivityDetail() {
                 <Progress
                   className={styles.completionProgress}
                   value={completion}
-                  aria-label={`${completion}% dos entregáveis preenchidos`}
+                  aria-label={`${requiredCompleted} de ${requiredRequirements.length} requisitos obrigatórios preenchidos`}
                 />
                 <span>
                   {missing.length
                     ? `${missing.length} pendência${missing.length > 1 ? "s" : ""}`
-                    : "Pronto para enviar"}
+                    : "Obrigatórios preenchidos"}
                 </span>
               </div>
             </div>
@@ -824,6 +816,7 @@ export function ActivityDetail() {
                   requirement={requirement}
                   entry={values[requirement.id]}
                   uploading={uploadingId === requirement.id}
+                  disabled={saving || Boolean(uploadingId)}
                   onChange={(entry) =>
                     setValues((current) => ({
                       ...current,
@@ -832,12 +825,23 @@ export function ActivityDetail() {
                   }
                   onUpload={(file) => void upload(requirement, file)}
                   onOpenFile={(fileId) => void openFileById(fileId)}
+                  onRemove={() =>
+                    setValues((current) => ({
+                      ...current,
+                      [requirement.id]: { value: "" },
+                    }))
+                  }
                 />
               ))}
             </div>
             <div className={styles.actions}>
               <p>
-                <span />O rascunho fica privado até você enviar.
+                <span data-dirty={hasUnsavedChanges} />
+                {saving
+                  ? "Salvando esta versão…"
+                  : hasUnsavedChanges
+                    ? "Alterações não salvas"
+                    : "Rascunho salvo e privado"}
               </p>
               <button
                 type="button"
@@ -847,43 +851,28 @@ export function ActivityDetail() {
               >
                 Salvar rascunho
               </button>
-              {activity.status === "revision_requested" ? (
-                <MagneticAction>
-                  <button
-                    ref={submitActionRef}
-                    type="submit"
-                    className={styles.primaryAction}
-                    aria-busy={saving}
-                    disabled={saving || Boolean(uploadingId)}
-                  >
-                    {saving ? "Salvando…" : "Enviar nova versão"}
-                    <Send aria-hidden="true" />
-                  </button>
-                </MagneticAction>
-              ) : (
-                <button
-                  ref={submitActionRef}
-                  type="submit"
-                  className={styles.primaryAction}
-                  aria-busy={saving}
-                  disabled={saving || Boolean(uploadingId)}
-                >
-                  {saving ? "Salvando…" : "Enviar versão"}
-                  <Send aria-hidden="true" />
-                </button>
-              )}
-            </div>
-            {message && (
-              <p
-                className={styles.message}
-                data-tone={message.tone}
-                role="status"
+              <button
+                type="submit"
+                className={styles.primaryAction}
+                aria-busy={saving}
+                disabled={saving || Boolean(uploadingId)}
               >
-                {message.tone === "success" ? <Check /> : <AlertTriangle />}
-                {message.text}
-              </p>
-            )}
+                {saving
+                  ? "Salvando…"
+                  : activity.status === "revision_requested"
+                    ? "Enviar nova versão"
+                    : "Enviar versão"}
+                <Send aria-hidden="true" />
+              </button>
+            </div>
           </form>
+        )}
+
+        {message && (
+          <p className={styles.message} data-tone={message.tone} role="status">
+            {message.tone === "success" ? <Check /> : <AlertTriangle />}
+            {message.text}
+          </p>
         )}
 
         <section id="qualidade" className={styles.qualitySection}>
@@ -896,6 +885,7 @@ export function ActivityDetail() {
                 <Link
                   key={concept.id}
                   href={`/atlas?tab=conceitos&item=${concept.id}`}
+                  onClick={protectNavigation}
                 >
                   <GitBranch />
                   {concept.title}
@@ -979,75 +969,8 @@ export function ActivityDetail() {
             </button>
           )}
         </section>
-      </main>
+      </div>
     </div>
-  );
-}
-
-function CircuitField({ target }: { target: CircuitTarget | null }) {
-  const destination = target ?? { x: 1027, y: 760 };
-  const circuits = [185, 381, 578, 763, 949, 1123].map((startX, index) => {
-    const offset = (index - 2.5) * 46;
-    return `M${startX} 165 C${startX + offset} ${Math.max(250, destination.y * 0.32)} ${destination.x + offset} ${destination.y * 0.7} ${destination.x} ${destination.y}`;
-  });
-  return (
-    <svg
-      className={styles.circuitField}
-      viewBox="0 0 1200 1000"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      {circuits.map((path, index) => (
-        <g
-          key={path}
-          className={styles.circuitWire}
-          style={
-            {
-              "--wire-delay": `${index * -1.1}s`,
-              "--wire-opacity": `${0.1 + index * 0.025}`,
-            } as CSSProperties
-          }
-        >
-          <path className={styles.circuitCable} d={path} />
-          <path className={styles.circuitConductor} d={path} />
-          <path className={styles.circuitPulse} pathLength="1" d={path} />
-        </g>
-      ))}
-      <g className={styles.circuitPort}>
-        <circle cx={destination.x} cy={destination.y} r="10" />
-        <circle cx={destination.x} cy={destination.y} r="3" />
-      </g>
-    </svg>
-  );
-}
-
-function CoreWires() {
-  const launches = [
-    "M800 215 C670 260 340 330 115 430",
-    "M800 215 C720 275 470 350 294 430",
-    "M800 215 C750 290 600 360 474 430",
-    "M800 215 C790 290 720 360 645 430",
-    "M800 215 C820 285 825 355 818 430",
-    "M800 215 C875 270 950 345 982 430",
-  ];
-  return (
-    <svg
-      className={styles.heroCircuits}
-      viewBox="0 0 1000 430"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      {launches.map((path, index) => (
-        <g
-          key={path}
-          style={{ "--wire-delay": `${index * -1.1}s` } as CSSProperties}
-        >
-          <path className={styles.heroCable} d={path} />
-          <path className={styles.heroConductor} d={path} />
-          <path className={styles.heroPulse} pathLength="1" d={path} />
-        </g>
-      ))}
-    </svg>
   );
 }
 
@@ -1141,16 +1064,20 @@ function RequirementField({
   requirement,
   entry,
   uploading,
+  disabled,
   onChange,
   onUpload,
   onOpenFile,
+  onRemove,
 }: {
   requirement: ActivityRequirement;
   entry: RequirementValue | undefined;
   uploading: boolean;
+  disabled: boolean;
   onChange: (entry: RequirementValue) => void;
   onUpload: (file: File | undefined) => void;
   onOpenFile: (fileId: string) => void;
+  onRemove: () => void;
 }) {
   const label = `${requirement.label}${requirement.required ? " *" : " · opcional"}`;
   const fieldId = `requirement-${requirement.id}`;
@@ -1183,19 +1110,29 @@ function RequirementField({
             required={requirement.required && !entry?.fileId}
             aria-invalid={invalid}
             aria-describedby={helperId}
-            disabled={uploading}
+            disabled={disabled}
             accept=".pdf,.txt,.md,.png,.jpg,.jpeg,.webp,.docx,.pptx"
             onChange={(event) => onUpload(event.target.files?.[0])}
           />
         </label>
         {entry?.fileId && (
-          <button
-            type="button"
-            className={styles.fileOpen}
-            onClick={() => onOpenFile(entry.fileId!)}
-          >
-            Abrir arquivo anexado <ExternalLink aria-hidden="true" />
-          </button>
+          <div className={styles.fileActions}>
+            <button
+              type="button"
+              className={styles.fileRemove}
+              disabled={disabled}
+              onClick={onRemove}
+            >
+              Remover do rascunho
+            </button>
+            <button
+              type="button"
+              className={styles.fileOpen}
+              onClick={() => onOpenFile(entry.fileId!)}
+            >
+              Abrir arquivo anexado <ExternalLink aria-hidden="true" />
+            </button>
+          </div>
         )}
       </div>
     );
@@ -1213,6 +1150,8 @@ function RequirementField({
           value={entry?.value ?? ""}
           onChange={(event) => onChange({ value: event.target.value })}
           placeholder="Explique a escolha, o teste e o que mudou."
+          maxLength={10_000}
+          disabled={disabled}
           required={requirement.required}
           aria-invalid={invalid}
           aria-describedby={helperId}
@@ -1231,8 +1170,15 @@ function RequirementField({
           pattern={
             requirement.kind === "github_repository"
               ? "https://github\\.com/.*"
-              : undefined
+              : "https://.*"
           }
+          title={
+            requirement.kind === "github_repository"
+              ? "Use uma URL HTTPS de github.com."
+              : "Use uma URL que comece com https://."
+          }
+          maxLength={2_000}
+          disabled={disabled}
           required={requirement.required}
           aria-invalid={invalid}
           aria-describedby={helperId}
@@ -1434,6 +1380,14 @@ function valuesFromItems(
         filename: item.fileName ?? undefined,
       },
     ]),
+  );
+}
+
+function stableValuesKey(values: Record<string, RequirementValue>): string {
+  return JSON.stringify(
+    Object.entries(values)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([id, value]) => [id, value.value, value.fileId, value.filename]),
   );
 }
 
