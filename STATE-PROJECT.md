@@ -34,6 +34,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. **Bloqueio descoberto em 25/09:** a UI de convite já existe pronta em `release-2/onda-a-admin` (commit `de3b435`, 22/09) e nunca foi mesclada; a migration `0053` (`admin_active_curricula`, `admin_file_download_target`) existe só nessa branch e `main` pula de `0052` para `0054`. Integrar a Onda A e aplicar `0053` antes de `0054` são pré-requisitos do ensaio. O merge conflita em `admin-students.tsx`, `app-shell.tsx` e `registry.json`.
 - [ ] `student-visual-system-rounding-orbit`: raios sistêmicos e campo orbital compartilhado implementados e validados; aguardando gate visual humano.
 - [ ] `student-journey-premium`: fusão da Jornada real com a direção premium implementada e validada; aguardando gate visual humano.
 - [ ] `student-knowledge-atlas`: versão premium implementada e validada em 1440/768/375, tema claro/escuro e movimento reduzido; aguardando gate visual humano.
