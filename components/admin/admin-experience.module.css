@@ -97,12 +97,63 @@
 @keyframes selectReveal { from { opacity: 0; transform: translateY(calc(var(--spacing-unit) * -1.5)) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes selectHide { from { opacity: 1; } to { opacity: 0; } }
 
+.inviteSheet { width: min(100vw, 51rem) !important; max-width: 51rem !important; gap: 0 !important; overflow-y: auto; border-inline-start-color: color-mix(in srgb, var(--color-academy-orange) 32%, var(--border)) !important; background: var(--background) !important; }
+.inviteHeader { position: relative; gap: calc(var(--spacing-unit) * 3) !important; padding: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 6) !important; overflow: hidden; border-bottom: 1px solid var(--border); background: var(--obsidian-card), var(--card); }
+.inviteHeader::after { position: absolute; inset: 0; background-image: linear-gradient(90deg, color-mix(in srgb, var(--border) 55%, transparent) 1px, transparent 1px); background-size: calc(var(--spacing-unit) * 18) 100%; mask-image: linear-gradient(90deg, transparent, #000 32%, transparent); content: ""; pointer-events: none; }
+.inviteHeader > * { position: relative; z-index: 1; }
+.inviteEyebrow { display: flex; align-items: center; gap: calc(var(--spacing-unit) * 2); color: var(--color-academy-orange); font: 750 calc(var(--spacing-unit) * 2.75) var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.inviteTitle { max-width: 13ch; font-size: clamp(calc(var(--spacing-unit) * 8), 6vw, calc(var(--spacing-unit) * 12)) !important; font-weight: 760 !important; line-height: .94 !important; letter-spacing: -.055em; }
+.inviteDescription { max-width: 58ch; font-size: calc(var(--spacing-unit) * 3.75) !important; line-height: 1.6; }
+.inviteProgress { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0 calc(var(--spacing-unit) * 8); border-bottom: 1px solid var(--border); }
+.inviteProgress span { display: flex; min-width: 0; align-items: center; gap: calc(var(--spacing-unit) * 2); padding: calc(var(--spacing-unit) * 4) 0; color: var(--muted-foreground); font: 700 calc(var(--spacing-unit) * 2.5) var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+.inviteProgress span + span { padding-inline-start: calc(var(--spacing-unit) * 4); border-inline-start: 1px solid var(--border); }
+.inviteProgress i { display: grid; width: calc(var(--spacing-unit) * 6); height: calc(var(--spacing-unit) * 6); place-items: center; border: 1px solid color-mix(in srgb, var(--color-academy-orange) 46%, var(--border)); border-radius: 50%; color: var(--color-academy-orange); font-style: normal; }
+.inviteProgress span[data-complete] { color: var(--foreground); }
+.inviteProgress span[data-complete] i { border-color: var(--color-academy-success); background: color-mix(in srgb, var(--color-academy-success) 12%, transparent); color: var(--color-academy-success); }
+.inviteForm { display: grid; gap: calc(var(--spacing-unit) * 5); padding: calc(var(--spacing-unit) * 6) calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 8); }
+.inviteSection { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--card); box-shadow: var(--shadow-soft); }
+.inviteSection > header { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: calc(var(--spacing-unit) * 4); padding: calc(var(--spacing-unit) * 5); border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--foreground) 2%, var(--card)); }
+.inviteSection > header small { color: var(--color-academy-orange); font: 750 calc(var(--spacing-unit) * 2.5) var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.inviteSection > header h3 { margin: calc(var(--spacing-unit) * 1) 0 0; font-size: calc(var(--spacing-unit) * 5); }
+.inviteSection > header p { margin: calc(var(--spacing-unit) * 1.5) 0 0; color: var(--muted-foreground); line-height: 1.5; }
+.inviteSectionIcon { display: grid; width: calc(var(--spacing-unit) * 11); height: calc(var(--spacing-unit) * 11); place-items: center; border: 1px solid color-mix(in srgb, var(--color-academy-orange) 40%, var(--border)); border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-academy-orange) 8%, transparent); color: var(--color-academy-orange); }
+.inviteSectionIcon svg { width: calc(var(--spacing-unit) * 5); }
+.inviteSectionBody { display: grid; gap: calc(var(--spacing-unit) * 4); padding: calc(var(--spacing-unit) * 5); }
+.inviteConsent { display: flex; align-items: flex-start; gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 4); border: 1px solid var(--border); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--color-academy-orange) 4%, var(--card)); cursor: pointer; transition: border-color var(--duration-fast), transform var(--duration-standard) var(--ease-entrance); }
+.inviteConsent:hover { border-color: color-mix(in srgb, var(--color-academy-orange) 52%, var(--border)); transform: translateY(-2px); }
+.inviteConsent input { width: calc(var(--spacing-unit) * 5); height: calc(var(--spacing-unit) * 5); margin-top: 1px; accent-color: var(--color-academy-orange); }
+.inviteConsent span { display: grid; gap: calc(var(--spacing-unit) * 1); }
+.inviteConsent small { color: var(--muted-foreground); }
+.inviteClassSignal { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 4); border-inline-start: 3px solid var(--color-academy-orange); border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-academy-orange) 7%, var(--card)); }
+.inviteClassSignal > svg { color: var(--color-academy-orange); }
+.inviteClassSignal span { display: grid; gap: calc(var(--spacing-unit) * 1); }
+.inviteClassSignal small { color: var(--muted-foreground); }
+.inviteFooter { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--spacing-unit) * 5); padding-top: calc(var(--spacing-unit) * 2); }
+.inviteFooter p { display: flex; max-width: 46ch; align-items: center; gap: calc(var(--spacing-unit) * 2); margin: 0; color: var(--muted-foreground); font-size: calc(var(--spacing-unit) * 3); }
+.inviteFooter p svg { flex: 0 0 auto; color: var(--color-academy-success); }
+.inviteSuccess { display: grid; justify-items: start; gap: calc(var(--spacing-unit) * 5); padding: calc(var(--spacing-unit) * 10) calc(var(--spacing-unit) * 8); }
+.inviteSuccessIcon { display: grid; width: calc(var(--spacing-unit) * 18); height: calc(var(--spacing-unit) * 18); place-items: center; border: 1px solid color-mix(in srgb, var(--color-academy-success) 50%, var(--border)); border-radius: 50%; background: color-mix(in srgb, var(--color-academy-success) 10%, transparent); color: var(--color-academy-success); box-shadow: 0 0 0 calc(var(--spacing-unit) * 2) color-mix(in srgb, var(--color-academy-success) 4%, transparent); }
+.inviteSuccessIcon svg { width: calc(var(--spacing-unit) * 8); height: calc(var(--spacing-unit) * 8); }
+.inviteSuccess h2 { max-width: 14ch; margin: 0; font-size: clamp(calc(var(--spacing-unit) * 7), 5vw, calc(var(--spacing-unit) * 10)); line-height: .98; letter-spacing: -.045em; }
+.inviteSuccess > p { max-width: 58ch; margin: 0; color: var(--muted-foreground); font-size: calc(var(--spacing-unit) * 4); line-height: 1.65; }
+.inviteSuccess > p strong { color: var(--foreground); }
+.inviteRoute { display: grid; width: 100%; margin: 0; padding: 0; list-style: none; }
+.inviteRoute li { position: relative; display: grid; grid-template-columns: calc(var(--spacing-unit) * 10) minmax(0, 1fr); gap: calc(var(--spacing-unit) * 4); min-height: calc(var(--spacing-unit) * 17); align-items: center; }
+.inviteRoute li::after { position: absolute; inset: 50% auto auto calc(var(--spacing-unit) * 5); width: 1px; height: 100%; background: var(--border); content: ""; }
+.inviteRoute li:last-child::after { display: none; }
+.inviteRoute li > span { z-index: 1; display: grid; width: calc(var(--spacing-unit) * 10); height: calc(var(--spacing-unit) * 10); place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--card); color: var(--muted-foreground); font: 750 calc(var(--spacing-unit) * 2.5) var(--font-mono); }
+.inviteRoute li[data-active] > span { border-color: var(--color-academy-orange); color: var(--color-academy-orange); box-shadow: 0 0 calc(var(--spacing-unit) * 5) color-mix(in srgb, var(--color-academy-orange) 18%, transparent); }
+.inviteRoute li div { display: grid; gap: calc(var(--spacing-unit) * 1); }
+.inviteRoute li small { color: var(--muted-foreground); }
+
 @media (max-width: 52rem) {
   .rowLink { grid-template-columns: minmax(0, 1fr) auto; }
   .rowMeta { display: none; }
   .sectionGrid, .sessionHero { grid-template-columns: 1fr; }
   .sessionDate { border-inline-start: 0; border-block-start: 1px solid color-mix(in srgb, var(--color-academy-paper) 22%, transparent); padding: calc(var(--spacing-unit) * 4) 0 0; text-align: left; }
   .attendanceRow { grid-template-columns: 1fr; }
+  .inviteFooter { align-items: stretch; flex-direction: column; }
+  .inviteFooter :global(.magnetic-action), .inviteFooter button { width: 100%; }
 }
 
 @media (max-width: 35rem) {
@@ -114,10 +165,17 @@
   .rowArrow { display: none; }
   .timelineRow { grid-template-columns: calc(var(--spacing-unit) * 11) minmax(0, 1fr); }
   .timelineRow > :last-child { grid-column: 2; justify-self: start; }
+  .inviteSheet { width: 100vw !important; max-width: 100vw !important; }
+  .inviteHeader, .inviteForm, .inviteSuccess { padding-inline: calc(var(--spacing-unit) * 4) !important; }
+  .inviteProgress { padding-inline: calc(var(--spacing-unit) * 4); }
+  .inviteProgress span { align-items: flex-start; flex-direction: column; }
+  .inviteProgress span + span { padding-inline-start: calc(var(--spacing-unit) * 2); }
+  .inviteClassSignal { grid-template-columns: auto minmax(0, 1fr); }
+  .inviteClassSignal > :last-child { grid-column: 2; justify-self: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .toolbarAction:hover, .secondaryAction:hover, .attendanceRow:hover, .backLink:hover, .rowLink:hover .rowArrow { transform: none; }
   .selectContent[data-state="open"], .selectContent[data-state="closed"] { animation: none; }
-  .selectTrigger[data-state="open"] .selectChevron { transform: none; }
+  .selectTrigger[data-state="open"] .selectChevron, .inviteConsent:hover { transform: none; }
 }
