@@ -30,7 +30,7 @@ export class AdmissionsAdminAdapter {
         input.email,
         redirectTo ? { redirectTo } : undefined,
       );
-      if (invited.error || !invited.data.user) throw new AppError("INTERNAL_ERROR", "Não foi possível enviar o convite.", requestId);
+      if (invited.error || !invited.data.user) throw invitationAuthError(invited.error, requestId);
       authUserId = invited.data.user.id; invitationSentAt = new Date().toISOString(); createdHere = true;
       await this.rpc("bind_student_invitation_auth", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId, p_invitation_sent_at: invitationSentAt }, requestId);
     }
@@ -57,7 +57,13 @@ export class AdmissionsAdminAdapter {
 
   private async rpc(name: string, parameters: Record<string, unknown>, requestId: string, allowsNull = false): Promise<Record<string, unknown>> {
     const { data, error } = await this.client.schema("logos_academy" as "public").rpc(name as never, parameters as never);
-    if (error || (data === null && !allowsNull) || (data !== null && !isRecord(data))) throw new AppError(mapRpcError(error?.code), "Não foi possível concluir a operação.", requestId);
+    if (error || (data === null && !allowsNull) || (data !== null && !isRecord(data))) {
+      console.error(`[${requestId}] admissions rpc failed`, { rpc: name, code: error?.code, message: error?.message, details: error?.details, hint: error?.hint });
+      if (error?.code === "PGRST202") throw new AppError("INTERNAL_ERROR", "O banco de dados ainda não recebeu a configuração de convites.", requestId);
+      if (error?.code === "23505" || error?.code === "23514") throw new AppError("CONFLICT", "Não foi possível concluir porque este convite conflita com um registro existente.", requestId);
+      if (error?.code === "P0002") throw new AppError("NOT_FOUND", "A turma ou o registro selecionado não está mais disponível.", requestId);
+      throw new AppError(mapRpcError(error?.code), "Não foi possível concluir a operação.", requestId);
+    }
     return data ?? {};
   }
 }
@@ -68,3 +74,12 @@ function isRecord(value: unknown): value is Record<string, unknown> { return typ
 function readString(value: Record<string, unknown>, key: string): string | null { const item = value[key]; return typeof item === "string" ? item : null; }
 function hasFinalResult(value: Record<string, unknown>): value is Record<string, string> { return typeof value.studentId === "string" && typeof value.enrollmentId === "string" && typeof value.invitationSentAt === "string"; }
 function toInviteResult(value: Record<string, string>): InviteResult { return { studentId: value.studentId, enrollmentId: value.enrollmentId, invitationSentAt: value.invitationSentAt }; }
+
+function invitationAuthError(error: { code?: string; message?: string } | null, requestId: string): AppError {
+  const detail = `${error?.code ?? ""} ${error?.message ?? ""}`.toLowerCase();
+  console.error(`[${requestId}] student invitation auth failed`, { code: error?.code, message: error?.message });
+  if (detail.includes("redirect") || detail.includes("url is not allowed")) return new AppError("VALIDATION_ERROR", "A URL de ativação ainda não foi autorizada no Supabase. Adicione /ativar em Authentication → URL Configuration.", requestId);
+  if (detail.includes("rate limit") || detail.includes("over_email_send_rate_limit")) return new AppError("RATE_LIMITED", "O limite de envio de e-mails foi atingido. Aguarde alguns minutos e tente novamente.", requestId);
+  if (detail.includes("already") || detail.includes("exists") || detail.includes("registered")) return new AppError("CONFLICT", "Este e-mail já possui uma conta ou convite. Use outro e-mail ou localize o aluno existente.", requestId);
+  return new AppError("INTERNAL_ERROR", "O Supabase não conseguiu enviar o convite. Confira a configuração de e-mail e tente novamente.", requestId);
+}
