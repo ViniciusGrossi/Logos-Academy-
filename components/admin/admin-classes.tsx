@@ -9,6 +9,7 @@ import { apiMutation } from "@/components/prototype/live-api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
 import { useAdminClass, useAdminClasses } from "./admin-data";
+import { CreateClassSheet } from "./admin-operations-sheets";
 import { classStatusLabels, sessionStatusLabels } from "./admin-utils";
 import styles from "./admin-experience.module.css";
 
@@ -31,7 +32,7 @@ export function AdminClasses() {
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
 
   return <div className={styles.stack}>
-    <PageHeader eyebrow="Operação pedagógica · turmas" title="Pequenas por desenho. Próximas por método." description="Cada turma reúne no máximo seis alunos para preservar atenção, prática e feedback durante as aulas presenciais." marker="capacidade 6" />
+    <PageHeader eyebrow="Operação pedagógica · turmas" title="Pequenas por desenho. Próximas por método." description="Cada turma reúne no máximo seis alunos para preservar atenção, prática e feedback durante as aulas presenciais." marker="capacidade 6" action={<CreateClassSheet afterSave={reload} />} />
     <MetricStrip metrics={[
       { id: "classes", label: "Turmas no recorte", value: String(classes.length), detail: `${active} ativa(s)` },
       { id: "students", label: "Alunos ativos", value: String(occupied), detail: "acompanhamento próximo" },

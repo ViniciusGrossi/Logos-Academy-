@@ -13,6 +13,13 @@ export const ReviewQueueQuerySchema = z.object({
 export const SubmissionPathSchema = z.object({ submissionId: Uuid }).strict();
 export const ReviewPathSchema = z.object({ reviewId: Uuid }).strict();
 
+/** SR-A6 (Release 2): entregas do aluno na ficha administrativa. */
+export const StudentSubmissionsQuerySchema = z.object({
+  studentId: Uuid,
+  cursor: z.string().min(1).max(2_000).optional(),
+  limit: PageLimit,
+}).strict();
+
 const CriterionSchema = z.object({
   criterionId: Uuid,
   result: z.enum(["met", "needs_adjustment"]),
@@ -31,3 +38,4 @@ export const PublishReviewSchema = z.object({
 
 export type ReviewQueueQuery = z.infer<typeof ReviewQueueQuerySchema>;
 export type PublishReviewInput = z.infer<typeof PublishReviewSchema>;
+export type StudentSubmissionsQuery = z.infer<typeof StudentSubmissionsQuerySchema>;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Page, ReviewDetail, ReviewQueueSubmission } from "@/specs/api.contracts";
+import type { AdminSubmissionWorkspace, Page, ReviewDetail, ReviewQueueSubmission } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
 import type { AdminActor, ReviewFeedbackStore } from "@/src/modules/review-feedback-loop/repository";
 import { ReviewFeedbackService } from "@/src/modules/review-feedback-loop/service";
@@ -19,6 +19,19 @@ class Store implements ReviewFeedbackStore {
   async publish(_actor: AdminActor, input: unknown): Promise<ReviewDetail> {
     this.published = input;
     return { id: submissionId, decision: "approved", feedback: "Entrega aprovada.", reviewerName: "Admin", reviewedAt: new Date().toISOString(), seenAt: null, criteria: [{ criterionId, result: "met", comment: null }] };
+  }
+  async workspace(): Promise<AdminSubmissionWorkspace> {
+    return {
+      id: submissionId, assignmentId: submissionId, version: 1, isDraft: false, isLate: false, submittedAt: new Date().toISOString(),
+      items: [], review: null, reviews: [], criteria: [],
+      student: { id: submissionId, displayName: "Aluno" },
+      activity: { title: "Atividade", lessonPosition: 1, cyclePosition: 1 },
+      classSummary: null, dueAt: null,
+      requirements: [], previousVersions: [],
+    };
+  }
+  async studentSubmissions(): Promise<Page<ReviewQueueSubmission>> {
+    return { items: [], nextCursor: null };
   }
 }
 

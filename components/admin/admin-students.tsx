@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, FolderKanban, GraduationCap, Search, ShieldCheck, UserRound, UserRoundPlus, UsersRound } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CalendarCheck2, ClipboardCheck, FolderKanban, GraduationCap, Search, ShieldCheck, UserRound, UserRoundPlus, UsersRound } from "lucide-react";
 import { type FormEvent, useDeferredValue, useMemo, useState } from "react";
 import type { CompletionCheck, ConsentRecord, EnrollmentSummary, GuardianRecord, PresentationRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
-import { apiMutation } from "@/components/prototype/live-api";
+import { apiMutation, apiQuery } from "@/components/prototype/live-api";
 import { DataList, FilterBar, MagneticAction, MetricStrip, PageHeader, SpotlightCard, StateScene, StatusBadge } from "@/components/academy";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
 import { AdminInviteStudent } from "./admin-invite-student";
-import { useAdminStudent, useAdminStudents, useEnrollmentCompletion } from "./admin-data";
+import { useAdminStudent, useAdminStudentAttendance, useAdminStudentSubmissions, useAdminStudents, useEnrollmentCompletion } from "./admin-data";
 import { hasStudentRisk, matchesRisk, type RiskFilter } from "./admin-utils";
 import styles from "./admin-experience.module.css";
 
@@ -117,18 +117,40 @@ export function AdminStudentDetail({ studentId }: { studentId: string }) {
         <TabsList variant="line" className={styles.tabsList} aria-label="Seções do aluno">
           <TabsTrigger className={styles.tabTrigger} value="overview">Visão geral</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="enrollments">Matrículas</TabsTrigger>
+          <TabsTrigger className={styles.tabTrigger} value="submissions">Entregas</TabsTrigger>
+          <TabsTrigger className={styles.tabTrigger} value="attendance">Frequência</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="projects">Projetos</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="formacao">Formação</TabsTrigger>
           <TabsTrigger className={styles.tabTrigger} value="guardian">Responsável e consentimento</TabsTrigger>
         </TabsList>
         <TabsContent className={styles.tabPanel} value="overview"><StudentOverview student={student} guardian={guardian} consent={consent} /></TabsContent>
-        <TabsContent className={styles.tabPanel} value="enrollments"><EnrollmentList enrollments={enrollments} /></TabsContent>
+        <TabsContent className={styles.tabPanel} value="enrollments"><EnrollmentList enrollments={enrollments} reload={reload} /></TabsContent>
+        <TabsContent className={styles.tabPanel} value="submissions"><StudentSubmissions studentId={student.id} /></TabsContent>
+        <TabsContent className={styles.tabPanel} value="attendance"><StudentAttendance studentId={student.id} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="projects"><ProjectList projects={projects} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="formacao"><FormacaoPanel enrollments={enrollments} reload={reload} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="guardian"><ConsentPanel studentId={student.id} guardian={guardian} consent={consent} reload={reload} /></TabsContent>
       </Tabs>
     </div>
   );
+}
+
+function StudentSubmissions({ studentId }: { studentId: string }) {
+  const { data, error, loading, reload } = useAdminStudentSubmissions(studentId);
+  if (loading) return <StateScene state="loading" title="Lendo entregas" description="Carregando versões, atividade e estado de revisão." />;
+  if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
+  const items = data?.items ?? [];
+  if (!items.length) return <StateScene state="empty" title="Nenhuma entrega enviada" description="As evidências publicadas pelo aluno aparecerão aqui." />;
+  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Entregas e versões</h2><p>Cada linha preserva a atividade, a versão submetida e o estado de feedback.</p></div><ClipboardCheck aria-hidden="true" /></div><DataList items={[...items]} ariaLabel="Entregas do aluno" renderItem={(submission) => <Link className={styles.rowLink} href={`/admin/revisoes/${submission.id}`}><span className={styles.rowIdentity}><span className={styles.avatar}>V{submission.version}</span><span className={styles.rowCopy}><strong>{submission.activity.title}</strong><small>Ciclo {submission.activity.cyclePosition} · aula {submission.activity.lessonPosition}</small></span></span><span className={styles.rowMeta}><strong>{submission.submittedAt ? `Enviada em ${formatDate(submission.submittedAt)}` : "Rascunho"}</strong><small>{submission.items.length} item(ns) · {submission.isLate ? "fora do prazo" : "no prazo"}</small></span><span className={styles.rowSignals}><StatusBadge tone={submission.review?.decision === "approved" ? "success" : submission.review ? "warning" : "neutral"}>{submission.review?.decision === "approved" ? "Aprovada" : submission.review ? "Ajustes pedidos" : "Aguardando"}</StatusBadge><ArrowUpRight className={styles.rowArrow} /></span></Link>} /></section>;
+}
+
+function StudentAttendance({ studentId }: { studentId: string }) {
+  const { data, error, loading, reload } = useAdminStudentAttendance(studentId);
+  if (loading) return <StateScene state="loading" title="Lendo frequência" description="Reunindo encontro original, status e eventual reposição." />;
+  if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
+  const items = data?.items ?? [];
+  if (!items.length) return <StateScene state="empty" title="Nenhuma chamada registrada" description="A frequência aparecerá após os encontros concluídos." />;
+  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Histórico de presença</h2><p>As ausências permanecem visíveis mesmo depois de recompostas.</p></div><CalendarCheck2 aria-hidden="true" /></div><DataList items={items.map((entry) => ({ ...entry, id: entry.attendanceId }))} ariaLabel="Frequência do aluno" renderItem={(entry) => <div className={styles.rowLink}><span className={styles.rowIdentity}><span className={styles.avatar}>{String(entry.session.lessonPosition).padStart(2, "0")}</span><span className={styles.rowCopy}><strong>{entry.session.lessonTitle}</strong><small>{formatDate(entry.session.startsAt)}</small></span></span><span className={styles.rowMeta}><strong>{entry.makeup ? `Reposta em ${formatDate(entry.makeup.completedAt)}` : "Registro original"}</strong><small>{entry.privateNote || "Sem observação privada"}</small></span><span className={styles.rowSignals}><StatusBadge tone={entry.status === "present" ? "success" : entry.makeup ? "warning" : "danger"}>{entry.status === "present" ? "Presente" : entry.makeup ? "Falta reposta" : entry.status === "absent" ? "Falta" : "Justificada"}</StatusBadge></span></div>} /></section>;
 }
 
 function StudentOverview({ student, guardian, consent }: { student: StudentSummary; guardian: GuardianRecord; consent: ConsentRecord }) {
@@ -154,9 +176,17 @@ function StudentOverview({ student, guardian, consent }: { student: StudentSumma
   );
 }
 
-function EnrollmentList({ enrollments }: { enrollments: readonly EnrollmentSummary[] }) {
+function EnrollmentList({ enrollments, reload }: { enrollments: readonly EnrollmentSummary[]; reload: () => Promise<void> }) {
   if (!enrollments.length) return <StateScene state="empty" title="Nenhuma matrícula" description="Este aluno ainda não iniciou um percurso na Academy." />;
-  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Matrículas</h2><p>Turma e produto individual convivem sem misturar dados pessoais.</p></div><UsersRound aria-hidden="true" /></div><div className={styles.paperBody}><DataList items={[...enrollments]} ariaLabel="Matrículas do aluno" renderItem={(enrollment) => <div className={styles.rowLink}><span className={styles.rowIdentity}><span className={styles.avatar}>{enrollment.kind === "class" ? "T" : "I"}</span><span className={styles.rowCopy}><strong>{enrollment.curriculumName}</strong><small>{enrollment.kind === "class" ? "Turma" : "Individual"}</small></span></span><span className={styles.rowMeta}><strong>{enrollment.activatedAt ? `Ativada em ${formatDate(enrollment.activatedAt)}` : "Aguardando ativação"}</strong><small>{enrollment.completedAt ? `Concluída em ${formatDate(enrollment.completedAt)}` : "Percurso em andamento"}</small></span><span className={styles.rowSignals}><StatusBadge tone={enrollment.status === "active" ? "success" : enrollment.status === "paused" ? "warning" : "neutral"}>{enrollment.status}</StatusBadge></span></div>} /></div></section>;
+  return <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Matrículas</h2><p>Turma e produto individual convivem sem misturar dados pessoais.</p></div><UsersRound aria-hidden="true" /></div><div className={styles.paperBody}>{enrollments.map((enrollment) => <EnrollmentLifecycle key={enrollment.id} enrollment={enrollment} reload={reload} />)}</div></section>;
+}
+
+function EnrollmentLifecycle({ enrollment, reload }: { enrollment: EnrollmentSummary; reload: () => Promise<void> }) {
+  const [pending, setPending] = useState(false); const [notice, setNotice] = useState<string | null>(null); const [check, setCheck] = useState<CompletionCheck | null>(null);
+  async function changeStatus(status: "active" | "paused" | "cancelled") { setPending(true); setNotice(null); try { await apiMutation(`/api/admin/enrollments/${enrollment.id}`, "PATCH", { status }); await reload(); setNotice("Status da matrícula atualizado."); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível atualizar a matrícula."); } finally { setPending(false); } }
+  async function inspectCompletion() { setPending(true); setNotice(null); try { setCheck(await apiQuery<CompletionCheck>(`/api/admin/enrollments/${enrollment.id}/completion`)); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível conferir a conclusão."); } finally { setPending(false); } }
+  async function complete() { setPending(true); setNotice(null); try { await apiMutation(`/api/admin/enrollments/${enrollment.id}/complete`, "POST", {}); await reload(); setNotice("Matrícula concluída."); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível concluir a matrícula."); } finally { setPending(false); } }
+  return <article className={styles.attendanceRow}><div className={styles.rowIdentity}><span className={styles.avatar}>{enrollment.kind === "class" ? "T" : "I"}</span><span className={styles.rowCopy}><strong>{enrollment.curriculumName}</strong><small>{enrollment.kind === "class" ? "Turma" : "Individual"} · {enrollment.completedAt ? `concluída em ${formatDate(enrollment.completedAt)}` : "percurso em andamento"}</small></span></div><div className={styles.formActions}><StatusBadge tone={enrollment.status === "active" ? "success" : enrollment.status === "paused" ? "warning" : "neutral"}>{enrollment.status}</StatusBadge>{enrollment.status !== "completed" && <><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void changeStatus(enrollment.status === "paused" ? "active" : "paused")}>{enrollment.status === "paused" ? "Reativar" : "Pausar"}</button><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void inspectCompletion()}>Conferir conclusão</button></>} </div>{check && <div className={check.eligible ? styles.notice : styles.warning}><strong>{check.eligible ? "Pronta para conclusão" : "Conclusão bloqueada"}</strong><p>{check.blockers.length ? check.blockers.join(" · ") : "Todos os requisitos foram atendidos."}</p>{check.eligible && <button type="button" className={styles.toolbarAction} disabled={pending} onClick={() => void complete()}>Concluir matrícula</button>}</div>}{notice && <p className={styles.notice} role="status">{notice}</p>}</article>;
 }
 
 function ProjectList({ projects }: { projects: readonly ProjectSummary[] }) {

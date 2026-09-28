@@ -7,8 +7,11 @@ import type {
   ConsentRecord,
   EnrollmentSummary,
   GuardianRecord,
+  AdminStudentAttendanceEntry,
+  CurriculumOption,
   Page,
   ProjectSummary,
+  ReviewQueueSubmission,
   SessionSummary,
   StudentSummary,
 } from "@/specs/api.contracts";
@@ -41,6 +44,14 @@ export function useAdminStudent(studentId: string | undefined) {
   return useLiveApi<StudentDetailData>(studentId ? `/api/admin/students/${studentId}` : null);
 }
 
+export function useAdminStudentSubmissions(studentId: string | undefined) {
+  return useLiveApi<Page<ReviewQueueSubmission>>(studentId ? `/api/admin/students/${studentId}/submissions?limit=30` : null);
+}
+
+export function useAdminStudentAttendance(studentId: string | undefined) {
+  return useLiveApi<Page<AdminStudentAttendanceEntry>>(studentId ? `/api/admin/students/${studentId}/attendance?limit=30` : null);
+}
+
 export function useAdminClasses(status: ClassSummary["status"] | "all") {
   const query = useMemo(() => {
     const params = new URLSearchParams({ limit: "50" });
@@ -48,6 +59,10 @@ export function useAdminClasses(status: ClassSummary["status"] | "all") {
     return `/api/admin/classes?${params}`;
   }, [status]);
   return useLiveApi<Page<ClassSummary>>(query);
+}
+
+export function useAdminCurricula() {
+  return useLiveApi<readonly CurriculumOption[]>("/api/admin/curricula");
 }
 
 export function useAdminClass(classId: string | undefined) {
