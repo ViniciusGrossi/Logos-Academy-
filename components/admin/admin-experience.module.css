@@ -119,6 +119,23 @@
 .inviteSectionIcon { display: grid; width: calc(var(--spacing-unit) * 11); height: calc(var(--spacing-unit) * 11); place-items: center; border: 1px solid color-mix(in srgb, var(--color-academy-orange) 40%, var(--border)); border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-academy-orange) 8%, transparent); color: var(--color-academy-orange); }
 .inviteSectionIcon svg { width: calc(var(--spacing-unit) * 5); }
 .inviteSectionBody { display: grid; gap: calc(var(--spacing-unit) * 4); padding: calc(var(--spacing-unit) * 5); }
+.dateTrigger { display: grid; width: 100%; min-height: var(--spacing-control); grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: calc(var(--spacing-unit) * 2); padding-inline: calc(var(--spacing-unit) * 3); border: 1px solid var(--input); border-radius: var(--radius-md); background: var(--card); color: var(--foreground); text-align: left; cursor: pointer; transition: border-color var(--duration-fast), background-color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast) var(--ease-entrance); }
+.dateTrigger:hover, .dateTrigger:focus-visible { border-color: color-mix(in srgb, var(--color-academy-orange) 58%, var(--input)); background: color-mix(in srgb, var(--color-academy-orange) 5%, var(--card)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-academy-orange) 12%, transparent); outline: none; }
+.dateTrigger:active { transform: translateY(1px); }
+.dateTrigger svg { color: var(--color-academy-orange); }
+.dateTrigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; }
+.dateTrigger small { color: var(--muted-foreground); font: 700 calc(var(--spacing-unit) * 2.25) var(--font-mono); letter-spacing: .05em; }
+.datePopover { width: min(22rem, calc(100vw - 2rem)) !important; padding: calc(var(--spacing-unit) * 2) !important; border: 1px solid color-mix(in srgb, var(--color-academy-orange) 28%, var(--border)) !important; background: var(--color-academy-raised) !important; color: var(--color-academy-paper) !important; box-shadow: 0 calc(var(--spacing-unit) * 7) calc(var(--spacing-unit) * 16) rgb(0 0 0 / 42%) !important; }
+.inviteCalendar { width: 100%; padding: calc(var(--spacing-unit) * 2) !important; --cell-size: calc(var(--spacing-unit) * 9); background: transparent !important; }
+.inviteCalendar :global(.rdp-root), .inviteCalendar :global(.rdp-month), .inviteCalendar :global(.rdp-month_grid) { width: 100%; }
+.inviteCalendar :global(.rdp-month_caption) { color: var(--color-academy-paper); font-family: var(--font-mono); font-size: calc(var(--spacing-unit) * 2.75); font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.inviteCalendar :global(.rdp-dropdown) { color: var(--color-academy-paper); cursor: pointer; }
+.inviteCalendar :global(.rdp-weekday) { color: color-mix(in srgb, var(--color-academy-paper) 48%, transparent); font: 750 calc(var(--spacing-unit) * 2.25) var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+.inviteCalendar :global([data-day]) { border-radius: var(--radius-md); color: var(--color-academy-paper); transition: transform var(--duration-fast) var(--ease-entrance), background-color var(--duration-fast), color var(--duration-fast); }
+.inviteCalendar :global([data-day]):hover { background: color-mix(in srgb, var(--color-academy-orange) 14%, transparent); color: var(--color-academy-orange); transform: translateY(-1px); }
+.inviteCalendar :global([data-selected-single="true"]) { background: var(--color-academy-orange); color: var(--color-academy-ink); box-shadow: 0 calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 5) color-mix(in srgb, var(--color-academy-orange) 26%, transparent); }
+.inviteCalendar :global(.rdp-today) { color: var(--color-academy-orange); }
+.inviteCalendar :global(.rdp-button_previous), .inviteCalendar :global(.rdp-button_next) { color: var(--color-academy-orange); }
 .inviteConsent { display: flex; align-items: flex-start; gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 4); border: 1px solid var(--border); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--color-academy-orange) 4%, var(--card)); cursor: pointer; transition: border-color var(--duration-fast), transform var(--duration-standard) var(--ease-entrance); }
 .inviteConsent:hover { border-color: color-mix(in srgb, var(--color-academy-orange) 52%, var(--border)); transform: translateY(-2px); }
 .inviteConsent input { width: calc(var(--spacing-unit) * 5); height: calc(var(--spacing-unit) * 5); margin-top: 1px; accent-color: var(--color-academy-orange); }

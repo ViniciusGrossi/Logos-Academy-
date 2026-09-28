@@ -1,11 +1,14 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { ptBR } from "date-fns/locale";
 import { ArrowRight, CalendarDays, Check, MailCheck, Send, ShieldCheck, UserRoundPlus, UsersRound } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
 
 import { MagneticAction, StatusBadge } from "@/components/academy";
 import { apiMutation, useLiveApi } from "@/components/prototype/live-api";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AcademySelect } from "./academy-select";
 import styles from "./admin-experience.module.css";
@@ -67,6 +70,7 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
     setPending(true);
     setError(null);
     try {
+      if (!form.birthDate || !form.signedAt) throw new Error("Selecione as duas datas obrigatórias antes de enviar.");
       if (!selectedClass) throw new Error("Selecione uma turma disponível.");
       if (selectedClass.occupiedSeats >= selectedClass.capacity) throw new Error("Esta turma já atingiu a capacidade máxima.");
       if (!form.physicalCopyArchived) throw new Error("Confirme o arquivamento do termo físico antes de convidar.");
@@ -132,7 +136,7 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
               <div className={styles.formGrid}>
                 <InviteField label="Nome completo" value={form.displayName} onChange={(value) => update("displayName", value)} autoComplete="name" required />
                 <InviteField label="E-mail do convite" value={form.email} onChange={(value) => update("email", value)} type="email" autoComplete="email" required />
-                <InviteField label="Data de nascimento" value={form.birthDate} onChange={(value) => update("birthDate", value)} type="date" required />
+                <InviteDateField label="Data de nascimento" value={form.birthDate} onChange={(value) => update("birthDate", value)} startMonth={new Date(1940, 0)} />
               </div>
             </InviteSection>
 
@@ -143,7 +147,7 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
                 <InviteField label="E-mail do responsável" value={form.guardianEmail} onChange={(value) => update("guardianEmail", value)} type="email" required />
                 <InviteField label="WhatsApp (opcional)" value={form.guardianPhone} onChange={(value) => update("guardianPhone", value)} type="tel" />
                 <InviteField label="Versão do termo" value={form.termVersion} onChange={(value) => update("termVersion", value)} required />
-                <InviteField label="Data da assinatura" value={form.signedAt} onChange={(value) => update("signedAt", value)} type="date" required />
+                <InviteDateField label="Data da assinatura" value={form.signedAt} onChange={(value) => update("signedAt", value)} startMonth={new Date(2020, 0)} />
               </div>
               <label className={styles.inviteConsent}>
                 <input type="checkbox" checked={form.physicalCopyArchived} onChange={(event) => update("physicalCopyArchived", event.target.checked)} />
@@ -195,6 +199,36 @@ function InviteSection({ icon, index, title, description, children }: { icon: Re
 
 function InviteField({ label, value, onChange, type = "text", required, placeholder, autoComplete }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; placeholder?: string; autoComplete?: string }) {
   return <label className={styles.formField}><span className={styles.label}>{label}</span><input className={styles.field} value={value} onChange={(event) => onChange(event.target.value)} type={type} required={required} placeholder={placeholder} autoComplete={autoComplete} /></label>;
+}
+
+function InviteDateField({ label, value, onChange, startMonth }: { label: string; value: string; onChange: (value: string) => void; startMonth: Date }) {
+  const [open, setOpen] = useState(false);
+  const selected = value ? new Date(`${value}T12:00:00`) : undefined;
+  return <label className={styles.formField}>
+    <span className={styles.label}>{label}</span>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button" className={styles.dateTrigger} aria-label={label}>
+          <CalendarDays size={17} aria-hidden="true" />
+          <span>{selected ? formatDate(value) : "Selecionar data"}</span>
+          <small>{selected ? value : "AAAA-MM-DD"}</small>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" sideOffset={8} className={styles.datePopover}>
+        <Calendar
+          mode="single"
+          locale={ptBR}
+          captionLayout="dropdown-years"
+          startMonth={startMonth}
+          endMonth={new Date()}
+          selected={selected}
+          onSelect={(date) => { if (date) { onChange(date.toISOString().slice(0, 10)); setOpen(false); } }}
+          className={styles.inviteCalendar}
+          aria-label={label}
+        />
+      </PopoverContent>
+    </Popover>
+  </label>;
 }
 
 function formatDate(value: string) {

@@ -27,7 +27,9 @@ export function AdminStudents() {
   const students = useMemo(() => (data?.items ?? []).filter((student) => matchesRisk(student, risk)), [data, risk]);
   const attention = data?.items.filter(hasStudentRisk).length ?? 0;
 
-  if (loading) return <StateScene state="loading" title="Organizando alunos" description="Lendo matrículas, atividades e reposições da Academy." />;
+  // Durante um convite bem-sucedido recarregamos a lista, mas mantemos o Sheet
+  // montado para que a confirmação "Convite em rota" não desapareça.
+  if (loading && !data) return <StateScene state="loading" title="Organizando alunos" description="Lendo matrículas, atividades e reposições da Academy." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
 
   return (
