@@ -4,16 +4,24 @@ import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } fro
 import { useEffect } from "react";
 import styles from "./auth-experience.module.css";
 
-const geoContours = [
+/** Paralelos: fixos. Uma latitude não muda quando a esfera gira no próprio eixo. */
+const geoParallels = [
   "M365 390 C500 330 940 330 1075 390",
   "M340 472 C500 424 940 424 1100 472",
   "M342 560 C505 612 935 612 1098 560",
   "M390 650 C530 706 910 706 1050 650",
-  "M720 98 C585 250 575 705 720 872",
-  "M720 98 C855 250 865 705 720 872",
-  "M535 148 C650 292 650 675 535 820",
-  "M905 148 C790 292 790 675 905 820",
 ];
+
+/**
+ * Meridianos: elipses de mesma altura e largura variável.
+ *
+ * A largura projetada de um meridiano é r·|cos θ|, então animar scaleX de 1 até 0
+ * e de volta percorre meia volta da esfera — e a passagem por zero é o meridiano
+ * visto de perfil, que degenera na linha vertical do diâmetro. Com as fases
+ * distribuídas, o conjunto lê como rotação contínua sem nenhuma biblioteca 3D.
+ */
+const MERIDIAN_COUNT = 5;
+const MERIDIAN_TURN_SECONDS = 30;
 
 const geoFacets = [
   "M420 300 L575 225 L720 330 L865 225 L1020 300",
@@ -84,7 +92,19 @@ export function MissionField({ activeStage }: { activeStage: number }) {
         </defs>
         <circle className={styles.sphereBoundary} cx="720" cy="485" r="386" />
         <g clipPath="url(#auth-sphere-clip)">
-          <g className={styles.geoContours}>{geoContours.map((path) => <path d={path} key={path} />)}</g>
+          <g className={styles.geoContours}>{geoParallels.map((path) => <path d={path} key={path} />)}</g>
+          <g className={styles.geoMeridians}>
+            {Array.from({ length: MERIDIAN_COUNT }, (_, index) => (
+              <ellipse
+                cx="720"
+                cy="485"
+                rx="386"
+                ry="386"
+                key={index}
+                style={{ animationDelay: `${-(index * MERIDIAN_TURN_SECONDS) / MERIDIAN_COUNT}s` }}
+              />
+            ))}
+          </g>
           <g className={styles.geoFacets}>{geoFacets.map((path) => <path d={path} key={path} />)}</g>
           <path className={styles.geoSweep} d="M350 520 C510 455 930 455 1090 520" />
           <g className={styles.trajectory}>

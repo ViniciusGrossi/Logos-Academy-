@@ -105,6 +105,23 @@
   animation-direction: alternate-reverse;
 }
 
+/* Meridianos: a esfera gira variando só a largura projetada de cada um.
+   non-scaling-stroke mantém o traço com espessura constante enquanto scaleX
+   comprime a elipse, senão o contorno afinaria junto. */
+.geoMeridians ellipse {
+  fill: none;
+  stroke: color-mix(in srgb, var(--auth-paper) 11%, transparent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: meridian-turn 30s linear infinite;
+}
+
+.geoMeridians ellipse:nth-child(2n) {
+  stroke: color-mix(in srgb, var(--auth-orange) 26%, transparent);
+}
+
 .geoFacets path {
   stroke: color-mix(in srgb, var(--auth-paper) 8%, transparent);
   stroke-dasharray: 1 8;
@@ -495,6 +512,14 @@
 }
 
 @keyframes geo-drift { from { stroke-dashoffset: 0; opacity: .42; } to { stroke-dashoffset: -76; opacity: .78; } }
+/* A largura de um meridiano segue |cos θ|: varia devagar perto do máximo e
+   depressa ao cruzar o zero. Por isso a curva de tempo é declarada por quadro —
+   linear leria como cone, e ease-in-out desaceleraria justamente no perfil. */
+@keyframes meridian-turn {
+  0% { transform: scaleX(1); animation-timing-function: cubic-bezier(.45, 0, .75, .55); }
+  50% { transform: scaleX(.015); animation-timing-function: cubic-bezier(.25, .45, .55, 1); }
+  100% { transform: scaleX(1); }
+}
 @keyframes geo-scan { 0% { stroke-dashoffset: 0; opacity: .25; } 45% { opacity: 1; } 100% { stroke-dashoffset: -860; opacity: .25; } }
 @keyframes geo-node-pulse { 0%, 100% { opacity: .18; } 50% { opacity: .68; } }
 @keyframes trajectory-travel { from { stroke-dashoffset: 768; opacity: .35; } 45% { opacity: 1; } to { stroke-dashoffset: 0; opacity: .35; } }
@@ -585,6 +610,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pointerLight { display: none; }
+  /* Sem animação os cinco meridianos ficariam todos em scaleX(1), sobrepostos numa
+     elipse só. O quadro parado recebe larguras próprias para seguir lendo esfera. */
+  .geoMeridians ellipse { animation: none; }
+  .geoMeridians ellipse:nth-child(1) { transform: scaleX(1); }
+  .geoMeridians ellipse:nth-child(2) { transform: scaleX(.78); }
+  .geoMeridians ellipse:nth-child(3) { transform: scaleX(.46); }
+  .geoMeridians ellipse:nth-child(4) { transform: scaleX(.16); }
+  .geoMeridians ellipse:nth-child(5) { transform: scaleX(.02); }
   .portalGlow,
   .geoContours path,
   .geoSweep,
