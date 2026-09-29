@@ -35,7 +35,11 @@ export async function GET(): Promise<NextResponse> {
     }
     const curricula = (curriculaResult.data ?? []).map((curriculum) => ({ id: curriculum.id, name: curriculum.name, version: curriculum.version }));
     const curriculumNames = new Map(curricula.map((curriculum) => [curriculum.id, curriculum.name]));
-    const classes = (classesResult.data ?? []).map((classroom) => ({
+    // A class may remain planned/active after its curriculum is closed to new
+    // enrollments. Only expose combinations accepted by the enrollment RPC.
+    const classes = (classesResult.data ?? [])
+      .filter((classroom) => curriculumNames.has(classroom.curriculum_id))
+      .map((classroom) => ({
       id: classroom.id,
       name: classroom.name,
       curriculumId: classroom.curriculum_id,
@@ -44,7 +48,7 @@ export async function GET(): Promise<NextResponse> {
       status: classroom.status,
       occupiedSeats: counts.get(classroom.id) ?? 0,
       capacity: classroom.capacity,
-    }));
+      }));
     return NextResponse.json({ ok: true, data: { curricula, classes } });
   } catch (error: unknown) {
     const appError = asApiError(error, requestId, "Não foi possível preparar o convite.");
