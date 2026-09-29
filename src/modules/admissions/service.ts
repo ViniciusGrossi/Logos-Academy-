@@ -20,7 +20,7 @@ export class AdmissionsService {
 
   async createClass(actor: TenantActor, input: unknown): Promise<{ class: ClassSummary; sessions: readonly SessionSummary[] }> {
     const parsed = parse(CreateClassSchema, input);
-    const summary: ClassSummary = { id: crypto.randomUUID(), name: parsed.name, curriculumName: "Explorer", startsOn: parsed.schedule.startsOn, status: "planned", activeStudentCount: 0 };
+    const summary: ClassSummary = { id: crypto.randomUUID(), name: parsed.name, curriculumName: "Explorer", startsOn: parsed.schedule.startsOn, status: "planned", capacity: 6, activeStudentCount: 0 };
     const sessions = sessionsFor(parsed.schedule);
     await this.repository.saveClass({ tenantId: actor.tenantId, curriculumId: parsed.curriculumId, schedule: parsed.schedule, summary }, sessions);
     return { class: summary, sessions };
