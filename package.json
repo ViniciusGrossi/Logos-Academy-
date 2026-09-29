@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "vitest run --config vitest.config.mjs"
+    "test": "vitest run --config vitest.config.mjs",
+    "test:db": "npx --yes supabase@2.118.0 test db"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",

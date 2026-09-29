@@ -44,11 +44,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const { data: profile } = useLiveApi<MeProfile>("/api/me");
-  const adminContext = pathname.startsWith("/admin");
+  const isAdmin = profile?.role === "admin";
+  const adminContext = isAdmin;
   // Os contadores da navegação saem de dados reais; um papel sem acesso à rota
   // simplesmente não recebe dado e o item fica sem selo.
-  const { data: studentPulse } = useLiveApi<StudentHome>("/api/student/home");
-  const { data: adminPulse } = useLiveApi<AdminDashboard>(profile?.role === "admin" ? "/api/admin/dashboard" : null);
+  const { data: studentPulse } = useLiveApi<StudentHome>(profile?.role === "student" ? "/api/student/home" : null);
+  const { data: adminPulse } = useLiveApi<AdminDashboard>(isAdmin ? "/api/admin/dashboard" : null);
   const pendingKind = studentPulse?.primaryAction.kind;
   const navBadges: Record<string, NavBadge | undefined> = {
     "/atividade": pendingKind && pendingKind !== "none" && pendingKind !== "setup_github" ? { value: "1", hint: "uma ação aguardando você" } : undefined,
@@ -57,10 +58,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     "/perfil": profile && profile.role === "student" && !profile.githubUsername ? { value: "!", hint: "vínculo do GitHub pendente" } : undefined,
     "/admin": adminPulse && adminPulse.awaitingReviewCount > 0 ? { value: String(adminPulse.awaitingReviewCount), hint: `${adminPulse.awaitingReviewCount} aguardando revisão` } : undefined,
   };
-  const navGroups = [
-    { label: "Meu espaço", items: studentNav },
-    { label: "Gestão", items: adminNav },
-  ];
+  const navGroups = isAdmin
+    ? [{ label: "Gestão", items: adminNav }]
+    : [{ label: "Meu espaço", items: studentNav }];
   const thesisProgress = adminContext ? 4 : studentPulse?.currentProject ? Math.min(4, studentPulse.currentProject.cyclePosition) : 1;
   const current = [...allNav]
     .sort((left, right) => right.href.length - left.href.length)
@@ -74,6 +74,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => setMenuOpen(false), [pathname]);
+
+  useEffect(() => {
+    // Impersonação não é uma função disponível: evita a navegação de admin para
+    // páginas de aluno que serão negadas pela API.
+    if (isAdmin && !pathname.startsWith("/admin")) router.replace("/admin");
+  }, [isAdmin, pathname, router]);
 
   function toggleTheme() {
     const next = !dark;
@@ -109,7 +115,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className={`academy-sidebar ${menuOpen ? "is-open" : ""}`} aria-label="Navegação principal">
         <span className="sidebar-rail" aria-hidden="true" />
         <div className="sidebar-head">
-          <Link href="/" className="brand-link" aria-label="Logos Academy, início">
+          <Link href={isAdmin ? "/admin" : "/"} className="brand-link" aria-label={isAdmin ? "Logos Academy, gestão" : "Logos Academy, início"}>
             <span className="brand-mark">
               <Image src="/brand/logos-academy-symbol-dark.png" alt="" width={52} height={52} priority />
               <i aria-hidden="true" />
@@ -151,12 +157,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button type="button" className="icon-button menu-button" onClick={() => setMenuOpen(true)} aria-label="Abrir navegação" aria-expanded={menuOpen}><Menu /></button>
           <div className="breadcrumb"><span>Logos Academy</span><ChevronRight aria-hidden="true" /><strong>{current}</strong></div>
           <div className="top-actions">
-            {profile?.role === "admin" && <Link className="role-switch" href={adminContext ? "/" : "/admin"}>{adminContext ? "Ver como aluno" : "Abrir gestão"}</Link>}
             <Tooltip>
               <TooltipTrigger asChild><AnimatedThemeToggle isDark={dark} onToggle={toggleTheme} /></TooltipTrigger>
               <TooltipContent side="bottom">{dark ? "Usar tema claro" : "Usar tema escuro"}</TooltipContent>
             </Tooltip>
-            <Link className="avatar" href="/perfil" aria-label={profile ? `Abrir perfil de ${profile.displayName}` : "Abrir perfil"}><CircleUserRound /></Link>
+            <Link className="avatar" href={isAdmin ? "/admin" : "/perfil"} aria-label={profile ? (isAdmin ? `Abrir gestão de ${profile.displayName}` : `Abrir perfil de ${profile.displayName}`) : "Abrir perfil"}><CircleUserRound /></Link>
             {profile && <Tooltip><TooltipTrigger asChild><button type="button" className="icon-button" onClick={() => void signOut()} aria-label="Sair da plataforma"><LogOut /></button></TooltipTrigger><TooltipContent side="bottom">Sair</TooltipContent></Tooltip>}
           </div>
         </header>

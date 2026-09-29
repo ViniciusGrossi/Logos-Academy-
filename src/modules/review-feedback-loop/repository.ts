@@ -158,7 +158,11 @@ function parseActivityCriterion(value: unknown, requestId: string): ActivityCrit
 function parseSubmission(value: unknown, requestId: string): SubmissionDetail {
   if (!isRecord(value) || !isUuid(value.id) || !isUuid(value.assignmentId) || !isPositiveInteger(value.version)
     || typeof value.isDraft !== "boolean" || typeof value.isLate !== "boolean" || !(typeof value.submittedAt === "string" || value.submittedAt === null) || !Array.isArray(value.items) || !Array.isArray(value.reviews)) {
-    throw new AppError("INTERNAL_ERROR", "Resposta de entrega inválida.", requestId);
+    console.error(`[${requestId}] review submission contract mismatch`, {
+      receivedFields: isRecord(value) ? Object.keys(value).sort() : typeof value,
+      requiredFields: ["assignmentId", "id", "isDraft", "isLate", "items", "reviews", "submittedAt", "version"],
+    });
+    throw new AppError("INTERNAL_ERROR", "A fila de revisões está temporariamente indisponível. Verifique se as migrations mais recentes foram aplicadas.", requestId);
   }
   return {
     id: value.id, assignmentId: value.assignmentId, version: value.version, isDraft: value.isDraft, isLate: value.isLate, submittedAt: value.submittedAt,
