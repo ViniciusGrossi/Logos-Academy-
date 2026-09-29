@@ -113,6 +113,7 @@ export interface ClassSummary {
   curriculumName: string;
   startsOn: ISODate;
   status: "planned" | "active" | "completed" | "cancelled";
+  capacity: number;
   activeStudentCount: number;
 }
 
@@ -475,7 +476,7 @@ export interface ApiContracts {
       };
       enrollment: { curriculumId: UUID } & EnrollmentPlacementInput;
     },
-    { studentId: UUID; enrollmentId: UUID; invitationSentAt: ISODateTime }
+    { studentId: UUID; enrollmentId: UUID; invitationSentAt: ISODateTime; activationLink: string | null }
   >;
   "GET /api/admin/students": Endpoint<
     PageQuery & { search?: string; classId?: UUID },

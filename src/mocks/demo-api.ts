@@ -80,6 +80,7 @@ let classSummary: ClassSummary = {
   curriculumName: "Explorer",
   startsOn: "2026-08-02",
   status: "active",
+  capacity: 6,
   activeStudentCount: 2,
 };
 const enrollment: EnrollmentSummary = {
@@ -1115,6 +1116,7 @@ export async function demoApi<T>(
       studentId: ids.caio,
       enrollmentId: attendance[1]!.enrollmentId,
       invitationSentAt: now,
+      activationLink: "https://demo.logos.academy/ativar?token=demo-nao-funcional",
     } as T;
   if (method === "POST" && pathname === "/api/admin/classes")
     return { class: classSummary, sessions } as T;

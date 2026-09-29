@@ -76,7 +76,7 @@ describe("admissions-classes-calendar", () => {
   });
   it("valida consentimento antes de chamar o adapter de Auth", async () => {
     let calls = 0;
-    const invitations = new AdmissionsInvitationService({ invite: async () => { calls += 1; return { studentId, enrollmentId: crypto.randomUUID(), invitationSentAt: new Date().toISOString() }; } });
+    const invitations = new AdmissionsInvitationService({ invite: async () => { calls += 1; return { studentId, enrollmentId: crypto.randomUUID(), invitationSentAt: new Date().toISOString(), activationLink: null }; } });
     await expect(invitations.invite(admin, { email: "aluno@example.com", displayName: "Aluno", birthDate: "2012-01-01", guardian: { name: "Responsável", relationship: "mãe", email: "r@example.com" }, consent: { termVersion: "v1", signedAt: "2026-09-01", physicalCopyArchived: false }, enrollment: { curriculumId, kind: "individual", individualSchedule: schedule } }, "retry-1", crypto.randomUUID())).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
     expect(calls).toBe(0);
   });

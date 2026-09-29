@@ -27,8 +27,8 @@ export function AdminStudents() {
   const students = useMemo(() => (data?.items ?? []).filter((student) => matchesRisk(student, risk)), [data, risk]);
   const attention = data?.items.filter(hasStudentRisk).length ?? 0;
 
-  // Durante um convite bem-sucedido recarregamos a lista, mas mantemos o Sheet
-  // montado para que a confirmação "Convite em rota" não desapareça.
+  // Apenas a primeira carga troca a página pela cena de loading; recarregar
+  // depois do convite preserva o Sheet e o link de ativação gerado uma única vez.
   if (loading && !data) return <StateScene state="loading" title="Organizando alunos" description="Lendo matrículas, atividades e reposições da Academy." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
 

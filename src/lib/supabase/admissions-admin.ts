@@ -9,7 +9,7 @@ import { mapRpcError } from "@/src/lib/supabase/rpc-error";
 import type { InviteStudentInput } from "@/src/modules/admissions/schema";
 import type { TenantActor } from "@/src/modules/admissions/repository";
 
-type InviteResult = Readonly<{ studentId: string; enrollmentId: string; invitationSentAt: string }>;
+type InviteResult = Readonly<{ studentId: string; enrollmentId: string; invitationSentAt: string; activationLink: string | null }>;
 
 export class AdmissionsAdminAdapter {
   private readonly env = getAdminSupabaseEnv();
@@ -20,25 +20,28 @@ export class AdmissionsAdminAdapter {
   async invite(actor: TenantActor, input: InviteStudentInput, idempotencyKey: string, requestId: string): Promise<InviteResult> {
     const payloadHash = createHash("sha256").update(canonical(input)).digest();
     const claim = await this.rpc("claim_student_invitation", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash }, requestId);
-    if (hasFinalResult(claim)) return toInviteResult(claim);
+    if (hasFinalResult(claim)) return toInviteResult(claim, null);
     let authUserId = readString(claim, "authUserId");
     let invitationSentAt = readString(claim, "invitationSentAt");
+    let activationLink: string | null = null;
     let createdHere = false;
     if (!authUserId || !invitationSentAt) {
       const redirectTo = this.siteOrigin ? new URL("/ativar", this.siteOrigin).toString() : undefined;
-      const invited = await this.client.auth.admin.inviteUserByEmail(
-        input.email,
-        redirectTo ? { redirectTo } : undefined,
-      );
-      if (invited.error || !invited.data.user) throw invitationAuthError(invited.error, requestId);
+      const invited = await this.client.auth.admin.generateLink({
+        type: "invite",
+        email: input.email,
+        ...(redirectTo ? { options: { redirectTo } } : {}),
+      });
+      if (invited.error || !invited.data.user || !invited.data.properties) throw invitationAuthError(invited.error, requestId);
       authUserId = invited.data.user.id; invitationSentAt = new Date().toISOString(); createdHere = true;
+      activationLink = invited.data.properties.action_link;
       await this.rpc("bind_student_invitation_auth", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId, p_invitation_sent_at: invitationSentAt }, requestId);
     }
     try {
       const enrollment = input.enrollment.kind === "class" ? { p_kind: "class", p_class_id: input.enrollment.classId, p_individual_schedule: null } : { p_kind: "individual", p_class_id: null, p_individual_schedule: input.enrollment.individualSchedule };
       const result = await this.rpc("finalize_invited_student", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId, p_email: input.email, p_display_name: input.displayName, p_birth_date: input.birthDate, p_guardian_name: input.guardian.name, p_relationship: input.guardian.relationship, p_guardian_email: input.guardian.email ?? null, p_guardian_phone: input.guardian.phone ?? null, p_term_version: input.consent.termVersion, p_signed_at: input.consent.signedAt, p_physical_copy_archived: true, p_curriculum_id: input.enrollment.curriculumId, ...enrollment, p_encryption_key: this.env.PII_ENCRYPTION_KEY, p_invitation_sent_at: invitationSentAt, p_request_id: requestId }, requestId);
       if (!hasFinalResult(result)) throw new AppError("INTERNAL_ERROR", "Não foi possível concluir o convite.", requestId);
-      return toInviteResult(result);
+      return toInviteResult(result, activationLink);
     } catch (error: unknown) {
       if (createdHere) {
         await this.rpc("clear_student_invitation_auth", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId }, requestId, true);
@@ -73,13 +76,13 @@ function sortValue(value: unknown): unknown { if (Array.isArray(value)) return v
 function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === "object" && value !== null; }
 function readString(value: Record<string, unknown>, key: string): string | null { const item = value[key]; return typeof item === "string" ? item : null; }
 function hasFinalResult(value: Record<string, unknown>): value is Record<string, string> { return typeof value.studentId === "string" && typeof value.enrollmentId === "string" && typeof value.invitationSentAt === "string"; }
-function toInviteResult(value: Record<string, string>): InviteResult { return { studentId: value.studentId, enrollmentId: value.enrollmentId, invitationSentAt: value.invitationSentAt }; }
+function toInviteResult(value: Record<string, string>, activationLink: string | null): InviteResult { return { studentId: value.studentId, enrollmentId: value.enrollmentId, invitationSentAt: value.invitationSentAt, activationLink }; }
 
 function invitationAuthError(error: { code?: string; message?: string } | null, requestId: string): AppError {
   const detail = `${error?.code ?? ""} ${error?.message ?? ""}`.toLowerCase();
   console.error(`[${requestId}] student invitation auth failed`, { code: error?.code, message: error?.message });
   if (detail.includes("redirect") || detail.includes("url is not allowed")) return new AppError("VALIDATION_ERROR", "A URL de ativação ainda não foi autorizada no Supabase. Adicione /ativar em Authentication → URL Configuration.", requestId);
-  if (detail.includes("rate limit") || detail.includes("over_email_send_rate_limit")) return new AppError("RATE_LIMITED", "O limite de envio de e-mails foi atingido. Aguarde alguns minutos e tente novamente.", requestId);
+  if (detail.includes("rate limit")) return new AppError("RATE_LIMITED", "O limite de geração de convites foi atingido. Aguarde alguns minutos e tente novamente.", requestId);
   if (detail.includes("already") || detail.includes("exists") || detail.includes("registered")) return new AppError("CONFLICT", "Este e-mail já possui uma conta ou convite. Use outro e-mail ou localize o aluno existente.", requestId);
-  return new AppError("INTERNAL_ERROR", "O Supabase não conseguiu enviar o convite. Confira a configuração de e-mail e tente novamente.", requestId);
+  return new AppError("INTERNAL_ERROR", "O Supabase não conseguiu gerar o link de ativação. Tente novamente.", requestId);
 }
