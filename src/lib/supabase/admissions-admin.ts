@@ -18,7 +18,10 @@ export class AdmissionsAdminAdapter {
   constructor(private readonly siteOrigin?: string) {}
 
   async invite(actor: TenantActor, input: InviteStudentInput, idempotencyKey: string, requestId: string): Promise<InviteResult> {
-    const payloadHash = createHash("sha256").update(canonical(input)).digest();
+    // PostgREST receives RPC arguments as JSON. Passing Node's Buffer here makes
+    // it an object (`{ type: "Buffer", data: [...] }`) rather than PostgreSQL
+    // `bytea`; use the textual bytea representation instead.
+    const payloadHash = `\\x${createHash("sha256").update(canonical(input)).digest("hex")}`;
     const claim = await this.rpc("claim_student_invitation", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash }, requestId);
     if (hasFinalResult(claim)) return toInviteResult(claim, null);
     let authUserId = readString(claim, "authUserId");
