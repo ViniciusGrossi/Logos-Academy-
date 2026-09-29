@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = logos_academy, extensions;
-select plan(8);
+select plan(10);
 insert into auth.users (id,aud,role,email,raw_app_meta_data,raw_user_meta_data) values
  (md5('read-admin-a-auth')::uuid,'authenticated','authenticated','read-admin-a@test','{}','{}'),(md5('read-admin-b-auth')::uuid,'authenticated','authenticated','read-admin-b@test','{}','{}'),(md5('read-student-1-auth')::uuid,'authenticated','authenticated','read-student-1@test','{}','{}'),(md5('read-student-2-auth')::uuid,'authenticated','authenticated','read-student-2@test','{}','{}');
 insert into tenants(id,tenant_id,name,slug) values (md5('read-a')::uuid,md5('read-a')::uuid,'Read A','read-a'),(md5('read-b')::uuid,md5('read-b')::uuid,'Read B','read-b');
@@ -22,4 +22,6 @@ select is((logos_academy.admin_student_detail(md5('read-a')::uuid,md5('read-admi
 select throws_ok($$select logos_academy.admin_list_students(md5('read-a')::uuid,md5('read-admin-b')::uuid,'test-key',null,null,null,25)$$,'42501','tenant admin required','tenant B admin cannot list tenant A');
 select lives_ok($$select logos_academy.admin_update_class(md5('read-a')::uuid,md5('read-admin-a')::uuid,md5('read-class')::uuid,'Renamed',null)$$,'admin updates class minimally');
 select is((logos_academy.admin_update_enrollment(md5('read-a')::uuid,md5('read-admin-a')::uuid,md5('read-enrollment')::uuid,'paused')->>'status'),'paused','admin updates enrollment without completed state');
+select is(((logos_academy.admin_list_classes(md5('read-a')::uuid,md5('read-admin-a')::uuid,null,null,25)->'items'->0->>'capacity')::int),6,'class list reads capacity from classes table');
+select is(((logos_academy.admin_class_detail(md5('read-a')::uuid,md5('read-admin-a')::uuid,md5('read-class')::uuid)->'class'->>'capacity')::int),6,'class detail reads capacity from classes table');
 reset role; select * from finish(); rollback;

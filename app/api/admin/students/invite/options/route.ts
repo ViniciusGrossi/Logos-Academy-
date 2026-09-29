@@ -22,7 +22,7 @@ export async function GET(): Promise<NextResponse> {
     });
     const [curriculaResult, classesResult, enrollmentsResult] = await Promise.all([
       admin.from("curricula").select("id, name, version").eq("tenant_id", identity.tenantId).eq("status", "active").is("deleted_at", null).order("name"),
-      admin.from("classes").select("id, name, curriculum_id, starts_on, status").eq("tenant_id", identity.tenantId).in("status", ["planned", "active"]).is("deleted_at", null).order("starts_on"),
+      admin.from("classes").select("id, name, curriculum_id, starts_on, status, capacity").eq("tenant_id", identity.tenantId).in("status", ["planned", "active"]).is("deleted_at", null).order("starts_on"),
       admin.from("enrollments").select("class_id").eq("tenant_id", identity.tenantId).in("status", ["invited", "active", "paused"]).is("deleted_at", null).not("class_id", "is", null),
     ]);
     if (curriculaResult.error || classesResult.error || enrollmentsResult.error) {
@@ -43,7 +43,7 @@ export async function GET(): Promise<NextResponse> {
       startsOn: classroom.starts_on,
       status: classroom.status,
       occupiedSeats: counts.get(classroom.id) ?? 0,
-      capacity: 6,
+      capacity: classroom.capacity,
     }));
     return NextResponse.json({ ok: true, data: { curricula, classes } });
   } catch (error: unknown) {

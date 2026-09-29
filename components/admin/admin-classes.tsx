@@ -26,7 +26,7 @@ export function AdminClasses() {
   const classes = data?.items ?? [];
   const active = classes.filter((item) => item.status === "active").length;
   const occupied = classes.reduce((total, item) => total + item.activeStudentCount, 0);
-  const seats = classes.reduce((total, item) => total + Math.max(0, 6 - item.activeStudentCount), 0);
+  const seats = classes.reduce((total, item) => total + Math.max(0, item.capacity - item.activeStudentCount), 0);
 
   if (loading) return <StateScene state="loading" title="Montando o calendário de turmas" description="Verificando capacidade, encontros e ritmo de cada grupo." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
@@ -47,8 +47,8 @@ export function AdminClasses() {
       <SpotlightCard className={styles.paper}>
         <div className={styles.paperHeader}><div><h2>Mapa de turmas</h2><p>Capacidade e calendário coletivo permanecem juntos.</p></div><CalendarClock aria-hidden="true" /></div>
         <DataList items={[...classes]} ariaLabel="Turmas da Academy" renderItem={(item) => <Link className={styles.rowLink} href={`/admin/turmas/${item.id}`}>
-          <span className={styles.rowIdentity}><span className={styles.avatar}>{item.activeStudentCount}/6</span><span className={styles.rowCopy}><strong>{item.name}</strong><small>{item.curriculumName}</small></span></span>
-          <span className={styles.rowMeta}><strong>Início em {formatDate(item.startsOn)}</strong><small>{6 - item.activeStudentCount > 0 ? `${6 - item.activeStudentCount} vaga(s) disponível(is)` : "Turma completa"}</small></span>
+          <span className={styles.rowIdentity}><span className={styles.avatar}>{item.activeStudentCount}/{item.capacity}</span><span className={styles.rowCopy}><strong>{item.name}</strong><small>{item.curriculumName}</small></span></span>
+          <span className={styles.rowMeta}><strong>Início em {formatDate(item.startsOn)}</strong><small>{item.capacity - item.activeStudentCount > 0 ? `${item.capacity - item.activeStudentCount} vaga(s) disponível(is)` : "Turma completa"}</small></span>
           <span className={styles.rowSignals}><StatusBadge tone={classTone(item.status)}>{classStatusLabels[item.status]}</StatusBadge><ArrowUpRight className={styles.rowArrow} aria-hidden="true" /></span>
         </Link>} />
       </SpotlightCard>}
@@ -65,9 +65,9 @@ export function AdminClassDetail({ classId }: { classId: string }) {
   const activeStudents = data.enrollments.filter((enrollment) => enrollment.status === "active").length;
   return <div className={styles.stack}>
     <Link className={styles.backLink} href="/admin/turmas"><ArrowLeft className={styles.icon} aria-hidden="true" /> Voltar às turmas</Link>
-    <PageHeader eyebrow="Estúdio da turma" title={data.class.name} description={`${data.class.curriculumName} · calendário fixo, encontros presenciais e acompanhamento coletivo.`} marker={`${activeStudents}/6 alunos`} action={<StatusBadge tone={classTone(data.class.status)}>{classStatusLabels[data.class.status]}</StatusBadge>} />
+    <PageHeader eyebrow="Estúdio da turma" title={data.class.name} description={`${data.class.curriculumName} · calendário fixo, encontros presenciais e acompanhamento coletivo.`} marker={`${activeStudents}/${data.class.capacity} alunos`} action={<StatusBadge tone={classTone(data.class.status)}>{classStatusLabels[data.class.status]}</StatusBadge>} />
     <MetricStrip metrics={[
-      { id: "students", label: "Alunos ativos", value: String(activeStudents), detail: `${Math.max(0, 6 - activeStudents)} vaga(s)` },
+      { id: "students", label: "Alunos ativos", value: String(activeStudents), detail: `${Math.max(0, data.class.capacity - activeStudents)} vaga(s)` },
       { id: "sessions", label: "Encontros concluídos", value: `${completedSessions}/16`, detail: "100% exigidos" },
       { id: "next", label: "Próximo encontro", value: nextSessionLabel(data.sessions), detail: "aula presencial" },
     ]} />
