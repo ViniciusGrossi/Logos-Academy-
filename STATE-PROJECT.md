@@ -1,6 +1,6 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-25
+date: 2026-09-29
 fase_atual: "12"
 etapa_atual: "Superfície administrativa de Formação implementada; aguardando gate visual humano das páginas do aluno e ensaio ponta-a-ponta com aluno real"
 produto_tipo: "saas-premium"
@@ -44,6 +44,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-09-29] `explorer-assistant-build` implementado localmente: novo currículo Explorer v3 preserva as turmas v2 e conduz o Projeto 1 por interface, rota server-side, system prompt, testes e deploy externo. A Academy registra arquivos, links, versões e feedbacks; a página do projeto mostra somente as peças aprovadas mais recentes. A migration 0054 amplia tipos de arquivo de código, identifica cada peça por `project_slot`, bloqueia segredo/URL assinada em texto e links e arquiva o v2 para novas turmas. TypeScript, lint sem erros, teste focalizado e build passaram. A migration ainda não foi aplicada remotamente.
 
 - [2026-09-25] Aba **Formação** criada em `/admin/alunos/[studentId]`, fechando a única superfície da spec `projects-portfolio-completion` que nunca havia sido construída: checklist dos cinco requisitos (`CompletionCheck`), lista de bloqueios antes da confirmação, registro de apresentação (Demo Day ou substitutiva, data/hora e nota contextual) e confirmação de conclusão — ambos em Dialog, reaproveitando o `Sheet` (Radix Dialog) já instalado. Matrícula concluída fica somente-leitura. As três rotas (`GET /completion`, `POST /presentation`, `POST /complete`), os RPCs e o mock de demo já existiam; faltava apenas o consumo. Novo teste `src/tests/projects-portfolio-completion.test.ts` cobre o contrato do check e a conversão `datetime-local` → ISO exigida pelo Zod. TypeScript, ESLint e 76 testes passaram. Produção não foi alterada.
 

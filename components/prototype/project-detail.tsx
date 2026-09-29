@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, CircleDotDashed, Clock3, FileStack, Layers3, Lightbulb, ListChecks, LockKeyhole, MessageSquareQuote, Radio, RotateCcw, Send, Sparkles, Target, UsersRound, Waypoints } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, CircleDotDashed, Clock3, Code2, ExternalLink, FileStack, GitBranch, Layers3, Lightbulb, ListChecks, LockKeyhole, MessageSquareQuote, Radio, RotateCcw, Send, Sparkles, Target, UsersRound, Waypoints } from "lucide-react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { MagneticAction } from "@/components/academy";
-import type { AssignmentStatus, ProjectDetail as ProjectDto } from "@/specs/api.contracts";
-import { useLiveApi } from "./live-api";
+import type { AssignmentStatus, ProjectBuildArtifact, ProjectDetail as ProjectDto } from "@/specs/api.contracts";
+import { apiQuery, useLiveApi } from "./live-api";
 import { EmptyState, ErrorState, LoadingState } from "./state-lab";
 import styles from "./project-detail.module.css";
 
@@ -35,6 +35,20 @@ function moveFocusGrid(event: ReactPointerEvent<HTMLElement>) {
   const bounds = event.currentTarget.getBoundingClientRect();
   event.currentTarget.style.setProperty("--evidence-x", `${event.clientX - bounds.left}px`);
   event.currentTarget.style.setProperty("--evidence-y", `${event.clientY - bounds.top}px`);
+}
+
+const buildIcons = {
+  frontend: Code2,
+  api: Code2,
+  prompt: MessageSquareQuote,
+  tests: ListChecks,
+  deploy: ExternalLink,
+  repository: GitBranch,
+} satisfies Record<ProjectBuildArtifact["slot"], typeof Code2>;
+
+async function openBuildFile(fileId: string) {
+  const file = await apiQuery<{ signedDownloadUrl: string }>(`/api/files/${fileId}/download-url`);
+  window.open(file.signedDownloadUrl, "_blank", "noopener,noreferrer");
 }
 
 export function ProjectDetailPage() {
@@ -101,6 +115,23 @@ export function ProjectDetailPage() {
         <MagneticAction><Link href={`/atividade?assignmentId=${active.assignmentId}`} className={styles.focusAction}>{active.status === "revision_requested" ? "Revisar evidência" : active.status === "submitted" || active.status === "approved" ? "Consultar evidência" : "Abrir atividade"}<ArrowRight /></Link></MagneticAction>
       </div>
       <div className={styles.focusIndex}><span>{String(data.activities.findIndex((activity) => activity.assignmentId === active.assignmentId) + 1).padStart(2, "0")}</span><i /><small>posição ativa</small></div>
+    </section>}
+
+    {data.build.length > 0 && <section className={styles.build} aria-labelledby="build-title">
+      <div className={styles.sectionHeading}><div><span><Code2 size={13} /> Construção atual</span><h2 id="build-title">Peças aprovadas do assistente</h2></div><small>fora da Academy, visível aqui</small></div>
+      <p className={styles.buildLead}>Este é o retrato aprovado do que você está construindo. O app continua no seu GitHub e na sua Vercel; aqui ficam as versões, decisões e o caminho para retomá-las.</p>
+      <div className={styles.buildGrid}>
+        {data.build.map((artifact) => {
+          const Icon = buildIcons[artifact.slot];
+          const external = artifact.kind === "external_link" || artifact.kind === "github_repository";
+          return <article key={artifact.slot} className={styles.buildArtifact}>
+            <div><Icon /><span><small>Atividade {String(artifact.sourceActivityPosition).padStart(2, "0")} · v{artifact.version}</small><h3>{artifact.label}</h3></span></div>
+            {artifact.value && <details><summary>Ver conteúdo</summary><p>{artifact.value}</p></details>}
+            {artifact.fileName && <p className={styles.fileName}>{artifact.fileName}</p>}
+            {external && artifact.value ? <a href={artifact.value} target="_blank" rel="noreferrer">Abrir referência <ExternalLink /></a> : artifact.fileId ? <button type="button" onClick={() => void openBuildFile(artifact.fileId!)}>Baixar arquivo <ArrowRight /></button> : <span className={styles.filePending}>Arquivo registrado</span>}
+          </article>;
+        })}
+      </div>
     </section>}
 
     <section className={styles.evidenceSection} aria-labelledby="evidence-title">

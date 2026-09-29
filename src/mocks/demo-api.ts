@@ -1177,6 +1177,14 @@ function projectDetail(id: string): ProjectDetail {
   return {
     ...project,
     brief: projectBrief(project.cyclePosition),
+    build: project.cyclePosition === 1 ? [
+      { slot: "frontend", label: "Interface atual", sourceActivityPosition: 3, version: 2, kind: "file", value: null, fileId: null, fileName: "index.html" },
+      { slot: "api", label: "Rota segura", sourceActivityPosition: 2, version: 1, kind: "file", value: null, fileId: null, fileName: "app/api/chat/route.ts" },
+      { slot: "prompt", label: "System prompt", sourceActivityPosition: 3, version: 2, kind: "text", value: "Você é um assistente de estudos. Responda com clareza, reconheça limites e peça contexto quando necessário.", fileId: null, fileName: null },
+      { slot: "tests", label: "Testes registrados", sourceActivityPosition: 3, version: 2, kind: "text", value: "Cinco perguntas reais; ajustei a resposta quando faltava contexto.", fileId: null, fileName: null },
+      { slot: "repository", label: "Repositório", sourceActivityPosition: 1, version: 1, kind: "github_repository", value: "https://github.com/marina-alves/meu-assistente", fileId: null, fileName: null },
+      { slot: "deploy", label: "Versão publicada", sourceActivityPosition: 4, version: 1, kind: "external_link", value: "https://meu-assistente.vercel.app", fileId: null, fileName: null },
+    ] : [],
     activities: projectActivities(project.cyclePosition),
   };
 }

@@ -381,9 +381,31 @@ export interface ProjectBrief {
   concepts: readonly string[];
 }
 
+/** Peça aprovada que compõe um projeto construído fora da Academy. */
+export type ProjectBuildSlot =
+  | "frontend"
+  | "api"
+  | "prompt"
+  | "tests"
+  | "deploy"
+  | "repository";
+
+export interface ProjectBuildArtifact {
+  slot: ProjectBuildSlot;
+  label: string;
+  sourceActivityPosition: number;
+  version: number;
+  kind: SubmissionItemKind;
+  value: string | null;
+  fileId: UUID | null;
+  fileName: string | null;
+}
+
 export interface ProjectDetail extends ProjectSummary {
   /** Nullable durante o rollout da migration 0045. */
   brief: ProjectBrief | null;
+  /** Somente evidências aprovadas; código e deploy continuam nas contas do aluno. */
+  build: readonly ProjectBuildArtifact[];
   activities: readonly {
     assignmentId: UUID;
     lessonPosition: number;

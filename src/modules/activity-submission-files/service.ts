@@ -66,9 +66,11 @@ export class ActivitySubmissionFilesService {
     input: unknown,
     requestId: string,
   ): Promise<SubmissionDetail> {
+    const parsed = parse(DraftInputSchema, input, requestId);
+    assertNoSecrets(parsed.items, requestId);
     return this.repository.saveDraft(
       actor,
-      parse(DraftInputSchema, input, requestId),
+      parsed,
       requestId,
     );
   }
@@ -88,6 +90,7 @@ export class ActivitySubmissionFilesService {
       detail.latestSubmission.isDraft
         ? detail.latestSubmission
         : null;
+    assertNoSecrets(draft?.items ?? [], requestId);
     const presentRequirementIds = new Set(
       draft?.items.map((item) => item.requirementId) ?? [],
     );
@@ -201,6 +204,26 @@ export class ActivitySubmissionFilesService {
       requestId,
     );
     return { signedDownloadUrl: url.signedUrl, expiresAt: url.expiresAt };
+  }
+}
+
+/** Chaves e URLs assinadas não são evidência pedagógica e nunca entram no dossiê. */
+export function assertNoSecrets(
+  items: readonly { kind: string; textValue?: string; urlValue?: string }[],
+  requestId: string,
+) {
+  const material = items
+    .flatMap((item) => [item.textValue, item.urlValue])
+    .filter((value): value is string => typeof value === "string")
+    .join("\n");
+  const containsCredential = /(?:gsk_[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{20,}|(?:GROQ_API_KEY|SUPABASE_SERVICE_ROLE_KEY|VERCEL_TOKEN)\s*[:=]\s*["']?[A-Za-z0-9_-]{12,})/iu.test(material);
+  const containsSignedUrl = /(?:X-Amz-Signature|X-Amz-Credential|storage\/v1\/object\/sign)/iu.test(material);
+  if (containsCredential || containsSignedUrl) {
+    throw new AppError(
+      "VALIDATION_ERROR",
+      "Não envie chaves nem URLs assinadas. Use uma referência segura ou descreva a variável de ambiente.",
+      requestId,
+    );
   }
 }
 

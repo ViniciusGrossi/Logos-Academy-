@@ -218,6 +218,20 @@
         "projects-portfolio-completion",
         "admin-dashboard"
       ]
+    },
+    "explorer-assistant-build": {
+      "spec": "docs/specs/explorer-assistant-build.md",
+      "status": "approved",
+      "wave": 12,
+      "scope": "project-1-external-build-workspace",
+      "built": true,
+      "reviewed": false,
+      "dependencies": [
+        "explorer-activity-system-v2",
+        "project-living-dossier",
+        "student-activity-workbench",
+        "review-feedback-loop"
+      ]
     }
   }
 }

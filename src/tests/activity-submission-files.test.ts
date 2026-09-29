@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ActivityDetail, SubmissionDetail } from "@/specs/api.contracts";
 
 import { AppError } from "@/src/lib/api-error";
-import { ActivitySubmissionFilesService } from "@/src/modules/activity-submission-files/service";
+import { ActivitySubmissionFilesService, assertNoSecrets } from "@/src/modules/activity-submission-files/service";
 import {
   DraftInputSchema,
   ProfilePatchSchema,
@@ -101,6 +101,11 @@ class Store implements ActivitySubmissionFilesStore {
 }
 
 describe("activity-submission-files", () => {
+  it("não deixa chaves ou URLs assinadas entrarem como evidência", () => {
+    expect(() => assertNoSecrets([{ kind: "text", textValue: "GROQ_API_KEY=gsk_12345678901234567890" }], "request")).toThrow(AppError);
+    expect(() => assertNoSecrets([{ kind: "external_link", urlValue: "https://bucket.example/file?X-Amz-Signature=secret" }], "request")).toThrow(AppError);
+  });
+
   it("GWT-05/GWT-10 valida HTTPS e GitHub antes do service", () => {
     expect(() =>
       DraftInputSchema.parse({
