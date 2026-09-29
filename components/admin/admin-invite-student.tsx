@@ -1,13 +1,14 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, CalendarDays, Check, MailCheck, Send, ShieldCheck, UserRoundPlus, UsersRound } from "lucide-react";
+import { ArrowRight, CalendarDays, Check, Copy, Link2, MessageCircle, Send, ShieldCheck, UserRoundPlus, UsersRound } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
 
 import { MagneticAction, StatusBadge } from "@/components/academy";
 import { apiMutation, useLiveApi } from "@/components/prototype/live-api";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AcademySelect } from "./academy-select";
+import { inviteMessage, whatsAppInviteUrl } from "./admin-utils";
 import styles from "./admin-experience.module.css";
 
 type InviteOptions = {
@@ -24,7 +25,7 @@ type InviteOptions = {
   }[];
 };
 
-type InviteResult = { studentId: string; enrollmentId: string; invitationSentAt: string };
+type InviteResult = { studentId: string; enrollmentId: string; invitationSentAt: string; activationLink: string | null };
 
 const initialForm = {
   displayName: "",
@@ -46,9 +47,21 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<InviteResult | null>(null);
+  const [copied, setCopied] = useState(false);
   const idempotencyKey = useRef(crypto.randomUUID());
   const reduceMotion = useReducedMotion();
   const selectedClass = options?.classes.find((item) => item.id === form.classId);
+
+  const message = result?.activationLink
+    ? inviteMessage({
+        guardianName: form.guardianName,
+        studentName: form.displayName,
+        className: selectedClass?.name ?? "sua turma",
+        loginEmail: form.email,
+        activationLink: result.activationLink,
+      })
+    : null;
+  const whatsAppUrl = message && form.guardianPhone.trim() ? whatsAppInviteUrl(form.guardianPhone, message) : null;
 
   function update<Key extends keyof typeof initialForm>(key: Key, value: (typeof initialForm)[Key]) {
     idempotencyKey.current = crypto.randomUUID();
@@ -59,7 +72,19 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
     setForm(initialForm);
     setResult(null);
     setError(null);
+    setCopied(false);
     idempotencyKey.current = crypto.randomUUID();
+  }
+
+  async function copyMessage() {
+    if (!message) return;
+    try {
+      await navigator.clipboard.writeText(message);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2400);
+    } catch {
+      setError("Não foi possível copiar automaticamente. Selecione o link na tela e copie à mão.");
+    }
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -98,9 +123,9 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
       <SheetContent className={styles.inviteSheet} aria-describedby="invite-description">
         <SheetHeader className={styles.inviteHeader}>
           <div className={styles.inviteEyebrow}><UserRoundPlus size={16} aria-hidden="true" /> Novo acesso · estudante</div>
-          <SheetTitle className={styles.inviteTitle}>{result ? "Convite em rota." : "Abrir um novo percurso."}</SheetTitle>
+          <SheetTitle className={styles.inviteTitle}>{result ? "Convite pronto." : "Abrir um novo percurso."}</SheetTitle>
           <SheetDescription id="invite-description" className={styles.inviteDescription}>
-            {result ? "O e-mail já saiu com o link seguro para a criação da senha." : "Registre identidade, proteção e turma. A senha será criada somente pelo estudante no link recebido."}
+            {result ? "O link de ativação está pronto para você enviar ao responsável." : "Registre identidade, proteção e turma. A senha será criada somente pelo estudante no link enviado."}
           </SheetDescription>
         </SheetHeader>
 
@@ -112,12 +137,25 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
 
         {result ? (
           <motion.section className={styles.inviteSuccess} initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-            <div className={styles.inviteSuccessIcon}><MailCheck aria-hidden="true" /></div>
-            <StatusBadge tone="success">Convite enviado</StatusBadge>
+            <div className={styles.inviteSuccessIcon}><Link2 aria-hidden="true" /></div>
+            <StatusBadge tone="success">Link gerado</StatusBadge>
             <h2>{form.displayName} assume daqui.</h2>
-            <p>Enviamos o link para <strong>{form.email}</strong>. O estudante confirmará o endereço, criará a senha e ativará a matrícula.</p>
+            {message ? (
+              <>
+                <p>Envie o link para <strong>{form.guardianName}</strong> pelo WhatsApp. Depois da ativação, o login do estudante será sempre <strong>{form.email}</strong>.</p>
+                <p className={styles.inviteLink}>{result.activationLink}</p>
+                {!whatsAppUrl && <p className={styles.warning}>Sem WhatsApp válido do responsável. Copie a mensagem e envie pelo canal que preferir.</p>}
+                <div className={styles.formActions}>
+                  {whatsAppUrl && <MagneticAction><a className={styles.toolbarAction} href={whatsAppUrl} target="_blank" rel="noreferrer"><MessageCircle size={17} /> Enviar pelo WhatsApp <ArrowRight size={17} /></a></MagneticAction>}
+                  <button type="button" className={styles.secondaryAction} onClick={copyMessage}>{copied ? <><Check size={16} /> Mensagem copiada</> : <><Copy size={16} /> Copiar mensagem</>}</button>
+                </div>
+              </>
+            ) : (
+              <p className={styles.warning}>Este convite já havia sido registrado, então o link não pode ser exibido outra vez. Convide novamente para gerar um link novo.</p>
+            )}
+            {error && <p className={styles.danger} role="alert">{error}</p>}
             <ol className={styles.inviteRoute}>
-              <li data-active="true"><span>01</span><div><strong>E-mail enviado</strong><small>Link individual e seguro</small></div></li>
+              <li data-active="true"><span>01</span><div><strong>Link gerado</strong><small>Individual, com validade</small></div></li>
               <li><span>02</span><div><strong>Senha criada</strong><small>Feita pelo próprio estudante</small></div></li>
               <li><span>03</span><div><strong>Estúdio liberado</strong><small>Matrícula passa de convidada para ativa</small></div></li>
             </ol>
@@ -128,20 +166,20 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
           </motion.section>
         ) : (
           <form className={styles.inviteForm} onSubmit={submit}>
-            <InviteSection icon={<UserRoundPlus />} index="01" title="Identidade do estudante" description="O nome aparecerá nas evidências; o e-mail será o endereço do convite.">
+            <InviteSection icon={<UserRoundPlus />} index="01" title="Identidade do estudante" description="O nome aparecerá nas evidências; o e-mail será o login do estudante.">
               <div className={styles.formGrid}>
                 <InviteField label="Nome completo" value={form.displayName} onChange={(value) => update("displayName", value)} autoComplete="name" required />
-                <InviteField label="E-mail do convite" value={form.email} onChange={(value) => update("email", value)} type="email" autoComplete="email" required />
+                <InviteField label="E-mail de login" value={form.email} onChange={(value) => update("email", value)} type="email" autoComplete="email" required />
                 <InviteField label="Data de nascimento" value={form.birthDate} onChange={(value) => update("birthDate", value)} type="date" required />
               </div>
             </InviteSection>
 
-            <InviteSection icon={<ShieldCheck />} index="02" title="Responsável e consentimento" description="A Academy só envia o convite depois que o termo físico está registrado.">
+            <InviteSection icon={<ShieldCheck />} index="02" title="Responsável e consentimento" description="O convite só é gerado depois que o termo físico está registrado.">
               <div className={styles.formGrid}>
                 <InviteField label="Nome do responsável" value={form.guardianName} onChange={(value) => update("guardianName", value)} required />
                 <InviteField label="Relação" value={form.guardianRelationship} onChange={(value) => update("guardianRelationship", value)} placeholder="Mãe, pai, responsável…" required />
                 <InviteField label="E-mail do responsável" value={form.guardianEmail} onChange={(value) => update("guardianEmail", value)} type="email" required />
-                <InviteField label="WhatsApp (opcional)" value={form.guardianPhone} onChange={(value) => update("guardianPhone", value)} type="tel" />
+                <InviteField label="WhatsApp do responsável" value={form.guardianPhone} onChange={(value) => update("guardianPhone", value)} type="tel" placeholder="(11) 98888-7777" />
                 <InviteField label="Versão do termo" value={form.termVersion} onChange={(value) => update("termVersion", value)} required />
                 <InviteField label="Data da assinatura" value={form.signedAt} onChange={(value) => update("signedAt", value)} type="date" required />
               </div>
@@ -176,8 +214,8 @@ export function AdminInviteStudent({ open, onOpenChange, onCreated }: { open: bo
 
             {error && <p className={styles.danger} role="alert">{error}</p>}
             <div className={styles.inviteFooter}>
-              <p><MailCheck size={16} aria-hidden="true" /> O aluno receberá um link; nenhuma senha é criada pela gestão.</p>
-              <MagneticAction><button className={styles.toolbarAction} disabled={pending || loading || !options?.classes.length}>{pending ? "Enviando convite…" : <><Send size={17} /> Enviar convite <ArrowRight size={17} /></>}</button></MagneticAction>
+              <p><Link2 size={16} aria-hidden="true" /> Você recebe o link para enviar ao responsável; nenhuma senha é criada pela gestão.</p>
+              <MagneticAction><button className={styles.toolbarAction} disabled={pending || loading || !options?.classes.length}>{pending ? "Gerando convite…" : <><Send size={17} /> Gerar convite <ArrowRight size={17} /></>}</button></MagneticAction>
             </div>
           </form>
         )}
