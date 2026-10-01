@@ -34,7 +34,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. **Bloqueio descoberto em 25/09:** a UI de convite já existe pronta em `release-2/onda-a-admin` (commit `de3b435`, 22/09) e nunca foi mesclada; a migration `0053` (`admin_active_curricula`, `admin_file_download_target`) existe só nessa branch e `main` pula de `0052` para `0054`. Integrar a Onda A e aplicar `0053` antes de `0054` são pré-requisitos do ensaio. O merge conflita em `admin-students.tsx`, `app-shell.tsx` e `registry.json`.
+- [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. A Onda A administrativa e a migration `0053` já foram integradas de `main` em 30/09; antes do ensaio, validar o gate de qualidade e aplicar no Supabase, na ordem, as migrations ainda pendentes.
 - [ ] `student-visual-system-rounding-orbit`: raios sistêmicos e campo orbital compartilhado implementados e validados; aguardando gate visual humano.
 - [ ] `student-journey-premium`: fusão da Jornada real com a direção premium implementada e validada; aguardando gate visual humano.
 - [ ] `student-knowledge-atlas`: versão premium implementada e validada em 1440/768/375, tema claro/escuro e movimento reduzido; aguardando gate visual humano.
@@ -45,7 +45,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
-- [2026-09-29] `explorer-assistant-build` implementado localmente: novo currículo Explorer v3 preserva as turmas v2 e conduz o Projeto 1 por interface, rota server-side, system prompt, testes e deploy externo. A Academy registra arquivos, links, versões e feedbacks; a página do projeto mostra somente as peças aprovadas mais recentes. A migration 0054 amplia tipos de arquivo de código, identifica cada peça por `project_slot`, bloqueia segredo/URL assinada em texto e links e arquiva o v2 para novas turmas. TypeScript, lint sem erros, teste focalizado e build passaram. A migration ainda não foi aplicada remotamente.
+- [2026-09-29] `explorer-assistant-build` implementado localmente: novo currículo Explorer v3 preserva as turmas v2 e conduz o Projeto 1 por interface, rota server-side, system prompt, testes e deploy externo. A Academy registra arquivos, links, versões e feedbacks; a página do projeto mostra somente as peças aprovadas mais recentes. A migration 0056 amplia tipos de arquivo de código, identifica cada peça por `project_slot`, bloqueia segredo/URL assinada em texto e links e arquiva o v2 para novas turmas. TypeScript, lint sem erros, teste focalizado e build passaram. A migration ainda não foi aplicada remotamente.
 
 - [2026-09-25] Aba **Formação** criada em `/admin/alunos/[studentId]`, fechando a única superfície da spec `projects-portfolio-completion` que nunca havia sido construída: checklist dos cinco requisitos (`CompletionCheck`), lista de bloqueios antes da confirmação, registro de apresentação (Demo Day ou substitutiva, data/hora e nota contextual) e confirmação de conclusão — ambos em Dialog, reaproveitando o `Sheet` (Radix Dialog) já instalado. Matrícula concluída fica somente-leitura. As três rotas (`GET /completion`, `POST /presentation`, `POST /complete`), os RPCs e o mock de demo já existiam; faltava apenas o consumo. Novo teste `src/tests/projects-portfolio-completion.test.ts` cobre o contrato do check e a conversão `datetime-local` → ISO exigida pelo Zod. TypeScript, ESLint e 76 testes passaram. Produção não foi alterada.
 

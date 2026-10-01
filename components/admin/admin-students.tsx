@@ -27,8 +27,8 @@ export function AdminStudents() {
   const students = useMemo(() => (data?.items ?? []).filter((student) => matchesRisk(student, risk)), [data, risk]);
   const attention = data?.items.filter(hasStudentRisk).length ?? 0;
 
-  // ponytail: só a primeira carga troca a página pela cena de loading — recarregar depois do convite
-  // desmontaria o sheet e perderia o link de ativação, que não pode ser gerado de novo.
+  // Apenas a primeira carga troca a página pela cena de loading; recarregar
+  // depois do convite preserva o Sheet e o link de ativação gerado uma única vez.
   if (loading && !data) return <StateScene state="loading" title="Organizando alunos" description="Lendo matrículas, atividades e reposições da Academy." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
 
