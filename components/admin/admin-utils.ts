@@ -41,6 +41,7 @@ export function inviteMessage(invite: { guardianName: string; studentName: strin
     "",
     "Para ativar, abra este link e crie a senha:",
     invite.activationLink,
+    "Abra o link uma única vez, em uma única aba.",
     "",
     `Depois da ativação, o login será sempre o e-mail ${invite.loginEmail}.`,
     "",

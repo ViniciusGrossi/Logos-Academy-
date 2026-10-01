@@ -23,19 +23,13 @@ export class AdmissionsAdminAdapter {
     // `bytea`; use the textual bytea representation instead.
     const payloadHash = `\\x${createHash("sha256").update(canonical(input)).digest("hex")}`;
     const claim = await this.rpc("claim_student_invitation", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash }, requestId);
-    if (hasFinalResult(claim)) return toInviteResult(claim, null);
+    if (hasFinalResult(claim)) return toInviteResult(claim, (await this.generateActivationLink(input.email, "recovery", requestId)).data.properties.action_link);
     let authUserId = readString(claim, "authUserId");
     let invitationSentAt = readString(claim, "invitationSentAt");
     let activationLink: string | null = null;
     let createdHere = false;
     if (!authUserId || !invitationSentAt) {
-      const redirectTo = this.siteOrigin ? new URL("/ativar", this.siteOrigin).toString() : undefined;
-      const invited = await this.client.auth.admin.generateLink({
-        type: "invite",
-        email: input.email,
-        ...(redirectTo ? { options: { redirectTo } } : {}),
-      });
-      if (invited.error || !invited.data.user || !invited.data.properties) throw invitationAuthError(invited.error, requestId);
+      const invited = await this.generateActivationLink(input.email, "invite", requestId);
       authUserId = invited.data.user.id; invitationSentAt = new Date().toISOString(); createdHere = true;
       activationLink = invited.data.properties.action_link;
       await this.rpc("bind_student_invitation_auth", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId, p_invitation_sent_at: invitationSentAt }, requestId);
@@ -59,6 +53,13 @@ export class AdmissionsAdminAdapter {
   async activate(tenantId: string, authUserId: string, requestId: string): Promise<string | null> {
     const result = await this.rpc("activate_invited_student", { p_tenant_id: tenantId, p_auth_user_id: authUserId }, requestId);
     return readString(result, "enrollmentId");
+  }
+
+  private async generateActivationLink(email: string, type: "invite" | "recovery", requestId: string) {
+    const redirectTo = this.siteOrigin ? new URL("/ativar", this.siteOrigin).toString() : undefined;
+    const result = await this.client.auth.admin.generateLink({ type, email, ...(redirectTo ? { options: { redirectTo } } : {}) });
+    if (result.error || !result.data.user || !result.data.properties) throw invitationAuthError(result.error, requestId);
+    return result;
   }
 
   private async rpc(name: string, parameters: Record<string, unknown>, requestId: string, allowsNull = false): Promise<Record<string, unknown>> {

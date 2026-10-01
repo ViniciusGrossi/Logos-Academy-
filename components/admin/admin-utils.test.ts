@@ -69,6 +69,7 @@ describe("entrega do convite por WhatsApp", () => {
     expect(message).toContain("Ada Lovelace");
     expect(message).toContain("Explorer v2 · Turma A");
     expect(message).toContain(invite.activationLink);
+    expect(message).toContain("Abra o link uma única vez, em uma única aba.");
     expect(message).toContain("ada@example.com");
   });
 

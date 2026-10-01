@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-01] O reenvio de convite pendente passou a gerar um novo link de recuperação/ativação, sem reaproveitar token consumido. A ativação local foi verificada em `http://localhost:3000/ativar`; a mensagem de WhatsApp orienta abrir o link somente uma vez.
+
 - [2026-10-01] Explorer v1 e v2 foram removidos do Supabase, incluindo turmas, matrículas, conteúdo, sessões e evidências vinculadas. Perfis e contas dos alunos foram preservados; somente Explorer v3 permanece ativo.
 
 - [2026-10-01] A conta demo de aluno passou a iniciar zerada: sem entregas, frequência, feedback ou portfólio e com todos os projetos em zero; somente a primeira atividade fica disponível para iniciar o ensaio local.

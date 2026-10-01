@@ -39,7 +39,7 @@ Os alertas do advisor para schemas como `public`, `delphi`, `paideia` e outros p
 | Check | Result | Evidence / next action |
 | --- | --- | --- |
 | Admin login | Passed | Authentication and `/api/me` returned 200 with role `admin`. |
-| Invite link | Passed | The API generated an activation link without sending e-mail; the invite redirect returned a session. |
+| Invite link | Repaired | Pending students can receive a fresh activation link; it redirects to `/ativar` and the WhatsApp message instructs a single opening. |
 | Student activation | Passed | A separate test student set a password, activated enrollment, signed in again, and received 200 from `/api/me` (`student`) and `/api/student/home`. |
 | Invite class selection | Fixed | The class UI now has only the current Explorer v3 curriculum available; retired v1/v2 data was removed from production on 2026-10-01. |
 | Evidence submission | Blocked by data | The test student received no assignment. The database has 8 assignments, but 0 are released or in progress. Release a real activity to a test enrollment. |
