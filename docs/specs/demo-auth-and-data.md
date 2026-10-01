@@ -14,7 +14,7 @@ Permitir uma demonstração local completa da Logos Academy sem depender de cred
 
 - Login local somente fora de produção, com credenciais em `.env.local` e uma conta pública fictícia de aluno (`aluno@logos.test`), exclusivamente para teste local.
 - Cookie `httpOnly` de demonstração, com papel assinado, recusado em produção.
-- Dados fictícios coerentes para todas as telas de aluno e administração.
+- Dados fictícios coerentes para todas as telas de aluno e administração; a conta de aluno inicia sem entregas, frequência, feedback, portfólio ou atividades concluídas. Apenas a primeira atividade fica disponível para iniciar o teste.
 - Mutações da demonstração retornam sucesso fictício, sem gravar no Supabase.
 - Sidebar leva a todas as telas disponíveis, preservando destaque da rota atual.
 
@@ -32,3 +32,4 @@ Permitir uma demonstração local completa da Logos Academy sem depender de cred
 4. Dado qualquer tela, quando clica na navegação lateral, então chega à rota correspondente e a navegação marca a página atual.
 5. Dado build de produção, quando o modo demo não está ativo, então nenhuma rota ou cookie demo concede acesso.
 6. Dado a conta fictícia de aluno, quando entra no modo demo local, então vê somente a navegação e os dados fictícios de aluno; rotas administrativas são recusadas pelo protótipo.
+7. Dado a conta fictícia de aluno, quando entra pela primeira vez, então todos os projetos mostram zero atividades concluídas, o portfólio e a frequência estão vazios e não há feedback ou entrega prévia.

@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-01] A conta demo de aluno passou a iniciar zerada: sem entregas, frequência, feedback ou portfólio e com todos os projetos em zero; somente a primeira atividade fica disponível para iniciar o ensaio local.
+
 - [2026-10-01] Corrigida a abertura da próxima evidência no detalhe de projeto: a geometria da cópia estava acidentalmente condicionada a `:hover`, por isso a tela só alinhava após mover o mouse. O login também deixou de recarregar a rota depois do redirecionamento; a sessão já está definida antes de navegar.
 
 - [2026-09-30] A demonstração local agora tem uma conta fictícia exclusiva de aluno, com papel vinculado ao cookie assinado. Ela mostra a navegação e os dados de aluno e recusa a área administrativa no mock, sem criar usuário, acessar o Supabase ou expor dados reais.

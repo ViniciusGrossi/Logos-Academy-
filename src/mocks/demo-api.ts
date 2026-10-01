@@ -19,6 +19,8 @@ import type {
   ReviewDetail,
   ReviewQueueSubmission,
   SessionSummary,
+  SubmissionDetail,
+  SubmissionItem,
   StudentSummary,
 } from "@/specs/api.contracts";
 import {
@@ -140,6 +142,12 @@ const projects: readonly ProjectSummary[] = [
     activityCount: 4,
   },
 ];
+const freshStudentProjects: readonly ProjectSummary[] = projects.map((project) => ({
+  ...project,
+  status: project.cyclePosition === 1 ? "in_progress" : "locked",
+  approvedAt: null,
+  completedActivityCount: 0,
+}));
 const students: readonly StudentSummary[] = [
   {
     id: ids.marina,
@@ -402,6 +410,7 @@ const review: ReviewDetail = {
   ],
 };
 let submissionVersion = 2;
+let freshStudentSubmission: SubmissionDetail | null = null;
 
 function page<T>(items: readonly T[]): Page<T> {
   return { items, nextCursor: null };
@@ -789,6 +798,125 @@ function seededActivity(position: number): ActivityDetail {
   };
 }
 
+function freshStudentEnrollment(): EnrollmentSummary {
+  return {
+    ...enrollment,
+    id: "00000000-0000-4000-8000-000000000044",
+    studentId: studentProfile.id,
+    studentName: studentProfile.displayName,
+  };
+}
+
+function freshStudentStatus(position: number): ActivityDetail["status"] {
+  if (position !== 1) return "locked";
+  if (!freshStudentSubmission) return "available";
+  return freshStudentSubmission.isDraft ? "draft" : "submitted";
+}
+
+function freshStudentProjectActivities(
+  cyclePosition: number,
+): ProjectDetail["activities"] {
+  const first = (cyclePosition - 1) * 4 + 1;
+  return Array.from({ length: 4 }, (_, index) => {
+    const position = first + index;
+    const seed = explorerActivitySeeds[position - 1]!;
+    return {
+      assignmentId: assignmentIdForPosition(position),
+      lessonPosition: position,
+      title: seed.title,
+      status: freshStudentStatus(position),
+      latestVersion: position === 1 ? freshStudentSubmission?.version ?? null : null,
+      decision: null,
+      latestFeedback: null,
+    };
+  });
+}
+
+function freshStudentActivity(assignmentId: string): ActivityDetail {
+  const position = positionForAssignmentId(assignmentId) ?? 1;
+  const base = seededActivity(position);
+  const status = freshStudentStatus(position);
+  const project = freshStudentProjects.find(
+    (item) => item.cyclePosition === base.project?.cyclePosition,
+  )!;
+  const submission = position === 1 ? freshStudentSubmission : null;
+  return {
+    ...base,
+    status,
+    canEdit: status === "available" || status === "draft",
+    readOnlyReason: status === "submitted" ? "submitted" : null,
+    project: {
+      id: project.id,
+      title: project.title,
+      cyclePosition: project.cyclePosition,
+      activities: freshStudentProjectActivities(project.cyclePosition).map(
+        ({ assignmentId: currentAssignmentId, lessonPosition, title, status: currentStatus, latestVersion }) => ({
+          assignmentId: currentAssignmentId,
+          lessonPosition,
+          title,
+          status: currentStatus,
+          latestVersion,
+        }),
+      ),
+    },
+    latestReview: null,
+    latestSubmission: submission,
+    submissionHistory: submission ? page([submission]) : page([]),
+  };
+}
+
+function freshStudentProjectDetail(id: string): ProjectDetail {
+  const project = freshStudentProjects.find((item) => item.id === id) ?? freshStudentProjects[0]!;
+  return {
+    ...project,
+    brief: projectBrief(project.cyclePosition),
+    build: [],
+    activities: freshStudentProjectActivities(project.cyclePosition),
+  };
+}
+
+function saveFreshStudentSubmission(
+  body: JsonObject | undefined,
+  isDraft: boolean,
+): SubmissionDetail {
+  freshStudentSubmission = {
+    id: freshStudentSubmission?.id ?? ids.submission,
+    assignmentId: assignmentIdForPosition(1),
+    version: freshStudentSubmission?.version ?? 1,
+    isDraft,
+    isLate: false,
+    submittedAt: isDraft ? null : now,
+    items: submissionItems(body),
+    review: null,
+    reviews: [],
+  };
+  return freshStudentSubmission;
+}
+
+function submissionItems(body: JsonObject | undefined): readonly SubmissionItem[] {
+  const items = body?.items;
+  if (!Array.isArray(items)) return [];
+  return items.flatMap((item, index) => {
+    if (!isJsonObject(item)) return [];
+    const requirementId = item.requirementId;
+    const kind = item.kind;
+    if (
+      typeof requirementId !== "string" ||
+      (kind !== "text" && kind !== "file" && kind !== "external_link" && kind !== "github_repository")
+    )
+      return [];
+    return [{
+      id: deterministicUuid("fresh-student-submission", index + 1),
+      requirementId,
+      kind,
+      textValue: typeof item.textValue === "string" ? item.textValue : undefined,
+      urlValue: typeof item.urlValue === "string" ? item.urlValue : undefined,
+      fileId: typeof item.fileId === "string" ? item.fileId : undefined,
+      fileName: typeof item.fileName === "string" ? item.fileName : null,
+    }];
+  });
+}
+
 function assignmentIdForPosition(position: number): string {
   if (position === 5) return ids.assignmentResearch;
   if (position === 7) return ids.assignment;
@@ -880,8 +1008,9 @@ export async function demoApi<T>(
 ): Promise<T> {
   const requestUrl = new URL(url, "http://demo.local");
   const pathname = requestUrl.pathname;
-  if (getDemoRole() === "student" && pathname.startsWith("/api/admin")) throw new Error("Esta área é exclusiva da gestão.");
-  const profile = getDemoRole() === "student" ? studentProfile : adminProfile;
+  const isFreshStudent = getDemoRole() === "student";
+  if (isFreshStudent && pathname.startsWith("/api/admin")) throw new Error("Esta área é exclusiva da gestão.");
+  const profile = isFreshStudent ? studentProfile : adminProfile;
   if (method === "GET" && pathname === "/api/me") return profile as T;
   if (method === "PATCH" && pathname === "/api/me") {
     const updated = {
@@ -898,7 +1027,19 @@ export async function demoApi<T>(
     return updated as T;
   }
   if (method === "GET" && pathname === "/api/student/home")
-    return {
+    return (isFreshStudent
+      ? {
+          primaryAction: {
+            kind: "continue_activity",
+            assignmentId: assignmentIdForPosition(1),
+            label: "Começar primeira atividade",
+          },
+          nextSession: null,
+          recentFeedback: null,
+          currentProject: freshStudentProjects[0]!,
+          pendingMakeupCount: 0,
+        }
+      : {
       primaryAction: {
         kind: "revise_submission",
         assignmentId: ids.assignment,
@@ -908,24 +1049,35 @@ export async function demoApi<T>(
       recentFeedback: review,
       currentProject: projects[0]!,
       pendingMakeupCount: 0,
-    } as T;
+    }) as T;
   if (method === "GET" && pathname === "/api/student/journey")
-    return {
+    return (isFreshStudent
+      ? {
+          enrollment: freshStudentEnrollment(),
+          projects: freshStudentProjects,
+          sessionsCompleted: 0,
+          sessionsTotal: 16,
+        }
+      : {
       enrollment,
       projects,
       sessionsCompleted: 6,
       sessionsTotal: 16,
-    } as T;
+    }) as T;
   if (method === "GET" && pathname === "/api/student/calendar")
-    return sessions as T;
+    return (isFreshStudent
+      ? sessions.map((session) => ({ ...session, status: "scheduled" as const }))
+      : sessions) as T;
   if (method === "GET" && pathname === "/api/student/attendance")
-    return page(
+    return (isFreshStudent
+      ? page([])
+      : page(
       sessions.slice(0, 6).map((session, index) => ({
         session,
         status: index === 3 ? "excused_absence" : "present",
         makeup: index === 3 ? null : null,
       })),
-    ) as T;
+    )) as T;
   if (method === "GET" && pathname === "/api/student/concepts")
     return page(
       filterKnowledge(concepts, requestUrl.searchParams.get("search")),
@@ -948,13 +1100,19 @@ export async function demoApi<T>(
       (item) => item.id === pathname.split("/").at(-1),
     ) ?? libraryResources[0]!) as T;
   if (method === "GET" && pathname.startsWith("/api/student/activities/")) {
-    const detail = activity(pathname.split("/").at(-1));
+    const detail = isFreshStudent
+      ? freshStudentActivity(
+          pathname.split("/").at(-1) ?? assignmentIdForPosition(1),
+        )
+      : activity(pathname.split("/").at(-1));
     if (detail.status === "locked")
       throw new Error(
         "Atividade bloqueada. Conclua a etapa atual para liberá-la.",
       );
     return detail as T;
   }
+  if (method === "PUT" && pathname.endsWith("/draft") && isFreshStudent)
+    return saveFreshStudentSubmission(body, true) as T;
   if (method === "PUT" && pathname.endsWith("/draft"))
     return {
       ...activity().latestSubmission!,
@@ -963,6 +1121,7 @@ export async function demoApi<T>(
       submittedAt: null,
     } as T;
   if (method === "POST" && pathname.endsWith("/submit")) {
+    if (isFreshStudent) return saveFreshStudentSubmission(body, false) as T;
     submissionVersion += 1;
     return {
       ...activity().latestSubmission!,
@@ -972,11 +1131,13 @@ export async function demoApi<T>(
     } as T;
   }
   if (method === "GET" && pathname === "/api/student/projects")
-    return projects as T;
+    return (isFreshStudent ? freshStudentProjects : projects) as T;
   if (method === "GET" && pathname.startsWith("/api/student/projects/"))
-    return projectDetail(pathname.split("/").at(-1) ?? ids.project) as T;
+    return (isFreshStudent
+      ? freshStudentProjectDetail(pathname.split("/").at(-1) ?? ids.project)
+      : projectDetail(pathname.split("/").at(-1) ?? ids.project)) as T;
   if (method === "GET" && pathname === "/api/student/portfolio")
-    return page([projectDetail(ids.project)]) as T;
+    return (isFreshStudent ? page([]) : page([projectDetail(ids.project)])) as T;
   if (
     method === "POST" &&
     pathname.includes("/reviews/") &&
@@ -1312,6 +1473,9 @@ function completion() {
     eligible: false,
     blockers: ["Há uma revisão pendente na demonstração."],
   };
+}
+function isJsonObject(value: unknown): value is JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 function stringValue(
   body: JsonObject | undefined,

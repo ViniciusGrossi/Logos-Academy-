@@ -7,6 +7,7 @@ import {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  window.localStorage.clear();
 });
 
 describe("provider de demonstração", () => {
@@ -16,6 +17,52 @@ describe("provider de demonstração", () => {
     expect(isDemoMode()).toBe(true);
     vi.stubEnv("NODE_ENV", "production");
     expect(isDemoMode()).toBe(false);
+  });
+
+  it("inicia a conta de aluno sem progresso ou entregas", async () => {
+    window.localStorage.setItem("logos_academy_demo_role", "student");
+    const [home, journey, activity, project, portfolio, attendance] =
+      await Promise.all([
+        demoApi<{ primaryAction: { kind: string }; recentFeedback: unknown }>(
+          "/api/student/home",
+          "GET",
+        ),
+        demoApi<{
+          sessionsCompleted: number;
+          projects: readonly { completedActivityCount: number; status: string }[];
+        }>("/api/student/journey", "GET"),
+        demoApi<{
+          status: string;
+          latestSubmission: unknown;
+          submissionHistory: { items: readonly unknown[] };
+        }>("/api/student/activities/20000000-0000-4000-8000-00003d522b76", "GET"),
+        demoApi<{
+          completedActivityCount: number;
+          activities: readonly { latestVersion: number | null; status: string }[];
+          build: readonly unknown[];
+        }>("/api/student/projects/00000000-0000-4000-8000-000000000007", "GET"),
+        demoApi<{ items: readonly unknown[] }>("/api/student/portfolio", "GET"),
+        demoApi<{ items: readonly unknown[] }>("/api/student/attendance", "GET"),
+      ]);
+
+    expect(home.primaryAction.kind).toBe("continue_activity");
+    expect(home.recentFeedback).toBeNull();
+    expect(journey.sessionsCompleted).toBe(0);
+    expect(journey.projects.map((project) => project.completedActivityCount)).toEqual([
+      0, 0, 0, 0,
+    ]);
+    expect(activity).toMatchObject({
+      status: "available",
+      latestSubmission: null,
+      submissionHistory: { items: [] },
+    });
+    expect(project).toMatchObject({
+      completedActivityCount: 0,
+      build: [],
+    });
+    expect(project.activities.every((item) => item.latestVersion === null)).toBe(true);
+    expect(portfolio.items).toEqual([]);
+    expect(attendance.items).toEqual([]);
   });
 
   it("entrega os dados que sustentam as telas de aluno e administração", async () => {
