@@ -41,10 +41,10 @@ Os alertas do advisor para schemas como `public`, `delphi`, `paideia` e outros p
 | Admin login | Passed | Authentication and `/api/me` returned 200 with role `admin`. |
 | Invite link | Passed | The API generated an activation link without sending e-mail; the invite redirect returned a session. |
 | Student activation | Passed | A separate test student set a password, activated enrollment, signed in again, and received 200 from `/api/me` (`student`) and `/api/student/home`. |
-| Invite class selection | Fixed | The UI no longer offers a class whose curriculum cannot accept enrollment. The only existing class belongs to retired Explorer v1; create a current-curriculum class before inviting through the class UI. |
+| Invite class selection | Fixed | The class UI now has only the current Explorer v3 curriculum available; retired v1/v2 data was removed from production on 2026-10-01. |
 | Evidence submission | Blocked by data | The test student received no assignment. The database has 8 assignments, but 0 are released or in progress. Release a real activity to a test enrollment. |
 | Review queue and feedback | Blocked by secret | The published API returns 500 while decrypting an existing submission (`Wrong key or corrupt data`). Configure production `PII_ENCRYPTION_KEY` with the original encryption key, never the local placeholder. |
-| QA v2 class and activity | Passed | Created a current Explorer v2 class, activated a QA enrollment, and released one activity. The class has 16 scheduled sessions and one available assignment. |
+| QA class and activity | Repeat on v3 | The former Explorer v2 QA data was intentionally purged on 2026-10-01. Repeat this check using the Explorer v3 pilot class. |
 | Evidence draft and submission | Passed | The QA student opened the released activity, saved both required text responses, and submitted the evidence; both endpoints returned 200. |
 | HTTP authorization isolation | Passed | The QA student received 403 for another student's activity and for `/api/admin/classes`. |
 

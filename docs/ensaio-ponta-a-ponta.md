@@ -112,7 +112,7 @@ Os quatro devem aparecer. Rodar também o pgTAP `056` se houver Docker.
 ## Etapa 3 — O ensaio, elo a elo
 
 Fora do modo demonstração (`NEXT_PUBLIC_DEMO_MODE` desligado), com turma
-Explorer v2 e um aluno de teste com e-mail real.
+Explorer v3 e um aluno de teste com e-mail real.
 
 ### 1. Criar turma
 

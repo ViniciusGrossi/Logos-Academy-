@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-30
+date: 2026-10-01
 fase_atual: "12"
 etapa_atual: "Superfície administrativa de Formação implementada; aguardando gate visual humano das páginas do aluno e ensaio ponta-a-ponta com aluno real"
 produto_tipo: "saas-premium"
-proximo_passo: "Criar turma-piloto Explorer v2 com aluno de teste e rodar o ensaio ponta-a-ponta fora do modo demo (convite → ativação → liberação → entrega com anexo → correção → reentrega → projeto aprovado → apresentação → conclusão); em paralelo, gate visual humano das páginas do aluno em 1440, 768 e 375 px"
+proximo_passo: "Rodar o ensaio ponta-a-ponta com a turma-piloto Explorer v3 e aluno de teste fora do modo demo (convite → ativação → liberação → entrega com anexo → correção → reentrega → projeto aprovado → apresentação → conclusão); em paralelo, gate visual humano das páginas do aluno em 1440, 768 e 375 px"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -44,6 +44,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-10-01] Explorer v1 e v2 foram removidos do Supabase, incluindo turmas, matrículas, conteúdo, sessões e evidências vinculadas. Perfis e contas dos alunos foram preservados; somente Explorer v3 permanece ativo.
 
 - [2026-10-01] A conta demo de aluno passou a iniciar zerada: sem entregas, frequência, feedback ou portfólio e com todos os projetos em zero; somente a primeira atividade fica disponível para iniciar o ensaio local.
 
@@ -209,7 +211,6 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ## Bloqueios
 
 - Nenhum aluno real percorreu o fluxo completo: `reviews`, `uploaded_files`, `presentation_records` e `completion_records` estão com zero linhas e `project_records.approved` = 0 em produção. Correção, anexo, apresentação e conclusão nunca foram exercitados fora do modo demo.
-- As duas matrículas existentes rodam Explorer v1; o sistema Explorer v2 (16 atividades, 32 templates) está no banco sem nenhuma turma usando. Criar turma-piloto antes de validar o currículo novo.
 - `logos_academy.approve_project` (migration 0009) é código morto: nenhuma rota, tela ou função do banco a chama — a aprovação real acontece pelo trigger `activity_assignments_sync_project`. Decidir entre remover ou expor como fallback manual.
 - `python [SKILL_ROOT]/scripts/validate.py` do CLAUDE.md não existe (`~/.claude/skills/logos/` só tem `agents/`, `phases/`, `references/`, `SKILL.md`). O gate de specs da fase 2 não tem como rodar — mesma classe de deriva do ADR-022.
 - Fase 12 — `npm audit` ainda reporta 2 vulnerabilidades altas em PostCSS transitivo do Next 15 e 1 crítica/4 moderadas no toolchain Vitest/Vite. A correção automática exige `npm audit fix --force` (Next 16 + Vitest 5), uma atualização major que requer aprovação explícita e validação completa antes de novo deploy.
