@@ -117,14 +117,14 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
         const demoRole = await signInWithDemo(email, password);
         if (demoRole) {
           setDemoRole(demoRole);
-          router.replace(safeNext); router.refresh();
+          router.replace(safeNext);
           return;
         }
         if (isLocalDemo) throw new Error("Este ambiente está em modo demonstração. Use as credenciais locais configuradas para acessar o estúdio.");
         const client = createSupabaseBrowserClient();
         const result = await client.auth.signInWithPassword({ email, password });
         if (result.error) throw result.error;
-        router.replace(safeNext); router.refresh();
+        router.replace(safeNext);
         return;
       }
       const client = createSupabaseBrowserClient();
@@ -152,7 +152,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
         }
       }
       setMessage(mode === "activate" ? "Acesso ativado. Seu estúdio está pronto." : "Senha atualizada com sucesso.");
-      window.setTimeout(() => { router.replace("/"); router.refresh(); }, 700);
+      window.setTimeout(() => { router.replace("/"); }, 700);
     } catch (cause) {
       setError(authErrorMessage(cause));
     } finally { setPending(false); }
