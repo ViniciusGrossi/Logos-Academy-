@@ -1,6 +1,6 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-09-29
+date: 2026-09-30
 fase_atual: "12"
 etapa_atual: "Superfície administrativa de Formação implementada; aguardando gate visual humano das páginas do aluno e ensaio ponta-a-ponta com aluno real"
 produto_tipo: "saas-premium"
@@ -34,7 +34,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. A Onda A administrativa e a migration `0053` já foram integradas de `main` em 30/09; antes do ensaio, validar o gate de qualidade e aplicar no Supabase, na ordem, as migrations ainda pendentes.
+- [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. A Onda A administrativa foi integrada de `main` e a migration `0053` foi aplicada no Supabase em 30/09; o gate local de lint, 83 testes e build passou. Falta executar o ciclo real com uma conta de aluno de teste.
 - [ ] `student-visual-system-rounding-orbit`: raios sistêmicos e campo orbital compartilhado implementados e validados; aguardando gate visual humano.
 - [ ] `student-journey-premium`: fusão da Jornada real com a direção premium implementada e validada; aguardando gate visual humano.
 - [ ] `student-knowledge-atlas`: versão premium implementada e validada em 1440/768/375, tema claro/escuro e movimento reduzido; aguardando gate visual humano.
