@@ -19,7 +19,7 @@ gates:
   fase_10: pass
   fase_11: pass
   fase_12: pass
-features: { draft: 0, approved: 14, built: 14, reviewed: 10 }
+features: { draft: 0, approved: 14, built: 14, reviewed: 11 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08

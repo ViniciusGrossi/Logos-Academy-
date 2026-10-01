@@ -225,7 +225,7 @@
       "wave": 12,
       "scope": "project-1-external-build-workspace",
       "built": true,
-      "reviewed": false,
+      "reviewed": true,
       "dependencies": [
         "explorer-activity-system-v2",
         "project-living-dossier",
