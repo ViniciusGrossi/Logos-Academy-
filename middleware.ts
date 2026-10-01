@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { hasDemoSession } from "@/src/lib/demo-mode";
 
 const publicPages = new Set(["/login", "/ativar", "/recuperar-senha"]);
 const demoCookieName = "logos_academy_demo";
@@ -22,16 +23,6 @@ function applySecurityHeaders(headers: Headers, production: boolean): void {
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   if (production) headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
-}
-
-async function hasDemoSession(value: string | undefined): Promise<boolean> {
-  if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_DEMO_MODE !== "true") return false;
-  const password = process.env.DEMO_LOGIN_PASSWORD;
-  if (!password) return false;
-  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  const bytes = new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(demoCookieName)));
-  const signature = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-  return value === signature;
 }
 
 function readAccessToken(request: NextRequest, supabaseUrl: string): string | null {

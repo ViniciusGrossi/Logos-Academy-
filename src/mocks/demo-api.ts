@@ -25,6 +25,7 @@ import {
   explorerActivityGuidance,
   explorerActivitySeeds,
 } from "./academy.mock";
+import { getDemoRole } from "@/src/lib/demo-mode";
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 type JsonObject = Record<string, unknown>;
@@ -67,12 +68,19 @@ const sessions: readonly SessionSummary[] = Array.from(
   }),
 );
 
-let profile: MeProfile = {
+let adminProfile: MeProfile = {
   id: ids.marina,
   email: "marina.demo@logos.academy",
   displayName: "Marina Alves",
   role: "admin",
   githubUsername: "marina-alves",
+};
+let studentProfile: MeProfile = {
+  id: ids.caio,
+  email: "aluno@logos.test",
+  displayName: "Caio Mendes",
+  role: "student",
+  githubUsername: null,
 };
 let classSummary: ClassSummary = {
   id: ids.class,
@@ -136,7 +144,7 @@ const students: readonly StudentSummary[] = [
   {
     id: ids.marina,
     displayName: "Marina Alves",
-    email: profile.email,
+    email: adminProfile.email,
     githubUsername: "marina-alves",
     activeEnrollmentCount: 1,
     pendingAssignmentCount: 1,
@@ -872,9 +880,11 @@ export async function demoApi<T>(
 ): Promise<T> {
   const requestUrl = new URL(url, "http://demo.local");
   const pathname = requestUrl.pathname;
+  if (getDemoRole() === "student" && pathname.startsWith("/api/admin")) throw new Error("Esta área é exclusiva da gestão.");
+  const profile = getDemoRole() === "student" ? studentProfile : adminProfile;
   if (method === "GET" && pathname === "/api/me") return profile as T;
   if (method === "PATCH" && pathname === "/api/me") {
-    profile = {
+    const updated = {
       ...profile,
       displayName: stringValue(body, "displayName", profile.displayName),
       githubUsername: nullableString(
@@ -883,7 +893,9 @@ export async function demoApi<T>(
         profile.githubUsername,
       ),
     };
-    return profile as T;
+    if (updated.role === "student") studentProfile = updated;
+    else adminProfile = updated;
+    return updated as T;
   }
   if (method === "GET" && pathname === "/api/student/home")
     return {

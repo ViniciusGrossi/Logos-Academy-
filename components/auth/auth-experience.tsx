@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { SmoothInput } from "@/components/ui/smooth-input";
 import { createSupabaseBrowserClient } from "@/src/lib/supabase/browser";
 import { safeInternalPath } from "@/src/lib/safe-internal-path";
+import { setDemoRole, type DemoRole } from "@/src/lib/demo-mode";
 import styles from "./auth-experience.module.css";
 
 type AuthMode = "login" | "activate" | "recover";
@@ -32,22 +33,23 @@ export function authErrorMessage(cause: unknown): string {
   return cause instanceof Error ? cause.message : "Não foi possível concluir. Tente novamente.";
 }
 
-async function signInWithDemo(email: string, password: string): Promise<boolean> {
+async function signInWithDemo(email: string, password: string): Promise<DemoRole | null> {
   const response = await fetch("/api/demo/session", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  if (response.status === 404) return false;
+  if (response.status === 404) return null;
   // A demo é opcional: uma credencial que não pertence a ela deve seguir
   // para a autenticação real do Supabase, em vez de bloquear o acesso.
-  if (response.status === 401) return false;
+  if (response.status === 401) return null;
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
     const message = typeof body === "object" && body && "message" in body && typeof body.message === "string" ? body.message : "Não foi possível entrar.";
     throw new Error(message);
   }
-  return true;
+  const body: unknown = await response.json().catch(() => null);
+  return typeof body === "object" && body && "role" in body && (body.role === "admin" || body.role === "student") ? body.role : null;
 }
 
 function PasswordMeter({ value }: { value: string }) {
@@ -112,7 +114,9 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
     setPending(true); setError(null); setMessage(null);
     try {
       if (mode === "login") {
-        if (await signInWithDemo(email, password)) {
+        const demoRole = await signInWithDemo(email, password);
+        if (demoRole) {
+          setDemoRole(demoRole);
           router.replace(safeNext); router.refresh();
           return;
         }

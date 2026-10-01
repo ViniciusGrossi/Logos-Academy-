@@ -11,6 +11,7 @@ import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLiveApi } from "@/components/prototype/live-api";
 import { createSupabaseBrowserClient } from "@/src/lib/supabase/browser";
+import { clearDemoRole } from "@/src/lib/demo-mode";
 
 const studentNav = [
   { href: "/", label: "Início", icon: Home },
@@ -79,7 +80,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     // Impersonação não é uma função disponível: evita a navegação de admin para
     // páginas de aluno que serão negadas pela API.
     if (isAdmin && !pathname.startsWith("/admin")) router.replace("/admin");
-  }, [isAdmin, pathname, router]);
+    if (profile?.role === "student" && pathname.startsWith("/admin")) router.replace("/");
+  }, [isAdmin, pathname, profile?.role, router]);
 
   function toggleTheme() {
     const next = !dark;
@@ -102,6 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   async function signOut() {
     if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
       await fetch("/api/demo/session", { method: "DELETE" });
+      clearDemoRole();
     } else {
       await createSupabaseBrowserClient().auth.signOut();
     }

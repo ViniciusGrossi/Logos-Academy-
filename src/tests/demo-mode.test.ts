@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createDemoSession, hasDemoSession, hasValidDemoCredentials, isDemoMode } from "@/src/lib/demo-mode";
+import { createDemoSession, demoRoleForCredentials, hasDemoSession, hasValidDemoCredentials, isDemoMode } from "@/src/lib/demo-mode";
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -13,7 +13,11 @@ describe("modo de demonstração", () => {
     expect(isDemoMode()).toBe(true);
     expect(hasValidDemoCredentials("demo@logos.test", "senha-de-teste")).toBe(true);
     expect(hasValidDemoCredentials("demo@logos.test", "outra")).toBe(false);
-    expect(await hasDemoSession(await createDemoSession())).toBe(true);
+    expect(await hasDemoSession(await createDemoSession("admin"))).toBe(true);
+    expect(demoRoleForCredentials("aluno@logos.test", "aluno-demo-2026")).toBe("student");
+    const studentSession = await createDemoSession("student");
+    expect(await hasDemoSession(studentSession)).toBe(true);
+    expect(await hasDemoSession(studentSession.replace("student.", "admin."))).toBe(false);
   });
 
   it("nunca habilita o modo em produção", () => {

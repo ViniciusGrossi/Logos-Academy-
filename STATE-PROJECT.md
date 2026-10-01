@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-09-30] A demonstração local agora tem uma conta fictícia exclusiva de aluno, com papel vinculado ao cookie assinado. Ela mostra a navegação e os dados de aluno e recusa a área administrativa no mock, sem criar usuário, acessar o Supabase ou expor dados reais.
+
 - [2026-09-30] `explorer-assistant-build` foi integrado ao `main` e ativado no Supabase: o currículo Explorer v3 conduz o Projeto 1 por interface, rota server-side, system prompt, testes e deploy externo; a Academy registra arquivos, links, versões e feedbacks e mostra somente as peças aprovadas mais recentes. As migrations 0056, 0057 e 0058 foram aplicadas e verificadas: v3 ativo com 4 ciclos e 16 atividades; v2 arquivado apenas para novas turmas; trigger do v1 preserva a imutabilidade sem bloquear updates legítimos. Lint, 83 testes, build e revisão contra a spec passaram.
 
 - [2026-09-25] Aba **Formação** criada em `/admin/alunos/[studentId]`, fechando a única superfície da spec `projects-portfolio-completion` que nunca havia sido construída: checklist dos cinco requisitos (`CompletionCheck`), lista de bloqueios antes da confirmação, registro de apresentação (Demo Day ou substitutiva, data/hora e nota contextual) e confirmação de conclusão — ambos em Dialog, reaproveitando o `Sheet` (Radix Dialog) já instalado. Matrícula concluída fica somente-leitura. As três rotas (`GET /completion`, `POST /presentation`, `POST /complete`), os RPCs e o mock de demo já existiam; faltava apenas o consumo. Novo teste `src/tests/projects-portfolio-completion.test.ts` cobre o contrato do check e a conversão `datetime-local` → ISO exigida pelo Zod. TypeScript, ESLint e 76 testes passaram. Produção não foi alterada.
