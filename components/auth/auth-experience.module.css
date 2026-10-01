@@ -626,7 +626,10 @@
   .trajectory circle,
   .geoNodes circle,
   .beaconSweep,
-  .constellations g,
+  /* :first-child/:last-child declaram a animação com especificidade maior que
+     `.constellations g` — o seletor precisa casar, senão o drift continua. */
+  .constellations g:first-child,
+  .constellations g:last-child,
   .sparkField i,
   .panel,
   .status,
@@ -872,4 +875,69 @@
   .journey li::after,
   .form :global(.smooth-caret) { animation: none !important; translate: none !important; will-change: auto; }
   .journey li[data-current="true"] { transform: none !important; }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Toque: campo de missão em modo estático.
+
+   O campo é decoração dirigida pelo cursor — num celular não existe cursor que
+   o dirija, e o custo por frame travava o aparelho. Somavam-se, por quadro:
+   ~36 nós SVG com feGaussianBlur (filter: url(#auth-glow)) animando opacidade,
+   dois blurs de tela cheia (um deles animando scale, o que reinvalida tudo
+   atrás a cada frame) e seis camadas de backdrop-filter empilhadas sobre esse
+   fundo em movimento — painel, três órbitas e os campos do formulário.
+   Aqui o desenho continua; o trabalho por frame cai para zero.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (hover: none) {
+  .pointerLight,
+  .cursorComet,
+  .sparkField { display: none; }
+
+  .portalGlow { filter: none; animation: none; }
+
+  .geoSweep,
+  .trajectoryPulse,
+  .trajectory circle,
+  .geoNodes circle,
+  .lateralBeacons circle,
+  .constellations circle { filter: none; }
+
+  .geoContours path,
+  .geoSweep,
+  .trajectoryPulse,
+  .trajectory circle,
+  .geoNodes circle,
+  .beaconSweep,
+  .constellations g:first-child,
+  .constellations g:last-child { animation: none; will-change: auto; }
+
+  /* Parados, os cinco meridianos ficariam sobrepostos em scaleX(1) — uma elipse
+     só. Larguras fixas mantêm a leitura de esfera no quadro estático. */
+  .geoMeridians ellipse { animation: none; }
+  .geoMeridians ellipse:nth-child(1) { transform: scaleX(1); }
+  .geoMeridians ellipse:nth-child(2) { transform: scaleX(.78); }
+  .geoMeridians ellipse:nth-child(3) { transform: scaleX(.46); }
+  .geoMeridians ellipse:nth-child(4) { transform: scaleX(.16); }
+  .geoMeridians ellipse:nth-child(5) { transform: scaleX(.02); }
+
+  /* Sem o blur do backdrop o fundo atravessaria o texto: as superfícies
+     translúcidas viram opacas — o que também melhora o contraste de leitura. */
+  .panel {
+    background: color-mix(in srgb, var(--auth-raised) 94%, var(--auth-ink));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .journey li {
+    background: color-mix(in srgb, var(--auth-raised) 92%, var(--auth-ink));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .form :global(.smooth-input-wrap) { backdrop-filter: none; }
+
+  /* panel-enter anima clip-path e filter: blur() — dois rasters por frame no
+     maior elemento da tela, justamente durante a primeira pintura. */
+  @keyframes panel-enter-lite { from { opacity: 0; transform: translateY(.8rem); } }
+  .panel { animation: panel-enter-lite 420ms cubic-bezier(.16, 1, .3, 1) both; }
 }

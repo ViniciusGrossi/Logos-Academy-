@@ -63,7 +63,10 @@ export function MissionField({ activeStage }: { activeStage: number }) {
   const inverseY = useTransform(y, (value) => value * -0.42);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    // Sem cursor não há paralaxe para seguir: no toque o pointermove dispara a
+    // cada arrasto e manteria quatro springs num loop de rAF por nada. O CSS
+    // esconde as camadas dirigidas pelo ponteiro no mesmo `(hover: none)`.
+    if (reducedMotion || matchMedia("(hover: none)").matches) return;
     function follow(event: PointerEvent) {
       const normalizedX = event.clientX / window.innerWidth - 0.5;
       const normalizedY = event.clientY / window.innerHeight - 0.5;
