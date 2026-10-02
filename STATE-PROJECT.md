@@ -45,9 +45,9 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
-- [2026-10-01] A conta de aluno Luis Vinicius Sabino Guimarães Grossi foi removida do Supabase, com a matrícula, convite e dados operacionais vinculados. A conta administrativa foi preservada.
+- [2026-10-02] Convites de aluno passaram a usar origem canônica fixa `https://logos-academy-three.vercel.app/ativar` e link público curto `https://logos-academy-three.vercel.app/c/<código>`. A allowlist remota do Supabase foi atualizada sem alterar os outros produtos do projeto compartilhado; o ensaio real em produção comprovou `307` do link curto, `303` do Supabase e destino final `/ativar`, sem `localhost`. Conta, link e auditoria descartáveis do ensaio foram removidos.
 
-- [2026-10-01] Convites de aluno passaram a usar `NEXT_PUBLIC_SITE_URL` como origem canônica de ativação. Assim, mesmo quando o admin cria o convite em ambiente local, o link abre a página pública `/ativar` da Academy.
+- [2026-10-01] A conta de aluno Luis Vinicius Sabino Guimarães Grossi foi removida do Supabase, com a matrícula, convite e dados operacionais vinculados. A conta administrativa foi preservada.
 
 - [2026-10-01] Base de testes manuais resetada no Supabase: as seis contas de aluno e todos os dados operacionais vinculados foram removidos; inclusive o perfil de aluno residual do administrador. Permanecem somente a conta administrativa `viniciussggrossi`, o Explorer v3 e a turma-piloto vazia.
 
@@ -227,6 +227,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-02] Definir `redirectTo` no código não basta: o Supabase substitui destinos ausentes da allowlist pelo `Site URL`, que ainda era `localhost`. Convites públicos exigem três garantias juntas: destino canônico fail-closed no adapter, URL exata na allowlist remota e rota curta excluída da autenticação do middleware. A validação deve seguir um token real até o `Location` final, não apenas inspecionar a string gerada.
 
 - [2026-09-25] Diagnóstico de "o fluxo não fecha" precisa seguir o gatilho, não só a função com nome óbvio. A conclusão anterior de que o projeto nunca chegava a `approved` estava errada: `admin_publish_review` dispara `activity_assignments_sync_project` → `private.sync_project_record_from_assignment`, que aprova o `project_records` do ciclo quando a atividade aprovada é a última aula. Quem estava sem uso era a `approve_project`, e o furo real era de UI, não de banco. Corolário: `specs/registry.json` marcando `built: true` não prova superfície existente — a feature tinha rotas, RPCs e mock prontos e nenhuma tela.
 

@@ -18,7 +18,7 @@ Este roteiro separa o que a base do código valida automaticamente do que só po
 - [ ] Rodar o ensaio: aluno entra, abre atividade, anexa ou escreve evidência, envia, administrador revisa, aluno visualiza o feedback.
 - [ ] Criar uma conta de aluno separada da conta administrativa e conferir as permissões de ambos os papéis.
 - [ ] Verificar RLS e Storage: um aluno não pode baixar, listar ou assinar arquivo de outro aluno.
-- [ ] Validar em produção o convite por link, o deep link/cópia da mensagem de WhatsApp e a criação de senha. SMTP não é mais requisito deste fluxo.
+- [x] Validar em produção o convite por link e o deep link usado na mensagem de WhatsApp. O ensaio de 2026-10-02 comprovou o link curto público até `/ativar`; a criação de senha permanece coberta pelo ensaio de ativação já registrado abaixo. SMTP não é requisito deste fluxo.
 - [ ] Confirmar que os segredos de produção estão configurados somente no provedor de deploy e não no repositório.
 
 ## Registro de ensaio — 2026-09-29
@@ -39,7 +39,7 @@ Os alertas do advisor para schemas como `public`, `delphi`, `paideia` e outros p
 | Check | Result | Evidence / next action |
 | --- | --- | --- |
 | Admin login | Passed | Authentication and `/api/me` returned 200 with role `admin`. |
-| Invite link | Repaired | Pending students can receive a fresh activation link; it redirects to `/ativar` and the WhatsApp message instructs a single opening. |
+| Invite link | Passed | Production returned `307` from `/c/<code>`, Supabase returned `303`, and the final destination was `https://logos-academy-three.vercel.app/ativar`, with no `localhost`. |
 | Student activation | Passed | A separate test student set a password, activated enrollment, signed in again, and received 200 from `/api/me` (`student`) and `/api/student/home`. |
 | Invite class selection | Fixed | The class UI now has only the current Explorer v3 curriculum available; retired v1/v2 data was removed from production on 2026-10-01. |
 | Evidence submission | Blocked by data | The test student received no assignment. The database has 8 assignments, but 0 are released or in progress. Release a real activity to a test enrollment. |
