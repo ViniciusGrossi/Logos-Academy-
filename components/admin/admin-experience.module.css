@@ -26,11 +26,11 @@
 .backLink { display: inline-flex; width: fit-content; min-height: var(--spacing-control); align-items: center; gap: calc(var(--spacing-unit) * 2); color: var(--muted-foreground); font-weight: 700; text-decoration: none; }
 .backLink:hover { color: var(--color-academy-orange); transform: translateX(calc(var(--spacing-unit) * -1)); }
 .tabShell { display: grid; min-width: 0; gap: calc(var(--spacing-unit) * 6); }
-.tabsList { display: flex; width: 100%; height: auto !important; min-width: 0; flex-wrap: wrap; align-items: stretch; justify-content: flex-start; gap: calc(var(--spacing-unit) * 1); overflow: hidden; padding: calc(var(--spacing-unit) * 1); border: 1px solid var(--border); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--foreground) 3%, var(--card)); }
+.tabsList { display: flex; width: 100%; height: auto !important; min-width: 0; flex-wrap: wrap; align-items: stretch; justify-content: flex-start; gap: calc(var(--spacing-unit) * 1); overflow: hidden; padding: calc(var(--spacing-unit) * 1); border: 1px solid var(--color-academy-orange); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--color-academy-orange) 4%, var(--card)); }
 .tabTrigger { isolation: isolate; min-width: 0; height: auto !important; min-height: var(--spacing-control); flex: 1 1 auto; padding-inline: calc(var(--spacing-unit) * 2.5); border-radius: var(--radius-md); }
 .tabTrigger::after { display: none; }
 .tabTrigger[data-state="active"] { color: var(--color-academy-ink); }
-.tabSelector { position: absolute; z-index: -1; inset: 0; border: 1px solid color-mix(in srgb, var(--color-academy-orange) 72%, var(--border)); border-radius: inherit; background: var(--color-academy-orange); box-shadow: 0 calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 4) color-mix(in srgb, var(--color-academy-orange) 24%, transparent); }
+.tabSelector { position: absolute; z-index: -1; inset: 0; border: 1px solid var(--color-academy-orange); border-radius: inherit; background: var(--color-academy-orange); box-shadow: 0 calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 4) color-mix(in srgb, var(--color-academy-orange) 24%, transparent); }
 .tabLabel { position: relative; z-index: 1; line-height: 1.2; text-wrap: balance; }
 .tabPanel { min-width: 0; animation: tabPanelEnter var(--duration-standard) var(--ease-entrance); }
 @keyframes tabPanelEnter { from { opacity: .72; transform: translateX(calc(var(--spacing-unit) * 3)); } to { opacity: 1; transform: translateX(0); } }
