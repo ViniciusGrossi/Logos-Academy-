@@ -7,7 +7,8 @@ import { InvitationLinkService } from "@/src/modules/invitation-links/service";
 export async function invitationLinkController(code: string): Promise<NextResponse> {
   const target = await new InvitationLinkService(new InvitationLinkRepository()).resolve(code);
   const destination = target ?? `${academyActivationUrl()}?error=invalid_link`;
-  const response = NextResponse.redirect(destination, 307);
+  // 303 converts the form POST into the provider's GET without replaying the body.
+  const response = NextResponse.redirect(destination, 303);
   response.headers.set("cache-control", "no-store");
   response.headers.set("referrer-policy", "no-referrer");
   return response;

@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
+import React from "react";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
+import { InvitationGate } from "@/components/auth/invitation-gate";
 import {
   academyActivationUrl,
   academyInvitationUrl,
@@ -11,6 +14,8 @@ import { InvitationLinkService } from "@/src/modules/invitation-links/service";
 const code = "AbCdEf0123_-xyzXYZ89ab";
 const providerLink =
   "https://nqubjiosnlaatxxamiut.supabase.co/auth/v1/verify?token=test&type=invite&redirect_to=https://logos-academy-three.vercel.app/ativar";
+
+afterEach(cleanup);
 
 describe("links públicos de convite", () => {
   it("mantém ativação e convite no domínio público, sem fallback local", () => {
@@ -33,5 +38,15 @@ describe("links públicos de convite", () => {
     await expect(valid.resolve(code)).resolves.toBe(providerLink);
     await expect(valid.resolve("curto")).resolves.toBeNull();
     await expect(altered.resolve(code)).resolves.toBeNull();
+  });
+
+  it("exige gesto humano antes de abrir o token do Supabase", () => {
+    render(React.createElement(InvitationGate, { code }));
+
+    const button = screen.getByRole("button", { name: "Continuar ativação" });
+    const form = button.closest("form");
+    expect(form?.getAttribute("method")).toBe("post");
+    expect(form?.getAttribute("action")).toBe(`/api/invitations/${code}/open`);
+    expect(document.body.innerHTML).not.toContain("supabase.co/auth/v1/verify");
   });
 });
