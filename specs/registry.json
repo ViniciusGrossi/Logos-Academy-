@@ -232,6 +232,18 @@
         "student-activity-workbench",
         "review-feedback-loop"
       ]
+    },
+    "explorer-four-projects-v3": {
+      "spec": "docs/specs/explorer-four-projects-v3.md",
+      "status": "approved",
+      "wave": 13,
+      "scope": "curriculum-content-v3",
+      "built": true,
+      "reviewed": true,
+      "dependencies": [
+        "explorer-assistant-build",
+        "explorer-activity-system-v2"
+      ]
     }
   }
 }
