@@ -39,7 +39,7 @@ Os alertas do advisor para schemas como `public`, `delphi`, `paideia` e outros p
 | Check | Result | Evidence / next action |
 | --- | --- | --- |
 | Admin login | Passed | Authentication and `/api/me` returned 200 with role `admin`. |
-| Invite link | Passed | Production returned `307` from `/c/<code>`, Supabase returned `303`, and the final destination was `https://logos-academy-three.vercel.app/ativar`, with no `localhost`. |
+| Invite link | Passed | Production returned `307` from `/c/<code>`, Supabase returned `303`, and `/ativar` captured the session, removed the token fragment, prefilled the e-mail and enabled `Ativar meu acesso`. |
 | Student activation | Passed | A separate test student set a password, activated enrollment, signed in again, and received 200 from `/api/me` (`student`) and `/api/student/home`. |
 | Invite class selection | Fixed | The class UI now has only the current Explorer v3 curriculum available; retired v1/v2 data was removed from production on 2026-10-01. |
 | Evidence submission | Blocked by data | The test student received no assignment. The database has 8 assignments, but 0 are released or in progress. Release a real activity to a test enrollment. |
