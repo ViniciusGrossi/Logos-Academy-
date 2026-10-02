@@ -34,6 +34,7 @@ Combina a estrutura escura do Estúdio de Missões com a clareza do Caderno de C
 - Page transitions usam `AnimatePresence`; estados loading para content usam crossfade.
 - Hover combina borda laranja progressiva, wash tonal, sombra tardia e deslocamento máximo de 2 px.
 - Todo motion tem alternativa estática em `prefers-reduced-motion`.
+- A ficha administrativa do aluno usa um seletor laranja deslizante entre abas, inspirado no `Tab Pill Glide` do Kinetics, sem scrollbar horizontal e com quebra responsiva.
 
 ## Componentes compartilhados
 

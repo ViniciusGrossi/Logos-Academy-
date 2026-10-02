@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, CalendarCheck2, ClipboardCheck, FolderKanban, GraduationCap, Search, ShieldCheck, UserRound, UserRoundPlus, UsersRound } from "lucide-react";
 import { type FormEvent, useDeferredValue, useMemo, useState } from "react";
 import type { CompletionCheck, ConsentRecord, EnrollmentSummary, GuardianRecord, PresentationRecord, ProjectSummary, StudentSummary } from "@/specs/api.contracts";
@@ -17,6 +18,18 @@ import styles from "./admin-experience.module.css";
 function studentTone(student: StudentSummary): "warning" | "success" {
   return hasStudentRisk(student) ? "warning" : "success";
 }
+
+const studentDetailTabs = [
+  { value: "overview", label: "Visão geral" },
+  { value: "enrollments", label: "Matrículas" },
+  { value: "submissions", label: "Entregas" },
+  { value: "attendance", label: "Frequência" },
+  { value: "projects", label: "Projetos" },
+  { value: "formacao", label: "Formação" },
+  { value: "guardian", label: "Responsável e consentimento" },
+] as const;
+
+type StudentDetailTab = (typeof studentDetailTabs)[number]["value"];
 
 export function AdminStudents() {
   const [search, setSearch] = useState("");
@@ -93,6 +106,8 @@ export function AdminStudents() {
 
 export function AdminStudentDetail({ studentId }: { studentId: string }) {
   const { data, error, loading, reload } = useAdminStudent(studentId);
+  const [activeTab, setActiveTab] = useState<StudentDetailTab>("overview");
+  const reduceMotion = useReducedMotion();
   if (loading) return <StateScene state="loading" title="Abrindo prontuário pedagógico" description="Reunindo matrícula, projetos e consentimento." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
   if (!data) return <StateScene state="empty" title="Aluno não encontrado" description="O registro pode ter sido removido ou não estar disponível neste tenant." />;
@@ -115,15 +130,22 @@ export function AdminStudentDetail({ studentId }: { studentId: string }) {
         { id: "makeups", label: "Reposições", value: String(student.pendingMakeupCount), detail: "100% de frequência", emphasis: student.pendingMakeupCount > 0 },
         { id: "projects", label: "Projetos aprovados", value: String(approvedProjects), detail: `de ${projects.length} projeto(s)` },
       ]} />
-      <Tabs defaultValue="overview" className={styles.tabShell}>
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as StudentDetailTab)} className={styles.tabShell}>
         <TabsList variant="line" className={styles.tabsList} aria-label="Seções do aluno">
-          <TabsTrigger className={styles.tabTrigger} value="overview">Visão geral</TabsTrigger>
-          <TabsTrigger className={styles.tabTrigger} value="enrollments">Matrículas</TabsTrigger>
-          <TabsTrigger className={styles.tabTrigger} value="submissions">Entregas</TabsTrigger>
-          <TabsTrigger className={styles.tabTrigger} value="attendance">Frequência</TabsTrigger>
-          <TabsTrigger className={styles.tabTrigger} value="projects">Projetos</TabsTrigger>
-          <TabsTrigger className={styles.tabTrigger} value="formacao">Formação</TabsTrigger>
-          <TabsTrigger className={styles.tabTrigger} value="guardian">Responsável e consentimento</TabsTrigger>
+          {studentDetailTabs.map((tab) => (
+            <TabsTrigger className={styles.tabTrigger} value={tab.value} key={tab.value}>
+              {activeTab === tab.value && (
+                <motion.span
+                  aria-hidden="true"
+                  className={styles.tabSelector}
+                  layoutId="student-detail-tab-selector"
+                  initial={false}
+                  transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 30, mass: 1 }}
+                />
+              )}
+              <span className={styles.tabLabel}>{tab.label}</span>
+            </TabsTrigger>
+          ))}
         </TabsList>
         <TabsContent className={styles.tabPanel} value="overview"><StudentOverview student={student} guardian={guardian} consent={consent} /></TabsContent>
         <TabsContent className={styles.tabPanel} value="enrollments"><EnrollmentList enrollments={enrollments} reload={reload} /></TabsContent>

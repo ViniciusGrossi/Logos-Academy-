@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-02] A ficha administrativa do aluno ganhou navegação de abas com seletor laranja deslizante inspirado no `Tab Pill Glide` do Kinetics, transição curta do painel e quebra responsiva sem scrollbar. Browser validou o spring entre posições e ausência de overflow em 1440 e 375 px; 88 testes, TypeScript, lint e build passaram.
+
 - [2026-10-02] A ativação por convite passou a capturar a sessão implícita entregue no fragmento pelo Supabase antes de iniciar o cliente PKCE. Em produção, um convite real abriu `/ativar`, removeu os tokens da URL, preencheu o e-mail e habilitou `Ativar meu acesso`; 88 testes, TypeScript, lint e build passaram. Contas e links descartáveis do ensaio foram removidos.
 
 - [2026-10-02] Convites de aluno passaram a usar origem canônica fixa `https://logos-academy-three.vercel.app/ativar` e link público curto `https://logos-academy-three.vercel.app/c/<código>`. A allowlist remota do Supabase foi atualizada sem alterar os outros produtos do projeto compartilhado; o ensaio real em produção comprovou `307` do link curto, `303` do Supabase e destino final `/ativar`, sem `localhost`. Conta, link e auditoria descartáveis do ensaio foram removidos.
@@ -229,6 +231,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-02] A navegação da ficha do aluno substituiu o scroll horizontal por abas responsivas com seletor laranja deslizante, seguindo o `Tab Pill Glide` do Kinetics. O spring usa a dependência Framer Motion já instalada, e `prefers-reduced-motion` mantém a troca estática.
 
 - [2026-10-02] `generateLink` administrativo entrega a sessão do convite no fragmento por fluxo implícito, enquanto `createBrowserClient` de `@supabase/ssr` força PKCE. Redirecionar corretamente para `/ativar` não prova que a sessão foi criada: a página precisa capturar `access_token` e `refresh_token`, remover o fragmento e chamar `setSession` antes de instanciar o cliente PKCE. O aceite deve verificar e-mail preenchido e botão habilitado em navegador real.
 
