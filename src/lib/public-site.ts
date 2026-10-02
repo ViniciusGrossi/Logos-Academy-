@@ -8,6 +8,10 @@ export function academyInvitationUrl(code: string): string {
   return `${ACADEMY_PUBLIC_ORIGIN}/c/${code}`;
 }
 
+export function isAcademyInvitationPath(pathname: string): boolean {
+  return /^\/c\/[A-Za-z0-9_-]{22}$/u.test(pathname);
+}
+
 export function isAcademySupabaseVerificationUrl(value: string): boolean {
   try {
     const url = new URL(value);

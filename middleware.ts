@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { hasDemoSession } from "@/src/lib/demo-mode";
+import { isAcademyInvitationPath } from "@/src/lib/public-site";
 
 const publicPages = new Set(["/login", "/ativar", "/recuperar-senha"]);
 const demoCookieName = "logos_academy_demo";
@@ -61,7 +62,7 @@ function finish(response: NextResponse): NextResponse {
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
   if (process.env.NODE_ENV === "development" && request.nextUrl.searchParams.get("preview") === "phase8") return finish(response);
-  const isPublic = publicPages.has(request.nextUrl.pathname);
+  const isPublic = publicPages.has(request.nextUrl.pathname) || isAcademyInvitationPath(request.nextUrl.pathname);
   const demoSession = await hasDemoSession(request.cookies.get(demoCookieName)?.value);
   if (demoSession) {
     if (request.nextUrl.pathname === "/login") {

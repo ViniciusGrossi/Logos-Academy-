@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   academyActivationUrl,
   academyInvitationUrl,
+  isAcademyInvitationPath,
   isAcademySupabaseVerificationUrl,
 } from "@/src/lib/public-site";
 import { InvitationLinkService } from "@/src/modules/invitation-links/service";
@@ -15,6 +16,8 @@ describe("links públicos de convite", () => {
   it("mantém ativação e convite no domínio público, sem fallback local", () => {
     expect(academyActivationUrl()).toBe("https://logos-academy-three.vercel.app/ativar");
     expect(academyInvitationUrl(code)).toBe(`https://logos-academy-three.vercel.app/c/${code}`);
+    expect(isAcademyInvitationPath(`/c/${code}`)).toBe(true);
+    expect(isAcademyInvitationPath("/c/curto")).toBe(false);
     expect(academyActivationUrl()).not.toContain("localhost");
   });
 
