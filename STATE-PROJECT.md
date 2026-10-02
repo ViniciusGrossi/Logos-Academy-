@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-02] A confirmação do convite deixou de ser bloqueada pela CSP: `form-action` permite a origem exata do Supabase além de `'self'`, e o middleware passou a reutilizar a política de segurança testada. Em produção, um clique real em `Continuar ativação` chegou a `/ativar`, preencheu o e-mail, habilitou o envio e não exibiu erro; o QA descartável foi removido.
+
 - [2026-10-02] O link curto de convite passou a exigir uma confirmação humana antes de abrir o token de uso único do Supabase. Em produção, uma prévia com user-agent do WhatsApp recebeu `200`, sem redirecionamento nem token no HTML; o acesso posterior chegou a `/ativar`, removeu o fragmento, preencheu o e-mail e manteve `Ativar meu acesso` habilitado. O deploy `f4d1cd2` está ativo e os dados descartáveis do ensaio foram removidos.
 
 - [2026-10-02] A ficha administrativa do aluno ganhou navegação de abas com seletor laranja deslizante inspirado no `Tab Pill Glide` do Kinetics, transição curta do painel e quebra responsiva sem scrollbar. Browser validou o spring entre posições e ausência de overflow em 1440 e 375 px; 88 testes, TypeScript, lint e build passaram.
@@ -233,6 +235,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-02] A diretiva CSP `form-action` também valida os destinos atravessados por redirecionamentos do envio. Um formulário que posta em `'self'` e recebe `303` para um provedor externo precisa autorizar a origem exata desse provedor. A CSP do middleware deve importar a mesma função coberta pelos testes; manter uma cópia local torna a regressão invisível.
 
 - [2026-10-02] Links de autenticação de uso único não podem ficar atrás de um `GET` que redireciona diretamente: crawlers de preview do WhatsApp seguem o redirecionamento e consomem o token antes do aluno. O link compartilhável deve responder com uma página inerte, sem expor o destino, e liberar a verificação somente apó um `POST` iniciado pelo usuário.
 
