@@ -98,6 +98,7 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Lições
 
+- [2026-10-02] Em regex SQL, uma barra invertida pode atravessar duas camadas de escape e virar uma busca por barra literal. Para domínios fixos, preferir a classe `[.]`; o teste de migração deve cobrir uma URL real de `github.com` no rascunho e no envio.
 - [2026-10-02] Nos projetos Explorer, diferenciar contrato de aprendizagem de escolha estética: o aluno deve cumprir capacidades, limites e evidências, mas elementos como orbe, avatar, waveform e o tema professor são referências opcionais, não critérios obrigatórios.
 - [2026-10-02] A diretiva CSP `form-action` também valida os destinos atravessados por redirecionamentos do envio. Um formulário que posta em `'self'` e recebe `303` para um provedor externo precisa autorizar a origem exata desse provedor. A CSP do middleware deve importar a mesma função coberta pelos testes; manter uma cópia local torna a regressão invisível.
 - [2026-10-02] Links de autenticação de uso único não podem ficar atrás de um `GET` que redireciona diretamente: crawlers de preview do WhatsApp seguem o redirecionamento e consomem o token antes do aluno. O link compartilhável deve responder com uma página inerte, sem expor o destino, e liberar a verificação somente apó um `POST` iniciado pelo usuário.
