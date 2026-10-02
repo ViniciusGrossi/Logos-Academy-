@@ -79,6 +79,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedNext = searchParams.get("next");
+  const invalidInvitation = searchParams.get("error") === "invalid_link";
   const safeNext = safeInternalPath(requestedNext, typeof window === "undefined" ? "http://localhost" : window.location.origin);
   const updateMode = mode !== "login" && (mode === "activate" || searchParams.get("mode") === "update");
   const [email, setEmail] = useState("");
@@ -86,7 +87,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
   const [confirmation, setConfirmation] = useState("");
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(invalidInvitation ? "Este convite é inválido ou expirou. Peça um novo link à Logos Academy." : null);
   const [sessionReady, setSessionReady] = useState(mode === "login" || !updateMode);
   const [activeStage, setActiveStage] = useState(0);
 
@@ -97,7 +98,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
       const applySession = (session: Awaited<ReturnType<typeof client.auth.getSession>>["data"]["session"]) => {
         setSessionReady(Boolean(session));
         if (mode === "activate") setEmail(session?.user.email ?? "");
-        if (!session) setError("Abra novamente o link seguro enviado pela Logos Academy.");
+        if (!session) setError(invalidInvitation ? "Este convite é inválido ou expirou. Peça um novo link à Logos Academy." : "Abra novamente o link seguro enviado pela Logos Academy.");
         else setError(null);
       };
       void client.auth.getSession().then(({ data }) => applySession(data.session)).catch((cause: unknown) => setError(authErrorMessage(cause)));
@@ -107,7 +108,7 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
       setSessionReady(false);
       setError(authErrorMessage(cause));
     }
-  }, [mode, updateMode]);
+  }, [invalidInvitation, mode, updateMode]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -1,9 +1,10 @@
 import "server-only";
 
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 import { AppError } from "@/src/lib/api-error";
+import { academyActivationUrl, academyInvitationUrl, isAcademySupabaseVerificationUrl } from "@/src/lib/public-site";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
 import { mapRpcError } from "@/src/lib/supabase/rpc-error";
 import type { InviteStudentInput } from "@/src/modules/admissions/schema";
@@ -15,29 +16,31 @@ export class AdmissionsAdminAdapter {
   private readonly env = getAdminSupabaseEnv();
   private readonly client: SupabaseClient = createClient(this.env.NEXT_PUBLIC_SUPABASE_URL, this.env.SUPABASE_SECRET_KEY, { auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false } });
 
-  constructor(private readonly siteOrigin?: string) {}
-
   async invite(actor: TenantActor, input: InviteStudentInput, idempotencyKey: string, requestId: string): Promise<InviteResult> {
     // PostgREST receives RPC arguments as JSON. Passing Node's Buffer here makes
     // it an object (`{ type: "Buffer", data: [...] }`) rather than PostgreSQL
     // `bytea`; use the textual bytea representation instead.
     const payloadHash = `\\x${createHash("sha256").update(canonical(input)).digest("hex")}`;
     const claim = await this.rpc("claim_student_invitation", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash }, requestId);
-    if (hasFinalResult(claim)) return toInviteResult(claim, (await this.generateActivationLink(input.email, "recovery", requestId)).data.properties.action_link);
+    if (hasFinalResult(claim)) {
+      const recovery = await this.generateActivationLink(input.email, "recovery", requestId);
+      return toInviteResult(claim, await this.shortenActivationLink(actor, recovery.data.properties.action_link, requestId));
+    }
     let authUserId = readString(claim, "authUserId");
     let invitationSentAt = readString(claim, "invitationSentAt");
-    let activationLink: string | null = null;
+    let providerLink: string | null = null;
     let createdHere = false;
     if (!authUserId || !invitationSentAt) {
       const invited = await this.generateActivationLink(input.email, "invite", requestId);
       authUserId = invited.data.user.id; invitationSentAt = new Date().toISOString(); createdHere = true;
-      activationLink = invited.data.properties.action_link;
+      providerLink = invited.data.properties.action_link;
       await this.rpc("bind_student_invitation_auth", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId, p_invitation_sent_at: invitationSentAt }, requestId);
     }
     try {
       const enrollment = input.enrollment.kind === "class" ? { p_kind: "class", p_class_id: input.enrollment.classId, p_individual_schedule: null } : { p_kind: "individual", p_class_id: null, p_individual_schedule: input.enrollment.individualSchedule };
       const result = await this.rpc("finalize_invited_student", { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_idempotency_key: idempotencyKey, p_payload_hash: payloadHash, p_auth_user_id: authUserId, p_email: input.email, p_display_name: input.displayName, p_birth_date: input.birthDate, p_guardian_name: input.guardian.name, p_relationship: input.guardian.relationship, p_guardian_email: input.guardian.email ?? null, p_guardian_phone: input.guardian.phone ?? null, p_term_version: input.consent.termVersion, p_signed_at: input.consent.signedAt, p_physical_copy_archived: true, p_curriculum_id: input.enrollment.curriculumId, ...enrollment, p_encryption_key: this.env.PII_ENCRYPTION_KEY, p_invitation_sent_at: invitationSentAt, p_request_id: requestId }, requestId);
       if (!hasFinalResult(result)) throw new AppError("INTERNAL_ERROR", "Não foi possível concluir o convite.", requestId);
+      const activationLink = providerLink ? await this.shortenActivationLink(actor, providerLink, requestId) : null;
       return toInviteResult(result, activationLink);
     } catch (error: unknown) {
       if (createdHere) {
@@ -56,10 +59,28 @@ export class AdmissionsAdminAdapter {
   }
 
   private async generateActivationLink(email: string, type: "invite" | "recovery", requestId: string) {
-    const redirectTo = this.siteOrigin ? new URL("/ativar", this.siteOrigin).toString() : undefined;
-    const result = await this.client.auth.admin.generateLink({ type, email, ...(redirectTo ? { options: { redirectTo } } : {}) });
+    const result = await this.client.auth.admin.generateLink({ type, email, options: { redirectTo: academyActivationUrl() } });
     if (result.error || !result.data.user || !result.data.properties) throw invitationAuthError(result.error, requestId);
+    if (!isAcademySupabaseVerificationUrl(result.data.properties.action_link)) {
+      throw new AppError("INTERNAL_ERROR", "O Supabase devolveu um destino de ativação inválido.", requestId);
+    }
     return result;
+  }
+
+  private async shortenActivationLink(actor: TenantActor, providerLink: string, requestId: string): Promise<string> {
+    const code = randomBytes(16).toString("base64url");
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const result = await this.rpc("create_invitation_link", {
+      p_tenant_id: actor.tenantId,
+      p_actor_user_id: actor.userId,
+      p_code: code,
+      p_target_url: providerLink,
+      p_expires_at: expiresAt,
+      p_encryption_key: this.env.PII_ENCRYPTION_KEY,
+      p_request_id: requestId,
+    }, requestId);
+    if (readString(result, "code") !== code) throw new AppError("INTERNAL_ERROR", "Não foi possível encurtar o convite.", requestId);
+    return academyInvitationUrl(code);
   }
 
   private async rpc(name: string, parameters: Record<string, unknown>, requestId: string, allowsNull = false): Promise<Record<string, unknown>> {
