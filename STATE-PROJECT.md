@@ -2,9 +2,9 @@
 title: "Logos Academy Platform — State of Project"
 date: 2026-10-02
 fase_atual: "12"
-etapa_atual: "Conteúdo integral dos quatro projetos do Explorer v3 implementado e validado; aguardando gate humano de deploy da migration curricular"
+etapa_atual: "Conteúdo integral dos quatro projetos do Explorer v3 publicado e verificado em produção"
 produto_tipo: "saas-premium"
-proximo_passo: "Após aprovação explícita do deploy, aplicar a migration explorer_four_projects_v3 no Supabase, verificar os 4 ciclos/16 aulas/69 entregáveis/64 critérios e validar a primeira atividade pela projeção real do aluno"
+proximo_passo: "Rodar o ensaio ponta-a-ponta com um aluno real da turma-piloto Explorer v3, incluindo convite, ativação, entrega, revisão, reentrega, aprovação, apresentação e conclusão"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -18,13 +18,13 @@ gates:
   fase_9: pass
   fase_10: pass
   fase_11: pass
-  fase_12: pending
+  fase_12: pass
 features: { draft: 0, approved: 15, built: 15, reviewed: 12 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08
     motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
-status: "🟡 Produção estável · currículo v3 pronto para deploy"
+status: "🟢 Produção estável · currículo Explorer v3 publicado"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 # ESTADO — Logos Academy Platform
@@ -35,7 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] **`explorer-four-projects-v3`**: spec aprovada, migration e pgTAP concluídos; execução transacional com rollback validou 4 ciclos, 16 aulas completas, 69 entregáveis e 64 critérios. Falta o gate humano para aplicar a migration curricular em produção e executar o smoke da projeção real.
+- [x] **`explorer-four-projects-v3`**: publicado no Supabase e GitHub; verificação remota confirmou os quatro ciclos, 16 aulas completas, 69 entregáveis, 64 critérios e a atividade atribuída atualizada para o novo conteúdo.
 - [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. A Onda A administrativa foi integrada de `main` e a migration `0053` foi aplicada no Supabase em 30/09; o gate local de lint, 83 testes e build passou. Falta executar o ciclo real com uma conta de aluno de teste.
 - [ ] `student-visual-system-rounding-orbit`: raios sistêmicos e campo orbital compartilhado implementados e validados; aguardando gate visual humano.
 - [ ] `student-journey-premium`: fusão da Jornada real com a direção premium implementada e validada; aguardando gate visual humano.
@@ -46,6 +46,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-10-02] Deploy curricular concluído: migration `enrich_explorer_v3_four_projects` aplicada no Supabase e commit `1da06a5` enviado ao GitHub. A produção agora exibe Assistente Pessoal Inteligente, Creative Studio, Automation Lab e MVP: Produto Inteligente; consulta remota confirmou 4 ciclos, 16 aulas, 16 atividades, 69 entregáveis e 64 critérios. O login público respondeu 200 e a raiz protegida manteve o redirecionamento esperado. O advisor de segurança não trouxe regressão desta migration; o único aviso Academy é preexistente para `invitation_links` sem policy de cliente, mantida bloqueada e acessada somente por servidor.
 
 - [2026-10-02] `explorer-four-projects-v3` implementado localmente: os quatro ciclos agora constroem Assistente Pessoal Inteligente, Creative Studio, Automation Lab e MVP: Produto Inteligente em 16 aulas incrementais. Todos os campos pedagógicos, 69 entregáve…
 - [2026-10-02] As abas do prontuário do aluno foram refinadas com laranja sólido tanto no seletor animado quanto na moldura do conjunto, sem alterar a transição ou o suporte a movimento reduzido.
