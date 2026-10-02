@@ -37,6 +37,9 @@ describe("platform-security", () => {
     applySecurityHeaders(developmentHeaders, false);
     expect(developmentHeaders.get("Content-Security-Policy")).toContain("frame-ancestors 'none'");
     expect(developmentHeaders.get("Content-Security-Policy")).toContain("frame-src https://www.youtube-nocookie.com");
+    expect(developmentHeaders.get("Content-Security-Policy")).toContain(
+      "form-action 'self' https://nqubjiosnlaatxxamiut.supabase.co",
+    );
     expect(developmentHeaders.get("X-Frame-Options")).toBe("DENY");
     expect(developmentHeaders.get("Strict-Transport-Security")).toBeNull();
 

@@ -18,6 +18,8 @@ gera o convite a partir do ambiente local.
   de verificação do Supabase; somente o `POST` disparado pelo aluno abre o token.
 - Robôs de preview do WhatsApp podem consultar o link curto sem consumir o
   convite individual.
+- A CSP permite `form-action` somente para a própria aplicação e para a origem
+  exata do projeto Supabase, necessária apó o redirecionamento do `POST`.
 - Links inexistentes ou expirados terminam em `/ativar?error=invalid_link`.
 - O link original do Supabase permanece criptografado no banco e acessível
   somente pela `service_role`.

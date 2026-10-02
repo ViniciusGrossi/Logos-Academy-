@@ -1,4 +1,5 @@
 export const ACADEMY_PUBLIC_ORIGIN = "https://logos-academy-three.vercel.app";
+export const ACADEMY_SUPABASE_ORIGIN = "https://nqubjiosnlaatxxamiut.supabase.co";
 
 export function academyActivationUrl(): string {
   return `${ACADEMY_PUBLIC_ORIGIN}/ativar`;
@@ -15,7 +16,7 @@ export function isAcademyInvitationPath(pathname: string): boolean {
 export function isAcademySupabaseVerificationUrl(value: string): boolean {
   try {
     const url = new URL(value);
-    return url.origin === "https://nqubjiosnlaatxxamiut.supabase.co"
+    return url.origin === ACADEMY_SUPABASE_ORIGIN
       && url.pathname === "/auth/v1/verify"
       && url.searchParams.get("redirect_to") === academyActivationUrl();
   } catch {

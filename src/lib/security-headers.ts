@@ -1,8 +1,10 @@
+import { ACADEMY_SUPABASE_ORIGIN } from "@/src/lib/public-site";
+
 export function applySecurityHeaders(headers: Headers, production: boolean): void {
   headers.set("Content-Security-Policy", [
     "default-src 'self'",
     "base-uri 'self'",
-    "form-action 'self'",
+    `form-action 'self' ${ACADEMY_SUPABASE_ORIGIN}`,
     "frame-ancestors 'none'",
     "object-src 'none'",
     "frame-src https://www.youtube-nocookie.com",
