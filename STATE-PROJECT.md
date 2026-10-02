@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-01] Convites de aluno passaram a usar `NEXT_PUBLIC_SITE_URL` como origem canônica de ativação. Assim, mesmo quando o admin cria o convite em ambiente local, o link abre a página pública `/ativar` da Academy.
+
 - [2026-10-01] Base de testes manuais resetada no Supabase: as seis contas de aluno e todos os dados operacionais vinculados foram removidos; inclusive o perfil de aluno residual do administrador. Permanecem somente a conta administrativa `viniciussggrossi`, o Explorer v3 e a turma-piloto vazia.
 
 - [2026-10-01] O reenvio de convite pendente passou a gerar um novo link de recuperação/ativação, sem reaproveitar token consumido. A ativação local foi verificada em `http://localhost:3000/ativar`; a mensagem de WhatsApp orienta abrir o link somente uma vez.
