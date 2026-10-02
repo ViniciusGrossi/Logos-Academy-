@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-02] As abas do prontuário do aluno foram refinadas com laranja sólido tanto no seletor animado quanto na moldura do conjunto, sem alterar a transição ou o suporte a movimento reduzido.
+
 - [2026-10-02] A confirmação do convite deixou de ser bloqueada pela CSP: `form-action` permite a origem exata do Supabase além de `'self'`, e o middleware passou a reutilizar a política de segurança testada. Em produção, um clique real em `Continuar ativação` chegou a `/ativar`, preencheu o e-mail, habilitou o envio e não exibiu erro; o QA descartável foi removido.
 
 - [2026-10-02] O link curto de convite passou a exigir uma confirmação humana antes de abrir o token de uso único do Supabase. Em produção, uma prévia com user-agent do WhatsApp recebeu `200`, sem redirecionamento nem token no HTML; o acesso posterior chegou a `/ativar`, removeu o fragmento, preencheu o e-mail e manteve `Ativar meu acesso` habilitado. O deploy `f4d1cd2` está ativo e os dados descartáveis do ensaio foram removidos.
