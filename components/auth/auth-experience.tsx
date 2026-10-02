@@ -10,6 +10,7 @@ import { MissionField } from "./mission-field";
 import { Button } from "@/components/ui/button";
 import { SmoothInput } from "@/components/ui/smooth-input";
 import { createSupabaseBrowserClient } from "@/src/lib/supabase/browser";
+import { activationSessionFromHash } from "@/src/lib/supabase/activation-session";
 import { safeInternalPath } from "@/src/lib/safe-internal-path";
 import { setDemoRole, type DemoRole } from "@/src/lib/demo-mode";
 import styles from "./auth-experience.module.css";
@@ -94,6 +95,10 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
   useEffect(() => {
     if (!updateMode) return;
     try {
+      const activationSession = mode === "activate" ? activationSessionFromHash(window.location.hash) : null;
+      if (activationSession) {
+        window.history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.search}`);
+      }
       const client = createSupabaseBrowserClient();
       const applySession = (session: Awaited<ReturnType<typeof client.auth.getSession>>["data"]["session"]) => {
         setSessionReady(Boolean(session));
@@ -101,7 +106,13 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
         if (!session) setError(invalidInvitation ? "Este convite é inválido ou expirou. Peça um novo link à Logos Academy." : "Abra novamente o link seguro enviado pela Logos Academy.");
         else setError(null);
       };
-      void client.auth.getSession().then(({ data }) => applySession(data.session)).catch((cause: unknown) => setError(authErrorMessage(cause)));
+      const loadSession = activationSession
+        ? client.auth.setSession(activationSession)
+        : client.auth.getSession();
+      void loadSession.then(({ data, error: sessionError }) => {
+        if (sessionError) throw sessionError;
+        applySession(data.session);
+      }).catch((cause: unknown) => setError(authErrorMessage(cause)));
       const { data: listener } = client.auth.onAuthStateChange((_event, session) => applySession(session));
       return () => listener.subscription.unsubscribe();
     } catch (cause) {

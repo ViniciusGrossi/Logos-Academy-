@@ -17,6 +17,8 @@ gera o convite a partir do ambiente local.
 - Links inexistentes ou expirados terminam em `/ativar?error=invalid_link`.
 - O link original do Supabase permanece criptografado no banco e acessível
   somente pela `service_role`.
+- A página `/ativar` converte a sessão implícita entregue pelo Supabase em
+  cookies antes de iniciar o cliente PKCE e remove os tokens da barra do navegador.
 
 ## Critérios de aceite
 
@@ -26,3 +28,5 @@ gera o convite a partir do ambiente local.
 3. Ao verificar o token, o Supabase redireciona para a página pública `/ativar`.
 4. Link inválido ou expirado não funciona como redirecionador aberto.
 5. A mensagem de WhatsApp contém somente o link curto.
+6. Após abrir um convite válido, o e-mail aparece preenchido e somente leitura,
+   os campos de senha ficam disponíveis e o botão `Ativar meu acesso` é habilitado.
