@@ -45,6 +45,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-01] A conta de aluno Luis Vinicius Sabino Guimarães Grossi foi removida do Supabase, com a matrícula, convite e dados operacionais vinculados. A conta administrativa foi preservada.
+
 - [2026-10-01] Convites de aluno passaram a usar `NEXT_PUBLIC_SITE_URL` como origem canônica de ativação. Assim, mesmo quando o admin cria o convite em ambiente local, o link abre a página pública `/ativar` da Academy.
 
 - [2026-10-01] Base de testes manuais resetada no Supabase: as seis contas de aluno e todos os dados operacionais vinculados foram removidos; inclusive o perfil de aluno residual do administrador. Permanecem somente a conta administrativa `viniciussggrossi`, o Explorer v3 e a turma-piloto vazia.
