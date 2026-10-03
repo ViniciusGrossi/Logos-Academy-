@@ -131,6 +131,7 @@ Construir um produto novo para um problema e público definidos pelo aluno. Ele 
 - [ ] Toda atividade possui ao menos três passos, dois requisitos obrigatórios e três critérios atômicos.
 - [ ] As atividades 4, 8, 12 e 16 integram e validam o que foi construído, sem introduzir núcleo teórico novo.
 - [ ] O Assistente não exige orbe nem o tema professor; ambos aparecem somente como opções de referência.
+- [ ] Na aula 1, o repositório inicial pode ser informado, mas não bloqueia o primeiro envio; o repositório final continua obrigatório na aula 4.
 - [ ] O MVP exige, no mesmo fluxo principal, IA, experiência visual e automação.
 - [ ] O conteúdo exibido pela projeção `student_activity_detail` reflete a nova trilha.
 - [ ] Teste automatizado protege contagens, títulos, completude e invariantes curriculares.

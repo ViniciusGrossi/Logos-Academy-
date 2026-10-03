@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path=logos_academy,extensions;
-select plan(18);
+select plan(19);
 
 select is((select count(*)::integer from cycles where curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and deleted_at is null),4,'Explorer v3 has four projects');
 select results_eq(
@@ -28,6 +28,7 @@ select ok((select instructions ilike '%não é obrigatório%' from activity_temp
 select ok((select context ilike '%apenas o exemplo%' from activity_templates where id=md5('logos-academy-explorer-v3-activity-1')::uuid),'the teacher assistant is explicitly an example');
 select ok((select project_challenge ilike '%IA especializada%' and project_challenge ilike '%experiência visual%' and project_challenge ilike '%automação confiável%' from cycles where id=md5('logos-academy-explorer-v3-cycle-4')::uuid),'the MVP combines AI, visual experience and automation');
 select is((select count(*)::integer from activity_templates where id in(md5('logos-academy-explorer-v3-activity-4')::uuid,md5('logos-academy-explorer-v3-activity-8')::uuid,md5('logos-academy-explorer-v3-activity-12')::uuid,md5('logos-academy-explorer-v3-activity-16')::uuid) and reference_content ilike '%não %nov%'),4,'project days explicitly avoid new core content');
+select is((select is_required from activity_requirements where id=md5('logos-academy-explorer-v3-requirement-1-4')::uuid),false,'the initial GitHub repository is optional');
 select is((select count(*)::integer from lesson_templates where id in(select md5('logos-academy-explorer-v3-lesson-'||n)::uuid from generate_series(1,16)n) and estimated_activity_minutes=45),16,'every lesson reserves forty-five minutes for the hands-on mission');
 
 select * from finish();

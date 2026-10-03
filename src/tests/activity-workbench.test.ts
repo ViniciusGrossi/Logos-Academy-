@@ -5,6 +5,7 @@ import {
   latestReviewedSubmission,
   restorationSource,
   submissionReviews,
+  visibleSubmissionHistory,
 } from "@/components/prototype/activity-detail";
 
 const assignmentId = "10000000-0000-4000-8000-000000000001";
@@ -78,6 +79,12 @@ const activity: ActivityDetail = {
 };
 
 describe("activity workbench", () => {
+  it("mostra o rascunho salvo junto das versões enviadas no histórico", () => {
+    expect(
+      visibleSubmissionHistory(activity).map((submission) => submission.id),
+    ).toEqual([emptyDraft.id, reviewed.id]);
+  });
+
   it("mantém feedback e evidências quando a revisão cria um rascunho vazio", () => {
     const source = latestReviewedSubmission(activity.submissionHistory.items);
     expect(source?.review?.feedback).toBe("Ajuste o contraste.");

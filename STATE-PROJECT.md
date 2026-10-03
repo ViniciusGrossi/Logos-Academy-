@@ -47,6 +47,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
+- [2026-10-03] A mesa de Atividade passou a incluir o rascunho salvo em `latestSubmission` no histórico visível, com estado próprio e sem duplicar versões já enviadas. O “Repositório inicial” da aula 1 do Assistente foi tornado opcional em produção; os três demais entregáveis continuam obrigatórios. Regressão coberta por teste de UI e pgTAP; suíte com 90 testes e build passaram.
+
 - [2026-10-02] Deploy curricular concluído: migration `enrich_explorer_v3_four_projects` aplicada no Supabase e commit `1da06a5` enviado ao GitHub. A produção agora exibe Assistente Pessoal Inteligente, Creative Studio, Automation Lab e MVP: Produto Inteligente; consulta remota confirmou 4 ciclos, 16 aulas, 16 atividades, 69 entregáveis e 64 critérios. O login público respondeu 200 e a raiz protegida manteve o redirecionamento esperado. O advisor de segurança não trouxe regressão desta migration; o único aviso Academy é preexistente para `invitation_links` sem policy de cliente, mantida bloqueada e acessada somente por servidor.
 
 - [2026-10-02] `explorer-four-projects-v3` implementado localmente: os quatro ciclos agora constroem Assistente Pessoal Inteligente, Creative Studio, Automation Lab e MVP: Produto Inteligente em 16 aulas incrementais. Todos os campos pedagógicos, 69 entregáve…
@@ -98,6 +100,7 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Lições
 
+- [2026-10-03] `latestSubmission` e `submissionHistory` têm papéis diferentes: o primeiro pode conter o rascunho editável, enquanto o segundo reúne versões enviadas. Uma linha do tempo que promete mostrar versões salvas deve compor as duas projeções e deduplicar por `submission.id`.
 - [2026-10-02] Em regex SQL, uma barra invertida pode atravessar duas camadas de escape e virar uma busca por barra literal. Para domínios fixos, preferir a classe `[.]`; o teste de migração deve cobrir uma URL real de `github.com` no rascunho e no envio.
 - [2026-10-02] Nos projetos Explorer, diferenciar contrato de aprendizagem de escolha estética: o aluno deve cumprir capacidades, limites e evidências, mas elementos como orbe, avatar, waveform e o tema professor são referências opcionais, não critérios obrigatórios.
 - [2026-10-02] A diretiva CSP `form-action` também valida os destinos atravessados por redirecionamentos do envio. Um formulário que posta em `'self'` e recebe `303` para um provedor externo precisa autorizar a origem exata desse provedor. A CSP do middleware deve importar a mesma função coberta pelos testes; manter uma cópia local torna a regressão invisível.

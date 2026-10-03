@@ -154,7 +154,10 @@ export function ActivityDetail() {
   const savedValuesKey = useRef("");
   const sectionLock = useRef<string | null>(null);
 
-  const initialHistory = historyItems(detail.data?.submissionHistory);
+  const initialHistory = useMemo(
+    () => visibleSubmissionHistory(detail.data),
+    [detail.data],
+  );
   const historyKey = initialHistory
     .map((submission) => submission.id)
     .join(",");
@@ -1523,8 +1526,9 @@ function HistoryVersion({
   const [open, setOpen] = useState(false);
   const reviews = submissionReviews(submission);
   const latestReview = latestSubmissionReview(submission);
-  const state =
-    latestReview?.decision === "approved"
+  const state = submission.isDraft
+    ? "Rascunho salvo"
+    : latestReview?.decision === "approved"
       ? "Aprovada"
       : latestReview
         ? "Revisão recebida"
@@ -1533,7 +1537,11 @@ function HistoryVersion({
     <article
       className={styles.historyVersion}
       data-open={open}
-      data-state={latestReview?.decision ?? "submitted"}
+      data-state={
+        submission.isDraft
+          ? "draft"
+          : (latestReview?.decision ?? "submitted")
+      }
     >
       <button
         type="button"
@@ -1680,6 +1688,20 @@ function historyItems(
   history: ActivityDto["submissionHistory"] | undefined,
 ): readonly SubmissionDetail[] {
   return history?.items ?? [];
+}
+
+export function visibleSubmissionHistory(
+  activity: ActivityDto | null | undefined,
+): readonly SubmissionDetail[] {
+  const submissions = [
+    ...(activity?.latestSubmission ? [activity.latestSubmission] : []),
+    ...historyItems(activity?.submissionHistory),
+  ];
+  return submissions.filter(
+    (submission, index) =>
+      submissions.findIndex((candidate) => candidate.id === submission.id) ===
+      index,
+  );
 }
 
 function valuesFromItems(
