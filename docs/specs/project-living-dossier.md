@@ -15,10 +15,12 @@ Transformar `/projetos/[projectId]` em um dossiê vivo: o aluno entende o desafi
 ## Escopo aprovado
 
 1. Exibir o **Norte do projeto** com desafio, problema, público, resultado esperado, critérios de qualidade e conceitos.
-2. Converter a lista de atividades em **Mapa de decisões**, preservando ordem pedagógica, estado, versão e acesso à atividade.
-3. Destacar a decisão textual mais recente e o feedback mais recente de cada atividade, quando existirem.
-4. Preservar cabeçalho, progresso, próxima ação, estados loading/empty/error e responsividade.
-5. Preencher o brief canônico dos quatro ciclos Explorer sem expor dados pessoais.
+2. Converter a lista de atividades em uma **linha de construção**, preservando ordem pedagógica, estado, versão e acesso à atividade.
+3. A régua da atividade em destaque deve refletir somente estados reais de `AssignmentStatus`: disponível, rascunho, em análise, ajustes solicitados e aprovada. Ela é informativa, não uma navegação paralela.
+4. Destacar o registro textual mais recente e o feedback mais recente de cada atividade, quando existirem, sem apresentar uma resposta genérica como se fosse necessariamente uma decisão.
+5. Cada atividade deve comunicar a próxima ação disponível: abrir, continuar rascunho, consultar envio, revisar feedback ou consultar atividade aprovada.
+6. Preservar cabeçalho, progresso, próxima ação, estados loading/empty/error e responsividade.
+7. Preencher o brief canônico dos quatro ciclos Explorer sem expor dados pessoais.
 
 ## Contrato
 
@@ -35,8 +37,11 @@ Transformar `/projetos/[projectId]` em um dossiê vivo: o aluno entende o desafi
 
 - [x] Creative Studio comunica o desafio antes da lista de atividades.
 - [x] Problema, público, resultado, critérios e conceitos têm hierarquia própria.
-- [x] O mapa mostra atividade, estado, versão, decisão e feedback quando disponíveis.
+- [x] A linha mostra atividade, estado, versão, registro textual e feedback quando disponíveis.
 - [x] Cada etapa continua levando à atividade vinculada.
+- [x] A régua usa o estado real da atividade em destaque e explica que avança automaticamente.
+- [x] Cada card apresenta uma próxima ação coerente com o estado real.
+- [x] Respostas textuais genéricas não recebem o rótulo enganoso de “Decisão registrada”.
 - [x] O contrato real e o modo demo fornecem os mesmos campos.
 - [x] Dados legados sem brief recebem fallback compreensível.
 - [x] Testes, TypeScript, lint e build passam.

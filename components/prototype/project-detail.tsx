@@ -7,6 +7,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { MagneticAction } from "@/components/academy";
 import type { AssignmentStatus, ProjectBuildArtifact, ProjectDetail as ProjectDto } from "@/specs/api.contracts";
 import { apiQuery, useLiveApi } from "./live-api";
+import { activityActionCopy, activityFlowSteps, activityPositionCopy, getActivityFlowState } from "./project-activity-flow";
 import { EmptyState, ErrorState, LoadingState } from "./state-lab";
 import styles from "./project-detail.module.css";
 
@@ -27,8 +28,6 @@ const statusIcon = {
   revision_requested: RotateCcw,
   approved: Check,
 } satisfies Record<AssignmentStatus, typeof Check>;
-
-const decisionStages = ["Referências", "Hipótese", "Primeira versão", "Feedback", "Versão revisada", "Evidência final"];
 
 function moveFocusGrid(event: ReactPointerEvent<HTMLElement>) {
   if (event.pointerType === "touch") return;
@@ -135,8 +134,15 @@ export function ProjectDetailPage() {
     </section>}
 
     <section className={styles.evidenceSection} aria-labelledby="evidence-title">
-      <div className={styles.sectionHeading}><div><span>Mapa de decisões</span><h2 id="evidence-title">A construção deste projeto</h2></div><small>{data.activities.length} etapas vinculadas</small></div>
-      <div className={styles.decisionFlow} aria-label="Fluxo de construção do projeto">{decisionStages.map((stage, index) => <span key={stage} data-reached={index <= Math.min(5, Math.max(0, versions + data.completedActivityCount - 1))}>{stage}</span>)}</div>
+      <div className={styles.sectionHeading}><div><span>Evolução do projeto</span><h2 id="evidence-title">Atividades, versões e retornos</h2></div><small>{data.activities.length} atividades vinculadas</small></div>
+      <p className={styles.flowHelp}><strong>Como funciona:</strong> você não precisa navegar pelas etapas abaixo. A régua mostra o estado da atividade em destaque e avança automaticamente quando você salva, envia ou recebe o retorno do orientador.</p>
+      {active?.status === "locked" ? <p className={styles.flowLocked}><LockKeyhole /> A primeira atividade ainda aguarda liberação.</p> : active && <div className={styles.flowPanel}>
+        <div className={styles.flowContext}><span>Fluxo da atividade em destaque</span><small>Aula {String(active.lessonPosition).padStart(2, "0")} · {active.title}</small></div>
+        <ol className={styles.decisionFlow} aria-label="Estado da atividade em destaque">{activityFlowSteps.map((step, index) => {
+          const flowState = getActivityFlowState(index, active.status);
+          return <li key={step.status} data-state={flowState} aria-current={flowState === "current" ? "step" : undefined}>{flowState === "complete" && <Check aria-hidden="true" />}{step.label}</li>;
+        })}</ol>
+      </div>}
       <ol className={styles.evidenceRoute}>
         {data.activities.map((activity, index) => {
           const Icon = statusIcon[activity.status];
@@ -145,9 +151,9 @@ export function ProjectDetailPage() {
           const card = <>
             <div className={styles.evidenceTop}><span>Aula {String(activity.lessonPosition).padStart(2, "0")}</span><small><Icon /> {statusCopy[activity.status]}</small></div>
             <div className={styles.evidenceBody}><div><h3>{activity.title}</h3><p>{activity.latestVersion ? `Versão ${String(activity.latestVersion).padStart(2, "0")} registrada neste projeto.` : locked ? "Conclua a etapa atual para liberar esta atividade." : "A primeira versão ainda não foi registrada."}</p></div>{locked ? <LockKeyhole aria-label="Bloqueada" /> : <ArrowRight />}</div>
-            {activity.decision && <div className={styles.decisionNote}><Lightbulb /><span><small>Decisão registrada</small>{activity.decision}</span></div>}
+            {activity.decision && <div className={styles.decisionNote}><Lightbulb /><span><small>Registro da atividade</small>{activity.decision}</span></div>}
             {activity.latestFeedback && <div className={styles.feedbackNote}><MessageSquareQuote /><span><small>Feedback de {activity.latestFeedback.reviewerName}</small>{activity.latestFeedback.feedback}</span></div>}
-            <div className={styles.evidenceFooter}><span><Clock3 /> {current ? "Posição atual" : activity.status === "approved" ? "Etapa percorrida" : "Etapa do ciclo"}</span>{activity.latestVersion && <em>v{String(activity.latestVersion).padStart(2, "0")}</em>}</div>
+            <div className={styles.evidenceFooter}><span><Clock3 /> {activityPositionCopy[activity.status]}</span><div>{activity.latestVersion && <em>v{String(activity.latestVersion).padStart(2, "0")}</em>}{!locked && <strong>{activityActionCopy[activity.status]}<ArrowRight aria-hidden="true" /></strong>}</div></div>
           </>;
           return <li key={activity.assignmentId} data-status={activity.status} data-current={current}>
             <span className={styles.routeNode}>{activity.status === "approved" ? <Check /> : String(index + 1).padStart(2, "0")}</span>

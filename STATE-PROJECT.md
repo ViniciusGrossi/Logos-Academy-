@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-10-02
+date: 2026-10-05
 fase_atual: "12"
-etapa_atual: "Conteúdo integral dos quatro projetos do Explorer v3 publicado e verificado em produção"
+etapa_atual: "Fluxo real da página de projeto validado localmente e aguardando aprovação de deploy"
 produto_tipo: "saas-premium"
-proximo_passo: "Rodar o ensaio ponta-a-ponta com um aluno real da turma-piloto Explorer v3, incluindo convite, ativação, entrega, revisão, reentrega, aprovação, apresentação e conclusão"
+proximo_passo: "Aprovar o deploy da correção da página Projetos; depois retomar o ensaio ponta-a-ponta com o aluno da turma-piloto Explorer v3"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -24,7 +24,7 @@ overrides:
   - gate: npm-audit
     data: 2026-09-08
     motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
-status: "🟢 Produção estável · currículo Explorer v3 publicado"
+status: "🟢 Produção estável · correção da página Projetos pronta para deploy"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 # ESTADO — Logos Academy Platform
@@ -35,6 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; responsivo validado localmente, aguardando gate humano de deploy.
 - [x] **`explorer-four-projects-v3`**: publicado no Supabase e GitHub; verificação remota confirmou os quatro ciclos, 16 aulas completas, 69 entregáveis, 64 critérios e a atividade atribuída atualizada para o novo conteúdo.
 - [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. A Onda A administrativa foi integrada de `main` e a migration `0053` foi aplicada no Supabase em 30/09; o gate local de lint, 83 testes e build passou. Falta executar o ciclo real com uma conta de aluno de teste.
 - [ ] `student-visual-system-rounding-orbit`: raios sistêmicos e campo orbital compartilhado implementados e validados; aguardando gate visual humano.
@@ -46,6 +47,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-10-05] A página de projeto deixou de inferir “Referências → Hipótese” por contagem de versões. A régua agora acompanha `AssignmentStatus`, explica que avança automaticamente e cada card informa a próxima ação. “Decisão registrada” virou “Registro da atividade”. Validação: 94 testes, lint, build e browser em 375 px sem overflow global.
 
 - [2026-10-03] A mesa de Atividade passou a incluir o rascunho salvo em `latestSubmission` no histórico visível, com estado próprio e sem duplicar versões já enviadas. O “Repositório inicial” da aula 1 do Assistente foi tornado opcional em produção; os três demais entregáveis continuam obrigatórios. Regressão coberta por teste de UI e pgTAP; suíte com 90 testes e build passaram.
 
@@ -99,6 +102,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-05] Uma régua pedagógica não pode avançar por uma soma indireta de versões e atividades concluídas quando o aluno interpreta cada rótulo como uma ação. O estado visual deve vir do mesmo enum que governa o workflow e explicar explicitamente quando a transição é automática.
 
 - [2026-10-03] `latestSubmission` e `submissionHistory` têm papéis diferentes: o primeiro pode conter o rascunho editável, enquanto o segundo reúne versões enviadas. Uma linha do tempo que promete mostrar versões salvas deve compor as duas projeções e deduplicar por `submission.id`.
 - [2026-10-02] Em regex SQL, uma barra invertida pode atravessar duas camadas de escape e virar uma busca por barra literal. Para domínios fixos, preferir a classe `[.]`; o teste de migração deve cobrir uma URL real de `github.com` no rascunho e no envio.
