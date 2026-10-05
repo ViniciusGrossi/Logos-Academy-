@@ -2,9 +2,9 @@
 title: "Logos Academy Platform — State of Project"
 date: 2026-10-05
 fase_atual: "12"
-etapa_atual: "Fluxo real da página de projeto validado localmente e aguardando aprovação de deploy"
+etapa_atual: "Correção do fluxo da página de projeto publicada e verificada em produção"
 produto_tipo: "saas-premium"
-proximo_passo: "Aprovar o deploy da correção da página Projetos; depois retomar o ensaio ponta-a-ponta com o aluno da turma-piloto Explorer v3"
+proximo_passo: "Retomar o ensaio ponta-a-ponta com o aluno da turma-piloto Explorer v3, incluindo convite, ativação, entrega, revisão, reentrega, aprovação, apresentação e conclusão"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -24,7 +24,7 @@ overrides:
   - gate: npm-audit
     data: 2026-09-08
     motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
-status: "🟢 Produção estável · correção da página Projetos pronta para deploy"
+status: "🟢 Produção estável · fluxo da página Projetos publicado"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 # ESTADO — Logos Academy Platform
@@ -35,7 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; responsivo validado localmente, aguardando gate humano de deploy.
+- [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; publicada e verificada em produção.
 - [x] **`explorer-four-projects-v3`**: publicado no Supabase e GitHub; verificação remota confirmou os quatro ciclos, 16 aulas completas, 69 entregáveis, 64 critérios e a atividade atribuída atualizada para o novo conteúdo.
 - [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. A Onda A administrativa foi integrada de `main` e a migration `0053` foi aplicada no Supabase em 30/09; o gate local de lint, 83 testes e build passou. Falta executar o ciclo real com uma conta de aluno de teste.
 - [ ] `student-visual-system-rounding-orbit`: raios sistêmicos e campo orbital compartilhado implementados e validados; aguardando gate visual humano.
@@ -48,7 +48,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Concluído
 
-- [2026-10-05] A página de projeto deixou de inferir “Referências → Hipótese” por contagem de versões. A régua agora acompanha `AssignmentStatus`, explica que avança automaticamente e cada card informa a próxima ação. “Decisão registrada” virou “Registro da atividade”. Validação: 94 testes, lint, build e browser em 375 px sem overflow global.
+- [2026-10-05] A página de projeto deixou de inferir “Referências → Hipótese” por contagem de versões. A régua agora acompanha `AssignmentStatus`, explica que avança automaticamente e cada card informa a próxima ação. “Decisão registrada” virou “Registro da atividade”. Commit `c3d6778` publicado na Vercel; validação: 94 testes, lint, build, browser em 375 px sem overflow global e smoke de produção (`/login` 200; `/projetos` 307 para login).
 
 - [2026-10-03] A mesa de Atividade passou a incluir o rascunho salvo em `latestSubmission` no histórico visível, com estado próprio e sem duplicar versões já enviadas. O “Repositório inicial” da aula 1 do Assistente foi tornado opcional em produção; os três demais entregáveis continuam obrigatórios. Regressão coberta por teste de UI e pgTAP; suíte com 90 testes e build passaram.
 
