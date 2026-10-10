@@ -24,6 +24,12 @@ Permitir ao admin revisar cada entrega por critérios binários e devolver feedb
 5. Registrar leitura de feedback idempotente, inclusive aprovação, e refletir prioridade na Home.
 6. Correção administrativa supersede com novo registro auditável.
 
+### Hotfix — identificadores determinísticos do currículo
+
+- A fila e o workspace devem aceitar qualquer valor armazenável em uma coluna PostgreSQL `uuid`, inclusive IDs determinísticos que não codificam versão/variante RFC.
+- A mesma regra deve valer para os IDs de critérios recebidos ao publicar a revisão.
+- Uma entrega válida não pode derrubar a fila inteira por causa do formato de um identificador já persistido pelo currículo.
+
 ## Superfícies Frontend
 - `/admin/revisoes`: tabs `Aguardando`, `Prazo crítico` e `Correções`, persistidas em `?tab=`.
 - `/admin/revisoes/[submissionId]`: workspace único de revisão, sem tabs, para manter entrega e critérios simultaneamente visíveis.

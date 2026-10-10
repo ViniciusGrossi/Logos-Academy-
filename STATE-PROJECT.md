@@ -1,6 +1,6 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-10-05
+date: 2026-10-10
 fase_atual: "12"
 etapa_atual: "Correção do fluxo da página de projeto publicada e verificada em produção"
 produto_tipo: "saas-premium"
@@ -35,6 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [x] **`reviews-postgres-uuid-hotfix`**: causa do “Sinal interrompido” identificada nos validadores da aplicação; fila e publicação de revisão agora aceitam UUIDs determinísticos já persistidos pelo currículo. Teste focado, lint e TypeScript aprovados; aguarda deploy e smoke autenticado em produção.
 - [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; publicada e verificada em produção.
 - [x] **`explorer-four-projects-v3`**: publicado no Supabase e GitHub; verificação remota confirmou os quatro ciclos, 16 aulas completas, 69 entregáveis, 64 critérios e a atividade atribuída atualizada para o novo conteúdo.
 - [ ] **`ensaio-ponta-a-ponta`**: runbook em `docs/ensaio-ponta-a-ponta.md`. A Onda A administrativa foi integrada de `main` e a migration `0053` foi aplicada no Supabase em 30/09; o gate local de lint, 83 testes e build passou. Falta executar o ciclo real com uma conta de aluno de teste.
@@ -47,6 +48,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-10-10] Hotfix da fila de Revisões implementado em worktree isolado: o banco e a RPC estavam íntegros, mas o parser TypeScript rejeitava IDs determinísticos armazenados em colunas PostgreSQL `uuid` por exigir bits RFC de versão/variante. O contrato passou a validar a forma aceita pelo PostgreSQL tanto na leitura quanto na publicação do feedback; regressão coberta por teste com ID real do currículo.
 
 - [2026-10-05] A página de projeto deixou de inferir “Referências → Hipótese” por contagem de versões. A régua agora acompanha `AssignmentStatus`, explica que avança automaticamente e cada card informa a próxima ação. “Decisão registrada” virou “Registro da atividade”. Commit `c3d6778` publicado na Vercel; validação: 94 testes, lint, build, browser em 375 px sem overflow global e smoke de produção (`/login` 200; `/projetos` 307 para login).
 
@@ -102,6 +105,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-10] Colunas PostgreSQL `uuid` aceitam qualquer sequência hexadecimal no formato 8-4-4-4-12; IDs determinísticos do currículo não necessariamente carregam bits RFC de versão/variante. Validadores da fronteira precisam reproduzir o contrato do armazenamento ou um registro válido pode derrubar uma projeção inteira.
 
 - [2026-10-05] Uma régua pedagógica não pode avançar por uma soma indireta de versões e atividades concluídas quando o aluno interpreta cada rótulo como uma ação. O estado visual deve vir do mesmo enum que governa o workflow e explicar explicitamente quando a transição é automática.
 

@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-const Uuid = z.string().uuid();
+const POSTGRES_UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+
+/** PostgreSQL accepts UUID-shaped values without enforcing RFC version/variant bits. */
+export function isPostgresUuid(value: unknown): value is string {
+  return typeof value === "string" && POSTGRES_UUID_PATTERN.test(value);
+}
+
+const Uuid = z.string().regex(POSTGRES_UUID_PATTERN, "Identificador UUID inválido.");
 const PageLimit = z.coerce.number().int().min(1).max(100).default(25);
 
 export const ReviewQueueQuerySchema = z.object({
