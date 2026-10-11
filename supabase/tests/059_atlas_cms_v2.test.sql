@@ -148,7 +148,7 @@ select throws_ok(
 );
 
 select ok((select bool_and(private.knowledge_content_blocks_valid(content_blocks)) from logos_academy.concepts where status='published' and deleted_at is null),'all published concepts use typed valid blocks');
-select ok((select bool_and(exists(select 1 from jsonb_array_elements(c.content_blocks) b where b->>'type' in ('image','diagram','gallery','comparison','steps','checklist','do_dont','palette','typography','specimen'))) from logos_academy.concepts c where c.status='published' and c.deleted_at is null),'all published concepts persist a visual block');
+select ok((select bool_and(exists(select 1 from jsonb_array_elements(c.content_blocks) b where b->>'type' in ('image','diagram','gallery','comparison','steps','checklist','do_dont','palette','typography','specimen'))) from logos_academy.concepts c join logos_academy.tenants t on t.id=c.tenant_id where t.slug='logos-academy' and c.status='published' and c.deleted_at is null),'all published Academy concepts persist a visual block');
 
 select ok(not private.knowledge_content_blocks_valid(jsonb_build_array(jsonb_build_object('id',gen_random_uuid(),'isVisible',true,'type','text','heading','X','body','Y','html','<script>'))),'closed block union rejects HTML/extra keys');
 select ok(not private.knowledge_content_blocks_valid(jsonb_build_array(jsonb_build_object('id',gen_random_uuid(),'isVisible',true,'type','image','source',jsonb_build_object('kind','external','url','https://example.test/a.png','alt','A','css','display:none')))),'closed image source rejects CSS/extra keys');
