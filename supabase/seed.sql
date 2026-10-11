@@ -23,7 +23,7 @@ where id in (
 on conflict (provider_id, provider) do nothing;
 
 insert into logos_academy.tenants (id, tenant_id, name, slug) values
-  ('10000000-0000-0000-0000-000000000001','10000000-0000-0000-0000-000000000001','Logos Academy','logos-academy'),
+  ('10000000-0000-0000-0000-000000000001','10000000-0000-0000-0000-000000000001','Logos Academy Fixture','logos-academy-fixture'),
   ('20000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000001','Academy Isolamento','academy-isolamento')
 on conflict (id) do nothing;
 
