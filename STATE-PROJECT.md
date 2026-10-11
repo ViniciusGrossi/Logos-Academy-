@@ -2,9 +2,9 @@
 title: "Logos Academy Platform — State of Project"
 date: 2026-10-11
 fase_atual: "12"
-etapa_atual: "Nova experiência de Revisões implementada e validada localmente; aguardando gate de deploy"
+etapa_atual: "Nova experiência de Revisões publicada e verificada em produção"
 produto_tipo: "saas-premium"
-proximo_passo: "Aprovar deploy; aplicar a migration 20261010120000_review_overview.sql e publicar a experiência de Revisões após o gate humano"
+proximo_passo: "Executar o ensaio autenticado da revisão com uma nova entrega real de aluno"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -24,7 +24,7 @@ overrides:
   - gate: npm-audit
     data: 2026-09-08
     motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
-status: "🟡 Produção estável · Revisões v2 validada localmente e aguardando deploy"
+status: "🟢 Produção estável · Revisões v2 publicada"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 # ESTADO — Logos Academy Platform
@@ -35,7 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [x] **`reviews-experience-v2`**: Mapa de Evidências por turma e atividade, roster completo de alunos, filtros operacionais e Mesa de Revisão premium implementados e validados em 1440/768/375. Aprovação sem observações e correção com orientação obrigatória estão cobertas por contrato e teste. A migration ainda não foi aplicada em produção.
+- [x] **`reviews-experience-v2`**: Mapa de Evidências por turma e atividade, roster completo de alunos, filtros operacionais e Mesa de Revisão premium publicados em `https://logos-academy-three.vercel.app/admin/revisoes`. Migration aplicada e função validada com bloqueio para `anon`/`authenticated` e acesso exclusivo do backend.
 - [x] **`reviews-postgres-uuid-hotfix`**: causa do “Sinal interrompido” identificada nos validadores da aplicação; fila e publicação de revisão agora aceitam UUIDs determinísticos já persistidos pelo currículo. Teste focado, lint e TypeScript aprovados; aguarda deploy e smoke autenticado em produção.
 - [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; publicada e verificada em produção.
 - [x] **`explorer-four-projects-v3`**: publicado no Supabase e GitHub; verificação remota confirmou os quatro ciclos, 16 aulas completas, 69 entregáveis, 64 critérios e a atividade atribuída atualizada para o novo conteúdo.
@@ -49,6 +49,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-10-11] Revisões v2 publicada pelo commit `1d09408`: migration `review_overview` aplicada no Supabase e produção Vercel `dpl_2jSsEGNDM7ddvBAxVqtnEmp8CqU4` em estado `READY`. Smoke: `/login` 200, `/admin/revisoes` 307 para login sem sessão, API administrativa 401 anônima, CSP/HSTS presentes, função remota retornando atividades e alunos, nenhum erro novo nos logs Vercel ou PostgreSQL. Rollback: promover o deployment anterior na Vercel e restaurar as funções pela migration `0050` se necessário.
 
 - [2026-10-11] A experiência administrativa de Revisões foi reconstruída em dois níveis: o Mapa de Evidências parte das matrículas da turma para mostrar também quem ainda não enviou; a Mesa de Revisão separa evidências, histórico, rubrica, correções obrigatórias e sugestões opcionais. O administrador pode aprovar sem escrever feedback quando tudo está satisfatório. Foram adicionados endpoint tipado, RPC backend-only, pgTAP, regressões unitárias e referências visuais. Lint, TypeScript, 94 testes aplicáveis e build passaram; o pgTAP novo aguarda ambiente Supabase local ou aplicação controlada da migration.
 
