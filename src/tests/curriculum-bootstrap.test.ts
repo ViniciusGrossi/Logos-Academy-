@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { describe, expect, it } from "vitest";
 
 import { AppError } from "@/src/lib/api-error";
@@ -8,10 +5,18 @@ import { InMemoryCurriculumRepository } from "@/src/modules/curriculum/repositor
 import { CurriculumImportService } from "@/src/modules/curriculum/service";
 
 const tenantId = "11111111-1111-4111-8111-111111111111";
-const canonicalSource = readFileSync(
-  path.resolve("..", "Curriculo", "Curriculo_Operacional_Explorer.md"),
-  "utf8",
-);
+const canonicalSource = Array.from({ length: 4 }, (_, cycleIndex) => {
+  const cycle = cycleIndex + 1;
+  const lessons = Array.from({ length: 4 }, (_, lessonIndex) => {
+    const lesson = cycleIndex * 4 + lessonIndex + 1;
+    const title = lesson === 16 ? "Demo Day" : `Aula de constru\u00e7\u00e3o ${lesson}`;
+    const content = lesson === 16 ? "Apresente o projeto e registre a reflex\u00e3o final." : `Conte\u00fado da aula ${lesson}.`;
+
+    return `## Aula ${lesson} \u2014 ${title}\n\n### Objetivo da aula\n\nObjetivo verific\u00e1vel da aula ${lesson}.\n\n### Conte\u00fado\n\n${content}\n\n### Entrega do aluno\n\nEvid\u00eancia da aula ${lesson}.\n\n### Atividade pr\u00e1tica\n\nConstrua e registre a vers\u00e3o ${lesson}.\n\n### Tarefa p\u00f3s-aula\n\nPrepare a pr\u00f3xima decis\u00e3o.\n\n### Crit\u00e9rio de conclus\u00e3o\n\nA entrega explica a decis\u00e3o.`;
+  }).join("\n\n");
+
+  return `# Ciclo ${cycle} \u2014 Projeto ${cycle}\n\n## Resultado esperado\n\nProjeto ${cycle} \u2014 Projeto ${cycle}: uma entrega demonstr\u00e1vel.\n\n${lessons}`;
+}).join("\n\n");
 
 describe("curriculum", () => {
   it("mantém IDs e contagens estáveis ao importar o Explorer novamente", async () => {

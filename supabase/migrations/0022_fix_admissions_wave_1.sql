@@ -20,12 +20,13 @@ begin
 end; $$;
 
 create or replace function logos_academy.clear_student_invitation_auth(p_tenant_id uuid,p_actor_user_id uuid,p_idempotency_key text,p_payload_hash bytea,p_auth_user_id uuid)
-returns void language plpgsql security definer set search_path='' as $$
+returns jsonb language plpgsql security definer set search_path='' as $$
 begin
   perform private.assert_tenant_admin(p_tenant_id,p_actor_user_id);
   update logos_academy.idempotency_keys set auth_user_id=null, invitation_sent_at=null
   where tenant_id=p_tenant_id and actor_user_id=p_actor_user_id and route='admin.students.invite' and key=btrim(p_idempotency_key) and payload_hash=p_payload_hash and auth_user_id=p_auth_user_id and result is null and deleted_at is null;
   if not found then raise exception using errcode='P0002',message='pending invitation binding not found'; end if;
+  return jsonb_build_object('state','claimed','cleared',true);
 end; $$;
 
 create or replace function logos_academy.activate_invited_student(p_tenant_id uuid,p_auth_user_id uuid)

@@ -4,9 +4,9 @@ Estas referências já foram fornecidas e aprovadas como identidade da Logos Aca
 
 ## Fontes canônicas
 
-- `../../../logo.png` — logo original recortada e sem fundo.
-- `../../../Logos_Academy_Design_System.md` — design system institucional.
-- `../../../logos-academy-identidade-de-marca.md` — posicionamento e identidade verbal/visual.
+- `../../../02-Marca/logo.png` — logo original recortada e sem fundo.
+- `../../../02-Marca/Logos_Academy_Design_System.md` — design system institucional.
+- `../../../01-Estrategia/logos-academy-identidade-de-marca.md` — posicionamento e identidade verbal/visual.
 - `../../../Design/Design.md` — especificação visual detalhada.
 - `../../../Design/tokens.css` e `../../../Design/tokens.json` — tokens existentes.
 - `../../../Design/components.md` — componentes e padrões.
