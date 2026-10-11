@@ -24,6 +24,7 @@ select distinct tenant_id
 from target_users;
 
 do $$
+declare v_external_reference boolean := false;
 begin
   -- A limpeza nasceu para a base remota com um administrador preservado.
   -- Em uma migração limpa de CI ainda não há contas; nesse caso ela é no-op.
@@ -34,23 +35,21 @@ begin
     raise exception 'expected exactly one retained Academy administrator';
   end if;
 
-  if exists (
-    select 1
-    from delphi.tenants d
-    join target_auth_users t on t.id = d.auth_user_id
-  ) or exists (
-    select 1
-    from iris.tenant_members m
-    join target_auth_users t on t.id = m.user_id
-  ) or exists (
-    select 1
-    from public.profiles p
-    join target_auth_users t on t.id = p.id
-  ) or exists (
-    select 1
-    from storage.objects o
-    join target_auth_users t on t.id::text = o.owner_id
-  ) then
+  -- Alguns schemas pertencem a outros produtos do vault e não fazem parte
+  -- do Supabase isolado. A proteção só consulta uma tabela quando ela existe.
+  if to_regclass('delphi.tenants') is not null then
+    execute 'select exists (select 1 from delphi.tenants d join target_auth_users t on t.id = d.auth_user_id)' into v_external_reference;
+  end if;
+  if not v_external_reference and to_regclass('iris.tenant_members') is not null then
+    execute 'select exists (select 1 from iris.tenant_members m join target_auth_users t on t.id = m.user_id)' into v_external_reference;
+  end if;
+  if not v_external_reference and to_regclass('public.profiles') is not null then
+    execute 'select exists (select 1 from public.profiles p join target_auth_users t on t.id = p.id)' into v_external_reference;
+  end if;
+  if not v_external_reference and to_regclass('storage.objects') is not null then
+    execute 'select exists (select 1 from storage.objects o join target_auth_users t on t.id::text = o.owner_id)' into v_external_reference;
+  end if;
+  if v_external_reference then
     raise exception 'refusing to delete Academy accounts referenced outside the Academy scope';
   end if;
 end;
