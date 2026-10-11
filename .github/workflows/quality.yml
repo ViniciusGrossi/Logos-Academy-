@@ -2,7 +2,7 @@ name: Quality gate
 
 on:
   push:
-    branches: [main]
+    branches: [main, validate/atlas-cms-pgtap]
   pull_request:
     branches: [main]
   workflow_dispatch:
