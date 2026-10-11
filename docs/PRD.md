@@ -678,7 +678,7 @@ Autenticação, convite e recuperação de senha usam fluxos oficiais do Supabas
 | `../../Curriculo/Curriculo_Operacional_Explorer.md` | estrutura das 16 aulas, quatro ciclos e critérios pedagógicos |
 | `specs/product.schema.json` | entidades, invariantes e relações do produto |
 | `specs/api.contracts.ts` | contratos executáveis dos endpoints |
-| `../../prd-plataforma-logos-academy.md` | referência histórica; não é fonte canônica |
+| `../../01-Estrategia/prd-plataforma-logos-academy.md` | referência histórica; não é fonte canônica |
 
 ## 20. PRD Lock
 

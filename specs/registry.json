@@ -184,11 +184,23 @@
       "status": "approved",
       "wave": 9,
       "scope": "student-glossary",
-      "built": false,
+      "built": true,
       "reviewed": false,
       "dependencies": [
         "student-experience-elevation",
         "student-home-journey-concepts"
+      ]
+    },
+    "atlas-cms-v2": {
+      "spec": "docs/specs/atlas-cms-v2.md",
+      "status": "approved",
+      "wave": 10,
+      "scope": "admin-atlas-editorial-cms",
+      "built": false,
+      "reviewed": false,
+      "dependencies": [
+        "student-knowledge-atlas",
+        "admin-dashboard"
       ]
     },
     "explorer-activity-system-v2": {

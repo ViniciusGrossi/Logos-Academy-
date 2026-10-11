@@ -235,4 +235,4 @@ Videoaulas, catálogo, IA, ranking, pagamentos, CMS e automações estão explic
 
 ## Fonte legada
 
-O documento `../prd-plataforma-logos-academy.md` é referência histórica e não é fonte de verdade. O novo `docs/PRD.md` será escrito do zero na Fase 2 após aprovação explícita deste documento.
+O documento `../01-Estrategia/prd-plataforma-logos-academy.md` é referência histórica e não é fonte de verdade. O novo `docs/PRD.md` será escrito do zero na Fase 2 após aprovação explícita deste documento.

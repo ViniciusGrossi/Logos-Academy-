@@ -735,8 +735,11 @@ function ContentBlock({ block }: { block: KnowledgeContentBlock }) {
     return <aside className={styles.calloutBlock}><Sparkles aria-hidden="true" /><div><h3>{block.heading}</h3><p>{block.body}</p></div></aside>;
   }
   if (block.type === "image") {
-    return <figure className={styles.imageBlock}><Image src={block.url} alt={block.alt} width={1200} height={675} sizes="(max-width: 900px) 100vw, 760px" unoptimized />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>;
+    const source = "source" in block ? block.source : { kind: "external" as const, url: block.url as `https://${string}`, alt: block.alt, caption: block.caption };
+    if (source.kind !== "external") return null;
+    return <figure className={styles.imageBlock}><Image src={source.url} alt={source.alt} width={1200} height={675} sizes="(max-width: 900px) 100vw, 760px" unoptimized />{source.caption && <figcaption>{source.caption}</figcaption>}</figure>;
   }
+  if (block.type !== "diagram") return null;
   return (
     <section className={styles.diagramBlock}>
       <h3>{block.heading}</h3>

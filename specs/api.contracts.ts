@@ -154,25 +154,94 @@ export interface ConceptSummary {
   title: string;
   summary: string;
   releasedAt: ISODateTime;
+  /** Campos adicionados pelo Atlas v2; opcionais enquanto o backfill antigo estiver em leitura. */
+  videoAvailable?: boolean;
+  tags?: readonly string[];
 }
 
-export type KnowledgeContentBlock =
-  | { type: "text"; heading: string; body: string }
-  | { type: "callout"; heading: string; body: string }
-  | { type: "image"; url: string; alt: string; caption: string | null }
-  | {
+export type KnowledgeItemStatus = "draft" | "published" | "archived";
+export type AtlasItemKind = "concept" | "prompt" | "design_system";
+export type AtlasBlockBase = { id: UUID; isVisible: boolean };
+export type AtlasImageSource =
+  | { kind: "asset"; assetId: UUID; alt: string; caption?: string }
+  | { kind: "external"; url: `https://${string}`; alt: string; caption?: string };
+export type AtlasSpecimen =
+  | { component: "button"; props: { label: string; variant: "primary" | "secondary" | "outline"; disabled: boolean } }
+  | { component: "field"; props: { label: string; placeholder: string; helpText?: string; state: "default" | "error" | "success" } }
+  | { component: "card"; props: { eyebrow?: string; title: string; body: string; actionLabel?: string } }
+  | { component: "badge"; props: { label: string; tone: "neutral" | "accent" | "success" | "warning" } }
+  | { component: "callout"; props: { title: string; body: string; tone: "info" | "warning" | "success" } }
+  | { component: "navigation"; props: { items: readonly string[]; activeIndex: number } }
+  | { component: "editorial"; props: { eyebrow?: string; title: string; summary: string } };
+
+export type AtlasContentBlock =
+  | (AtlasBlockBase & { type: "text"; heading: string; body: string })
+  | (AtlasBlockBase & { type: "callout"; heading: string; body: string })
+  | (AtlasBlockBase & { type: "image"; source: AtlasImageSource })
+  | (AtlasBlockBase & {
       type: "diagram";
       heading: string;
       nodes: readonly { label: string; detail: string }[];
-    };
+    })
+  | (AtlasBlockBase & { type: "section"; heading: string })
+  | (AtlasBlockBase & { type: "list"; ordered: boolean; items: readonly string[] })
+  | (AtlasBlockBase & { type: "gallery"; items: readonly AtlasImageSource[] })
+  | (AtlasBlockBase & { type: "code"; language: string; code: string })
+  | (AtlasBlockBase & { type: "quote"; body: string; attribution?: string })
+  | (AtlasBlockBase & {
+      type: "comparison";
+      heading: string;
+      left: { eyebrow?: string; title: string; body: string };
+      right: { eyebrow?: string; title: string; body: string };
+      emphasis: "left" | "right" | "balanced";
+    })
+  | (AtlasBlockBase & { type: "steps"; heading: string; items: readonly { title: string; body?: string }[] })
+  | (AtlasBlockBase & { type: "checklist"; heading: string; items: readonly { label: string; detail?: string }[] })
+  | (AtlasBlockBase & { type: "do_dont"; heading: string; do: readonly string[]; dont: readonly string[] })
+  | (AtlasBlockBase & { type: "palette"; heading: string; colors: readonly { name: string; value: string; usage?: string }[] })
+  | (AtlasBlockBase & { type: "typography"; heading: string; samples: readonly { role: string; family: string; weight: string; sample: string }[] })
+  | (AtlasBlockBase & { type: "specimen"; heading: string } & AtlasSpecimen);
+
+/**
+ * Conteúdo pré-CMS que continua legível até o backfill editorial ser aplicado.
+ * Escritas administrativas usam exclusivamente `AtlasContentBlock`.
+ */
+export type LegacyKnowledgeContentBlock =
+  | { type: "text"; heading: string; body: string }
+  | { type: "callout"; heading: string; body: string }
+  | { type: "image"; url: string; alt: string; caption?: string }
+  | { type: "diagram"; heading: string; nodes: readonly { label: string; detail: string }[] };
+
+export type KnowledgeContentBlock = AtlasContentBlock | LegacyKnowledgeContentBlock;
+
+export interface KnowledgeVideo {
+  youtubeId: string;
+  title: string;
+  durationMinutes: number;
+  transcript: string | null;
+  captionsReviewed: boolean;
+}
+
+export interface ResolvedAtlasAsset {
+  id: UUID;
+  readUrl: string;
+  expiresAt: ISODateTime;
+  alt: string;
+  caption: string | null;
+  width: number;
+  height: number;
+  contentType: "image/png" | "image/jpeg" | "image/webp";
+}
 
 export interface ConceptDetail extends ConceptSummary {
   body: string;
   videoUrl: string | null;
   videoTitle: string | null;
   videoDurationMinutes: number | null;
+  video?: KnowledgeVideo | null;
   readingMinutes: number;
   contentBlocks: readonly KnowledgeContentBlock[];
+  resolvedAssets?: readonly ResolvedAtlasAsset[];
   relatedConcepts: readonly ConceptSummary[];
 }
 
@@ -209,7 +278,95 @@ export interface LibraryResourceDetail extends LibraryResourceSummary {
   readingMinutes: number;
   contentBlocks: readonly KnowledgeContentBlock[];
   artifact: LibraryArtifact;
+  resolvedAssets?: readonly ResolvedAtlasAsset[];
   relatedResources: readonly LibraryResourceSummary[];
+}
+
+export interface AdminAtlasListQuery extends PageQuery {
+  kind?: AtlasItemKind;
+  status?: KnowledgeItemStatus;
+  curriculum?: UUID;
+  cycle?: UUID;
+  lesson?: UUID;
+  tags?: readonly string[];
+  search?: string;
+}
+
+export interface AdminAtlasCreateInput { kind: AtlasItemKind; title: string }
+export interface AdminAtlasDraftCommon {
+  title: string;
+  slug: string;
+  summary: string;
+  tags: readonly string[];
+  lessonTemplateIds: readonly UUID[];
+  contentBlocks: readonly AtlasContentBlock[];
+}
+export type AdminAtlasConceptDraft = AdminAtlasDraftCommon & { kind: "concept"; video: KnowledgeVideo | null; artifact: null };
+export type AdminAtlasPromptDraft = AdminAtlasDraftCommon & { kind: "prompt"; video: null; artifact: Extract<LibraryArtifact, { type: "prompt" }> };
+export type AdminAtlasDesignSystemDraft = AdminAtlasDraftCommon & { kind: "design_system"; video: null; artifact: Extract<LibraryArtifact, { type: "design_system" }> };
+export type AdminAtlasDraftInput = AdminAtlasConceptDraft | AdminAtlasPromptDraft | AdminAtlasDesignSystemDraft;
+export interface AdminAtlasSaveInput { expectedDraftUpdatedAt: ISODateTime | null; draft: AdminAtlasDraftInput }
+export interface AdminAtlasRestoreInput { itemId: UUID; revision: number; expectedDraftUpdatedAt: ISODateTime | null }
+export interface AdminAtlasListItem {
+  id: UUID;
+  kind: AtlasItemKind;
+  title: string;
+  summary: string;
+  status: KnowledgeItemStatus;
+  tags: readonly string[];
+  linkedLessonCount: number;
+  hasWorkingDraft: boolean;
+  itemUpdatedAt: ISODateTime;
+  draftUpdatedAt: ISODateTime | null;
+  updatedByUserId: UUID | null;
+}
+export interface AdminAsset {
+  id: UUID;
+  ownerKind: "concept" | "resource";
+  ownerId: UUID;
+  status: "pending" | "ready" | "failed";
+  filename: string;
+  contentType: "image/png" | "image/jpeg" | "image/webp";
+  sizeBytes: number;
+  width: number | null;
+  height: number | null;
+  alt: string | null;
+  caption: string | null;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
+}
+export interface AdminAtlasDetailBase {
+  id: UUID;
+  status: KnowledgeItemStatus;
+  itemUpdatedAt: ISODateTime;
+  publishedAt: ISODateTime | null;
+  archivedAt: ISODateTime | null;
+  hasWorkingDraft: boolean;
+  draftUpdatedAt: ISODateTime | null;
+  assets: readonly AdminAsset[];
+  resolvedAssets: readonly ResolvedAtlasAsset[];
+  revisionCount: number;
+}
+export type AdminAtlasDetail = AdminAtlasDetailBase & (
+  | { kind: "concept"; draft: AdminAtlasConceptDraft; published: AdminAtlasConceptDraft | null }
+  | { kind: "prompt"; draft: AdminAtlasPromptDraft; published: AdminAtlasPromptDraft | null }
+  | { kind: "design_system"; draft: AdminAtlasDesignSystemDraft; published: AdminAtlasDesignSystemDraft | null }
+);
+export interface AdminAssetUploadRequest {
+  ownerKind: "concept" | "resource";
+  ownerId: UUID;
+  filename: string;
+  contentType: "image/png" | "image/jpeg" | "image/webp";
+  sizeBytes: number;
+}
+export interface AdminAssetFinalizeInput { alt: string; caption?: string }
+export interface AdminAssetUploadResponse { asset: AdminAsset; signedUploadUrl: string; expiresAt: ISODateTime }
+export interface AdminAtlasRevisionListItem {
+  revision: number;
+  reason: "save" | "publish" | "archive" | "restore";
+  title: string;
+  createdByUserId: UUID;
+  createdAt: ISODateTime;
 }
 
 export interface ActivityCriterion {
@@ -719,6 +876,37 @@ export interface ApiContracts {
     PageQuery & { studentId: UUID; enrollmentId?: UUID },
     Page<AdminStudentAttendanceEntry>
   >;
+  "GET /api/admin/atlas": Endpoint<AdminAtlasListQuery, Page<AdminAtlasListItem>>;
+  "POST /api/admin/atlas": Endpoint<AdminAtlasCreateInput, AdminAtlasDetail>;
+  "GET /api/admin/atlas/:itemId": Endpoint<{ itemId: UUID }, AdminAtlasDetail>;
+  "PATCH /api/admin/atlas/:itemId": Endpoint<
+    { itemId: UUID } & AdminAtlasSaveInput,
+    AdminAtlasDetail
+  >;
+  "POST /api/admin/atlas/:itemId/publish": Endpoint<
+    { itemId: UUID; expectedDraftUpdatedAt: ISODateTime; expectedItemUpdatedAt: ISODateTime },
+    AdminAtlasDetail
+  >;
+  "POST /api/admin/atlas/:itemId/archive": Endpoint<
+    { itemId: UUID; expectedItemUpdatedAt: ISODateTime },
+    AdminAtlasDetail
+  >;
+  "GET /api/admin/atlas/:itemId/revisions": Endpoint<
+    { itemId: UUID } & PageQuery,
+    Page<AdminAtlasRevisionListItem>
+  >;
+  "POST /api/admin/atlas/:itemId/revisions/:revision/restore": Endpoint<
+    AdminAtlasRestoreInput,
+    AdminAtlasDetail
+  >;
+  "POST /api/admin/atlas/assets/upload-url": Endpoint<
+    AdminAssetUploadRequest,
+    AdminAssetUploadResponse
+  >;
+  "POST /api/admin/atlas/assets/:assetId/finalize": Endpoint<
+    { assetId: UUID } & AdminAssetFinalizeInput,
+    AdminAsset
+  >;
 
   "GET /api/student/home": Endpoint<Record<string, never>, StudentHome>;
   "POST /api/student/reviews/:reviewId/seen": Endpoint<
@@ -747,7 +935,7 @@ export interface ApiContracts {
     }>
   >;
   "GET /api/student/concepts": Endpoint<
-    PageQuery & { search?: string },
+    PageQuery & { search?: string; cycle?: UUID; lesson?: UUID; hasVideo?: boolean; readingMax?: number },
     Page<ConceptSummary>
   >;
   "GET /api/student/concepts/:conceptId": Endpoint<
@@ -755,7 +943,7 @@ export interface ApiContracts {
     ConceptDetail
   >;
   "GET /api/student/library": Endpoint<
-    PageQuery & { kind: LibraryResourceKind; search?: string },
+    PageQuery & { kind: LibraryResourceKind; search?: string; cycle?: UUID; lesson?: UUID; tags?: readonly string[] },
     Page<LibraryResourceSummary>
   >;
   "GET /api/student/library/:resourceId": Endpoint<
