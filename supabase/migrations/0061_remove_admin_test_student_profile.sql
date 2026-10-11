@@ -15,7 +15,12 @@ join retained_admin a on a.id = u.auth_user_id;
 
 do $$
 begin
-  if (select count(*) from retained_admin) <> 1 then
+  -- Em CI a base começa sem contas. Só exigir o administrador quando houver
+  -- um perfil de aluno que esta migration possa efetivamente remover.
+  if (select count(*) from retained_admin) = 0
+     and exists (select 1 from admin_student_profiles) then
+    raise exception 'expected exactly one retained Academy administrator';
+  elsif (select count(*) from retained_admin) > 1 then
     raise exception 'expected exactly one retained Academy administrator';
   end if;
 

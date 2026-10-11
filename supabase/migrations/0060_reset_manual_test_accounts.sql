@@ -25,7 +25,12 @@ from target_users;
 
 do $$
 begin
-  if (select count(*) from retained_admin) <> 1 then
+  -- A limpeza nasceu para a base remota com um administrador preservado.
+  -- Em uma migração limpa de CI ainda não há contas; nesse caso ela é no-op.
+  if (select count(*) from retained_admin) = 0
+     and exists (select 1 from target_users) then
+    raise exception 'expected exactly one retained Academy administrator';
+  elsif (select count(*) from retained_admin) > 1 then
     raise exception 'expected exactly one retained Academy administrator';
   end if;
 
