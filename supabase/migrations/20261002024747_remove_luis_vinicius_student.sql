@@ -18,20 +18,26 @@ select distinct auth_user_id as id
 from target_users;
 
 do $$
+declare v_external_reference boolean := false;
 begin
-  if (select count(*) from target_users) <> 1 then
+  -- A remoção é idempotente: em uma base limpa não há aluno a remover.
+  if (select count(*) from target_users) > 1 then
     raise exception 'expected exactly one matching Academy student';
   end if;
 
-  if exists (
-    select 1 from storage.objects o join target_auth_users t on t.id::text = o.owner_id
-  ) or exists (
-    select 1 from public.profiles p join target_auth_users t on t.id = p.id
-  ) or exists (
-    select 1 from delphi.tenants d join target_auth_users t on t.id = d.auth_user_id
-  ) or exists (
-    select 1 from iris.tenant_members m join target_auth_users t on t.id = m.user_id
-  ) then
+  if to_regclass('storage.objects') is not null then
+    execute 'select exists (select 1 from storage.objects o join target_auth_users t on t.id::text = o.owner_id)' into v_external_reference;
+  end if;
+  if not v_external_reference and to_regclass('public.profiles') is not null then
+    execute 'select exists (select 1 from public.profiles p join target_auth_users t on t.id = p.id)' into v_external_reference;
+  end if;
+  if not v_external_reference and to_regclass('delphi.tenants') is not null then
+    execute 'select exists (select 1 from delphi.tenants d join target_auth_users t on t.id = d.auth_user_id)' into v_external_reference;
+  end if;
+  if not v_external_reference and to_regclass('iris.tenant_members') is not null then
+    execute 'select exists (select 1 from iris.tenant_members m join target_auth_users t on t.id = m.user_id)' into v_external_reference;
+  end if;
+  if v_external_reference then
     raise exception 'refusing to delete student with external references';
   end if;
 end;
