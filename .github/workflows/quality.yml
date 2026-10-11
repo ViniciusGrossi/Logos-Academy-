@@ -43,5 +43,9 @@ jobs:
       - run: npm ci
       - name: Start isolated Supabase stack
         run: npx --yes supabase@2.118.0 start
+      - name: Run Atlas CMS pgTAP contracts
+        if: github.ref == 'refs/heads/validate/atlas-cms-pgtap'
+        run: npx --yes supabase@2.118.0 test db supabase/tests/059_atlas_cms_v2.test.sql
       - name: Run pgTAP contracts
+        if: github.ref != 'refs/heads/validate/atlas-cms-pgtap'
         run: npm run test:db
