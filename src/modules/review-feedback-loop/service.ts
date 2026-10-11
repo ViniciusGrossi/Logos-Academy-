@@ -1,6 +1,6 @@
-import type { AdminSubmissionWorkspace, Page, ReviewDetail, ReviewQueueSubmission } from "@/specs/api.contracts";
+import type { AdminSubmissionWorkspace, Page, ReviewDetail, ReviewOverview, ReviewQueueSubmission } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
-import { PublishReviewSchema, ReviewQueueQuerySchema, StudentSubmissionsQuerySchema, SubmissionPathSchema } from "@/src/modules/review-feedback-loop/schema";
+import { PublishReviewSchema, ReviewOverviewQuerySchema, ReviewQueueQuerySchema, StudentSubmissionsQuerySchema, SubmissionPathSchema } from "@/src/modules/review-feedback-loop/schema";
 import type { AdminActor, ReviewFeedbackStore } from "@/src/modules/review-feedback-loop/repository";
 
 export class ReviewFeedbackService {
@@ -10,11 +10,18 @@ export class ReviewFeedbackService {
     return this.repository.page(actor, parse(ReviewQueueQuerySchema, query, requestId), requestId);
   }
 
+  async overview(actor: AdminActor, query: unknown, requestId: string): Promise<ReviewOverview> {
+    return this.repository.overview(actor, parse(ReviewOverviewQuerySchema, query, requestId), requestId);
+  }
+
   async publish(actor: AdminActor, input: unknown, requestId: string): Promise<ReviewDetail> {
     const parsed = parse(PublishReviewSchema, input, requestId);
     const needsAdjustment = parsed.criteria.some((criterion) => criterion.result === "needs_adjustment");
     if ((parsed.decision === "approved" && needsAdjustment) || (parsed.decision === "revision_requested" && !needsAdjustment)) {
       throw new AppError("VALIDATION_ERROR", "A decisão deve corresponder aos resultados da rubrica.", requestId, { decision: ["Use revisão solicitada quando houver ajuste; aprove somente quando todos os critérios forem atendidos."] });
+    }
+    if (needsAdjustment && !parsed.feedback) {
+      throw new AppError("VALIDATION_ERROR", "Explique ao aluno o que precisa ser corrigido.", requestId, { feedback: ["A orientação é obrigatória quando há ajuste."] });
     }
     return this.repository.publish(actor, parsed, requestId);
   }

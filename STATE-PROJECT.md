@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-10-10
+date: 2026-10-11
 fase_atual: "12"
-etapa_atual: "Correção do fluxo da página de projeto publicada e verificada em produção"
+etapa_atual: "Nova experiência de Revisões implementada e validada localmente; aguardando gate de deploy"
 produto_tipo: "saas-premium"
-proximo_passo: "Retomar o ensaio ponta-a-ponta com o aluno da turma-piloto Explorer v3, incluindo convite, ativação, entrega, revisão, reentrega, aprovação, apresentação e conclusão"
+proximo_passo: "Aprovar deploy; aplicar a migration 20261010120000_review_overview.sql e publicar a experiência de Revisões após o gate humano"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -19,12 +19,12 @@ gates:
   fase_10: pass
   fase_11: pass
   fase_12: pass
-features: { draft: 0, approved: 15, built: 15, reviewed: 12 }
+features: { draft: 0, approved: 15, built: 15, reviewed: 13 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08
     motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
-status: "🟢 Produção estável · fluxo da página Projetos publicado"
+status: "🟡 Produção estável · Revisões v2 validada localmente e aguardando deploy"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 # ESTADO — Logos Academy Platform
@@ -35,6 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [x] **`reviews-experience-v2`**: Mapa de Evidências por turma e atividade, roster completo de alunos, filtros operacionais e Mesa de Revisão premium implementados e validados em 1440/768/375. Aprovação sem observações e correção com orientação obrigatória estão cobertas por contrato e teste. A migration ainda não foi aplicada em produção.
 - [x] **`reviews-postgres-uuid-hotfix`**: causa do “Sinal interrompido” identificada nos validadores da aplicação; fila e publicação de revisão agora aceitam UUIDs determinísticos já persistidos pelo currículo. Teste focado, lint e TypeScript aprovados; aguarda deploy e smoke autenticado em produção.
 - [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; publicada e verificada em produção.
 - [x] **`explorer-four-projects-v3`**: publicado no Supabase e GitHub; verificação remota confirmou os quatro ciclos, 16 aulas completas, 69 entregáveis, 64 critérios e a atividade atribuída atualizada para o novo conteúdo.
@@ -48,6 +49,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 - [ ] Implementação do milestone `student-experience-elevation`: redesign de Início, Jornada, Projetos e Atividade; produção permanece estável até validação visual e deploy aprovado.
 
 ## Concluído
+
+- [2026-10-11] A experiência administrativa de Revisões foi reconstruída em dois níveis: o Mapa de Evidências parte das matrículas da turma para mostrar também quem ainda não enviou; a Mesa de Revisão separa evidências, histórico, rubrica, correções obrigatórias e sugestões opcionais. O administrador pode aprovar sem escrever feedback quando tudo está satisfatório. Foram adicionados endpoint tipado, RPC backend-only, pgTAP, regressões unitárias e referências visuais. Lint, TypeScript, 94 testes aplicáveis e build passaram; o pgTAP novo aguarda ambiente Supabase local ou aplicação controlada da migration.
 
 - [2026-10-10] Hotfix da fila de Revisões implementado em worktree isolado: o banco e a RPC estavam íntegros, mas o parser TypeScript rejeitava IDs determinísticos armazenados em colunas PostgreSQL `uuid` por exigir bits RFC de versão/variante. O contrato passou a validar a forma aceita pelo PostgreSQL tanto na leitura quanto na publicação do feedback; regressão coberta por teste com ID real do currículo.
 
@@ -77,7 +80,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 | `docs/ideia.md` | aprovado | 2026-08-31 |
 | `docs/PRD.md` | aprovado e locked — v0.1.2 (SR-003) | 2026-09-04 |
 | `specs/product.schema.json` | validado | 2026-09-01 |
-| `specs/api.contracts.ts` | validado — 39 endpoints | 2026-09-01 |
+| `specs/api.contracts.ts` | validado — 40 endpoints | 2026-10-11 |
+| `docs/specs/review-feedback-loop.md` | built e validado localmente | 2026-10-11 |
 | `docs/ARCHITECTURE.md` | aprovado | 2026-09-01 |
 | `docs/tasks.md` | aprovado — tasks ≤4h | 2026-09-04 |
 | `specs/registry.json` | 10 features aprovadas | 2026-09-04 |
@@ -105,6 +109,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-11] Uma fila construída apenas a partir de entregas nunca consegue responder “quem ainda não enviou”. A projeção operacional de revisão deve começar pelas matrículas e atribuições da turma, anexando a entrega e o parecer quando existirem.
 
 - [2026-10-10] Colunas PostgreSQL `uuid` aceitam qualquer sequência hexadecimal no formato 8-4-4-4-12; IDs determinísticos do currículo não necessariamente carregam bits RFC de versão/variante. Validadores da fronteira precisam reproduzir o contrato do armazenamento ou um registro válido pode derrubar uma projeção inteira.
 

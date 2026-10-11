@@ -2,16 +2,17 @@ import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-import type { AdminSubmissionWorkspace, Page, ReviewDetail, ReviewQueueSubmission } from "@/specs/api.contracts";
+import type { AdminSubmissionWorkspace, Page, ReviewDetail, ReviewOverview, ReviewQueueSubmission } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
 import { mapRpcError } from "@/src/lib/supabase/rpc-error";
-import { parseReview, parseReviewQueuePage, parseWorkspace } from "@/src/modules/review-feedback-loop/contract";
-import type { PublishReviewInput, ReviewQueueQuery, StudentSubmissionsQuery } from "@/src/modules/review-feedback-loop/schema";
+import { parseReview, parseReviewOverview, parseReviewQueuePage, parseWorkspace } from "@/src/modules/review-feedback-loop/contract";
+import type { PublishReviewInput, ReviewOverviewQuery, ReviewQueueQuery, StudentSubmissionsQuery } from "@/src/modules/review-feedback-loop/schema";
 
 export type AdminActor = Readonly<{ tenantId: string; userId: string; role: "admin" }>;
 export interface ReviewFeedbackStore {
   page(actor: AdminActor, query: ReviewQueueQuery, requestId: string): Promise<Page<ReviewQueueSubmission>>;
+  overview(actor: AdminActor, query: ReviewOverviewQuery, requestId: string): Promise<ReviewOverview>;
   publish(actor: AdminActor, input: PublishReviewInput, requestId: string): Promise<ReviewDetail>;
   /** SR-A5 (Release 2): workspace único de revisão. */
   workspace(actor: AdminActor, submissionId: string, requestId: string): Promise<AdminSubmissionWorkspace>;
@@ -40,6 +41,15 @@ export class ReviewFeedbackRepository implements ReviewFeedbackStore {
       p_limit: query.limit,
     }, requestId);
     return parseReviewQueuePage(result, requestId);
+  }
+
+  async overview(actor: AdminActor, query: ReviewOverviewQuery, requestId: string): Promise<ReviewOverview> {
+    return parseReviewOverview(await this.rpc("admin_review_overview", {
+      p_tenant_id: actor.tenantId,
+      p_actor_user_id: actor.userId,
+      p_class_id: query.classId,
+      p_activity_template_id: query.activityId ?? null,
+    }, requestId), requestId);
   }
 
   async publish(actor: AdminActor, input: PublishReviewInput, requestId: string): Promise<ReviewDetail> {

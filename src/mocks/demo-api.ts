@@ -17,6 +17,7 @@ import type {
   ProjectDetail,
   ProjectSummary,
   ReviewDetail,
+  ReviewOverview,
   ReviewQueueSubmission,
   SessionSummary,
   SubmissionDetail,
@@ -51,6 +52,10 @@ const ids = {
   attendanceMarina: "00000000-0000-4000-8000-000000000041",
   attendanceCaio: "00000000-0000-4000-8000-000000000042",
   curriculum: "00000000-0000-4000-8000-000000000043",
+  reviewActivity: "00000000-0000-4000-8000-000000000044",
+  reviewEnrollment2: "00000000-0000-4000-8000-000000000045",
+  reviewEnrollment3: "00000000-0000-4000-8000-000000000046",
+  reviewEnrollment4: "00000000-0000-4000-8000-000000000047",
 };
 
 const sessions: readonly SessionSummary[] = Array.from(
@@ -437,10 +442,15 @@ function reviewQueueSubmission(): ReviewQueueSubmission {
 
 /** SR-A5 (Release 2): workspace único de revisão. */
 function adminSubmissionWorkspace(): AdminSubmissionWorkspace {
+  const current = reviewQueueSubmission();
   return {
-    ...reviewQueueSubmission(),
+    ...current,
+    version: 2,
+    review: null,
+    reviews: [],
+    activity: { title: "Contrato e interface do meu assistente", lessonPosition: 1, cyclePosition: 1 },
     requirements: activity().requirements,
-    previousVersions: [],
+    previousVersions: [{ ...current, id: ids.assignmentResearch, version: 1 }],
   };
 }
 
@@ -1259,6 +1269,22 @@ export async function demoApi<T>(
     return { assignmentIds: [ids.assignment], releasedAt: now } as T;
   if (method === "GET" && pathname === "/api/admin/reviews")
     return page([reviewQueueSubmission()]) as T;
+  if (method === "GET" && pathname === "/api/admin/reviews/overview")
+    return {
+      classSummary: { id: ids.class, name: classSummary.name },
+      selectedActivityId: ids.reviewActivity,
+      activities: [
+        { id: ids.reviewActivity, title: "Contrato e interface do meu assistente", lessonPosition: 1, cyclePosition: 1, awaitingReviewCount: 1 },
+        { id: ids.assignmentResearch, title: "Persona, modos e limites", lessonPosition: 2, cyclePosition: 1, awaitingReviewCount: 0 },
+        { id: ids.assignmentPrototype, title: "Memória e contexto seguro", lessonPosition: 3, cyclePosition: 1, awaitingReviewCount: 0 },
+      ],
+      students: [
+        { studentId: ids.marina, enrollmentId: ids.enrollment, displayName: "Marina Alves", assignmentId: ids.assignment, status: "submitted", dueAt: "2026-09-08T18:00:00.000Z", submissionId: ids.submission, version: 2, submittedAt: "2026-09-08T13:20:00.000Z", reviewedAt: null, isLate: false },
+        { studentId: ids.caio, enrollmentId: ids.reviewEnrollment2, displayName: "Caio Mendes", assignmentId: ids.assignmentResearch, status: "draft", dueAt: "2026-09-09T18:00:00.000Z", submissionId: null, version: null, submittedAt: null, reviewedAt: null, isLate: false },
+        { studentId: ids.reviewEnrollment3, enrollmentId: ids.reviewEnrollment3, displayName: "Luiza Nascimento", assignmentId: ids.assignmentPrototype, status: "revision_requested", dueAt: "2026-09-07T18:00:00.000Z", submissionId: ids.assignmentPrototype, version: 1, submittedAt: "2026-09-07T16:40:00.000Z", reviewedAt: "2026-09-08T09:10:00.000Z", isLate: false },
+        { studentId: ids.reviewEnrollment4, enrollmentId: ids.reviewEnrollment4, displayName: "Rafael Costa", assignmentId: ids.reviewEnrollment4, status: "approved", dueAt: "2026-09-07T18:00:00.000Z", submissionId: ids.reviewEnrollment4, version: 1, submittedAt: "2026-09-06T15:00:00.000Z", reviewedAt: "2026-09-07T11:30:00.000Z", isLate: false },
+      ],
+    } satisfies ReviewOverview as T;
   if (method === "GET" && /^\/api\/admin\/submissions\/[^/]+$/.test(pathname))
     return adminSubmissionWorkspace() as T;
   if (

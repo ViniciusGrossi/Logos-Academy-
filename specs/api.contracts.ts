@@ -330,6 +330,40 @@ export interface ReviewQueueSubmission extends SubmissionDetail {
   dueAt: ISODateTime | null;
 }
 
+export type ReviewRosterStatus = AssignmentStatus | "not_assigned";
+
+/** Atividade disponível no mapa de evidências da turma. */
+export interface ReviewOverviewActivity {
+  id: UUID;
+  title: string;
+  lessonPosition: number;
+  cyclePosition: number;
+  awaitingReviewCount: number;
+}
+
+/** Situação de um aluno na atividade selecionada. */
+export interface ReviewOverviewStudent {
+  studentId: UUID;
+  enrollmentId: UUID;
+  displayName: string;
+  assignmentId: UUID | null;
+  status: ReviewRosterStatus;
+  dueAt: ISODateTime | null;
+  submissionId: UUID | null;
+  version: number | null;
+  submittedAt: ISODateTime | null;
+  reviewedAt: ISODateTime | null;
+  isLate: boolean;
+}
+
+/** Read model da visão de turma em /admin/revisoes. */
+export interface ReviewOverview {
+  classSummary: { id: UUID; name: string };
+  activities: readonly ReviewOverviewActivity[];
+  selectedActivityId: UUID | null;
+  students: readonly ReviewOverviewStudent[];
+}
+
 /** SR-A5 (Release 2): workspace único de revisão. */
 export interface AdminSubmissionWorkspace extends ReviewQueueSubmission {
   requirements: readonly ActivityRequirement[];
@@ -642,6 +676,10 @@ export interface ApiContracts {
   "GET /api/admin/reviews": Endpoint<
     PageQuery & { classId?: UUID; overdueOnly?: boolean },
     Page<ReviewQueueSubmission>
+  >;
+  "GET /api/admin/reviews/overview": Endpoint<
+    { classId: UUID; activityId?: UUID },
+    ReviewOverview
   >;
   "POST /api/admin/submissions/:submissionId/review": Endpoint<
     {

@@ -1,4 +1,4 @@
-import type { ActivityCriterion, ActivityRequirement, AdminSubmissionWorkspace, Page, ReviewDetail, ReviewQueueSubmission, SubmissionDetail } from "@/specs/api.contracts";
+import type { ActivityCriterion, ActivityRequirement, AdminSubmissionWorkspace, Page, ReviewDetail, ReviewOverview, ReviewOverviewActivity, ReviewOverviewStudent, ReviewQueueSubmission, SubmissionDetail } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
 import { isPostgresUuid } from "@/src/modules/review-feedback-loop/schema";
 
@@ -7,6 +7,61 @@ export function parseReviewQueuePage(value: unknown, requestId: string): Page<Re
     throw new AppError("INTERNAL_ERROR", "Resposta de revisões inválida.", requestId);
   }
   return { items: value.items.map((item) => parseQueueSubmission(item, requestId)), nextCursor: value.nextCursor };
+}
+
+export function parseReviewOverview(value: unknown, requestId: string): ReviewOverview {
+  if (!isRecord(value) || !isRecord(value.classSummary) || !isPostgresUuid(value.classSummary.id)
+    || typeof value.classSummary.name !== "string" || !Array.isArray(value.activities)
+    || !Array.isArray(value.students) || !(isPostgresUuid(value.selectedActivityId) || value.selectedActivityId === null)) {
+    throw new AppError("INTERNAL_ERROR", "Mapa de evidências inválido.", requestId);
+  }
+  return {
+    classSummary: { id: value.classSummary.id, name: value.classSummary.name },
+    activities: value.activities.map((activity) => parseOverviewActivity(activity, requestId)),
+    selectedActivityId: value.selectedActivityId,
+    students: value.students.map((student) => parseOverviewStudent(student, requestId)),
+  };
+}
+
+function parseOverviewActivity(value: unknown, requestId: string): ReviewOverviewActivity {
+  if (!isRecord(value) || !isPostgresUuid(value.id) || typeof value.title !== "string"
+    || !isPositiveInteger(value.lessonPosition) || !isPositiveInteger(value.cyclePosition)
+    || !isNonNegativeInteger(value.awaitingReviewCount)) {
+    throw new AppError("INTERNAL_ERROR", "Atividade do mapa de evidências inválida.", requestId);
+  }
+  return {
+    id: value.id,
+    title: value.title,
+    lessonPosition: value.lessonPosition,
+    cyclePosition: value.cyclePosition,
+    awaitingReviewCount: value.awaitingReviewCount,
+  };
+}
+
+function parseOverviewStudent(value: unknown, requestId: string): ReviewOverviewStudent {
+  if (!isRecord(value) || !isPostgresUuid(value.studentId) || !isPostgresUuid(value.enrollmentId)
+    || typeof value.displayName !== "string" || !(isPostgresUuid(value.assignmentId) || value.assignmentId === null)
+    || !isRosterStatus(value.status) || !(typeof value.dueAt === "string" || value.dueAt === null)
+    || !(isPostgresUuid(value.submissionId) || value.submissionId === null)
+    || !(isPositiveInteger(value.version) || value.version === null)
+    || !(typeof value.submittedAt === "string" || value.submittedAt === null)
+    || !(typeof value.reviewedAt === "string" || value.reviewedAt === null)
+    || typeof value.isLate !== "boolean") {
+    throw new AppError("INTERNAL_ERROR", "Aluno do mapa de evidências inválido.", requestId);
+  }
+  return {
+    studentId: value.studentId,
+    enrollmentId: value.enrollmentId,
+    displayName: value.displayName,
+    assignmentId: value.assignmentId,
+    status: value.status,
+    dueAt: value.dueAt,
+    submissionId: value.submissionId,
+    version: value.version,
+    submittedAt: value.submittedAt,
+    reviewedAt: value.reviewedAt,
+    isLate: value.isLate,
+  };
 }
 
 export function parseReview(value: unknown, requestId: string): ReviewDetail {
@@ -127,6 +182,11 @@ function parseCriterion(value: unknown, requestId: string): ReviewDetail["criter
 
 function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === "object" && value !== null; }
 function isPositiveInteger(value: unknown): value is number { return typeof value === "number" && Number.isInteger(value) && value > 0; }
+function isNonNegativeInteger(value: unknown): value is number { return typeof value === "number" && Number.isInteger(value) && value >= 0; }
 function isKind(value: unknown): value is SubmissionDetail["items"][number]["kind"] { return value === "text" || value === "file" || value === "external_link" || value === "github_repository"; }
 function isDecision(value: unknown): value is ReviewDetail["decision"] { return value === "approved" || value === "revision_requested"; }
 function isResult(value: unknown): value is ReviewDetail["criteria"][number]["result"] { return value === "met" || value === "needs_adjustment"; }
+function isRosterStatus(value: unknown): value is ReviewOverviewStudent["status"] {
+  return value === "not_assigned" || value === "locked" || value === "available" || value === "draft"
+    || value === "submitted" || value === "revision_requested" || value === "approved";
+}

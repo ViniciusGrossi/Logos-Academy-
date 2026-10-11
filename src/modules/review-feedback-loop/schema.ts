@@ -17,6 +17,11 @@ export const ReviewQueueQuerySchema = z.object({
   limit: PageLimit,
 }).strict();
 
+export const ReviewOverviewQuerySchema = z.object({
+  classId: Uuid,
+  activityId: Uuid.optional(),
+}).strict();
+
 export const SubmissionPathSchema = z.object({ submissionId: Uuid }).strict();
 export const ReviewPathSchema = z.object({ reviewId: Uuid }).strict();
 
@@ -36,7 +41,7 @@ const CriterionSchema = z.object({
 export const PublishReviewSchema = z.object({
   submissionId: Uuid,
   decision: z.enum(["approved", "revision_requested"]),
-  feedback: z.string().trim().min(1).max(10_000),
+  feedback: z.string().trim().max(10_000),
   criteria: z.array(CriterionSchema).min(1).max(30).refine(
     (criteria) => new Set(criteria.map((criterion) => criterion.criterionId)).size === criteria.length,
     "Cada critério deve aparecer uma única vez.",
@@ -44,5 +49,6 @@ export const PublishReviewSchema = z.object({
 }).strict();
 
 export type ReviewQueueQuery = z.infer<typeof ReviewQueueQuerySchema>;
+export type ReviewOverviewQuery = z.infer<typeof ReviewOverviewQuerySchema>;
 export type PublishReviewInput = z.infer<typeof PublishReviewSchema>;
 export type StudentSubmissionsQuery = z.infer<typeof StudentSubmissionsQuerySchema>;

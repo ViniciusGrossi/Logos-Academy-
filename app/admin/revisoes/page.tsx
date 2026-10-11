@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { ReviewQueue } from "@/components/prototype/review-queue";
+import { AdminReviewOverview } from "@/components/admin/admin-review-overview";
 
 export default function AdminReviewsPage() {
-  return <AppShell><ReviewQueue /></AppShell>;
+  return <AppShell><AdminReviewOverview /></AppShell>;
 }

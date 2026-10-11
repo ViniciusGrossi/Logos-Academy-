@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { AdminSubmissionWorkspace, Page, ReviewDetail, ReviewQueueSubmission } from "@/specs/api.contracts";
+import type { AdminSubmissionWorkspace, Page, ReviewDetail, ReviewOverview, ReviewQueueSubmission } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
 import type { AdminActor, ReviewFeedbackStore } from "@/src/modules/review-feedback-loop/repository";
-import { parseReviewQueuePage, parseWorkspace } from "@/src/modules/review-feedback-loop/contract";
+import { parseReviewOverview, parseReviewQueuePage, parseWorkspace } from "@/src/modules/review-feedback-loop/contract";
 import { ReviewFeedbackService } from "@/src/modules/review-feedback-loop/service";
 
 const admin: AdminActor = { tenantId: "10000000-0000-4000-8000-000000000001", userId: "11000000-0000-4000-8000-000000000001", role: "admin" };
@@ -17,6 +17,10 @@ class Store implements ReviewFeedbackStore {
   async page(_actor: AdminActor, query: unknown): Promise<Page<ReviewQueueSubmission>> {
     this.query = query;
     return { items: [], nextCursor: null };
+  }
+  async overview(_actor: AdminActor, query: unknown): Promise<ReviewOverview> {
+    this.query = query;
+    return { classSummary: { id: submissionId, name: "Turma" }, activities: [], selectedActivityId: null, students: [] };
   }
   async publish(_actor: AdminActor, input: unknown): Promise<ReviewDetail> {
     this.published = input;
@@ -66,10 +70,30 @@ describe("review-feedback-loop", () => {
     expect(store.query).toEqual({ classId: submissionId, overdueOnly: true, cursor: "cursor", limit: 10 });
   });
 
-  it("GWT-02 bloqueia feedback vazio e critério ausente antes da RPC", async () => {
+  it("GWT-02 permite aprovação sem texto, mas bloqueia correção sem orientação", async () => {
     const service = new ReviewFeedbackService(new Store());
-    await expect(service.publish(admin, { submissionId, decision: "approved", feedback: " ", criteria: [{ criterionId, result: "met" }] }, "request")).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
+    await expect(service.publish(admin, { submissionId, decision: "approved", feedback: " ", criteria: [{ criterionId, result: "met" }] }, "request")).resolves.toMatchObject({ decision: "approved" });
+    await expect(service.publish(admin, { submissionId, decision: "revision_requested", feedback: " ", criteria: [{ criterionId, result: "needs_adjustment" }] }, "request")).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
     await expect(service.publish(admin, { submissionId, decision: "approved", feedback: "Ok", criteria: [] }, "request")).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
+  });
+
+  it("GWT-01/GWT-02 decodifica alunos que enviaram e que ainda não enviaram", () => {
+    const overview = parseReviewOverview({
+      classSummary: { id: submissionId, name: "Turma Sudoeste" },
+      activities: [{ id: criterionId, title: "Contrato", lessonPosition: 1, cyclePosition: 1, awaitingReviewCount: 1 }],
+      selectedActivityId: criterionId,
+      students: [
+        { studentId: submissionId, enrollmentId: criterionId, displayName: "Ana", assignmentId: criterionId, status: "submitted", dueAt: null, submissionId, version: 1, submittedAt: new Date().toISOString(), reviewedAt: null, isLate: false },
+        { studentId: criterionId, enrollmentId: submissionId, displayName: "Bia", assignmentId: null, status: "not_assigned", dueAt: null, submissionId: null, version: null, submittedAt: null, reviewedAt: null, isLate: false },
+      ],
+    }, "request");
+    expect(overview.students.map((student) => student.status)).toEqual(["submitted", "not_assigned"]);
+  });
+
+  it("valida turma e atividade antes de consultar o overview", async () => {
+    const store = new Store();
+    await new ReviewFeedbackService(store).overview(admin, { classId: submissionId, activityId: criterionId }, "request");
+    expect(store.query).toEqual({ classId: submissionId, activityId: criterionId });
   });
 
   it("GWT-03/GWT-04 publica somente decisão e critérios válidos", async () => {

@@ -1,8 +1,8 @@
 ---
 title: "review-feedback-loop — Spec"
-date: 2026-09-03
+date: 2026-10-10
 projeto: "Logos Academy Platform"
-fase: "build-backend"
+fase: "build-frontend"
 status: approved
 wave: 4
 tags: [spec, feature, sdd, reviews]
@@ -11,84 +11,106 @@ tags: [spec, feature, sdd, reviews]
 # Spec: review-feedback-loop
 
 ## Objetivo
-Permitir ao admin revisar cada entrega por critérios binários e devolver feedback pedagógico auditável até aprovação.
 
-## Fora de Escopo
-- Nota numérica, rubrica editável, revisão por professor, notificações automáticas e alteração silenciosa de revisão publicada.
+Dar ao admin uma visão completa da turma por atividade — quem ainda não enviou, quem aguarda revisão, quem precisa corrigir e quem foi aprovado — e um workspace claro para revisar cada evidência com histórico auditável.
 
-## Requisitos Funcionais
-1. Listar submissões paginadas por turma e proximidade do SLA de 48 horas.
-2. Exigir resultado para todos os critérios e feedback textual antes de publicar.
-3. Publicar revisão append-only e alterar assignment atomicamente para `approved` ou `revision_requested`.
-4. Em correção, abrir novo rascunho sem apagar versões/reviews anteriores.
-5. Registrar leitura de feedback idempotente, inclusive aprovação, e refletir prioridade na Home.
-6. Correção administrativa supersede com novo registro auditável.
+## Decisão de experiência aprovada
 
-### Hotfix — identificadores determinísticos do currículo
+- A visão de turma usa o conceito visual **Mapa de Evidências**: seletor de turma e atividade, síntese de estados e uma matriz de progresso por aluno.
+- A revisão individual permanece em rota própria como **Mesa de Revisão**, mantendo entrega, rubrica, comentários e versões no mesmo contexto.
+- A assinatura visual usa obsidiana, papel, linhas técnicas e laranja funcional do design system. O movimento principal é a progressão da linha de evidência; não há animação ornamental em todas as superfícies.
 
-- A fila e o workspace devem aceitar qualquer valor armazenável em uma coluna PostgreSQL `uuid`, inclusive IDs determinísticos que não codificam versão/variante RFC.
-- A mesma regra deve valer para os IDs de critérios recebidos ao publicar a revisão.
-- Uma entrega válida não pode derrubar a fila inteira por causa do formato de um identificador já persistido pelo currículo.
+## Fora de escopo
 
-## Superfícies Frontend
-- `/admin/revisoes`: tabs `Aguardando`, `Prazo crítico` e `Correções`, persistidas em `?tab=`.
-- `/admin/revisoes/[submissionId]`: workspace único de revisão, sem tabs, para manter entrega e critérios simultaneamente visíveis.
-- `/admin/alunos/[studentId]?tab=entregas`: histórico de versões e feedbacks.
-- `/atividades/[assignmentId]#historico`: feedback recebido e ação de correção no contexto da atividade.
+- Nota numérica, rubrica editável, revisão por múltiplos professores e notificações automáticas por WhatsApp.
+- Edição ou exclusão silenciosa de revisão publicada.
+- Lembretes automáticos; a interface apenas torna atrasos e pendências visíveis.
 
-## API Contract
+## Requisitos funcionais
+
+1. Listar turmas e permitir selecionar uma atividade do currículo da turma.
+2. Exibir todos os alunos vinculados à turma, inclusive os que ainda não enviaram a atividade.
+3. Distinguir `não enviado`, `rascunho`, `aguardando revisão`, `correção solicitada` e `aprovado`.
+4. Abrir o workspace apenas quando existir uma versão enviada.
+5. Mostrar a evidência atual, requisitos, rubrica, histórico de versões e revisões anteriores.
+6. Exigir resultado para todos os critérios antes de publicar.
+7. Permitir aprovação sem texto quando todos os critérios forem atendidos.
+8. Exigir orientação textual quando qualquer critério precisar de ajuste.
+9. Permitir comentário opcional por critério, tanto como correção quanto como sugestão de melhoria.
+10. Publicar revisão append-only e alterar o assignment atomicamente para `approved` ou `revision_requested`.
+11. Em correção, abrir novo rascunho sem apagar versões e revisões anteriores.
+12. Registrar leitura de feedback idempotente e preservar isolamento por tenant.
+
+## Contratos
+
 ```typescript
-"GET /api/admin/reviews": Endpoint<PageQuery & { classId?: UUID; overdueOnly?: boolean }, Page<SubmissionDetail>>;
+"GET /api/admin/reviews": Endpoint<PageQuery & {
+  classId?: UUID;
+  overdueOnly?: boolean;
+}, Page<ReviewQueueSubmission>>;
+
+"GET /api/admin/reviews/overview": Endpoint<{
+  classId: UUID;
+  activityId?: UUID;
+}, ReviewOverview>;
+
+"GET /api/admin/submissions/:submissionId": Endpoint<{
+  submissionId: UUID;
+}, AdminSubmissionWorkspace>;
+
 "POST /api/admin/submissions/:submissionId/review": Endpoint<{
   submissionId: UUID;
   decision: ReviewDecision;
   feedback: string;
-  criteria: readonly { criterionId: UUID; result: CriterionResult; comment?: string }[];
+  criteria: readonly {
+    criterionId: UUID;
+    result: CriterionResult;
+    comment?: string;
+  }[];
 }, ReviewDetail>;
-"POST /api/student/reviews/:reviewId/seen": Endpoint<{ reviewId: UUID }, ReviewDetail>;
 ```
 
-## Critérios de Aceite (= test cases do worker)
-- [ ] Fila pagina sem repetição e prioriza submissão próxima/fora de 48h.
-- [ ] Critério ausente ou feedback vazio bloqueia publicação.
-- [ ] `revision_requested` cria ação “Corrigir entrega” e rascunho da próxima versão.
-- [ ] `approved` muda estado e torna a evidência elegível ao projeto.
-- [ ] Revisão publicada nunca é atualizada/apagada pela aplicação.
-- [ ] Marcar feedback visto duas vezes produz um receipt e remove estado “novo”.
-- [ ] Admin não acessa submissão de tenant estranho; aluno não publica revisão.
+## Regras do read model
 
-## Restrições Técnicas
-- **Tabelas:** `reviews`, `criterion_reviews`, `feedback_receipts`, `submissions`, `activity_assignments`, `audit_events`, `idempotency_keys`.
-- **Endpoints:** três listados acima.
-- **Libs novas:** nenhuma.
-- **Background jobs:** não; SLA é derivado na consulta.
+- `admin_review_overview` é backend-only, valida o admin do tenant e exige `classId` pertencente ao mesmo tenant.
+- As atividades vêm do currículo da turma, não apenas de submissões existentes.
+- A linha do aluno parte das matrículas não canceladas da turma e faz `left join` com o assignment da atividade selecionada.
+- A submissão apontada é a versão enviada mais recente; rascunhos nunca aparecem como evidência revisável.
+- A resposta é ordenada por prioridade: aguardando revisão atrasada, aguardando revisão, correção solicitada, rascunho/disponível, aprovado.
 
-## Tokens e APIs Externas
-| API | Modelo/Tier | Rate Limit | Custo estimado | Fallback |
-|---|---|---|---|---|
-| — | — | — | R$ 0 | — |
+## Critérios de aceite
 
-## Segurança
-- **Auth:** mutação de review somente admin; receipt somente aluno dono.
-- **RLS:** reviews seguem tenant e cadeia submission→assignment→enrollment→student.
-- **Criptografia:** feedback pedagógico cifrado em repouso se classificação de dados exigir.
-- **LGPD:** feedback é dado educacional privado e não aparece em logs/demos reais.
+- [ ] Uma turma com três alunos e somente uma entrega mostra os três alunos e identifica corretamente os dois sem envio.
+- [ ] Trocar a atividade atualiza o mapa sem trocar de página e preserva a turma selecionada na URL.
+- [ ] Aguardando revisão abre `/admin/revisoes/[submissionId]`; estados sem submissão não oferecem ação falsa.
+- [ ] Todos os critérios atendidos permitem aprovar com feedback vazio.
+- [ ] Qualquer critério em ajuste bloqueia a publicação até existir orientação textual.
+- [ ] Comentários por critério são enviados e reaparecem no histórico da revisão.
+- [ ] Publicar uma correção cria um novo rascunho e preserva a versão anterior.
+- [ ] O mapa e o workspace têm estados loading, vazio, erro e sucesso; funcionam em 375, 768 e 1440 px.
+- [ ] Controles têm foco visível, alvos de toque de 44 px e movimento reduzido respeitado.
+- [ ] Admin de outro tenant não acessa turma, roster, submissão ou revisão.
+- [ ] IDs UUID determinísticos persistidos pelo currículo são aceitos.
 
-## Sub-Agents Designados
-| Agent | Task | SOP |
-|---|---|---|
-| backend-engineer | transação append-only e fila | agents/backend-engineer.md |
-| frontend-engineer | revisão admin e feedback aluno | agents/frontend-engineer.md |
-| adversarial-tester | autorização e concorrência | agents/adversarial-tester.md |
+## Validação Given/When/Then
 
-## Validação
-- **GWT-01:** Dadas submissões com 47h, 49h e 2h, quando lista overdue/prioridade, então ordena 49h antes de 47h e pagina sem duplicar.
-- **GWT-02:** Dado critério sem resultado ou feedback vazio, quando publica, então recebe `VALIDATION_ERROR` e nada persiste.
-- **GWT-03:** Dada decisão revision_requested, quando publica, então assignment muda e surge novo rascunho editável mantendo versão anterior.
-- **GWT-04:** Dada decisão approved, quando publica, então assignment fica approved e project query inclui evidência.
-- **GWT-05:** Dada revisão publicada, quando tenta alterá-la, então não existe update e correção cria revisão nova/superseding.
-- **GWT-06:** Dado feedback novo, quando aluno marca visto duas vezes, então existe um receipt e Home deixa de priorizá-lo.
-- **GWT-07:** Dado aluno ou admin de outro tenant, quando publica/lê review indevido, então recebe `FORBIDDEN`.
+- **GWT-01:** Dada uma turma com alunos em estados diferentes, quando o admin abre o mapa, então todos aparecem em uma única leitura comparável.
+- **GWT-02:** Dada uma atividade sem submissões, quando ela é selecionada, então o mapa mostra os alunos como não enviados, sem estado vazio enganoso.
+- **GWT-03:** Dada uma entrega satisfatória, quando todos os critérios são marcados como atendidos e o feedback fica vazio, então a aprovação é publicada.
+- **GWT-04:** Dado um critério em ajuste, quando o admin tenta publicar sem orientação, então recebe `VALIDATION_ERROR` e nada persiste.
+- **GWT-05:** Dada uma revisão publicada, quando o aluno reenvia, então o histórico preserva todas as versões e revisões.
+- **GWT-06:** Dado outro tenant, quando solicita o overview ou workspace, então recebe `FORBIDDEN`/recurso indisponível.
+
+## Segurança e privacidade
+
+- RPCs administrativas disponíveis apenas para `service_role` e chamadas após autenticação/role check no controller.
+- Feedback é dado educacional privado, cifrado em repouso e nunca registrado em logs.
+- Toda consulta filtra `tenant_id`; nenhum endpoint recebe tenant do cliente.
+
+## Comandos de validação
+
 ```bash
 npm test -- -t "review|feedback"
+npm run lint
+npm run build
 ```
