@@ -28,6 +28,7 @@ const adminNav = [
   { href: "/admin/alunos", label: "Alunos", icon: UsersRound },
   { href: "/admin/turmas", label: "Turmas", icon: CalendarDays },
   { href: "/admin/revisoes", label: "Revisões", icon: ClipboardCheck },
+  { href: "/admin/atlas", label: "Atlas", icon: BookOpenText },
   { href: "/admin/reposicoes", label: "Reposições", icon: Wrench },
 ] as const;
 
@@ -137,7 +138,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {navGroups.map(({ label: groupLabel, items }) => <div key={groupLabel} className="side-nav__group">
             <span className="side-nav__label">{groupLabel}</span>
             {items.map(({ href, label, icon: Icon }) => {
-              const active = pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+              const active = pathname === href || (href !== "/" && href !== "/admin" && pathname.startsWith(`${href}/`));
               const badge = navBadges[href];
               return <Link key={href} href={href} className={active ? "active" : ""} aria-current={active ? "page" : undefined}>
                 <span className="nav-bar" aria-hidden="true" />

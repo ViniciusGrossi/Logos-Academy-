@@ -196,7 +196,7 @@
       "status": "approved",
       "wave": 10,
       "scope": "admin-atlas-editorial-cms",
-      "built": false,
+      "built": true,
       "reviewed": false,
       "dependencies": [
         "student-knowledge-atlas",

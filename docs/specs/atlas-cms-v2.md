@@ -400,6 +400,9 @@ npx supabase test db
 
 ## Premissas e limites
 
+- Adendo de implementação (12/10): `GET /api/admin/atlas/options` entrega aulas ativas paginadas e totais globais por coleção/status, com autorização administrativa revalidada no banco. O mapa permite filtrar por coleção/aula, mas não afirma cobertura editorial por aula sem um agregado específico.
+- O histórico expõe metadados e restauração real para rascunho; o contrato não contém snapshots para comparar previews de versões antigas.
+- Referências aprovadas: `docs/design-refs/claude-admin/Atlas CMS.dc.html` e `Revisoes Admin.dc.html`. O runtime de protótipo não é incluído na aplicação.
 - Nome oficial: **Atlas**; `/glossario` só redirect.
 - CMS exclusivo para `admin`.
 - YouTube não listado é distribuição, não controle de acesso.

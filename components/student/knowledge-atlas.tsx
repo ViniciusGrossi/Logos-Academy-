@@ -12,12 +12,8 @@ import {
 import {
   ArrowRight,
   BookOpenText,
-  Check,
   ChevronRight,
-  Clipboard,
-  Copy,
   ExternalLink,
-  FileCode2,
   Network,
   Play,
   RotateCcw,
@@ -32,24 +28,21 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 
 import type {
   ConceptDetail,
   ConceptSummary,
-  KnowledgeContentBlock,
-  LibraryArtifact,
   LibraryResourceDetail,
   LibraryResourceSummary,
   Page,
 } from "@/specs/api.contracts";
 import { StateScene } from "@/components/academy";
+import { AtlasItemRenderer } from "@/components/atlas/atlas-item-renderer";
 import { useLiveApi } from "@/components/prototype/live-api";
 import {
   type AtlasTab,
-  fillPromptTemplate,
   libraryKindForTab,
   youtubeIdFromUrl,
 } from "@/src/lib/knowledge-atlas";
@@ -458,8 +451,6 @@ function ConceptReader({
   detail: ConceptDetail;
   onOpenRelated: (id: string) => void;
 }) {
-  const [leadBlock, ...deepBlocks] = detail.contentBlocks;
-
   return (
     <div className={styles.readerContent}>
       <ReaderHeading
@@ -479,25 +470,8 @@ function ConceptReader({
         </div>
       </div>
       <div id="atlas-article" className={styles.article}>
-        {leadBlock && <ContentBlock block={leadBlock} />}
-        <ConceptVisualReference slug={detail.slug} />
-        {deepBlocks.length > 0 && (
-          <details className={styles.deepDive}>
-            <summary>
-              <BookOpenText aria-hidden="true" />
-              <span>
-                <strong>Aprofundar conceito</strong>
-                <small>{deepBlocks.length} tópicos com exemplos e aplicação</small>
-              </span>
-              <ChevronRight aria-hidden="true" />
-            </summary>
-            <div className={styles.deepDiveContent}>
-              {deepBlocks.map((block, index) => (
-                <ContentBlock key={`${block.type}-${index}`} block={block} />
-              ))}
-            </div>
-          </details>
-        )}
+        <AtlasItemRenderer contentBlocks={detail.contentBlocks} body={detail.contentBlocks.length ? undefined : detail.body} resolvedAssets={detail.resolvedAssets} />
+        {detail.contentBlocks.every((block) => !("id" in block)) && <ConceptVisualReference slug={detail.slug} />}
         <section className={styles.summaryBlock}>
           <span>Em resumo</span>
           <p>{detail.body}</p>
@@ -604,15 +578,8 @@ function ResourceReader({
         meta={`Aula ${detail.lessonPosition} · ${detail.readingMinutes} min`}
       />
       <div className={styles.article}>
-        {detail.contentBlocks.map((block, index) => (
-          <ContentBlock key={`${block.type}-${index}`} block={block} />
-        ))}
+        <AtlasItemRenderer contentBlocks={detail.contentBlocks} body={detail.contentBlocks.length ? undefined : detail.body} artifact={detail.artifact} resolvedAssets={detail.resolvedAssets} />
       </div>
-      {detail.artifact.type === "prompt" ? (
-        <PromptWorkbench artifact={detail.artifact} />
-      ) : (
-        <DesignSystemSpecimen artifact={detail.artifact} />
-      )}
       <RelatedItems
         label="Materiais da mesma rota"
         items={detail.relatedResources}
@@ -727,173 +694,6 @@ function LazyVideo({ detail }: { detail: ConceptDetail }) {
   );
 }
 
-function ContentBlock({ block }: { block: KnowledgeContentBlock }) {
-  if (block.type === "text") {
-    return <section className={styles.textBlock}><h3>{block.heading}</h3><p>{block.body}</p></section>;
-  }
-  if (block.type === "callout") {
-    return <aside className={styles.calloutBlock}><Sparkles aria-hidden="true" /><div><h3>{block.heading}</h3><p>{block.body}</p></div></aside>;
-  }
-  if (block.type === "image") {
-    const source = "source" in block ? block.source : { kind: "external" as const, url: block.url as `https://${string}`, alt: block.alt, caption: block.caption };
-    if (source.kind !== "external") return null;
-    return <figure className={styles.imageBlock}><Image src={source.url} alt={source.alt} width={1200} height={675} sizes="(max-width: 900px) 100vw, 760px" unoptimized />{source.caption && <figcaption>{source.caption}</figcaption>}</figure>;
-  }
-  if (block.type !== "diagram") return null;
-  return (
-    <section className={styles.diagramBlock}>
-      <h3>{block.heading}</h3>
-      <ol>
-        {block.nodes.map((node, index) => (
-          <li key={`${node.label}-${index}`}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <div><strong>{node.label}</strong><p>{node.detail}</p></div>
-          </li>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-function PromptWorkbench({ artifact }: { artifact: Extract<LibraryArtifact, { type: "prompt" }> }) {
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [customizing, setCustomizing] = useState(false);
-  const customizedPrompt = useMemo(
-    () => fillPromptTemplate(artifact.template, values),
-    [artifact.template, values],
-  );
-  const copy = useCopyText();
-
-  return (
-    <section className={styles.promptWorkbench}>
-      <div className={styles.workbenchHead}>
-        <div>
-          <span className={styles.signalLabel}>Mesa de prompt</span>
-          <h3>Uma estrutura para adaptar, não uma fórmula pronta.</h3>
-        </div>
-        <button type="button" className={styles.primaryAction} onClick={() => void copy.copy(customizing ? customizedPrompt : artifact.template)}>
-          {copy.status === "copied" ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
-          {copy.status === "copied" ? "Prompt copiado" : "Copiar prompt"}
-        </button>
-      </div>
-
-      <pre className={styles.promptTemplate} tabIndex={0}><code>{customizing ? customizedPrompt : artifact.template}</code></pre>
-
-      <div className={styles.promptAnatomy}>
-        {artifact.variables.map((variable) => (
-          <div key={variable.token}>
-            <code>{variable.token}</code>
-            <p>{variable.description}</p>
-          </div>
-        ))}
-      </div>
-
-      <details className={styles.customizer} open={customizing} onToggle={(event) => setCustomizing(event.currentTarget.open)}>
-        <summary><FileCode2 aria-hidden="true" />Personalizar antes de copiar<ChevronRight aria-hidden="true" /></summary>
-        <div className={styles.customizerBody}>
-          <div className={styles.variableFields}>
-            {artifact.variables.map((variable, index) => {
-              const id = `atlas-variable-${index}`;
-              return (
-                <label key={variable.token} htmlFor={id}>
-                  <span>{variable.token}</span>
-                  <small>{variable.description}</small>
-                  <input
-                    id={id}
-                    value={values[variable.token] ?? ""}
-                    onChange={(event) => setValues((current) => ({ ...current, [variable.token]: event.target.value }))}
-                    placeholder="Escreva sua versão"
-                  />
-                </label>
-              );
-            })}
-          </div>
-          <div className={styles.promptPreview}>
-            <span>Prévia local</span>
-            <p>{customizedPrompt}</p>
-            <small>Nada é salvo ou enviado para uma IA.</small>
-          </div>
-        </div>
-      </details>
-
-      {(artifact.exampleInput || artifact.exampleOutput) && (
-        <div className={styles.promptExamples}>
-          {artifact.exampleInput && <div><span>Exemplo de entrada</span><p>{artifact.exampleInput}</p></div>}
-          {artifact.exampleOutput && <div><span>Exemplo de saída</span><p>{artifact.exampleOutput}</p></div>}
-        </div>
-      )}
-
-      <p className="sr-only" role="status" aria-live="polite">{copy.status === "copied" ? "Prompt copiado para a área de transferência." : copy.status === "fallback" ? "A cópia automática foi bloqueada. Use a seleção manual." : ""}</p>
-      {copy.status === "fallback" && <ManualCopyFallback value={customizing ? customizedPrompt : artifact.template} />}
-    </section>
-  );
-}
-
-function DesignSystemSpecimen({ artifact }: { artifact: Extract<LibraryArtifact, { type: "design_system" }> }) {
-  return (
-    <section className={styles.designSpecimen} style={{ "--specimen-accent": artifact.palette.at(-1)?.value ?? "#ff6b00", "--specimen-ink": artifact.palette[0]?.value ?? "#101114" } as React.CSSProperties}>
-      <div className={styles.specimenHead}>
-        <span className={styles.signalLabel}>Espécime vivo</span>
-        <h3>Decisões que podem ser testadas.</h3>
-        <p>Observe a função de cada token e experimente componentes construídos com uma lista segura.</p>
-      </div>
-
-      <section className={styles.paletteSection}>
-        <h4>Paleta e função</h4>
-        <div className={styles.paletteGrid}>
-          {artifact.palette.map((color) => <PaletteSwatch key={`${color.name}-${color.value}`} color={color} />)}
-        </div>
-      </section>
-
-      <section className={styles.typeSection}>
-        <h4>Tipografia em contexto</h4>
-        {artifact.typography.map((type, index) => (
-          <div key={`${type.name}-${index}`}>
-            <span>{type.name} · {type.role}</span>
-            <p data-display={index === 0}>{type.sample}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className={styles.principlesSection}>
-        <h4>Princípios</h4>
-        <ol>{artifact.principles.map((principle, index) => <li key={principle}><span>{String(index + 1).padStart(2, "0")}</span>{principle}</li>)}</ol>
-      </section>
-
-      <section className={styles.componentsSection}>
-        <h4>Componentes controlados</h4>
-        <div className={styles.specimenGrid}>
-          {artifact.components.map((component, index) => (
-            <div className={styles.specimenItem} key={`${component.name}-${index}`}>
-              <SafeSpecimen name={component.name} index={index} />
-              <div><strong>{component.name}</strong><p>{component.description}</p></div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </section>
-  );
-}
-
-function PaletteSwatch({ color }: { color: { name: string; value: string; role: string } }) {
-  const copy = useCopyText();
-  return (
-    <button type="button" className={styles.swatch} onClick={() => void copy.copy(color.value)}>
-      <span style={{ backgroundColor: color.value }} aria-hidden="true" />
-      <span><strong>{color.name}</strong><small>{color.role}</small><code>{copy.status === "copied" ? "Copiada" : color.value}</code></span>
-    </button>
-  );
-}
-
-function SafeSpecimen({ name, index }: { name: string; index: number }) {
-  const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  if (/chamada|botao|button/.test(normalized)) return <button className={styles.demoButton} type="button">Explorar sistema <ArrowRight /></button>;
-  if (/campo|input/.test(normalized)) return <label className={styles.demoField}><span>Nome do projeto</span><input defaultValue="Creative Studio" /></label>;
-  if (/status|badge|selo/.test(normalized)) return <span className={styles.demoBadge}>Em construção</span>;
-  if (/navega/.test(normalized)) return <nav className={styles.demoNav} aria-label="Exemplo de navegação"><span data-active="true">Visão</span><span>Tokens</span><span>Uso</span></nav>;
-  if (/contexto|callout|alerta/.test(normalized)) return <div className={styles.demoCallout}><Sparkles /><span>Contraste indica a próxima decisão.</span></div>;
-  return <div className={styles.demoEditorial}><small>0{index + 1} · direção</small><strong>{name}</strong><span>Mensagem principal com espaço para respirar.</span></div>;
-}
 
 /**
  * Constelação de conceitos: o conceito aberto no centro, os relacionados em órbita.
@@ -996,40 +796,6 @@ function RelatedItems({
   );
 }
 
-function ManualCopyFallback({ value }: { value: string }) {
-  const fieldRef = useRef<HTMLTextAreaElement>(null);
-  return (
-    <div className={styles.manualCopy}>
-      <label htmlFor="atlas-manual-copy">Selecione e copie manualmente</label>
-      <textarea id="atlas-manual-copy" ref={fieldRef} readOnly value={value} />
-      <button type="button" className="button-secondary" onClick={() => fieldRef.current?.select()}>
-        <Clipboard aria-hidden="true" /> Selecionar texto
-      </button>
-    </div>
-  );
-}
-
-function useCopyText() {
-  const [status, setStatus] = useState<"idle" | "copied" | "fallback">("idle");
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  }, []);
-
-  const copy = useCallback(async (value: string) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    try {
-      if (!navigator.clipboard) throw new Error("Clipboard indisponível");
-      await navigator.clipboard.writeText(value);
-      setStatus("copied");
-      timeoutRef.current = setTimeout(() => setStatus("idle"), 2000);
-    } catch {
-      setStatus("fallback");
-    }
-  }, []);
-
-  return { status, copy };
-}
 
 function AtlasIndexSkeleton() {
   return <div className={styles.indexSkeleton} aria-hidden="true">{Array.from({ length: 5 }, (_, index) => <span key={index} />)}</div>;

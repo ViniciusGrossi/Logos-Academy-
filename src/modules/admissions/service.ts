@@ -66,6 +66,10 @@ export class AdmissionsInvitationService {
 
 export class AdmissionsRpcService {
   constructor(private readonly adapter: Pick<AdmissionsAdminAdapter, "call">) {}
+  async resolveAtlasAssets(actor: TenantActor, released: Record<string, unknown>, ownerId: string, ownerKind: "concept" | "resource", requestId = crypto.randomUUID()) {
+    const { StudentAtlasAssetsRepository } = await import("@/src/modules/atlas-cms/student-assets.repository");
+    return new StudentAtlasAssetsRepository().resolve(actor.tenantId, released, ownerId, ownerKind, requestId);
+  }
   async call(actor: TenantActor, name: string, parameters: Record<string, unknown>, requestId: string): Promise<Record<string, unknown>> {
     return this.adapter.call(name, { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, ...parameters }, requestId);
   }

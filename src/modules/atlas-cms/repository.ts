@@ -1,7 +1,7 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import type { AdminAsset, AdminAtlasDetail, AdminAtlasDraftInput, AdminAtlasListItem, AdminAtlasRevisionListItem, Page, ResolvedAtlasAsset } from "@/specs/api.contracts";
+import type { AdminAsset, AdminAtlasDetail, AdminAtlasDraftInput, AdminAtlasListItem, AdminAtlasOptions, AdminAtlasRevisionListItem, Page, ResolvedAtlasAsset } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
 import { mapRpcError } from "@/src/lib/supabase/rpc-error";
@@ -9,6 +9,7 @@ import { assetSchema, detailSchema, listItemSchema, pageSchema, parseOutput, rev
 
 export type VerifiedImage = { contentType: "image/png" | "image/jpeg" | "image/webp"; sizeBytes: number; width: number; height: number };
 export interface AtlasCmsStore {
+  options?(actor: AtlasActor, query: PageQuery, requestId: string): Promise<AdminAtlasOptions>;
   list(actor: AtlasActor, query: ListQuery, requestId: string): Promise<Page<AdminAtlasListItem>>;
   detail(actor: AtlasActor, itemId: string, requestId: string): Promise<AdminAtlasDetail>;
   upsert(actor: AtlasActor, itemId: string | null, draft: AdminAtlasDraftInput, clock: string | null, requestId: string): Promise<AdminAtlasDetail>;
@@ -41,6 +42,24 @@ export class AtlasCmsRepository implements AtlasCmsStore {
       p_kind: query.kind ?? null, p_status: query.status ?? null, p_curriculum_id: query.curriculum ?? null, p_cycle_id: query.cycle ?? null, p_lesson_id: query.lesson ?? null,
       p_tags: query.tags ?? null, p_search: query.search ?? null, p_cursor: query.cursor ?? null, p_limit: query.limit,
     }, requestId), requestId);
+  }
+  async options(actor: AtlasActor, query: PageQuery, requestId: string): Promise<AdminAtlasOptions> {
+    // Recheck the database administrator guard before privileged reads.
+    await this.rpc(actor, "admin_atlas_list", { p_limit: 1 }, requestId);
+    const db = this.client.schema("logos_academy");
+    const offset = query.cursor ? Number(query.cursor) : 0;
+    if (!Number.isSafeInteger(offset) || offset < 0) throw new AppError("VALIDATION_ERROR", "Página inválida.", requestId);
+    const { data, error } = await db.from("lesson_templates").select("id,title,position,cycles!inner(id,title,position,curriculum_id,curricula!inner(status))").eq("tenant_id", actor.tenantId).is("deleted_at", null).is("cycles.deleted_at", null).is("cycles.curricula.deleted_at", null).eq("cycles.curricula.status", "active").order("id").range(offset, offset + query.limit);
+    if (error) throw this.storageError(requestId);
+    const cycle = z.object({ id: uuidSchema, title: z.string(), position: z.number(), curriculum_id: uuidSchema, curricula: z.object({ status: z.literal("active") }) });
+    const rows = parseOutput(z.array(z.object({ id: uuidSchema, title: z.string(), position: z.number(), cycles: cycle })), data, requestId);
+    const count = async (table: "concepts" | "knowledge_resources", field: "status" | "kind", value: string) => {
+      const result = await db.from(table).select("id", { count: "exact", head: true }).eq("tenant_id", actor.tenantId).is("deleted_at", null).eq(field, value);
+      if (result.error || result.count === null) throw this.storageError(requestId);
+      return result.count;
+    };
+    const values = await Promise.all([count("concepts", "status", "draft"), count("knowledge_resources", "status", "draft"), count("concepts", "status", "published"), count("knowledge_resources", "status", "published"), count("concepts", "status", "archived"), count("knowledge_resources", "status", "archived"), count("knowledge_resources", "kind", "prompt"), count("knowledge_resources", "kind", "design_system")]);
+    return { lessons: { items: rows.slice(0, query.limit).map((row) => ({ id: row.id, title: row.title, position: row.position, cycleId: row.cycles.id, cycleTitle: row.cycles.title, cyclePosition: row.cycles.position, curriculumId: row.cycles.curriculum_id })), nextCursor: rows.length > query.limit ? String(offset + query.limit) : null }, counts: { draft: values[0] + values[1], published: values[2] + values[3], archived: values[4] + values[5], concept: values[0] + values[2] + values[4], prompt: values[6], design_system: values[7] } };
   }
   async detail(actor: AtlasActor, itemId: string, requestId: string): Promise<AdminAtlasDetail> {
     return this.resolveDetail(actor, await this.rpc(actor, "admin_atlas_detail", { p_item_id: itemId }, requestId), requestId);

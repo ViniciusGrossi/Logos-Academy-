@@ -8,6 +8,12 @@ import { actorSchema, archiveSchema, assetSchema, createSchema, finalizeSchema, 
 
 export class AtlasCmsService {
   constructor(private readonly store: AtlasCmsStore) {}
+  options(actor: AtlasActor, input: unknown, requestId: string) {
+    this.admin(actor, requestId);
+    const query = parseInput(pageQuerySchema, input, requestId);
+    if (!this.store.options) throw new AppError("INTERNAL_ERROR", "Opções editoriais indisponíveis.", requestId);
+    return this.store.options(actor, query, requestId);
+  }
   list(actor: AtlasActor, input: unknown, requestId: string) {
     this.admin(actor, requestId); return this.store.list(actor, parseInput(listQuerySchema, input, requestId), requestId);
   }

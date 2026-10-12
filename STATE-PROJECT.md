@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-10-11
+date: 2026-10-12
 fase_atual: "12"
-etapa_atual: "Nova experiência de Revisões publicada e verificada em produção"
+etapa_atual: "Atlas CMS e Revisões: referências Claude Design implementadas localmente"
 produto_tipo: "saas-premium"
-proximo_passo: "Executar o ensaio autenticado da revisão com uma nova entrega real de aluno"
+proximo_passo: "Revisar interfaces, executar pgTAP no GitHub e aprovar publicação do milestone administrativo"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -19,7 +19,7 @@ gates:
   fase_10: pass
   fase_11: pass
   fase_12: pass
-features: { draft: 0, approved: 15, built: 15, reviewed: 13 }
+features: { draft: 0, approved: 22, built: 18, reviewed: 12 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08
@@ -35,6 +35,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [x] **`admin-design-reference`**: interfaces de Atlas CMS e Revisões reconstruídas a partir das referências aprovadas do Claude Design; componentes compartilhados, editor de 16 tipos de blocos, biblioteca editorial, preview, assets privados, histórico/restauração e mesa de feedback integrados às APIs. Worktree `C:/la-admin-interface`, branch `feat/admin-design-reference`; não publicado.
+- [ ] **Gate de publicação administrativa**: teste pgTAP da migration `20261012015740_atlas_asset_finalize_idempotent.sql` e ensaio com sessões reais admin/aluno pendentes. Migration incremental ainda não aplicada em produção. Rascunho de revisão é explicitamente local à aba, não sincronizado no servidor.
 - [x] **`reviews-experience-v2`**: Mapa de Evidências por turma e atividade, roster completo de alunos, filtros operacionais e Mesa de Revisão premium publicados em `https://logos-academy-three.vercel.app/admin/revisoes`. Migration aplicada e função validada com bloqueio para `anon`/`authenticated` e acesso exclusivo do backend.
 - [x] **`reviews-postgres-uuid-hotfix`**: causa do “Sinal interrompido” identificada nos validadores da aplicação; fila e publicação de revisão agora aceitam UUIDs determinísticos já persistidos pelo currículo. Teste focado, lint e TypeScript aprovados; aguarda deploy e smoke autenticado em produção.
 - [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; publicada e verificada em produção.
