@@ -140,8 +140,8 @@ export class AtlasCmsRepository implements AtlasCmsStore {
   private async rpc(actor: AtlasActor, name: string, parameters: Record<string, unknown>, requestId: string): Promise<unknown> {
     const { data, error } = await this.client.schema("logos_academy").rpc(name, { p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, ...parameters });
     if (error || data === null) {
-      const code = error?.code === "40001" ? "CONFLICT" : mapRpcError(error?.code);
       const match = error?.message.match(/^ATLAS_(?:VALIDATION|CONFLICT):([a-zA-Z0-9_.]+):([A-Z_]+)$/);
+      const code = error?.message.startsWith("ATLAS_VALIDATION:") ? "VALIDATION_ERROR" : error?.code === "40001" ? "CONFLICT" : mapRpcError(error?.code);
       throw new AppError(code, code === "CONFLICT" ? "O conteúdo mudou em outra sessão. Recarregue antes de continuar." : "Não foi possível concluir a operação editorial.", requestId,
         match ? { [match[1]]: [match[2]] } : undefined);
     }

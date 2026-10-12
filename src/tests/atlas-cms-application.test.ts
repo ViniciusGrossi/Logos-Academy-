@@ -59,6 +59,10 @@ describe("atlas-cms application through real repository", () => {
     const remote = fixture(() => ({ code: "40001", message: "ATLAS_CONFLICT:draftUpdatedAt:STALE" }));
     await expect(remote.service.save(actor, { itemId, expectedDraftUpdatedAt: time, draft }, "req")).rejects.toMatchObject({ code: "CONFLICT", fieldErrors: { draftUpdatedAt: ["STALE"] } });
   });
+  it("restrição editorial SQL preserva VALIDATION_ERROR e caminho do campo", async () => {
+    const { service } = fixture(() => ({ code: "23514", message: "ATLAS_VALIDATION:contentBlocks.assetId:OWNER_OR_STATUS_INVALID" }));
+    await expect(service.save(actor, { itemId, expectedDraftUpdatedAt: time, draft }, "req")).rejects.toMatchObject({ code: "VALIDATION_ERROR", fieldErrors: { "contentBlocks.assetId": ["OWNER_OR_STATUS_INVALID"] } });
+  });
   it("arquiva/restaura via RPCs autorizadas e pagina lista e histórico", async () => {
     const { service, calls } = fixture((call) => call.name === "admin_atlas_list" || call.name === "admin_atlas_revisions" ? { items: [], nextCursor: "opaque-next" } : detail);
     await service.archive(actor, { itemId, expectedItemUpdatedAt: time }, "req");
