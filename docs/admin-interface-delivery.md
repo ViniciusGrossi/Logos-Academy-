@@ -30,6 +30,8 @@ Implementação em `feat/admin-design-reference`, worktree `C:/la-admin-interfac
 
 ## Refinamento solicitado nas capturas
 
+Mapa Editorial premium: núcleo Atlas com anéis, coleções com contagens reais, 16 aulas divididas nos quatro projetos e conexões responsivas calculadas a partir da posição dos elementos. Pulsos de energia em laranja, entrada escalonada, realce da seleção e atualização contextual no rodapé. Motion-design orientou a hierarquia núcleo → coleções → aulas, cadência e movimento reduzido. Os pulsos podem ser pausados e são suspensos fora da viewport. Nenhuma conexão afirma cobertura publicada. A prévia usa 16 aulas exclusivamente locais; produção usa o currículo ativo real e desabilita slots sem aula. Validação: 181 testes, lint e TypeScript; capturas `atlas-map-premium-{1440,768,375}.png`.
+
 Tags agora usam chips com remoção individual, inclusão por Enter, prevenção de duplicatas e Backspace no campo vazio; permanecem armazenadas como string[] no contrato existente. O seletor de blocos é um modal central com busca, grupos Texto/Visual/Processo/Sistema/Outros e miniaturas CSS usando somente tokens da plataforma. Os 16 tipos continuam disponíveis. Busca ignora acentos, o foco inicia no campo de pesquisa, Escape fecha e a seleção insere o bloco real no editor.
 
 Capturas: `atlas-tags-chips-1440.png`, `atlas-block-picker-1440.png` e `atlas-block-picker-375.png`.

@@ -6,6 +6,13 @@ import { getDemoRole } from "@/src/lib/demo-mode";
 /** Local visual QA only. The caller's demo-mode gate is disabled in production.
  * No database record, invitation, user account or external request is created. */
 const lessonId = "43000000-0000-4000-8000-000000000001";
+const demoProjects = ["Assistente Pessoal Inteligente", "Creative Studio", "Automation Lab", "MVP: Produto Inteligente"];
+const demoLessons: AdminAtlasOptions["lessons"]["items"] = Array.from({ length: 16 }, (_, index) => ({
+  id: `43000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+  title: index === 0 ? "Contrato e interface do meu assistente" : `${demoProjects[Math.floor(index / 4)]} · construção ${index % 4 + 1}`,
+  position: index % 4 + 1, cycleId: `42000000-0000-4000-8000-${String(Math.floor(index / 4) + 1).padStart(12, "0")}`,
+  cycleTitle: demoProjects[Math.floor(index / 4)], cyclePosition: Math.floor(index / 4) + 1, curriculumId: "41000000-0000-4000-8000-000000000001",
+}));
 const records = new Map<string, AdminAtlasDetail>();
 const revisions = new Map<string, { summary: AdminAtlasRevisionListItem; draft: AdminAtlasDraftInput }[]>();
 let tick = Date.now();
@@ -25,7 +32,7 @@ export function atlasCmsDemo(url: URL, method: string, body?: Record<string, unk
   if (path === "/api/admin/atlas/options") {
     const counts = { draft: 0, published: 0, archived: 0, concept: 0, prompt: 0, design_system: 0 };
     for (const item of records.values()) { counts[item.kind]++; counts[item.status]++; }
-    return { lessons: { items: [{ id: lessonId, title: "Contrato e interface do meu assistente", position: 1, cycleId: "42000000-0000-4000-8000-000000000001", cycleTitle: "Assistente Pessoal Inteligente", cyclePosition: 1, curriculumId: "41000000-0000-4000-8000-000000000001" }], nextCursor: null }, counts } satisfies AdminAtlasOptions;
+    return { lessons: { items: [...demoLessons], nextCursor: null }, counts } satisfies AdminAtlasOptions;
   }
   if (path === "/api/admin/atlas" && method === "GET") {
     const items = [...records.values()].filter((r) => (!url.searchParams.get("kind") || r.kind === url.searchParams.get("kind")) && (!url.searchParams.get("status") || r.status === url.searchParams.get("status")) && (!url.searchParams.get("lesson") || r.draft.lessonTemplateIds.includes(url.searchParams.get("lesson")!)) && `${r.draft.title} ${r.draft.tags.join(" ")}`.toLowerCase().includes((url.searchParams.get("search") ?? "").toLowerCase())).map((r) => ({ id: r.id, kind: r.kind, title: r.draft.title, summary: r.draft.summary, status: r.status, tags: r.draft.tags, linkedLessonCount: r.draft.lessonTemplateIds.length, hasWorkingDraft: r.hasWorkingDraft, itemUpdatedAt: r.itemUpdatedAt, draftUpdatedAt: r.draftUpdatedAt, updatedByUserId: null } satisfies AdminAtlasListItem));

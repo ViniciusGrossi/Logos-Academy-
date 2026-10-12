@@ -6,6 +6,7 @@ import { ArrowRight, BookOpenText, ChevronLeft, ChevronRight, Plus, Search, Term
 import type { AdminAtlasDetail, AdminAtlasListItem, AtlasItemKind, Page } from "@/specs/api.contracts";
 import { AdminEditorialHeader, AnimatedCollectionTabs, EditorialConfirmation, EditorialRegionState, StatusCounterStrip } from "@/src/components/ui-shared/admin-editorial";
 import { useAtlasMutation, useAtlasOptions, useAtlasQuery } from "@/src/hooks/use-atlas-cms";
+import { AtlasEditorialMap } from "./atlas-editorial-map";
 import styles from "./atlas-cms.module.css";
 
 export const atlasKindLabels = { concept: "Conceito", prompt: "Prompt", design_system: "Sistema de Design" };
@@ -25,13 +26,7 @@ export function AtlasCmsLibrary() {
   }
   return <div className={styles.library}>
     <AdminEditorialHeader eyebrow="Central editorial" title="Atlas" display description="Crie, organize e publique o conhecimento que acompanha cada aula." actions={<><span className={styles.headerHint}>Preview fiel ao Atlas do aluno</span><button className={styles.primary} onClick={() => { mutation.clearError(); setCreate(true); }}><Plus />Novo conteúdo</button></>} />
-    <section className={styles.editorialMap} aria-label="Mapa editorial">
-      <header><strong>Mapa editorial</strong><span>{options.data ? `${options.data.lessons.items.length} aulas ativas · filtre por coleção ou aula` : "Carregando o currículo"}</span><button onClick={() => { setKind(""); setLesson(""); }}>Mostrar todo o Atlas</button></header>
-      <div className={styles.mapCollections}><span className={styles.mapOrigin}>ATLAS</span>{(["concept", "prompt", "design_system"] as const).map((value) => { const Icon = value === "concept" ? BookOpenText : value === "prompt" ? Terminal : Palette; return <button key={value} className={styles.collectionNode} data-selected={kind === value} onClick={() => setKind(kind === value ? "" : value)}><Icon /><span><strong>{value === "concept" ? "Conceitos" : value === "prompt" ? "Prompts" : "Sistemas de Design"}</strong><small>{options.data?.counts[value] ?? "—"} conteúdos</small></span></button>; })}</div>
-      <div className={styles.mapLines} aria-hidden="true"><svg viewBox="0 0 1000 50" preserveAspectRatio="none"><path d="M230 0 C230 30 90 20 90 50 M230 0 C230 35 350 20 350 50 M500 0 C500 32 470 25 470 50 M500 0 C500 25 650 20 650 50 M800 0 C800 30 750 25 750 50 M800 0 C800 30 940 25 940 50" /></svg></div>
-      <div className={styles.lessonRail}>{options.data?.lessons.items.map((item, index) => <button key={item.id} aria-label={`Aula ${index + 1}: ${item.title}`} title={`${item.cycleTitle} · ${item.title}`} aria-pressed={lesson === item.id} onClick={() => setLesson(lesson === item.id ? "" : item.id)}>{String(index + 1).padStart(2, "0")}</button>)}</div>
-      {options.error && <p className={styles.error} role="alert">{options.error}<button onClick={() => void options.reload()}>Tentar novamente</button></p>}
-    </section>
+    <AtlasEditorialMap options={options.data} loading={options.loading} error={options.error} kind={kind} lesson={lesson} onKindChange={setKind} onLessonChange={setLesson} onRetry={() => void options.reload()} />
     <div className={styles.libraryGrid} data-panel={Boolean(selected)}><section className={styles.listPanel} aria-label="Conteúdos do Atlas">
       <StatusCounterStrip items={[{ id: "draft", label: "Rascunhos", value: options.data?.counts.draft ?? null }, { id: "published", label: "Publicados", value: options.data?.counts.published ?? null, tone: "success" }, { id: "archived", label: "Arquivados", value: options.data?.counts.archived ?? null }]} selected={status} onSelect={(v) => setStatus(status === v ? "" : v)} />
       <div className={styles.libraryToolbar}><label className={styles.search}><Search /><input type="search" aria-label="Buscar conteúdo" placeholder="Buscar por título, tag ou aula…" value={search} onChange={(e) => setSearch(e.target.value)} /></label><AnimatedCollectionTabs value={kind || "all"} onChange={(v) => setKind(v === "all" ? "" : v)} items={[{ id: "all", label: "Todos", panelId: "atlas-list" }, { id: "concept", label: "Conceitos", panelId: "atlas-list" }, { id: "prompt", label: "Prompts", panelId: "atlas-list" }, { id: "design_system", label: "Sistemas de Design", panelId: "atlas-list" }]} /></div>

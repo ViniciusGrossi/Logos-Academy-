@@ -13,6 +13,8 @@ depends_on: [student-knowledge-atlas]
 
 ## Aprovação
 
+Mapa Editorial (12/10): reformulação visual autorizada pelo usuário como elemento assinatura da biblioteca; percurso de 16 aulas em quatro projetos, núcleo Atlas, coleções, conexões responsivas e pulsos de energia. A navegação permanece vinculada aos IDs reais; slots sem aula não podem filtrar por IDs inventados. As conexões expressam navegação curricular, não cobertura de conteúdo publicado. Pulsos pausáveis e estáticos com movimento reduzido.
+
 Refinamento aprovado em 12/10: tags em chips removíveis, inclusão por Enter e prevenção de duplicatas; seletor de blocos com busca, grupos Texto/Visual/Processo/Sistema e miniaturas, seguindo as capturas do usuário. Preservar os 16 tipos e os contratos existentes.
 
 Direção inicial fornecida por Vinicius em 2026-09-15 e ampliada em 2026-10-05 após o uso real do Atlas. Vinicius autorizou planejar e implementar o CMS, com duas exigências centrais: corrigir o conteúdo com caracteres corrompidos e permitir que o próprio administrador publique materiais visualmente ricos sem depender de pedir alterações no código. Esta spec estende `student-knowledge-atlas` (base de leitura do aluno, migration `0048`) sem quebrar seus contratos.

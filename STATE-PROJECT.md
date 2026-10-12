@@ -35,6 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [x] **`atlas-editorial-map-premium`**: Mapa Editorial reformulado com núcleo orbital, três coleções, 16 nós de aula em quatro projetos, conexões SVG medidas no layout real e pulsos de energia. Pausa manual, suspensão fora da viewport e versão estática para movimento reduzido. Validação local em 1440/768/375 sem overflow; 181 testes aprovados. Disponível na porta 3090, ainda sem deploy.
 - [x] **`atlas-editor-controls-refinement`**: tags em chips com Enter, remoção, prevenção de duplicatas e limite contratual; seletor central de blocos com busca sem acentos, categorias e miniaturas fiéis à referência. 175 testes, lint e TypeScript aprovados; disponível no servidor local 3090, sem deploy.
 - [x] **`admin-design-reference`**: interfaces de Atlas CMS e Revisões reconstruídas a partir das referências aprovadas do Claude Design; componentes compartilhados, editor de 16 tipos de blocos, biblioteca editorial, preview, assets privados, histórico/restauração e mesa de feedback integrados às APIs. Worktree `C:/la-admin-interface`, branch `feat/admin-design-reference`; não publicado.
 - [ ] **Gate de publicação administrativa**: teste pgTAP da migration `20261012015740_atlas_asset_finalize_idempotent.sql` e ensaio com sessões reais admin/aluno pendentes. Migration incremental ainda não aplicada em produção. Rascunho de revisão é explicitamente local à aba, não sincronizado no servidor.
@@ -114,6 +115,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-12] Mapa Editorial é o chamariz do CMS: tratar como elemento assinatura, com percurso completo de 16 aulas, conexões e energia visual; filtros usam IDs reais, sem inferir cobertura publicada a partir do diagrama.
 
 - [2026-10-12] Atlas CMS: preservar os controles visuais do protótipo aprovado. Tags devem ser chips removíveis; o catálogo de blocos deve manter busca, agrupamento e miniaturas, não ser reduzido a uma lista de botões genéricos.
 
