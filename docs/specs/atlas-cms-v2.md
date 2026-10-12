@@ -13,6 +13,8 @@ depends_on: [student-knowledge-atlas]
 
 ## Aprovação
 
+Refinamento aprovado em 12/10: tags em chips removíveis, inclusão por Enter e prevenção de duplicatas; seletor de blocos com busca, grupos Texto/Visual/Processo/Sistema e miniaturas, seguindo as capturas do usuário. Preservar os 16 tipos e os contratos existentes.
+
 Direção inicial fornecida por Vinicius em 2026-09-15 e ampliada em 2026-10-05 após o uso real do Atlas. Vinicius autorizou planejar e implementar o CMS, com duas exigências centrais: corrigir o conteúdo com caracteres corrompidos e permitir que o próprio administrador publique materiais visualmente ricos sem depender de pedir alterações no código. Esta spec estende `student-knowledge-atlas` (base de leitura do aluno, migration `0048`) sem quebrar seus contratos.
 
 ## Objetivo

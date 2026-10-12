@@ -35,6 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [x] **`atlas-editor-controls-refinement`**: tags em chips com Enter, remoção, prevenção de duplicatas e limite contratual; seletor central de blocos com busca sem acentos, categorias e miniaturas fiéis à referência. 175 testes, lint e TypeScript aprovados; disponível no servidor local 3090, sem deploy.
 - [x] **`admin-design-reference`**: interfaces de Atlas CMS e Revisões reconstruídas a partir das referências aprovadas do Claude Design; componentes compartilhados, editor de 16 tipos de blocos, biblioteca editorial, preview, assets privados, histórico/restauração e mesa de feedback integrados às APIs. Worktree `C:/la-admin-interface`, branch `feat/admin-design-reference`; não publicado.
 - [ ] **Gate de publicação administrativa**: teste pgTAP da migration `20261012015740_atlas_asset_finalize_idempotent.sql` e ensaio com sessões reais admin/aluno pendentes. Migration incremental ainda não aplicada em produção. Rascunho de revisão é explicitamente local à aba, não sincronizado no servidor.
 - [x] **`reviews-experience-v2`**: Mapa de Evidências por turma e atividade, roster completo de alunos, filtros operacionais e Mesa de Revisão premium publicados em `https://logos-academy-three.vercel.app/admin/revisoes`. Migration aplicada e função validada com bloqueio para `anon`/`authenticated` e acesso exclusivo do backend.
@@ -113,6 +114,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-12] Atlas CMS: preservar os controles visuais do protótipo aprovado. Tags devem ser chips removíveis; o catálogo de blocos deve manter busca, agrupamento e miniaturas, não ser reduzido a uma lista de botões genéricos.
 
 - [2026-10-11] Uma fila construída apenas a partir de entregas nunca consegue responder “quem ainda não enviou”. A projeção operacional de revisão deve começar pelas matrículas e atribuições da turma, anexando a entrega e o parecer quando existirem.
 
