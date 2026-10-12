@@ -4,9 +4,10 @@ import sharp from "sharp";
 import { inspectAtlasImage } from "@/src/modules/atlas-cms/image";
 
 describe("atlas-cms verified upload", () => {
-  it("deriva MIME e dimensões de uma imagem decodificada", async () => {
-    const bytes = await sharp({ create: { width: 12, height: 8, channels: 3, background: "#ffffff" } }).png().toBuffer();
-    await expect(inspectAtlasImage(bytes, { contentType: "image/png", sizeBytes: bytes.length }, "req")).resolves.toEqual({ contentType: "image/png", sizeBytes: bytes.length, width: 12, height: 8 });
+  it.each(["png", "jpeg", "webp"] as const)("deriva MIME e dimensões reais de %s", async (format) => {
+    const bytes = await sharp({ create: { width: 12, height: 8, channels: 3, background: "#ffffff" } }).toFormat(format).toBuffer();
+    const contentType = `image/${format}`;
+    await expect(inspectAtlasImage(bytes, { contentType, sizeBytes: bytes.length }, "req")).resolves.toEqual({ contentType, sizeBytes: bytes.length, width: 12, height: 8 });
   });
   it("recusa declaração falsa de MIME/tamanho e arquivo não decodificável", async () => {
     const bytes = await sharp({ create: { width: 12, height: 8, channels: 3, background: "#ffffff" } }).png().toBuffer();

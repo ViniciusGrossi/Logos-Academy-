@@ -83,6 +83,15 @@ describe("atlas-cms application through real repository", () => {
     const { service } = fixture(() => ({ id: itemId, secret: "must-not-return" }));
     await expect(service.detail(actor, itemId, "req")).rejects.toMatchObject({ code: "INTERNAL_ERROR", message: "Resposta editorial inválida." });
   });
+  it("retry de asset pronto retorna estado verificado sem download ou nova finalização", async () => {
+    const ready = { id: assetId, ownerKind: "concept", ownerId: itemId, status: "ready", filename: "a.png", contentType: "image/png", sizeBytes: 100, width: 12, height: 8, alt: "Alt persistido", caption: null, createdAt: time, updatedAt: time, bucket: "knowledge-assets", bucketPath: `${tenantId}/concept/${itemId}/${assetId}` };
+    const { service, calls } = fixture((call) => call.name.startsWith("knowledge_assets?") ? { id: assetId, concept_id: itemId, resource_id: null } : { ...detail, assets: [ready] });
+    const result = await service.finalize(actor, { assetId, alt: "Novo alt não sobrescreve" }, "req");
+    expect(result).toMatchObject({ status: "ready", alt: "Alt persistido", width: 12, height: 8 });
+    expect(result).not.toHaveProperty("bucketPath");
+    expect(calls).toHaveLength(2);
+    expect(calls.some((call) => call.name === "admin_atlas_asset_finalize")).toBe(false);
+  });
   it("não aceita dimensões/backend/path enviados pelo cliente", async () => {
     const { service, calls } = fixture();
     await expect(service.finalize(actor, { assetId, alt: "Ilustração", width: 12, height: 8 }, "req")).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
