@@ -101,7 +101,7 @@ export function AdminReviewWorkspace({ submissionId }: { submissionId: string })
             <span className={styles.reviewCounter}>{alreadyReviewed ? workspace.review?.criteria.filter((criterion) => criterion.result === "met").length : Object.keys(results).length}<small>/{workspace.criteria.length}</small></span>
           </header>
 
-          {alreadyReviewed && workspace.review ? <PublishedReview workspace={workspace} /> : <>
+          {alreadyReviewed && workspace.review ? <PublishedReview workspace={workspace} /> : <fieldset disabled={saving} className={styles.reviewFields}>
             <div className={styles.criteriaStack}>
               {workspace.criteria.map((criterion, index) => <article className={styles.criterionCard} key={criterion.id} data-result={results[criterion.id]}>
                 <header><span>{String(index + 1).padStart(2, "0")}</span><strong>{criterion.label}</strong></header>
@@ -137,7 +137,7 @@ export function AdminReviewWorkspace({ submissionId }: { submissionId: string })
                 <button type="button" className={styles.publishButton} disabled={saving || !canPublish} onClick={() => setConfirm("publish")}>{saving ? "Publicando…" : hasAdjustment ? "Enviar correção" : "Enviar feedback"}<Send aria-hidden="true" /></button>
               </div>
             </footer>
-          </>}
+          </fieldset>}
         </section>
       </aside>
     </div>

@@ -17,9 +17,9 @@ export class StudentAtlasAssetsRepository {
     const sources = content.contentBlocks.filter((block) => block.isVisible).flatMap((block) => block.type === "image" ? [block.source] : block.type === "gallery" ? [...block.items] : []);
     const ids = Array.from(new Set(sources.flatMap((source) => source.kind === "asset" ? [source.assetId] : [])));
     if (!ids.length) return { ...released, resolvedAssets: [] };
-    const { data, error } = await this.client.schema("logos_academy").from("knowledge_assets").select("id,bucket,bucket_path,alt,caption,width,height,content_type").eq("tenant_id", tenantId).eq(ownerKind === "concept" ? "concept_id" : "resource_id", ownerId).eq("status", "ready").is("deleted_at", null).in("id", ids);
+    const { data, error } = await this.client.schema("logos_academy").from("knowledge_assets").select("id,bucket_path,alt,caption,width,height,content_type").eq("tenant_id", tenantId).eq(ownerKind === "concept" ? "concept_id" : "resource_id", ownerId).eq("status", "ready").is("deleted_at", null).in("id", ids);
     if (error) throw new AppError("INTERNAL_ERROR", "Não foi possível carregar as imagens.", requestId);
-    const rows = parseOutput(z.array(z.object({ id: uuidSchema, bucket: z.literal("knowledge-assets"), bucket_path: z.string(), alt: z.string().min(1), caption: z.string().nullable(), width: z.number().int().positive(), height: z.number().int().positive(), content_type: mimeSchema })), data, requestId);
+    const rows = parseOutput(z.array(z.object({ id: uuidSchema, bucket_path: z.string(), alt: z.string().min(1), caption: z.string().nullable(), width: z.number().int().positive(), height: z.number().int().positive(), content_type: mimeSchema })), data, requestId);
     for (const row of rows) if (row.bucket_path !== `${tenantId}/${ownerKind}/${ownerId}/${row.id}`) throw new AppError("FORBIDDEN", "Imagem indisponível.", requestId);
     // Missing/deleted assets stay unresolved and receive an accessible fallback.
     if (!rows.length) return { ...released, resolvedAssets: [] };

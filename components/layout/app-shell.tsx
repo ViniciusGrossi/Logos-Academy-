@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useLiveApi } from "@/components/prototype/live-api";
 import { createSupabaseBrowserClient } from "@/src/lib/supabase/browser";
 import { clearDemoRole } from "@/src/lib/demo-mode";
+import { clearLocalReviewDrafts } from "@/src/lib/review-draft-storage";
 
 const studentNav = [
   { href: "/", label: "Início", icon: Home },
@@ -103,6 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   async function signOut() {
+    try { clearLocalReviewDrafts(window.sessionStorage); } catch { /* Browser storage may be unavailable; logout must remain possible. */ }
     if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
       await fetch("/api/demo/session", { method: "DELETE" });
       clearDemoRole();

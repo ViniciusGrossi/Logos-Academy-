@@ -9,7 +9,7 @@ const ownerId = "20000000-0000-4000-8000-000000000001";
 const assetId = "30000000-0000-4000-8000-000000000001";
 const path = `${tenantId}/concept/${ownerId}/${assetId}`;
 const released = { id: ownerId, title: "Referência", contentBlocks: [{ id: assetId, type: "image", isVisible: true, source: { kind: "asset", assetId, alt: "Interface" } }] };
-const row = { id: assetId, bucket: "knowledge-assets", bucket_path: path, alt: "Interface", caption: null, width: 600, height: 400, content_type: "image/png" };
+const row = { id: assetId, bucket_path: path, alt: "Interface", caption: null, width: 600, height: 400, content_type: "image/png" };
 function fixture(rows: unknown[] = [row]) {
   const calls: { url: URL; body: Record<string, unknown> | null }[] = [];
   const fetcher: typeof fetch = async (input, init) => {
@@ -27,6 +27,7 @@ describe("published Atlas private assets", () => {
     const { repository, calls } = fixture();
     const result = await repository.resolve(tenantId, released, ownerId, "concept", "req");
     const query = calls[0].url.searchParams;
+    expect(query.get("select")?.split(",")).not.toContain("bucket");
     expect(query.get("tenant_id")).toBe(`eq.${tenantId}`);
     expect(query.get("concept_id")).toBe(`eq.${ownerId}`);
     expect(query.get("status")).toBe("eq.ready");
