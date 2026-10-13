@@ -1,4 +1,4 @@
-# Preparação de publicação — Atlas CMS e Revisões
+# Publicação concluída — Atlas CMS e Revisões
 
 PR: https://github.com/ViniciusGrossi/Logos-Academy-/pull/2
 Branch: feat/admin-design-reference → main.
@@ -9,7 +9,9 @@ Branch publicada; prévia Vercel inicial READY:
 https://logos-academy-c43ioivoh-vinicius-projects-cf193513.vercel.app
 Deployment: dpl_Eo4DmbRvmEsqWjuuMy2BzhZBVLEc.
 
-Produção ainda não alterada. Rollback de frontend: promover a versão anterior READY,
+Produção publicada pelo squash `589b77d`: `dpl_12WUzped3votALdMERJfb82QLDUx` READY no domínio https://logos-academy-three.vercel.app. CI do PR #54 e CI da main verdes: 183 testes de aplicação e 390 pgTAP. Smoke público aprovado; ensaio autenticado real ainda pendente.
+
+Rollback de frontend: promover a versão anterior READY,
 https://logos-academy-g7ua6mjt1-vinicius-projects-cf193513.vercel.app.
 
 ## Correções pré-deploy
@@ -28,20 +30,20 @@ Projeto verificado: nqubjiosnlaatxxamiut, compartilhado com outros sistemas.
 Schema desta publicação: logos_academy / atlas_private.
 Consulta remota confirmou 16 aulas ativas, schema de knowledge_assets e ACL do finalize: anon/authenticated sem EXECUTE, service_role permitido.
 
-Única migration incremental da branch:
-20261012015740_atlas_asset_finalize_idempotent.sql.
-Apenas substitui a implementação existente por finalização idempotente, mantém ACL e não remove dados. Ainda NÃO aplicada em produção.
+Duas migrations incrementais aplicadas em produção:
+20261012015740_atlas_asset_finalize_idempotent.sql e 20261013023132_admin_pagination_last_returned_cursor.sql.
+Finalização idempotente e paginação sem omissão de registros. As quatro funções preservam assinaturas, ACL e dados; privilégios remotos verificados após aplicação.
 Não executar resets/seeds ou limpezas históricas de contas no banco remoto.
-pgTAP 062 e suite completa devem passar no GitHub antes da aplicação controlada.
+pgTAP 062 e suíte completa passaram no GitHub antes da aplicação controlada. Snapshot das quatro funções em `2026-10-12-functions-rollback.sql`.
 
-## Gates ainda necessários
+## Validação e acompanhamento
 
-- Deploy autorizado pelo usuário; CI #52 aprovou aplicação, Atlas 059, Revisões 058 e finalize 062. Suíte geral de banco permanece bloqueada por testes obsoletos e bug real do cursor em 0053.
-- Correção incremental adicional: `20261013023132_admin_pagination_last_returned_cursor.sql`, ainda não aplicada remotamente. Mesmas assinaturas, validação de tenant/admin e ACL, sem alteração de dados.
-- Nova execução CI verde para aplicação e banco.
-- Revisão do diff final após reparo dos contratos.
-- Migration incremental controlada, merge e Vercel produção READY.
-- Smoke público e ensaio autenticado real de administração/leitura de assets.
+- Deploy autorizado; falhas antigas corrigidas sem excluir contratos nem desativar proteções. Paginação real corrigida e coberta por 11 verificações adicionais, inclusive empates de timestamp.
+- Revisões independentes da migration e dos reparos de teste: zero blockers.
+- CI do PR #54 e CI da main verdes; produção READY e alias canônico confirmado.
+- Smoke: login 200 em 0,735 s; páginas administrativas 307 para login com next; APIs 401 anônimas; CSP/HSTS presentes; console do login limpo.
+- Relatório e screenshot em `.gstack/deploy-reports/2026-10-12-pr2-deploy.md` e `2026-10-12-pr2-login.png`.
+- Ensaio autenticado real de editor, upload/publicação e feedback ainda pendente; smoke anônimo não substitui essa validação.
 
 ## Ressalvas do review
 

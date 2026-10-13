@@ -2,9 +2,9 @@
 title: "Logos Academy Platform — State of Project"
 date: 2026-10-12
 fase_atual: "12"
-etapa_atual: "Atlas CMS e Revisões: referências Claude Design implementadas localmente"
+etapa_atual: "Atlas CMS e Revisões publicados em produção"
 produto_tipo: "saas-premium"
-proximo_passo: "Corrigir contratos pgTAP e bug do cursor; obter CI verde e publicar milestone administrativo autorizado"
+proximo_passo: "Ensaio manual autenticado: editar/publicar conteúdo no Atlas e revisar entrega de aluno"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -24,7 +24,7 @@ overrides:
   - gate: npm-audit
     data: 2026-09-08
     motivo: "1 critical + 4 moderate sao devDependencies (Vitest/esbuild dev-server, nunca em producao); 2 high sao postcss build-time interno do Next 15 com CSS 100% first-party — zero vetor runtime em producao. CSO PASS 9/10. Limpo pelo upgrade Next 16 (em git stash) como milestone proprio."
-status: "🟢 Produção estável · Revisões v2 publicada"
+status: "🟢 Produção · Atlas CMS e Revisões premium publicados"
 tags: [status, roadmap, logos-academy, plataforma-estudantil]
 ---
 # ESTADO — Logos Academy Platform
@@ -35,11 +35,11 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
-- [ ] **`admin-interface-deploy`**: branch enviada ao GitHub e PR #2 aberto. Prévia inicial Vercel `dpl_Eo4DmbRvmEsqWjuuMy2BzhZBVLEc` READY; produção não alterada. CI inicial falhou em npm ci (lockfile sem @emnapi/core/runtime); lock regenerado com npm 10.9.4 e dry-run aprovado. Revisão identificou e corrigiu consulta bucket inexistente, CSP de imagens, races de edição e privacidade de rascunho ao logout. Re-auditoria: zero críticas/altas, confiança 9/10 nos fixes. Falta CI completo verde e gate pré-merge.
-- [x] **`atlas-editorial-map-premium`**: Mapa Editorial reformulado com núcleo orbital, três coleções, 16 nós de aula em quatro projetos, conexões SVG medidas no layout real e pulsos de energia. Pausa manual, suspensão fora da viewport e versão estática para movimento reduzido. Validação local em 1440/768/375 sem overflow; 181 testes aprovados. Disponível na porta 3090, ainda sem deploy.
-- [x] **`atlas-editor-controls-refinement`**: tags em chips com Enter, remoção, prevenção de duplicatas e limite contratual; seletor central de blocos com busca sem acentos, categorias e miniaturas fiéis à referência. 175 testes, lint e TypeScript aprovados; disponível no servidor local 3090, sem deploy.
-- [x] **`admin-design-reference`**: interfaces de Atlas CMS e Revisões reconstruídas a partir das referências aprovadas do Claude Design; componentes compartilhados, editor de 16 tipos de blocos, biblioteca editorial, preview, assets privados, histórico/restauração e mesa de feedback integrados às APIs. Worktree `C:/la-admin-interface`, branch `feat/admin-design-reference`; não publicado.
-- [ ] **Gate de publicação administrativa**: teste pgTAP da migration `20261012015740_atlas_asset_finalize_idempotent.sql` e ensaio com sessões reais admin/aluno pendentes. Migration incremental ainda não aplicada em produção. Rascunho de revisão é explicitamente local à aba, não sincronizado no servidor.
+- [x] **`admin-interface-deploy`**: PR #2 integrado por squash `589b77d`; produção Vercel `dpl_12WUzped3votALdMERJfb82QLDUx` READY no domínio canônico. CI #54 e CI da main verdes: 183 testes da aplicação e 390 pgTAP. Finalize idempotente e paginação administrativa aplicados por migrations incrementais; ACL backend-only das quatro funções confirmada. Smoke: login 200 em 0,735 s, páginas admin 307 para login, APIs 401 sem sessão, CSP/HSTS presentes e console do login limpo. Sem resets/seeds ou novas contas remotas. Rollback em `docs/deploy/2026-10-12-functions-rollback.sql` e deployment anterior preservado. Ensaio autenticado real ainda pendente.
+- [x] **`atlas-editorial-map-premium`**: núcleo orbital, três coleções, 16 nós em quatro projetos, conexões SVG e pulsos; pausa manual, suspensão fora da viewport e reduced-motion. Validado localmente em 1440/768/375 sem overflow e publicado na produção pelo PR #2.
+- [x] **`atlas-editor-controls-refinement`**: tags em chips com Enter, remoção, deduplicação e limite; seletor visual central de blocos com busca, categorias e miniaturas. Publicado em produção pelo PR #2.
+- [x] **`admin-design-reference`**: Atlas CMS e Revisões reconstruídos conforme referências Claude Design; editor de 16 tipos de blocos, biblioteca, preview, assets privados, histórico/restauração e mesa de feedback integrados às APIs. Publicado em `https://logos-academy-three.vercel.app`; worktree `C:/la-admin-interface` preservado.
+- [ ] **Ensaio administrativo autenticado**: publicação autorizada e concluída com pgTAP completo verde. Falta testar editor, assets e envio/leitura de feedback com sessões reais admin/aluno; não substituído por smoke anônimo. Rascunho de revisão permanece local à aba, não sincronizado no servidor.
 - [x] **`reviews-experience-v2`**: Mapa de Evidências por turma e atividade, roster completo de alunos, filtros operacionais e Mesa de Revisão premium publicados em `https://logos-academy-three.vercel.app/admin/revisoes`. Migration aplicada e função validada com bloqueio para `anon`/`authenticated` e acesso exclusivo do backend.
 - [x] **`reviews-postgres-uuid-hotfix`**: causa do “Sinal interrompido” identificada nos validadores da aplicação; fila e publicação de revisão agora aceitam UUIDs determinísticos já persistidos pelo currículo. Teste focado, lint e TypeScript aprovados; aguarda deploy e smoke autenticado em produção.
 - [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; publicada e verificada em produção.
@@ -99,8 +99,7 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Workers Ativos
 
-- `repair_database_contracts` (DBA): testes em worktree `C:/la-db-test-repair`; fixtures e contratos atuais, sem escrita remota.
-- `deployment_code_review`: revisão read-only da migration incremental de paginação e da cobertura preservada.
+(nenhum; DBA e revisões concluídos.)
 
 ## Sync Requests Pendentes
 
