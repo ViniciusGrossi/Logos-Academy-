@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-10-12
-fase_atual: "12"
-etapa_atual: "Atlas CMS e Revisões publicados em produção"
+date: 2026-10-13
+fase_atual: "10"
+etapa_atual: "Auditoria e conclusão integral do MVP autorizadas; produção anterior preservada"
 produto_tipo: "saas-premium"
-proximo_passo: "Ensaio manual autenticado: editar/publicar conteúdo no Atlas e revisar entrega de aluno"
+proximo_passo: "Fechar lacunas F01-F14 e specs posteriores; E2E isolado real e smoke autenticado; revisão jurídica LGPD"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -16,9 +16,9 @@ gates:
   fase_7: pass
   fase_8: pass
   fase_9: pass
-  fase_10: pass
+  fase_10: pending
   fase_11: pass
-  fase_12: pass
+  fase_12: pending
 features: { draft: 0, approved: 22, built: 18, reviewed: 12 }
 overrides:
   - gate: npm-audit
@@ -35,6 +35,7 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [ ] **`mvp-completion`**: usuário autorizou concluir o MVP inteiro em 13/10. Escopo: F01-F14 e specs posteriores aprovadas, sem pós-MVP novo. Flags/gates herdados não provam conclusão. Auditoria de requisitos e segurança em andamento; teste local real será executado no runner isolado do GitHub (sem mocks na produção). Navegador `academy-mvp-admin` aberto para login manual seguro; nenhum reset de senha de admin.
 - [x] **`admin-interface-deploy`**: PR #2 integrado por squash `589b77d`; produção Vercel `dpl_12WUzped3votALdMERJfb82QLDUx` READY no domínio canônico. CI #54 e CI da main verdes: 183 testes da aplicação e 390 pgTAP. Finalize idempotente e paginação administrativa aplicados por migrations incrementais; ACL backend-only das quatro funções confirmada. Smoke: login 200 em 0,735 s, páginas admin 307 para login, APIs 401 sem sessão, CSP/HSTS presentes e console do login limpo. Sem resets/seeds ou novas contas remotas. Rollback em `docs/deploy/2026-10-12-functions-rollback.sql` e deployment anterior preservado. Ensaio autenticado real ainda pendente.
 - [x] **`atlas-editorial-map-premium`**: núcleo orbital, três coleções, 16 nós em quatro projetos, conexões SVG e pulsos; pausa manual, suspensão fora da viewport e reduced-motion. Validado localmente em 1440/768/375 sem overflow e publicado na produção pelo PR #2.
 - [x] **`atlas-editor-controls-refinement`**: tags em chips com Enter, remoção, deduplicação e limite; seletor visual central de blocos com busca, categorias e miniaturas. Publicado em produção pelo PR #2.
@@ -99,7 +100,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Workers Ativos
 
-(nenhum; DBA e revisões concluídos.)
+- `mvp_requirements_audit`: auditoria read-only PRD/specs/código/testes e matriz de aceite.
+- `deployment_security_review`: auditoria read-only auth/RLS/Storage/LGPD e dependências.
 
 ## Sync Requests Pendentes
 
@@ -107,6 +109,7 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Bloqueios
 
+- [13/10/2026] `docs/compliance/lgpd-operational-procedures.md` e evidência das aprovações jurídica e operacional exigidas pelo PRD/tasks não encontrados. Documento pode ser preparado tecnicamente; revisão jurídica não será presumida da autorização genérica de build.
 - Nenhum aluno real percorreu o fluxo completo: `reviews`, `uploaded_files`, `presentation_records` e `completion_records` estão com zero linhas e `project_records.approved` = 0 em produção. Correção, anexo, apresentação e conclusão nunca foram exercitados fora do modo demo.
 - `logos_academy.approve_project` (migration 0009) é código morto: nenhuma rota, tela ou função do banco a chama — a aprovação real acontece pelo trigger `activity_assignments_sync_project`. Decidir entre remover ou expor como fallback manual.
 - `python [SKILL_ROOT]/scripts/validate.py` do CLAUDE.md não existe (`~/.claude/skills/logos/` só tem `agents/`, `phases/`, `references/`, `SKILL.md`). O gate de specs da fase 2 não tem como rodar — mesma classe de deriva do ADR-022.

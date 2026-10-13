@@ -138,6 +138,15 @@ export interface SessionSummary {
   status: SessionStatus;
 }
 
+/** SR-MVP-01: contexto autorizado de encontro coletivo ou individual. */
+export interface AdminSessionContext {
+  session: SessionSummary;
+  classId: UUID | null;
+  enrollmentId: UUID | null;
+  studentId: UUID | null;
+  enrollments: readonly EnrollmentSummary[];
+}
+
 export interface AttendanceEntry {
   /** SR-A1 (Release 2): id do registro de frequência, exigido para registrar reposição. */
   attendanceId: UUID;
@@ -786,6 +795,8 @@ export interface ApiContracts {
     CompletionCheck
   >;
 
+  "GET /api/admin/sessions/:sessionId": Endpoint<{ sessionId: UUID }, AdminSessionContext>;
+  "GET /api/admin/enrollments/:enrollmentId/calendar": Endpoint<{ enrollmentId: UUID }, readonly SessionSummary[]>;
   "PATCH /api/admin/sessions/:sessionId": Endpoint<
     {
       sessionId: UUID;
