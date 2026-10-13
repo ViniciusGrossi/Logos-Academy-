@@ -4,7 +4,7 @@ date: 2026-10-12
 fase_atual: "12"
 etapa_atual: "Atlas CMS e Revisões: referências Claude Design implementadas localmente"
 produto_tipo: "saas-premium"
-proximo_passo: "Revisar interfaces, executar pgTAP no GitHub e aprovar publicação do milestone administrativo"
+proximo_passo: "Corrigir contratos pgTAP e bug do cursor; obter CI verde e publicar milestone administrativo autorizado"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -99,7 +99,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Workers Ativos
 
-(nenhum.)
+- `repair_database_contracts` (DBA): testes em worktree `C:/la-db-test-repair`; fixtures e contratos atuais, sem escrita remota.
+- `deployment_code_review`: revisão read-only da migration incremental de paginação e da cobertura preservada.
 
 ## Sync Requests Pendentes
 

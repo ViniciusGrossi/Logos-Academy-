@@ -36,8 +36,10 @@ pgTAP 062 e suite completa devem passar no GitHub antes da aplicação controlad
 
 ## Gates ainda necessários
 
+- Deploy autorizado pelo usuário; CI #52 aprovou aplicação, Atlas 059, Revisões 058 e finalize 062. Suíte geral de banco permanece bloqueada por testes obsoletos e bug real do cursor em 0053.
+- Correção incremental adicional: `20261013023132_admin_pagination_last_returned_cursor.sql`, ainda não aplicada remotamente. Mesmas assinaturas, validação de tenant/admin e ACL, sem alteração de dados.
 - Nova execução CI verde para aplicação e banco.
-- Aprovação do relatório pré-merge exigida por land-and-deploy.
+- Revisão do diff final após reparo dos contratos.
 - Migration incremental controlada, merge e Vercel produção READY.
 - Smoke público e ensaio autenticado real de administração/leitura de assets.
 
@@ -46,3 +48,4 @@ pgTAP 062 e suite completa devem passar no GitHub antes da aplicação controlad
 - Duplicação/undo local de blocos e filtros CMS na URL ainda ausentes; remoção confirmada preservada. Findings médios documentados, não marcados como corrigidos.
 - Rascunho de feedback continua restrito à aba, sem persistência no servidor.
 - Advisories de dependências da CLI e guarda herdada de tenant excluído são baseline separado; não executado audit fix automático.
+- Advisor remoto: tabelas editoriais backend-only com RLS sem policy de cliente continuam fechadas por desenho. Aviso preexistente fora da Academy em public.Leads (RLS desativado) não foi alterado neste deploy; requer tarefa separada. Referência: https://supabase.com/docs/guides/database/database-linter?lint=0007_policy_exists_rls_disabled.
