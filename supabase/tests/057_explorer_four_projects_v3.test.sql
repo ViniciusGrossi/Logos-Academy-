@@ -6,13 +6,13 @@ select plan(19);
 select is((select count(*)::integer from cycles where curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and deleted_at is null),4,'Explorer v3 has four projects');
 select results_eq(
   $$select project_title from cycles where curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and deleted_at is null order by position$$,
-  $$values('Assistente Pessoal Inteligente'),('Creative Studio'),('Automation Lab'),('MVP: Produto Inteligente')$$,
+  $$select title from (values(1,'Assistente Pessoal Inteligente'),(2,'Creative Studio'),(3,'Automation Lab'),(4,'MVP: Produto Inteligente')) expected(position,title) order by position$$,
   'Explorer v3 exposes the approved project sequence'
 );
 select is((select count(*)::integer from lesson_templates l join cycles c on c.id=l.cycle_id and c.tenant_id=l.tenant_id where c.curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and l.deleted_at is null),16,'Explorer v3 has sixteen lessons');
 select results_eq(
   $$select ((c.position-1)*4+l.position)::integer from lesson_templates l join cycles c on c.id=l.cycle_id and c.tenant_id=l.tenant_id where c.curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and l.position=4 and l.deleted_at is null order by 1$$,
-  $$values(4),(8),(12),(16)$$,
+  $$select position from (values(4),(8),(12),(16)) expected(position) order by position$$,
   'every fourth lesson is the project integration day'
 );
 select is((select title from lesson_templates where id=md5('logos-academy-explorer-v3-lesson-16')::uuid),'Demo Day: MVP publicado','lesson sixteen closes with the MVP Demo Day');

@@ -3,6 +3,13 @@ create extension if not exists pgtap with schema extensions;
 set local search_path = logos_academy, extensions;
 select plan(10);
 
+-- The approved core must exist; all present tables (including Atlas extensions)
+-- must independently retain the security/timestamp invariants below.
+create temp table product_tables as
+select c.oid, c.relname, c.relrowsecurity, c.relforcerowsecurity
+from pg_class c join pg_namespace n on n.oid=c.relnamespace
+where n.nspname='logos_academy' and c.relkind in ('r','p');
+
 select is(
   (select count(*)::integer from information_schema.tables where table_schema = 'logos_academy' and table_name in (
     'tenants','users','tenant_memberships','student_profiles','guardian_records','consent_records','curricula','cycles',
@@ -14,21 +21,21 @@ select is(
 
 select is((select count(*)::integer from pg_class c join pg_namespace n on n.oid=c.relnamespace
   where n.nspname='logos_academy' and c.relname in (select table_name from information_schema.tables where table_schema='logos_academy')
-    and c.relrowsecurity), 32, 'RLS is enabled on every product table');
+    and c.relrowsecurity), (select count(*)::integer from product_tables), 'RLS is enabled on every product table');
 
 select is((select count(*)::integer from pg_class c join pg_namespace n on n.oid=c.relnamespace
   where n.nspname='logos_academy' and c.relname in (select table_name from information_schema.tables where table_schema='logos_academy')
-    and c.relforcerowsecurity), 32, 'RLS is forced on every product table');
+    and c.relforcerowsecurity), (select count(*)::integer from product_tables), 'RLS is forced on every product table');
 
 select is((select count(*)::integer from information_schema.columns
   where table_schema='logos_academy' and table_name in (select table_name from information_schema.tables where table_schema='logos_academy')
-    and column_name='created_at'), 32, 'every product table has created_at');
+    and column_name='created_at'), (select count(*)::integer from product_tables), 'every product table has created_at');
 select is((select count(*)::integer from information_schema.columns
   where table_schema='logos_academy' and table_name in (select table_name from information_schema.tables where table_schema='logos_academy')
-    and column_name='updated_at'), 32, 'every product table has updated_at');
+    and column_name='updated_at'), (select count(*)::integer from product_tables), 'every product table has updated_at');
 select is((select count(*)::integer from information_schema.columns
   where table_schema='logos_academy' and table_name in (select table_name from information_schema.tables where table_schema='logos_academy')
-    and column_name='deleted_at'), 32, 'every product table has soft-delete timestamp');
+    and column_name='deleted_at'), (select count(*)::integer from product_tables), 'every product table has soft-delete timestamp');
 
 select ok(exists(select 1 from pg_extension where extname='pgcrypto'), 'pgcrypto is installed');
 select is((select count(*)::integer from pg_policies where schemaname='storage' and tablename='objects' and policyname like 'submissions_objects_%'), 4, 'storage has four operation policies');

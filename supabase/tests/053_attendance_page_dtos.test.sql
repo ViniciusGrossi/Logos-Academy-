@@ -4,6 +4,9 @@ set local search_path = logos_academy, extensions;
 select plan(8);
 
 insert into tenants(id,tenant_id,name,slug) values (md5('attendance-tenant')::uuid,md5('attendance-tenant')::uuid,'Attendance tenant','attendance-tenant');
+insert into auth.users(id,aud,role,email,raw_app_meta_data,raw_user_meta_data) values
+  (md5('attendance-admin-auth')::uuid,'authenticated','authenticated','attendance-admin@test','{}','{}'),
+  (md5('attendance-student-auth')::uuid,'authenticated','authenticated','attendance-student@test','{}','{}');
 insert into users(id,tenant_id,auth_user_id,email_encrypted,display_name) values
   (md5('attendance-admin')::uuid,md5('attendance-tenant')::uuid,md5('attendance-admin-auth')::uuid,extensions.pgp_sym_encrypt('admin@test','test-key'),'Admin'),
   (md5('attendance-student')::uuid,md5('attendance-tenant')::uuid,md5('attendance-student-auth')::uuid,extensions.pgp_sym_encrypt('student@test','test-key'),'Student');

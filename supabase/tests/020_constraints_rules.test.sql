@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = logos_academy, extensions;
-select plan(20);
+select plan(21);
 
 select throws_ok($$insert into enrollments (tenant_id,student_profile_id,curriculum_id,kind,status,invited_at)
   values ('10000000-0000-0000-0000-000000000001','13000000-0000-0000-0000-000000000001','16000000-0000-0000-0000-000000000001','class','invited',now())$$,
@@ -71,7 +71,13 @@ select throws_ok($$update classes set curriculum_id='16000000-0000-0000-0000-000
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub','a0000000-0000-0000-0000-000000000001',true);
-select is((logos_academy.completion_check('18000000-0000-0000-0000-000000000001')->>'eligible')::boolean,false,'completion stays ineligible with missing evidence');
+select throws_ok($$select logos_academy.completion_check('18000000-0000-0000-0000-000000000001')$$,
+  '42501',null,'authenticated cannot invoke revoked legacy completion RPC');
+reset role;
+set local role service_role;
+select is((logos_academy.admin_completion_check('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001','18000000-0000-0000-0000-000000000001')->>'eligible')::boolean,false,'completion stays ineligible with missing evidence through authorized server RPC');
+reset role;
+set local role authenticated;
 select is((select status from enrollments where id='18000000-0000-0000-0000-000000000001'),'active','ineligible completion check does not mutate enrollment');
 select throws_ok($$update enrollments set status='completed', completed_at=now() where id='18000000-0000-0000-0000-000000000001'$$,
   '42501', null, 'direct enrollment completion is rejected');

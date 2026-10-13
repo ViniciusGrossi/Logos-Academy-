@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path=logos_academy,extensions;
-select plan(21);
+select plan(22);
 
 insert into activity_assignments(id,tenant_id,enrollment_id,session_id,activity_template_id,status)
 values(md5('review-v2-locked')::uuid,'10000000-0000-0000-0000-000000000001','18000000-0000-0000-0000-000000000001',md5('academy-a-session-2')::uuid,md5('academy-a-activity-2')::uuid,'locked');
@@ -15,8 +15,10 @@ select throws_ok(
 
 update activity_assignments set due_at=now()-interval '2 days'
 where id='1a000000-0000-0000-0000-000000000001';
-update submissions set submitted_at=now()-interval '1 day'
-where id='1b000000-0000-0000-0000-000000000001';
+-- seed already submits this version yesterday; never mutate an immutable row.
+select throws_ok($$update submissions set submitted_at=now()-interval '1 day'
+where id='1b000000-0000-0000-0000-000000000001'$$,
+'42501','submitted versions are immutable','submitted timestamp cannot be rewritten by a fixture');
 
 select is((logos_academy.student_activity_detail('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000002','1a000000-0000-0000-0000-000000000001','local-seed-only')->>'canEdit')::boolean,false,'submitted activity is read-only');
 select is(logos_academy.student_activity_detail('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000002','1a000000-0000-0000-0000-000000000001','local-seed-only')->>'readOnlyReason','submitted','submitted reason is projected');
