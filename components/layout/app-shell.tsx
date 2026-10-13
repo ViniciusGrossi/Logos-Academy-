@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useLiveApi } from "@/components/prototype/live-api";
 import { createSupabaseBrowserClient } from "@/src/lib/supabase/browser";
 import { clearDemoRole } from "@/src/lib/demo-mode";
+import { clearLocalReviewDrafts } from "@/src/lib/review-draft-storage";
 
 const studentNav = [
   { href: "/", label: "Início", icon: Home },
@@ -28,6 +29,7 @@ const adminNav = [
   { href: "/admin/alunos", label: "Alunos", icon: UsersRound },
   { href: "/admin/turmas", label: "Turmas", icon: CalendarDays },
   { href: "/admin/revisoes", label: "Revisões", icon: ClipboardCheck },
+  { href: "/admin/atlas", label: "Atlas", icon: BookOpenText },
   { href: "/admin/reposicoes", label: "Reposições", icon: Wrench },
 ] as const;
 
@@ -102,6 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   async function signOut() {
+    try { clearLocalReviewDrafts(window.sessionStorage); } catch { /* Browser storage may be unavailable; logout must remain possible. */ }
     if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
       await fetch("/api/demo/session", { method: "DELETE" });
       clearDemoRole();
@@ -137,7 +140,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {navGroups.map(({ label: groupLabel, items }) => <div key={groupLabel} className="side-nav__group">
             <span className="side-nav__label">{groupLabel}</span>
             {items.map(({ href, label, icon: Icon }) => {
-              const active = pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+              const active = pathname === href || (href !== "/" && href !== "/admin" && pathname.startsWith(`${href}/`));
               const badge = navBadges[href];
               return <Link key={href} href={href} className={active ? "active" : ""} aria-current={active ? "page" : undefined}>
                 <span className="nav-bar" aria-hidden="true" />

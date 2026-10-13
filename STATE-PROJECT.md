@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-10-11
+date: 2026-10-12
 fase_atual: "12"
-etapa_atual: "Nova experiência de Revisões publicada e verificada em produção"
+etapa_atual: "Atlas CMS e Revisões: referências Claude Design implementadas localmente"
 produto_tipo: "saas-premium"
-proximo_passo: "Executar o ensaio autenticado da revisão com uma nova entrega real de aluno"
+proximo_passo: "Corrigir contratos pgTAP e bug do cursor; obter CI verde e publicar milestone administrativo autorizado"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -19,7 +19,7 @@ gates:
   fase_10: pass
   fase_11: pass
   fase_12: pass
-features: { draft: 0, approved: 15, built: 15, reviewed: 13 }
+features: { draft: 0, approved: 22, built: 18, reviewed: 12 }
 overrides:
   - gate: npm-audit
     data: 2026-09-08
@@ -35,6 +35,11 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [ ] **`admin-interface-deploy`**: branch enviada ao GitHub e PR #2 aberto. Prévia inicial Vercel `dpl_Eo4DmbRvmEsqWjuuMy2BzhZBVLEc` READY; produção não alterada. CI inicial falhou em npm ci (lockfile sem @emnapi/core/runtime); lock regenerado com npm 10.9.4 e dry-run aprovado. Revisão identificou e corrigiu consulta bucket inexistente, CSP de imagens, races de edição e privacidade de rascunho ao logout. Re-auditoria: zero críticas/altas, confiança 9/10 nos fixes. Falta CI completo verde e gate pré-merge.
+- [x] **`atlas-editorial-map-premium`**: Mapa Editorial reformulado com núcleo orbital, três coleções, 16 nós de aula em quatro projetos, conexões SVG medidas no layout real e pulsos de energia. Pausa manual, suspensão fora da viewport e versão estática para movimento reduzido. Validação local em 1440/768/375 sem overflow; 181 testes aprovados. Disponível na porta 3090, ainda sem deploy.
+- [x] **`atlas-editor-controls-refinement`**: tags em chips com Enter, remoção, prevenção de duplicatas e limite contratual; seletor central de blocos com busca sem acentos, categorias e miniaturas fiéis à referência. 175 testes, lint e TypeScript aprovados; disponível no servidor local 3090, sem deploy.
+- [x] **`admin-design-reference`**: interfaces de Atlas CMS e Revisões reconstruídas a partir das referências aprovadas do Claude Design; componentes compartilhados, editor de 16 tipos de blocos, biblioteca editorial, preview, assets privados, histórico/restauração e mesa de feedback integrados às APIs. Worktree `C:/la-admin-interface`, branch `feat/admin-design-reference`; não publicado.
+- [ ] **Gate de publicação administrativa**: teste pgTAP da migration `20261012015740_atlas_asset_finalize_idempotent.sql` e ensaio com sessões reais admin/aluno pendentes. Migration incremental ainda não aplicada em produção. Rascunho de revisão é explicitamente local à aba, não sincronizado no servidor.
 - [x] **`reviews-experience-v2`**: Mapa de Evidências por turma e atividade, roster completo de alunos, filtros operacionais e Mesa de Revisão premium publicados em `https://logos-academy-three.vercel.app/admin/revisoes`. Migration aplicada e função validada com bloqueio para `anon`/`authenticated` e acesso exclusivo do backend.
 - [x] **`reviews-postgres-uuid-hotfix`**: causa do “Sinal interrompido” identificada nos validadores da aplicação; fila e publicação de revisão agora aceitam UUIDs determinísticos já persistidos pelo currículo. Teste focado, lint e TypeScript aprovados; aguarda deploy e smoke autenticado em produção.
 - [x] **`project-activity-flow-clarity`**: régua conceitual substituída pelos estados reais da atividade, orientação de uso e próximas ações explícitas; publicada e verificada em produção.
@@ -94,7 +99,8 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Workers Ativos
 
-(nenhum.)
+- `repair_database_contracts` (DBA): testes em worktree `C:/la-db-test-repair`; fixtures e contratos atuais, sem escrita remota.
+- `deployment_code_review`: revisão read-only da migration incremental de paginação e da cobertura preservada.
 
 ## Sync Requests Pendentes
 
@@ -111,6 +117,10 @@ _Histórico completo: `STATE-HISTORY.md`._
 - Fase 12 — não existe superfície admin para **criar turma** (`POST /api/admin/classes`), **convidar aluno** (`POST /api/admin/students/invite`) nem **matricular** (`POST /api/admin/enrollments`), apesar de `docs/specs/admissions-classes-calendar.md` prever `/admin/alunos` com convite em Sheet e `/admin/turmas` com criação em Sheet. Mesma deriva da Formação: backend + RPC + mock prontos, tela ausente. Bloqueia o ensaio ponta-a-ponta com aluno real. Requer também `GET /api/admin/curricula`, que não existe (Sync Request).
 
 ## Lições
+
+- [2026-10-12] Mapa Editorial é o chamariz do CMS: tratar como elemento assinatura, com percurso completo de 16 aulas, conexões e energia visual; filtros usam IDs reais, sem inferir cobertura publicada a partir do diagrama.
+
+- [2026-10-12] Atlas CMS: preservar os controles visuais do protótipo aprovado. Tags devem ser chips removíveis; o catálogo de blocos deve manter busca, agrupamento e miniaturas, não ser reduzido a uma lista de botões genéricos.
 
 - [2026-10-11] Uma fila construída apenas a partir de entregas nunca consegue responder “quem ainda não enviou”. A projeção operacional de revisão deve começar pelas matrículas e atribuições da turma, anexando a entrega e o parecer quando existirem.
 

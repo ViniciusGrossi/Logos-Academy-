@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { demoApi, isDemoMode } from "@/src/mocks/demo-api";
 
 export type ApiFailure = { code?: string; message: string };
@@ -9,15 +9,18 @@ export function useLiveApi<T>(url: string | null) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<ApiFailure | null>(null);
   const [loading, setLoading] = useState(Boolean(url));
+  const sequence = useRef(0);
   const load = useCallback(async () => {
-    if (!url) { setLoading(false); return; }
-    setLoading(true); setError(null);
+    const current = ++sequence.current;
+    if (!url) { setLoading(false); setData(null); return; }
+    setLoading(true); setError(null); setData(null);
     try {
-      setData(await apiQuery<T>(url));
-    } catch (cause) { setError({ message: cause instanceof Error ? cause.message : "Não foi possível carregar os dados." }); }
-    finally { setLoading(false); }
+      const value = await apiQuery<T>(url);
+      if (current === sequence.current) setData(value);
+    } catch (cause) { if (current === sequence.current) setError({ message: cause instanceof Error ? cause.message : "Não foi possível carregar os dados." }); }
+    finally { if (current === sequence.current) setLoading(false); }
   }, [url]);
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { const guard = sequence; void load(); return () => { guard.current++; }; }, [load]);
   return { data, error, loading, reload: load };
 }
 

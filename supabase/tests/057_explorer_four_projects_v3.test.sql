@@ -6,13 +6,13 @@ select plan(19);
 select is((select count(*)::integer from cycles where curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and deleted_at is null),4,'Explorer v3 has four projects');
 select results_eq(
   $$select project_title from cycles where curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and deleted_at is null order by position$$,
-  $$values('Assistente Pessoal Inteligente'),('Creative Studio'),('Automation Lab'),('MVP: Produto Inteligente')$$,
+  $$select title from (values(1,'Assistente Pessoal Inteligente'),(2,'Creative Studio'),(3,'Automation Lab'),(4,'MVP: Produto Inteligente')) expected(position,title) order by position$$,
   'Explorer v3 exposes the approved project sequence'
 );
 select is((select count(*)::integer from lesson_templates l join cycles c on c.id=l.cycle_id and c.tenant_id=l.tenant_id where c.curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and l.deleted_at is null),16,'Explorer v3 has sixteen lessons');
 select results_eq(
   $$select ((c.position-1)*4+l.position)::integer from lesson_templates l join cycles c on c.id=l.cycle_id and c.tenant_id=l.tenant_id where c.curriculum_id=md5('logos-academy-explorer-v3-curriculum')::uuid and l.position=4 and l.deleted_at is null order by 1$$,
-  $$values(4),(8),(12),(16)$$,
+  $$select position from (values(4),(8),(12),(16)) expected(position) order by position$$,
   'every fourth lesson is the project integration day'
 );
 select is((select title from lesson_templates where id=md5('logos-academy-explorer-v3-lesson-16')::uuid),'Demo Day: MVP publicado','lesson sixteen closes with the MVP Demo Day');
@@ -27,7 +27,7 @@ select is((select count(*)::integer from activity_requirements where activity_te
 select ok((select instructions ilike '%não é obrigatório%' from activity_templates where id=md5('logos-academy-explorer-v3-activity-1')::uuid),'the visual reactive element is explicitly optional');
 select ok((select context ilike '%apenas o exemplo%' from activity_templates where id=md5('logos-academy-explorer-v3-activity-1')::uuid),'the teacher assistant is explicitly an example');
 select ok((select project_challenge ilike '%IA especializada%' and project_challenge ilike '%experiência visual%' and project_challenge ilike '%automação confiável%' from cycles where id=md5('logos-academy-explorer-v3-cycle-4')::uuid),'the MVP combines AI, visual experience and automation');
-select is((select count(*)::integer from activity_templates where id in(md5('logos-academy-explorer-v3-activity-4')::uuid,md5('logos-academy-explorer-v3-activity-8')::uuid,md5('logos-academy-explorer-v3-activity-12')::uuid,md5('logos-academy-explorer-v3-activity-16')::uuid) and reference_content ilike '%não %nov%'),4,'project days explicitly avoid new core content');
+select is((select count(*)::integer from activity_templates a join lesson_templates l on l.tenant_id=a.tenant_id and l.id=a.lesson_template_id where a.id in(md5('logos-academy-explorer-v3-activity-4')::uuid,md5('logos-academy-explorer-v3-activity-8')::uuid,md5('logos-academy-explorer-v3-activity-12')::uuid,md5('logos-academy-explorer-v3-activity-16')::uuid) and l.reference_content ilike '%não %nov%'),4,'project day lesson references explicitly avoid new core content');
 select is((select is_required from activity_requirements where id=md5('logos-academy-explorer-v3-requirement-1-4')::uuid),false,'the initial GitHub repository is optional');
 select is((select count(*)::integer from lesson_templates where id in(select md5('logos-academy-explorer-v3-lesson-'||n)::uuid from generate_series(1,16)n) and estimated_activity_minutes=45),16,'every lesson reserves forty-five minutes for the hands-on mission');
 

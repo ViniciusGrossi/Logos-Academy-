@@ -46,6 +46,9 @@ describe("platform-security", () => {
     const productionHeaders = new Headers();
     applySecurityHeaders(productionHeaders, true);
     expect(productionHeaders.get("Strict-Transport-Security")).toContain("max-age=31536000");
+    const imagePolicy = productionHeaders.get("Content-Security-Policy")?.split("; ").find((directive) => directive.startsWith("img-src"));
+    expect(imagePolicy).toBe("img-src 'self' data: blob: https://nqubjiosnlaatxxamiut.supabase.co https://i.ytimg.com");
+    expect(imagePolicy).not.toMatch(/(?:^|\s)https:(?:\s|$)/);
   });
 
   it("preserva cursor estável para paginação sem repetir registros", () => {

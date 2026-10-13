@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/tokens/tokens.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/fonts/fonts.css">
+<link rel="stylesheet" href="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/styles.css">
+<script src="_ds/logos-academy-design-system-4f1f0ecb-f589-4d62-9da5-502b67c8915a/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scrollbar-color: #343941 #101114; }
+  body { margin: 0; background: var(--color-ink-950); color: var(--color-white); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--color-orange-400); }
+  [data-icon] > svg { width: 100%; height: 100%; display: block; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  select option { background: #17191D; color: #fff; }
+  textarea::placeholder, input::placeholder { color: rgb(255 255 255 / 38%); }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @keyframes rv-in { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes rv-fade { from { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+  @media (max-width: 82rem) {
+    [data-r="ws"] { grid-template-columns: minmax(0, 1fr) !important; }
+    [data-r="panel"] { position: static !important; max-height: none !important; }
+  }
+  @media (max-width: 64rem) {
+    [data-r="sidebar"] { transform: translateX(-105%); }
+    [data-r="sidebar"][data-open="true"] { transform: translateX(0); box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 60%); }
+    [data-r="main"] { margin-inline-start: 0 !important; }
+    [data-r="menu"] { display: inline-grid !important; }
+  }
+  @media (max-width: 48rem) {
+    [data-r="crumb-root"] { display: none !important; }
+    [data-r="filters"] > * { flex: 1 1 100% !important; }
+  }
+</style>
+</helmet>
+<div class="dark" style="position: relative; min-height: 100vh; background: var(--color-ink-950); color: var(--color-white)">
+
+  <aside data-r="sidebar" data-open="{{ navOpen }}" style="position: fixed; z-index: 50; inset: 0 auto 0 0; display: flex; width: 16.5rem; flex-direction: column; padding: 24px 20px; background: var(--color-ink-900); border-right: 1px solid var(--border); transition: transform var(--motion-standard) var(--ease-standard)">
+    <a href="#" style="display: inline-flex; min-height: 44px; align-items: center; gap: 12px; color: var(--color-white)">
+      <span style="display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); background: rgb(255 107 0 / 8%)">
+        <img src="brand/logos-academy-symbol-dark.png" alt="" width="52" height="52" style="width: 26px; height: 26px; object-fit: contain">
+      </span>
+      <span style="display: grid; gap: 1px; text-transform: uppercase; letter-spacing: .16em">
+        <strong style="font-size: var(--text-xs); line-height: 1">Logos</strong>
+        <small style="color: var(--accent); font: 700 9px/1.2 var(--font-mono); letter-spacing: .28em">Academy</small>
+      </span>
+    </a>
+    <nav style="display: grid; gap: 6px; margin-top: 40px">
+      <span style="margin: 0 12px 6px; font: 700 10px var(--font-mono); color: rgb(255 255 255 / 40%); letter-spacing: .12em; text-transform: uppercase">Gestão</span>
+      <a href="#" style="display: flex; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border)"><span data-icon="gauge" style="width: 18px; height: 18px"></span>Visão geral</a>
+      <a href="#" style="display: flex; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border)"><span data-icon="users" style="width: 18px; height: 18px"></span>Alunos</a>
+      <a href="#" style="display: flex; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border)"><span data-icon="calendar-days" style="width: 18px; height: 18px"></span>Turmas</a>
+      <a href="#" aria-current="page" onClick="{{ goTable }}" style="position: relative; display: flex; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; overflow: hidden; border: 1px solid rgb(255 107 0 / 30%); border-radius: var(--radius-md); color: var(--color-white); background: rgb(255 107 0 / 10%); font-size: var(--text-sm); font-weight: 600">
+        <span aria-hidden="true" style="position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--accent)"></span>
+        <span data-icon="clipboard-check" style="width: 18px; height: 18px; color: var(--accent)"></span><span style="flex: 1">Revisões</span>
+        <span style="border: 1px solid rgb(255 107 0 / 40%); border-radius: var(--radius-pill); padding: 3px 8px; color: var(--accent); font: 700 10px/1 var(--font-mono)">{{ stats.pending }}</span>
+      </a>
+      <a href="#" style="display: flex; min-height: 44px; align-items: center; gap: 12px; padding-inline: 14px; border: 1px solid transparent; border-radius: var(--radius-md); color: rgb(255 255 255 / 62%); font-size: var(--text-sm); transition: all var(--motion-fast) var(--ease-standard)" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%); border-color: var(--border)"><span data-icon="wrench" style="width: 18px; height: 18px"></span>Reposições</a>
+    </nav>
+    <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px">
+      <span style="display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: var(--color-ink-800); border: 1px solid var(--border); font: 700 11px var(--font-mono)">RC</span>
+      <span style="display: grid; gap: 2px"><strong style="font-size: var(--text-sm)">Prof. Rafael Costa</strong><small style="color: var(--muted); font-size: var(--text-xs)">Revisor · Admin</small></span>
+    </div>
+  </aside>
+
+  <div data-r="main" style="min-width: 0; margin-inline-start: 16.5rem">
+    <header style="position: sticky; top: 0; z-index: 30; display: flex; min-height: 64px; align-items: center; justify-content: space-between; gap: 16px; padding-inline: clamp(16px, 3vw, 32px); background: rgb(16 17 20 / 88%); border-bottom: 1px solid var(--border); backdrop-filter: blur(1rem)">
+      <div style="display: flex; min-width: 0; align-items: center; gap: 10px; font-size: var(--text-sm); color: var(--muted)">
+        <button type="button" data-r="menu" onClick="{{ toggleNav }}" aria-label="Abrir navegação" style="display: none; width: 44px; height: 44px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; cursor: pointer"><span data-icon="menu" style="width: 18px; height: 18px"></span></button>
+        <span data-r="crumb-root">Logos Academy</span>
+        <span data-r="crumb-root" style="opacity: .5">/</span>
+        <a href="#" onClick="{{ goTable }}" style="color: var(--muted)">Revisões</a>
+        <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+          <span style="opacity: .5">/</span><strong style="color: var(--color-white)">{{ cur.name }}</strong>
+        </sc-if>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; font-size: var(--text-xs); color: var(--muted)">
+        <span style="font-family: var(--font-mono)">{{ progress.label }}</span>
+        <span aria-hidden="true" style="width: 96px; height: 4px; border-radius: var(--radius-pill); background: rgb(255 255 255 / 8%); overflow: hidden"><i style="display: block; height: 100%; width: {{ progress.pct }}; background: var(--accent); transition: width var(--motion-slow) var(--ease-emphasis)"></i></span>
+      </div>
+    </header>
+
+    <sc-if value="{{ isTable }}" hint-placeholder-val="{{ true }}">
+      <main style="padding: clamp(20px, 3vw, 32px); display: grid; gap: 24px; max-width: 1280px">
+        <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px">
+          <div style="display: grid; gap: 6px">
+            <span style="font: 700 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent)">Acompanhamento da turma</span>
+            <h1 style="margin: 0; font-size: var(--text-3xl); font-weight: 700; letter-spacing: -.02em; line-height: 1.15">Revisões</h1>
+          </div>
+          <sc-if value="{{ nextPending }}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{ startQueue }}" style="display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding-inline: 18px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-weight: 600; font-size: var(--text-sm); cursor: pointer; transition: background var(--motion-fast) var(--ease-standard)" style-hover="background: var(--color-orange-400)" style-active="background: var(--color-orange-600)">Revisar fila · {{ stats.pending }} entregas <span data-icon="arrow-right" style="width: 16px; height: 16px"></span></button>
+          </sc-if>
+        </div>
+
+        <div data-r="filters" style="display: flex; flex-wrap: wrap; gap: 12px">
+          <label style="flex: 1 1 200px; display: grid; gap: 6px; font-size: var(--text-xs); color: var(--muted)">Turma
+            <select value="{{ turma }}" onChange="{{ onTurma }}" style="min-height: 44px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-900); font-size: var(--text-sm); cursor: pointer">
+              <option>Sudoeste · Manhã</option><option>Sudoeste · Tarde</option><option>Centro · Noite</option>
+            </select>
+          </label>
+          <label style="flex: 1 1 200px; display: grid; gap: 6px; font-size: var(--text-xs); color: var(--muted)">Projeto
+            <select style="min-height: 44px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-900); font-size: var(--text-sm); cursor: pointer">
+              <option>Meu assistente de estudos</option><option>Portfólio pessoal</option>
+            </select>
+          </label>
+          <label style="flex: 1.4 1 260px; display: grid; gap: 6px; font-size: var(--text-xs); color: var(--muted)">Atividade
+            <select style="min-height: 44px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-900); font-size: var(--text-sm); cursor: pointer">
+              <option>Aula 1 · Contrato e interface do meu assistente</option><option>Aula 2 · Primeiro fluxo com IA</option><option>Aula 3 · Testes com usuários</option>
+            </select>
+          </label>
+          <label style="flex: 1 1 160px; display: grid; gap: 6px; font-size: var(--text-xs); color: var(--muted)">Prazo
+            <select value="{{ prazoFilter }}" onChange="{{ onPrazo }}" style="min-height: 44px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-900); font-size: var(--text-sm); cursor: pointer">
+              <option value="all">Qualquer prazo</option><option value="ok">No prazo</option><option value="soon">Prazo próximo</option><option value="late">Atrasado</option>
+            </select>
+          </label>
+        </div>
+
+        <div role="group" aria-label="Filtrar por situação" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: var(--color-ink-900)">
+          <sc-for list="{{ summary }}" as="s" hint-placeholder-count="7">
+            <button type="button" onClick="{{ s.onClick }}" aria-pressed="{{ s.active }}" style="position: relative; display: grid; gap: 6px; padding: 16px; text-align: left; border: 0; border-right: 1px solid var(--border); background: {{ s.bg }}; cursor: pointer; transition: background var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(255 255 255 / 4%)">
+              <span style="position: absolute; inset: auto 0 0 0; height: 2px; background: {{ s.bar }}"></span>
+              <span style="font: 700 var(--text-2xl)/1 var(--font-sans); letter-spacing: -.02em; color: {{ s.color }}">{{ s.value }}</span>
+              <span style="font-size: var(--text-xs); color: var(--muted)">{{ s.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <section style="border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--color-ink-900); overflow: hidden">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border)">
+            <label style="position: relative; flex: 1 1 260px; max-width: 360px">
+              <span data-icon="search" style="position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; color: var(--muted)"></span>
+              <input type="search" value="{{ search }}" onChange="{{ onSearch }}" placeholder="Buscar aluno" aria-label="Buscar aluno" style="width: 100%; min-height: 42px; padding: 0 12px 0 38px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-950); font-size: var(--text-sm)" style-focus="border-color: var(--accent); outline: none">
+            </label>
+            <span style="font-size: var(--text-xs); color: var(--muted)">{{ filterLabel }}</span>
+          </div>
+          <div style="overflow-x: auto">
+            <div role="table" style="min-width: 820px">
+              <div role="row" style="display: grid; grid-template-columns: minmax(180px, 1.4fr) minmax(220px, 1.6fr) 72px 130px 140px 150px; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); font: 700 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: rgb(255 255 255 / 45%)">
+                <span>Aluno</span><span>Situação</span><span>Versão</span><span>Enviado em</span><span>Prazo</span><span style="text-align: right">Ação</span>
+              </div>
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+                <div role="row" style="display: grid; grid-template-columns: minmax(180px, 1.4fr) minmax(220px, 1.6fr) 72px 130px 140px 150px; gap: 12px; align-items: center; padding: {{ rowPad }} 16px; border-bottom: 1px solid rgb(255 255 255 / 5%); font-size: var(--text-sm); transition: background var(--motion-fast) var(--ease-standard)" style-hover="background: rgb(255 255 255 / 3%)">
+                  <span style="display: flex; align-items: center; gap: 10px; min-width: 0">
+                    <span style="display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: var(--color-ink-800); border: 1px solid var(--border); font: 700 11px var(--font-mono); color: var(--muted)">{{ r.initials }}</span>
+                    <strong style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ r.name }}</strong>
+                  </span>
+                  <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+                    <span style="display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: var(--radius-pill); background: {{ r.chipBg }}; color: {{ r.chipFg }}; font-size: var(--text-xs); font-weight: 600"><i style="width: 6px; height: 6px; border-radius: 50%; background: {{ r.chipFg }}"></i>{{ r.statusLabel }}</span>
+                    <sc-if value="{{ r.isNew }}" hint-placeholder-val="{{ false }}"><span style="padding: 3px 7px; border: 1px solid rgb(255 107 0 / 45%); border-radius: var(--radius-sm); color: var(--accent); font: 700 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Nova versão</span></sc-if>
+                  </span>
+                  <span style="font-family: var(--font-mono); color: var(--muted)">{{ r.version }}</span>
+                  <span style="display: grid; gap: 2px"><span>{{ r.sent }}</span><sc-if value="{{ r.slaShow }}" hint-placeholder-val="{{ false }}"><small style="color: var(--color-warning); font-size: var(--text-xs)">{{ r.slaText }}</small></sc-if></span>
+                  <span style="color: {{ r.prazoColor }}">{{ r.prazo }}</span>
+                  <span style="display: flex; justify-content: flex-end">
+                    <sc-if value="{{ r.primary }}" hint-placeholder-val="{{ false }}">
+                      <button type="button" onClick="{{ r.onAction }}" style="min-height: 36px; padding-inline: 14px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: background var(--motion-fast) var(--ease-standard)" style-hover="background: var(--color-orange-400)">{{ r.actionLabel }}</button>
+                    </sc-if>
+                    <sc-if value="{{ r.secondary }}" hint-placeholder-val="{{ true }}">
+                      <button type="button" onClick="{{ r.onAction }}" style="min-height: 36px; padding-inline: 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; color: var(--color-white); font-size: var(--text-sm); font-weight: 500; cursor: pointer; transition: border-color var(--motion-fast) var(--ease-standard)" style-hover="border-color: rgb(255 255 255 / 40%)">{{ r.actionLabel }}</button>
+                    </sc-if>
+                  </span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+                <div style="padding: 40px 16px; text-align: center; color: var(--muted); font-size: var(--text-sm)">Nenhum aluno nesta situação. <a href="#" onClick="{{ clearFilters }}" style="color: var(--accent)">Limpar filtros</a></div>
+              </sc-if>
+            </div>
+          </div>
+        </section>
+      </main>
+    </sc-if>
+
+    <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+      <div style="position: sticky; top: 64px; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 10px clamp(16px, 3vw, 32px); background: rgb(16 17 20 / 92%); border-bottom: 1px solid var(--border); backdrop-filter: blur(1rem)">
+        <button type="button" onClick="{{ goTable }}" style="display: inline-flex; min-height: 40px; align-items: center; gap: 8px; padding-inline: 10px; border: 0; border-radius: var(--radius-md); background: transparent; color: var(--muted); font-size: var(--text-sm); cursor: pointer" style-hover="color: var(--color-white); background: rgb(255 255 255 / 5%)"><span data-icon="arrow-left" style="width: 16px; height: 16px"></span>Voltar à turma</button>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <span style="font-size: var(--text-xs); color: var(--muted); font-family: var(--font-mono)">{{ queuePos }}</span>
+          <button type="button" onClick="{{ goPrev }}" disabled="{{ noPrev }}" aria-label="Aluno anterior" style="display: inline-flex; min-height: 40px; align-items: center; gap: 6px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); cursor: pointer; opacity: {{ prevOpacity }}" style-hover="border-color: rgb(255 255 255 / 40%)"><span data-icon="chevron-left" style="width: 16px; height: 16px"></span>{{ prevName }}</button>
+          <button type="button" onClick="{{ goNext }}" disabled="{{ noNext }}" aria-label="Próximo aluno" style="display: inline-flex; min-height: 40px; align-items: center; gap: 6px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); cursor: pointer; opacity: {{ nextOpacity }}" style-hover="border-color: rgb(255 255 255 / 40%)">{{ nextName }}<span data-icon="chevron-right" style="width: 16px; height: 16px"></span></button>
+        </div>
+      </div>
+
+      <div data-r="ws" style="display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 24px; align-items: start; padding: clamp(20px, 3vw, 32px); max-width: 1440px">
+        <article style="display: grid; gap: 24px; min-width: 0">
+          <header style="display: grid; gap: 14px; padding-bottom: 24px; border-bottom: 1px solid var(--border)">
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+              <span style="display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: var(--radius-pill); background: {{ cur.chipBg }}; color: {{ cur.chipFg }}; font-size: var(--text-xs); font-weight: 600"><i style="width: 6px; height: 6px; border-radius: 50%; background: {{ cur.chipFg }}"></i>{{ cur.statusLabel }}</span>
+              <sc-if value="{{ cur.isNew }}" hint-placeholder-val="{{ false }}"><span style="padding: 4px 8px; border: 1px solid rgb(255 107 0 / 45%); border-radius: var(--radius-sm); color: var(--accent); font: 700 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Reentrega · {{ cur.version }}</span></sc-if>
+              <sc-if value="{{ cur.late }}" hint-placeholder-val="{{ false }}"><span style="padding: 4px 8px; border: 1px solid rgb(217 119 6 / 50%); border-radius: var(--radius-sm); color: var(--color-warning); font: 700 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Enviada com atraso</span></sc-if>
+            </div>
+            <h1 style="margin: 0; font-size: clamp(1.75rem, 2.6vw, 2.25rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; text-wrap: balance">Contrato e interface do meu assistente</h1>
+            <p style="margin: 0; max-width: 64ch; color: var(--muted); font-size: var(--text-md); line-height: 1.6; text-wrap: pretty"><strong style="color: var(--color-white); font-weight: 600">Objetivo:</strong> definir para quem o assistente existe, o que ele pode e não pode fazer, e entregar uma primeira interface utilizável.</p>
+            <dl style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin: 6px 0 0">
+              <div style="display: grid; gap: 4px"><dt style="font-size: var(--text-xs); color: var(--muted)">Aluno</dt><dd style="margin: 0; font-weight: 600; font-size: var(--text-sm)">{{ cur.name }}</dd></div>
+              <div style="display: grid; gap: 4px"><dt style="font-size: var(--text-xs); color: var(--muted)">Turma</dt><dd style="margin: 0; font-weight: 600; font-size: var(--text-sm)">{{ turma }}</dd></div>
+              <div style="display: grid; gap: 4px"><dt style="font-size: var(--text-xs); color: var(--muted)">Projeto</dt><dd style="margin: 0; font-weight: 600; font-size: var(--text-sm)">Meu assistente de estudos</dd></div>
+              <div style="display: grid; gap: 4px"><dt style="font-size: var(--text-xs); color: var(--muted)">Versão</dt><dd style="margin: 0; font-weight: 600; font-size: var(--text-sm); font-family: var(--font-mono)">{{ cur.version }}</dd></div>
+              <div style="display: grid; gap: 4px"><dt style="font-size: var(--text-xs); color: var(--muted)">Enviado em</dt><dd style="margin: 0; font-weight: 600; font-size: var(--text-sm)">{{ cur.sentFull }}</dd></div>
+            </dl>
+          </header>
+
+          <sc-if value="{{ cur.prevFeedback }}" hint-placeholder-val="{{ false }}">
+            <section style="display: grid; gap: 12px; padding: 20px; border: 1px solid rgb(220 38 38 / 30%); border-radius: var(--radius-lg); background: rgb(220 38 38 / 6%)">
+              <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+                <strong style="font-size: var(--text-sm)">Feedback enviado na {{ cur.prevFeedback.version }}</strong>
+                <span style="font-size: var(--text-xs); color: var(--muted)">{{ cur.prevFeedback.by }} · {{ cur.prevFeedback.when }}</span>
+              </div>
+              <p style="margin: 0; font-size: var(--text-sm); line-height: 1.6; color: rgb(255 255 255 / 85%)">{{ cur.prevFeedback.text }}</p>
+              <span style="font-size: var(--text-xs); color: var(--muted)">Critério em ajuste: <strong style="color: var(--color-white)">{{ cur.prevFeedback.criteria }}</strong></span>
+            </section>
+          </sc-if>
+
+          <section style="display: grid; gap: 4px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px">
+              <h2 style="margin: 0; font-size: var(--text-lg); font-weight: 600">O que {{ cur.first }} entregou</h2>
+              <span style="font-size: var(--text-xs); color: var(--muted)">{{ deliverables.length }} entregáveis</span>
+            </div>
+            <sc-for list="{{ deliverables }}" as="d" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; padding: 20px 0; border-top: 1px solid var(--border)">
+                <span style="font: 700 12px/1.6 var(--font-mono); color: var(--accent)">{{ d.n }}</span>
+                <div style="display: grid; gap: 10px; min-width: 0">
+                  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+                    <h3 style="margin: 0; font-size: var(--text-md); font-weight: 600">{{ d.title }}</h3>
+                    <sc-if value="{{ d.changed }}" hint-placeholder-val="{{ false }}"><span style="padding: 3px 7px; border-radius: var(--radius-sm); background: rgb(255 107 0 / 12%); color: var(--accent); font: 700 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase">Alterado nesta versão</span></sc-if>
+                  </div>
+                  <p style="margin: 0; font-size: var(--text-sm); color: var(--muted); line-height: 1.5">{{ d.ask }}</p>
+                  <sc-if value="{{ d.isText }}" hint-placeholder-val="{{ true }}">
+                    <blockquote style="margin: 0; padding: 14px 16px; border-radius: var(--radius-md); background: var(--color-ink-900); border: 1px solid var(--border); font-size: var(--text-md); line-height: 1.65; color: rgb(255 255 255 / 92%); text-wrap: pretty">{{ d.text }}</blockquote>
+                  </sc-if>
+                  <sc-if value="{{ d.isImage }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: grid; gap: 8px">
+                      <div style="display: grid; aspect-ratio: 16 / 9; max-height: 340px; place-items: center; border: 1px dashed var(--border); border-radius: var(--radius-md); background: repeating-linear-gradient(135deg, var(--color-ink-900) 0 12px, rgb(255 255 255 / 2%) 12px 24px); color: var(--muted); font: 500 var(--text-xs) var(--font-mono)">{{ d.file }} · prévia da imagem</div>
+                      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                        <a href="#" style="display: inline-flex; min-height: 36px; align-items: center; gap: 6px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: var(--text-sm)"><span data-icon="maximize-2" style="width: 14px; height: 14px"></span>Ampliar</a>
+                        <a href="#" style="display: inline-flex; min-height: 36px; align-items: center; gap: 6px; padding-inline: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: var(--text-sm)"><span data-icon="download" style="width: 14px; height: 14px"></span>Baixar arquivo</a>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ d.isLink }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-900)">
+                      <span style="display: flex; align-items: center; gap: 10px; min-width: 0"><span data-icon="git-branch" style="width: 16px; height: 16px; flex: 0 0 auto; color: var(--muted)"></span><code style="font: 500 var(--text-sm) var(--font-mono); overflow-wrap: anywhere">{{ d.url }}</code></span>
+                      <a href="#" style="display: inline-flex; min-height: 36px; align-items: center; gap: 6px; padding-inline: 12px; border-radius: var(--radius-md); background: rgb(255 255 255 / 6%); font-size: var(--text-sm); font-weight: 600">Abrir repositório<span data-icon="arrow-up-right" style="width: 14px; height: 14px"></span></a>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ d.hasPrev }}" hint-placeholder-val="{{ false }}">
+                    <details style="font-size: var(--text-sm)">
+                      <summary style="cursor: pointer; color: var(--muted); min-height: 32px; display: flex; align-items: center">Comparar com {{ d.prevVersion }}</summary>
+                      <div style="display: grid; gap: 8px; margin-top: 8px">
+                        <div style="padding: 10px 12px; border-left: 2px solid var(--color-error); background: rgb(220 38 38 / 6%); color: rgb(255 255 255 / 60%); line-height: 1.6; text-decoration: line-through; text-decoration-color: rgb(220 38 38 / 50%)">{{ d.prev }}</div>
+                        <div style="padding: 10px 12px; border-left: 2px solid var(--color-success); background: rgb(22 163 74 / 6%); line-height: 1.6">{{ d.text }}</div>
+                      </div>
+                    </details>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </section>
+
+          <section style="display: grid; gap: 12px; padding-top: 8px; border-top: 1px solid var(--border)">
+            <h2 style="margin: 16px 0 4px; font-size: var(--text-lg); font-weight: 600">Histórico</h2>
+            <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 0">
+              <sc-for list="{{ cur.history }}" as="h" hint-placeholder-count="2">
+                <li style="display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 12px; padding: 10px 0; font-size: var(--text-sm)">
+                  <i style="width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: {{ h.color }}"></i>
+                  <span style="display: grid; gap: 2px"><strong style="font-weight: 600">{{ h.what }}</strong><small style="color: var(--muted); font-size: var(--text-xs)">{{ h.who }}</small></span>
+                  <span style="color: var(--muted); font-size: var(--text-xs); font-family: var(--font-mono); white-space: nowrap">{{ h.when }}</span>
+                </li>
+              </sc-for>
+            </ol>
+          </section>
+        </article>
+
+        <aside data-r="panel" aria-label="Avaliação" style="position: sticky; top: 132px; max-height: calc(100vh - 148px); overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--color-ink-900)">
+
+          <sc-if value="{{ panelSent }}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; gap: 16px; padding: 28px 24px; animation: rv-in var(--motion-slow) var(--ease-emphasis) both">
+              <span style="display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: rgb(22 163 74 / 14%); color: var(--color-success)"><span data-icon="check" style="width: 22px; height: 22px"></span></span>
+              <div style="display: grid; gap: 6px">
+                <strong style="font-size: var(--text-lg)">{{ sentInfo.title }}</strong>
+                <p style="margin: 0; color: var(--muted); font-size: var(--text-sm); line-height: 1.5">{{ sentInfo.body }}</p>
+              </div>
+              <sc-if value="{{ nextPending }}" hint-placeholder-val="{{ true }}">
+                <button type="button" onClick="{{ reviewNextPending }}" style="display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-weight: 600; font-size: var(--text-sm); cursor: pointer" style-hover="background: var(--color-orange-400)">Revisar próximo aluno · {{ nextPending.name }}<span data-icon="arrow-right" style="width: 16px; height: 16px"></span></button>
+              </sc-if>
+              <sc-if value="{{ queueDone }}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0; padding: 12px 14px; border-radius: var(--radius-md); background: rgb(255 255 255 / 4%); font-size: var(--text-sm)">Fila zerada. Todas as entregas desta atividade foram revisadas.</p>
+              </sc-if>
+              <button type="button" onClick="{{ goTable }}" style="min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); cursor: pointer" style-hover="border-color: rgb(255 255 255 / 40%)">Voltar à turma</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ panelLocked }}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; gap: 16px; padding: 24px">
+              <div style="display: grid; gap: 4px">
+                <span style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted)">Decisão registrada</span>
+                <strong style="font-size: var(--text-lg); color: {{ cur.chipFg }}">{{ decision.label }}</strong>
+                <small style="color: var(--muted); font-size: var(--text-xs)">{{ decision.by }} · {{ decision.when }}</small>
+              </div>
+              <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 8px">
+                <sc-for list="{{ decision.crit }}" as="c" hint-placeholder-count="4">
+                  <li style="display: flex; justify-content: space-between; gap: 12px; font-size: var(--text-sm); padding: 8px 0; border-bottom: 1px solid rgb(255 255 255 / 5%)"><span>{{ c.title }}</span><strong style="color: {{ c.color }}; font-weight: 600; white-space: nowrap">{{ c.label }}</strong></li>
+                </sc-for>
+              </ul>
+              <sc-if value="{{ decision.text }}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0; padding: 12px 14px; border-radius: var(--radius-md); background: rgb(255 255 255 / 4%); font-size: var(--text-sm); line-height: 1.6">{{ decision.text }}</p>
+              </sc-if>
+              <p style="margin: 0; font-size: var(--text-xs); color: var(--muted); line-height: 1.5">{{ decision.note }}</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ panelEdit }}" hint-placeholder-val="{{ true }}">
+            <div style="display: grid">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 20px 24px 16px; border-bottom: 1px solid var(--border)">
+                <h2 style="margin: 0; font-size: var(--text-lg); font-weight: 600">Avaliação</h2>
+                <span style="font: 600 var(--text-xs) var(--font-mono); color: var(--muted)">{{ critCount }}</span>
+              </div>
+              <sc-for list="{{ crits }}" as="c" hint-placeholder-count="4">
+                <div style="display: grid; gap: 10px; padding: 16px 24px; border-bottom: 1px solid var(--border)">
+                  <div style="display: grid; gap: 4px">
+                    <strong style="font-size: var(--text-sm); font-weight: 600">{{ c.title }}</strong>
+                    <span style="font-size: var(--text-sm); color: var(--muted); line-height: 1.5">{{ c.desc }}</span>
+                  </div>
+                  <div role="radiogroup" aria-label="{{ c.title }}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px">
+                    <button type="button" role="radio" aria-checked="{{ c.ok }}" onClick="{{ c.onOk }}" style="min-height: 40px; border: 1px solid {{ c.okBorder }}; border-radius: var(--radius-md); background: {{ c.okBg }}; color: {{ c.okFg }}; font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Atendeu</button>
+                    <button type="button" role="radio" aria-checked="{{ c.fix }}" onClick="{{ c.onFix }}" style="min-height: 40px; border: 1px solid {{ c.fixBorder }}; border-radius: var(--radius-md); background: {{ c.fixBg }}; color: {{ c.fixFg }}; font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: all var(--motion-fast) var(--ease-standard)">Precisa de ajuste</button>
+                  </div>
+                  <sc-if value="{{ c.commentClosed }}" hint-placeholder-val="{{ true }}">
+                    <button type="button" onClick="{{ c.toggleComment }}" style="justify-self: start; min-height: 32px; padding: 0; border: 0; background: transparent; color: var(--muted); font-size: var(--text-xs); cursor: pointer; text-decoration: underline; text-underline-offset: 3px" style-hover="color: var(--color-white)">{{ c.commentCta }}</button>
+                  </sc-if>
+                  <sc-if value="{{ c.commentOpen }}" hint-placeholder-val="{{ false }}">
+                    <textarea value="{{ c.comment }}" onChange="{{ c.onComment }}" rows="2" aria-label="Comentário sobre {{ c.title }}" placeholder="{{ c.placeholder }}" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-950); font-size: var(--text-sm); line-height: 1.5; resize: vertical" style-focus="border-color: var(--accent); outline: none"></textarea>
+                  </sc-if>
+                </div>
+              </sc-for>
+
+              <div style="display: grid; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border)">
+                <label style="display: grid; gap: 6px">
+                  <span style="display: flex; justify-content: space-between; gap: 8px; font-size: var(--text-sm); font-weight: 600">{{ generalLabel }}<small style="font-weight: 400; color: {{ generalHintColor }}; font-size: var(--text-xs)">{{ generalHint }}</small></span>
+                  <textarea value="{{ rev.general }}" onChange="{{ onGeneral }}" rows="3" placeholder="{{ generalPlaceholder }}" style="width: 100%; padding: 10px 12px; border: 1px solid {{ generalBorder }}; border-radius: var(--radius-md); background: var(--color-ink-950); font-size: var(--text-sm); line-height: 1.5; resize: vertical" style-focus="border-color: var(--accent); outline: none"></textarea>
+                  <sc-if value="{{ errors.general }}" hint-placeholder-val="{{ false }}"><small style="color: var(--color-error); font-size: var(--text-xs)">{{ errors.general }}</small></sc-if>
+                </label>
+                <sc-if value="{{ hasFix }}" hint-placeholder-val="{{ false }}">
+                  <label style="display: grid; gap: 6px; animation: rv-in var(--motion-standard) var(--ease-standard) both">
+                    <span style="display: flex; justify-content: space-between; gap: 8px; font-size: var(--text-sm); font-weight: 600">Como reenviar<small style="font-weight: 400; color: var(--color-warning); font-size: var(--text-xs)">obrigatório</small></span>
+                    <textarea value="{{ rev.resend }}" onChange="{{ onResend }}" rows="2" placeholder="Ex.: atualize o entregável 03 e reenvie a mesma atividade como v02." style="width: 100%; padding: 10px 12px; border: 1px solid {{ resendBorder }}; border-radius: var(--radius-md); background: var(--color-ink-950); font-size: var(--text-sm); line-height: 1.5; resize: vertical" style-focus="border-color: var(--accent); outline: none"></textarea>
+                    <sc-if value="{{ errors.resend }}" hint-placeholder-val="{{ false }}"><small style="color: var(--color-error); font-size: var(--text-xs)">{{ errors.resend }}</small></sc-if>
+                  </label>
+                </sc-if>
+                <label style="display: grid; gap: 6px">
+                  <span style="display: flex; justify-content: space-between; gap: 8px; font-size: var(--text-sm); font-weight: 600">Sugestões<small style="font-weight: 400; color: var(--muted); font-size: var(--text-xs)">opcional · não exige reenvio</small></span>
+                  <textarea value="{{ rev.suggestion }}" onChange="{{ onSuggestion }}" rows="2" placeholder="Ideias para a próxima versão, sem bloquear a aprovação." style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-950); font-size: var(--text-sm); line-height: 1.5; resize: vertical" style-focus="border-color: var(--accent); outline: none"></textarea>
+                </label>
+              </div>
+
+              <div style="position: sticky; bottom: 0; display: grid; gap: 10px; padding: 16px 24px 20px; background: var(--color-ink-900); border-top: 1px solid var(--border)">
+                <sc-if value="{{ errors.crit }}" hint-placeholder-val="{{ false }}"><small style="color: var(--color-error); font-size: var(--text-xs)">{{ errors.crit }}</small></sc-if>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+                  <button type="button" onClick="{{ onRequest }}" style="min-height: 48px; border: 1px solid #D5D8DC33; border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: border-color var(--motion-fast) var(--ease-standard)" style-hover="border-color: var(--color-warning)">Solicitar ajustes</button>
+                  <button type="button" onClick="{{ onApprove }}" disabled="{{ hasFix }}" style="min-height: 48px; border: 0; border-radius: var(--radius-md); background: {{ approveBg }}; color: {{ approveFg }}; font-size: var(--text-sm); font-weight: 600; cursor: {{ approveCursor }}; transition: background var(--motion-fast) var(--ease-standard)">Aprovar entrega</button>
+                </div>
+                <small style="font-size: var(--text-xs); color: var(--muted); line-height: 1.5">{{ actionHint }}</small>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+                  <button type="button" onClick="{{ saveDraft }}" style="min-height: 32px; padding: 0; border: 0; background: transparent; color: var(--color-white); font-size: var(--text-xs); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px">Salvar rascunho</button>
+                  <small style="font-size: var(--text-xs); color: var(--muted); font-family: var(--font-mono)">{{ draftStatus }}</small>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </aside>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ modalConfirm }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Confirmar envio" style="position: fixed; z-index: 80; inset: 0; display: grid; place-items: center; padding: 16px; background: rgb(8 9 11 / 70%); animation: rv-fade var(--motion-fast) var(--ease-standard) both">
+      <div style="width: 100%; max-width: 520px; max-height: calc(100vh - 32px); overflow-y: auto; display: grid; gap: 18px; padding: 28px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--color-ink-900); box-shadow: var(--shadow-elevated); animation: rv-in var(--motion-standard) var(--ease-emphasis) both">
+        <div style="display: grid; gap: 6px">
+          <span style="font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted)">O que {{ cur.first }} vai receber</span>
+          <strong style="font-size: var(--text-xl); color: {{ confirm.color }}">{{ confirm.title }}</strong>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid">
+          <sc-for list="{{ confirm.crit }}" as="c" hint-placeholder-count="4">
+            <li style="display: grid; gap: 4px; padding: 10px 0; border-bottom: 1px solid rgb(255 255 255 / 6%); font-size: var(--text-sm)">
+              <span style="display: flex; justify-content: space-between; gap: 12px"><span>{{ c.title }}</span><strong style="color: {{ c.color }}; font-weight: 600; white-space: nowrap">{{ c.label }}</strong></span>
+              <sc-if value="{{ c.comment }}" hint-placeholder-val="{{ false }}"><small style="color: var(--muted); font-size: var(--text-xs); line-height: 1.5">{{ c.comment }}</small></sc-if>
+            </li>
+          </sc-for>
+        </ul>
+        <sc-for list="{{ confirm.blocks }}" as="b" hint-placeholder-count="1">
+          <div style="display: grid; gap: 4px"><span style="font-size: var(--text-xs); color: var(--muted)">{{ b.label }}</span><p style="margin: 0; font-size: var(--text-sm); line-height: 1.6">{{ b.text }}</p></div>
+        </sc-for>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap">
+          <button type="button" onClick="{{ closeModal }}" style="min-height: 44px; padding-inline: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); cursor: pointer">Voltar e editar</button>
+          <button type="button" onClick="{{ confirmSend }}" style="min-height: 44px; padding-inline: 18px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-size: var(--text-sm); font-weight: 600; cursor: pointer" style-hover="background: var(--color-orange-400)">{{ confirm.cta }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalLeave }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Avaliação não salva" style="position: fixed; z-index: 80; inset: 0; display: grid; place-items: center; padding: 16px; background: rgb(8 9 11 / 70%); animation: rv-fade var(--motion-fast) var(--ease-standard) both">
+      <div style="width: 100%; max-width: 440px; display: grid; gap: 16px; padding: 28px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--color-ink-900); box-shadow: var(--shadow-elevated); animation: rv-in var(--motion-standard) var(--ease-emphasis) both">
+        <strong style="font-size: var(--text-xl)">Avaliação não salva</strong>
+        <p style="margin: 0; color: var(--muted); font-size: var(--text-sm); line-height: 1.6">Você marcou critérios ou escreveu feedback para {{ cur.first }}. Salve como rascunho para terminar depois.</p>
+        <div style="display: grid; gap: 8px">
+          <button type="button" onClick="{{ leaveSave }}" style="min-height: 44px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-size: var(--text-sm); font-weight: 600; cursor: pointer">Salvar rascunho e sair</button>
+          <button type="button" onClick="{{ leaveDiscard }}" style="min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); cursor: pointer">Descartar alterações</button>
+          <button type="button" onClick="{{ closeModal }}" style="min-height: 40px; border: 0; background: transparent; color: var(--muted); font-size: var(--text-sm); cursor: pointer">Continuar revisando</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalRemind }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Lembrar aluno" style="position: fixed; z-index: 80; inset: 0; display: grid; place-items: center; padding: 16px; background: rgb(8 9 11 / 70%); animation: rv-fade var(--motion-fast) var(--ease-standard) both">
+      <div style="width: 100%; max-width: 480px; display: grid; gap: 16px; padding: 28px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--color-ink-900); box-shadow: var(--shadow-elevated); animation: rv-in var(--motion-standard) var(--ease-emphasis) both">
+        <div style="display: grid; gap: 4px">
+          <strong style="font-size: var(--text-xl)">Lembrar {{ remind.first }}</strong>
+          <span style="color: var(--muted); font-size: var(--text-sm)">Mensagem pronta para colar no WhatsApp.</span>
+        </div>
+        <textarea value="{{ remind.text }}" onChange="{{ onRemindText }}" rows="5" aria-label="Mensagem" style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-950); font-size: var(--text-sm); line-height: 1.6; resize: vertical"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <button type="button" onClick="{{ closeModal }}" style="min-height: 44px; padding-inline: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); cursor: pointer">Cancelar</button>
+          <button type="button" onClick="{{ copyRemind }}" style="min-height: 44px; padding-inline: 18px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-size: var(--text-sm); font-weight: 600; cursor: pointer" style-hover="background: var(--color-orange-400)">Copiar mensagem</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: fixed; z-index: 90; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 12px 18px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--color-ink-800); box-shadow: var(--shadow-elevated); font-size: var(--text-sm); animation: rv-in var(--motion-standard) var(--ease-emphasis) both">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;tabela&quot;,&quot;revisão&quot;],&quot;default&quot;:&quot;tabela&quot;,&quot;tsType&quot;:&quot;'tabela' | 'revisão'&quot;,&quot;section&quot;:&quot;Fluxo&quot;},&quot;slaDays&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:2,&quot;max&quot;:10,&quot;step&quot;:1,&quot;default&quot;:5,&quot;unit&quot;:&quot; dias&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Fluxo&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;compacta&quot;,&quot;confortável&quot;],&quot;default&quot;:&quot;compacta&quot;,&quot;tsType&quot;:&quot;'compacta' | 'confortável'&quot;,&quot;section&quot;:&quot;Tabela&quot;}}">
+const TODAY = 11;
+const CRITS = [
+  { id: 'c1', title: 'Problema específico', desc: 'Público, necessidade e promessa são concretos e diferentes de um chat genérico.' },
+  { id: 'c2', title: 'Contrato completo', desc: 'Três modos ou especialidades, instrução complementar e limites explícitos.' },
+  { id: 'c3', title: 'Interface utilizável', desc: 'O fluxo é responsivo e comunica estados vazio e carregando.' },
+  { id: 'c4', title: 'Autoria explicada', desc: 'As escolhas visuais e de interação são justificadas.' }
+];
+const STATUS = {
+  nao_iniciou: { label: 'Não iniciou', tone: 'muted' },
+  rascunho: { label: 'Rascunho salvo', tone: 'muted' },
+  nao_enviou: { label: 'Não enviou', tone: 'warning' },
+  aguardando: { label: 'Enviou · aguardando revisão', tone: 'info' },
+  correcao: { label: 'Correção solicitada', tone: 'error' },
+  reenviou: { label: 'Reenviou · aguardando nova revisão', tone: 'accent' },
+  aprovada: { label: 'Aprovada', tone: 'success' },
+  atrasada: { label: 'Enviada com atraso · aguardando', tone: 'warning' }
+};
+const TONES = {
+  muted: ['var(--muted)', 'rgb(255 255 255 / 6%)'],
+  warning: ['var(--color-warning)', 'rgb(217 119 6 / 14%)'],
+  info: ['var(--color-info)', 'rgb(8 145 178 / 16%)'],
+  error: ['#F87171', 'rgb(220 38 38 / 14%)'],
+  accent: ['var(--color-orange-400)', 'rgb(255 107 0 / 14%)'],
+  success: ['#4ADE80', 'rgb(22 163 74 / 14%)']
+};
+const PENDING = ['aguardando', 'reenviou', 'atrasada'];
+const NOTSENT = ['nao_iniciou', 'rascunho', 'nao_enviou'];
+const REVIEWER = 'Prof. Rafael Costa';
+
+const DELIV = [
+  { n: '01', title: 'Interface-base responsiva', ask: 'Print da tela principal do assistente, mostrando o estado inicial.', type: 'image', file: 'slide_01.png' },
+  { n: '02', title: 'Brief, público e problema', ask: 'Para quem é o assistente, que problema resolve e por que um chat genérico não basta.', type: 'text',
+    text: 'Estudantes do 1º ano do ensino médio que travam em exercícios de matemática à noite, sem ninguém por perto. Um chat genérico entrega a resposta pronta; o meu assistente guia passo a passo e só revela a solução depois de duas tentativas.' },
+  { n: '03', title: 'Contrato com três modos e limites', ask: 'Descreva os modos de operação, a instrução complementar e o que o assistente não faz.', type: 'text',
+    text: 'Haverá modo explicação, correção e exercícios. Em explicação, ele usa exemplos do cotidiano; em correção, aponta o primeiro erro sem refazer a conta; em exercícios, gera três questões do mesmo nível. Limites: não resolve provas, não responde fora de matemática e sempre pede para o aluno mostrar o raciocínio.',
+    prev: 'Haverá modo explicação, correção e exercícios.' },
+  { n: '04', title: 'Repositório inicial', ask: 'Link para o repositório com o código da interface.', type: 'link', url: 'github.com/ViniciusGrossi/Logos-Academy-assistente' }
+];
+
+const SEED = [
+  { id: 'vinicius', name: 'Vinicius Grossi', status: 'aguardando', version: 'v01', day: 5, time: '19:17', prazo: 'No prazo', pk: 'ok' },
+  { id: 'marina', name: 'Marina Alves', status: 'nao_enviou', prazo: '2 dias restantes', pk: 'soon' },
+  { id: 'lucas', name: 'Lucas Pereira', status: 'correcao', version: 'v01', day: 4, time: '10:42', prazo: 'No prazo', pk: 'ok',
+    decision: { kind: 'correcao', crit: { c1: 'ok', c2: 'fix', c3: 'ok', c4: 'ok' }, text: 'O contrato lista os modos, mas não define limites. Escreva pelo menos dois limites explícitos.', when: '6 out., 09:10' } },
+  { id: 'ana', name: 'Ana Ribeiro', status: 'aprovada', version: 'v02', day: 3, time: '21:05', prazo: 'No prazo', pk: 'ok',
+    decision: { kind: 'aprovada', crit: { c1: 'ok', c2: 'ok', c3: 'ok', c4: 'ok' }, text: 'Ótima justificativa das cores por modo.', when: '4 out., 08:30' } },
+  { id: 'pedro', name: 'Pedro Santos', status: 'reenviou', version: 'v02', day: 9, time: '18:20', prazo: 'No prazo', pk: 'ok', changed: ['03'],
+    prevFeedback: { version: 'v01', by: REVIEWER, when: '7 out., 14:02', text: 'O contrato cita os três modos, mas não diz como cada um se comporta nem quais são os limites. Descreva o comportamento de cada modo e liste o que o assistente não faz.', criteria: 'Contrato completo' } },
+  { id: 'julia', name: 'Júlia Martins', status: 'atrasada', version: 'v01', day: 10, time: '23:48', prazo: 'Atrasou 1 dia', pk: 'late', late: true },
+  { id: 'rafael', name: 'Rafael Lima', status: 'rascunho', prazo: '2 dias restantes', pk: 'soon' },
+  { id: 'beatriz', name: 'Beatriz Souza', status: 'nao_iniciou', prazo: 'Atrasado', pk: 'late' },
+  { id: 'gabriel', name: 'Gabriel Rocha', status: 'aguardando', version: 'v01', day: 9, time: '16:03', prazo: 'No prazo', pk: 'ok' },
+  { id: 'larissa', name: 'Larissa Costa', status: 'aprovada', version: 'v01', day: 2, time: '11:15', prazo: 'No prazo', pk: 'ok',
+    decision: { kind: 'aprovada', crit: { c1: 'ok', c2: 'ok', c3: 'ok', c4: 'ok' }, text: '', when: '3 out., 17:40' } },
+  { id: 'thiago', name: 'Thiago Nunes', status: 'aguardando', version: 'v01', day: 7, time: '20:31', prazo: 'No prazo', pk: 'ok' },
+  { id: 'camila', name: 'Camila Duarte', status: 'aprovada', version: 'v01', day: 3, time: '09:58', prazo: 'No prazo', pk: 'ok',
+    decision: { kind: 'aprovada', crit: { c1: 'ok', c2: 'ok', c3: 'ok', c4: 'ok' }, text: '', when: '5 out., 10:12' } }
+];
+
+const blankRev = () => ({ crit: {}, comments: {}, open: {}, general: '', resend: '', suggestion: '', dirty: false, savedAt: null });
+const initials = (n) => n.split(' ').map((p) => p[0]).slice(0, 2).join('');
+const nowStr = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+
+class Component extends DCLogic {
+  state = {
+    view: this.props.startView === 'revisão' ? 'review' : 'table',
+    activeId: 'vinicius', students: SEED.map((s) => ({ ...s })), reviews: {},
+    filter: 'all', prazoFilter: 'all', search: '', turma: 'Sudoeste · Manhã',
+    modal: null, pending: null, remind: null, toast: null, sent: null, errors: {}, navOpen: false
+  };
+
+  componentDidMount() {
+    this.paintIcons();
+    this.onUnload = (e) => { if (this.isDirty()) { e.preventDefault(); e.returnValue = ''; } };
+    window.addEventListener('beforeunload', this.onUnload);
+  }
+  componentDidUpdate() { this.paintIcons(); }
+  componentWillUnmount() { window.removeEventListener('beforeunload', this.onUnload); clearTimeout(this.tt); }
+
+  paintIcons(tries) {
+    const L = window.lucide;
+    if (!L || !L.icons) { if ((tries || 0) < 80) setTimeout(() => this.paintIcons((tries || 0) + 1), 120); return; }
+    document.querySelectorAll('[data-icon]').forEach((el) => {
+      if (el.firstElementChild) return;
+      const raw = el.getAttribute('data-icon');
+      const pascal = raw.split('-').map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+      const node = L.icons[pascal] || L.icons[raw];
+      if (node) el.appendChild(L.createElement(node));
+    });
+  }
+
+  rev(id) { return this.state.reviews[id || this.state.activeId] || blankRev(); }
+  isDirty() { return this.state.view === 'review' && this.rev().dirty && !this.state.sent; }
+  setRev(patch, id) {
+    const key = id || this.state.activeId;
+    this.setState((s) => ({ reviews: { ...s.reviews, [key]: { ...(s.reviews[key] || blankRev()), ...patch, dirty: true } }, errors: {} }));
+  }
+  showToast(msg) { clearTimeout(this.tt); this.setState({ toast: msg }); this.tt = setTimeout(() => this.setState({ toast: null }), 2600); }
+  guard(fn) { if (this.isDirty()) this.setState({ modal: 'leave', pending: fn }); else fn(); }
+  open(id) { this.setState({ view: 'review', activeId: id, sent: null, errors: {}, modal: null, navOpen: false }); window.scrollTo(0, 0); }
+  queue() { return this.state.students.filter((s) => !NOTSENT.includes(s.status)).sort((a, b) => a.day - b.day); }
+  nextPending(exclude) { return this.state.students.filter((s) => PENDING.includes(s.status) && s.id !== exclude).sort((a, b) => a.day - b.day)[0] || null; }
+
+  saveDraft() {
+    const id = this.state.activeId;
+    this.setState((s) => ({ reviews: { ...s.reviews, [id]: { ...this.rev(id), dirty: false, savedAt: nowStr() } } }));
+    this.showToast('Rascunho salvo. Você pode terminar depois.');
+  }
+
+  validateRequest() {
+    const r = this.rev();
+    const fix = CRITS.filter((c) => r.crit[c.id] === 'fix').length;
+    const e = {};
+    if (!fix) e.crit = 'Marque pelo menos um critério como "Precisa de ajuste".';
+    if (r.general.trim().length < 20) e.general = 'Escreva uma orientação concreta: o que está faltando e por quê.';
+    if (fix && !r.resend.trim()) e.resend = 'Explique o que o aluno precisa fazer para reenviar.';
+    return e;
+  }
+
+  confirmSend() {
+    const { activeId, modalData } = this.state;
+    const r = this.rev();
+    const kind = modalData;
+    const crit = {}; CRITS.forEach((c) => { crit[c.id] = kind === 'aprovada' ? (r.crit[c.id] || 'ok') : (r.crit[c.id] || 'ok'); });
+    const text = kind === 'aprovada' ? [r.general, r.suggestion].filter(Boolean).join(' ') : r.general + (r.resend ? ' Para reenviar: ' + r.resend : '');
+    this.setState((s) => ({
+      students: s.students.map((st) => st.id === activeId ? { ...st, status: kind, decision: { kind, crit, text, when: '11 out., ' + nowStr(), fresh: true } } : st),
+      reviews: { ...s.reviews, [activeId]: { ...r, dirty: false } },
+      modal: null, sent: kind
+    }));
+  }
+
+  renderVals() {
+    const S = this.state;
+    const sla = this.props.slaDays ?? 5;
+    const dense = (this.props.density ?? 'compacta') === 'compacta';
+    const st = S.students;
+    const count = (arr) => st.filter((s) => arr.includes(s.status)).length;
+    const stats = {
+      total: st.length, sent: st.length - count(NOTSENT), notsent: count(NOTSENT), pending: count(PENDING),
+      fix: count(['correcao']), approved: count(['aprovada']), late: st.filter((s) => s.pk === 'late').length
+    };
+    const reviewed = stats.fix + stats.approved;
+    const progress = { label: reviewed + ' de ' + stats.sent + ' entregas revisadas', pct: (stats.sent ? Math.round(reviewed / stats.sent * 100) : 0) + '%' };
+
+    const FILTERS = [
+      ['all', 'Total de alunos', stats.total, 'var(--color-white)', null],
+      ['sent', 'Enviaram', stats.sent, 'var(--color-white)', null],
+      ['notsent', 'Ainda não enviaram', stats.notsent, 'var(--color-white)', (s) => NOTSENT.includes(s.status)],
+      ['pending', 'Aguardando revisão', stats.pending, 'var(--accent)', (s) => PENDING.includes(s.status)],
+      ['fix', 'Precisam corrigir', stats.fix, '#F87171', (s) => s.status === 'correcao'],
+      ['approved', 'Aprovados', stats.approved, '#4ADE80', (s) => s.status === 'aprovada'],
+      ['late', 'Atrasadas', stats.late, 'var(--color-warning)', (s) => s.pk === 'late']
+    ];
+    FILTERS[1][4] = (s) => !NOTSENT.includes(s.status);
+    const summary = FILTERS.map(([k, label, value, color]) => ({
+      label, value, color, active: S.filter === k,
+      bg: S.filter === k ? 'rgb(255 255 255 / 5%)' : 'transparent',
+      bar: S.filter === k ? 'var(--accent)' : 'transparent',
+      onClick: () => this.setState({ filter: k })
+    }));
+    const fdef = FILTERS.find((f) => f[0] === S.filter);
+    const q = S.search.trim().toLowerCase();
+    const order = { aguardando: 1, atrasada: 0, reenviou: 0, correcao: 3, nao_enviou: 4, rascunho: 5, nao_iniciou: 6, aprovada: 7 };
+    const list = st.filter((s) => (!fdef[4] || fdef[4](s)) && (S.prazoFilter === 'all' || s.pk === S.prazoFilter) && (!q || s.name.toLowerCase().includes(q)))
+      .sort((a, b) => (order[a.status] - order[b.status]) || ((a.day || 99) - (b.day || 99)));
+
+    const decorate = (s) => {
+      const meta = STATUS[s.status]; const [fg, bg] = TONES[meta.tone];
+      const wait = s.day ? TODAY - s.day : 0;
+      return { ...s, first: s.name.split(' ')[0], initials: initials(s.name), statusLabel: meta.label, chipFg: fg, chipBg: bg,
+        isNew: s.status === 'reenviou', version: s.version || '—', sent: s.day ? s.day + ' out.' : '—',
+        sentFull: s.day ? s.day + ' de out. de 2026, ' + s.time : '—',
+        slaShow: PENDING.includes(s.status) && wait >= sla, slaText: 'esperando há ' + wait + ' dias',
+        prazoColor: s.pk === 'late' ? 'var(--color-warning)' : s.pk === 'soon' ? 'var(--color-white)' : 'var(--muted)' };
+    };
+    const rows = list.map((s) => {
+      const d = decorate(s);
+      let actionLabel = 'Revisar', primary = true, onAction = () => this.open(s.id);
+      if (NOTSENT.includes(s.status)) { actionLabel = 'Lembrar aluno'; primary = false; onAction = () => this.setState({ modal: 'remind', remind: { first: d.first, text: 'Oi, ' + d.first + '! Passando para lembrar da atividade "Contrato e interface do meu assistente" (Aula 1). ' + (s.pk === 'late' ? 'O prazo já passou, mas ainda dá para enviar hoje.' : 'O prazo termina em 2 dias.') + ' Se travou em alguma parte, me chama aqui. — Prof. Rafael' } }); }
+      else if (s.status === 'correcao') { actionLabel = 'Ver feedback'; primary = false; }
+      else if (s.status === 'aprovada') { actionLabel = 'Ver histórico'; primary = false; }
+      return { ...d, actionLabel, primary, secondary: !primary, onAction };
+    });
+
+    const raw = st.find((s) => s.id === S.activeId) || st[0];
+    const cur = decorate(raw);
+    const history = [];
+    if (raw.prevFeedback) {
+      history.push({ what: 'v01 enviada', who: cur.first, when: '6 out., 20:12', color: 'var(--muted)' });
+      history.push({ what: 'Correção solicitada', who: raw.prevFeedback.by + ' · Contrato completo', when: raw.prevFeedback.when, color: '#F87171' });
+    }
+    if (raw.day) history.push({ what: cur.version + ' enviada' + (raw.late ? ' com atraso' : ''), who: cur.first, when: raw.day + ' out., ' + raw.time, color: raw.late ? 'var(--color-warning)' : 'var(--color-info)' });
+    const r = this.rev(raw.id);
+    if (r.savedAt) history.push({ what: 'Rascunho de avaliação salvo', who: REVIEWER, when: '11 out., ' + r.savedAt, color: 'var(--muted)' });
+    if (raw.decision) history.push({ what: raw.decision.kind === 'aprovada' ? 'Entrega aprovada' : 'Correção solicitada', who: REVIEWER, when: raw.decision.when, color: raw.decision.kind === 'aprovada' ? '#4ADE80' : '#F87171' });
+    cur.history = history;
+
+    const changed = raw.changed || [];
+    const deliverables = DELIV.map((d) => ({ ...d, isText: d.type === 'text', isImage: d.type === 'image', isLink: d.type === 'link',
+      changed: changed.includes(d.n), hasPrev: changed.includes(d.n) && !!d.prev, prevVersion: 'v01',
+      text: d.type === 'text' && raw.id === 'julia' && d.n === '02' ? 'Pais que querem acompanhar a lição de casa dos filhos sem fazer por eles.' : d.text }));
+
+    const fixCount = CRITS.filter((c) => r.crit[c.id] === 'fix').length;
+    const okCount = CRITS.filter((c) => r.crit[c.id] === 'ok').length;
+    const hasFix = fixCount > 0;
+    const crits = CRITS.map((c) => {
+      const v = r.crit[c.id]; const open = !!r.open[c.id] || !!r.comments[c.id];
+      return { ...c, ok: v === 'ok', fix: v === 'fix',
+        okBg: v === 'ok' ? 'rgb(22 163 74 / 16%)' : 'transparent', okBorder: v === 'ok' ? 'var(--color-success)' : 'var(--border)', okFg: v === 'ok' ? '#4ADE80' : 'var(--muted)',
+        fixBg: v === 'fix' ? 'rgb(217 119 6 / 16%)' : 'transparent', fixBorder: v === 'fix' ? 'var(--color-warning)' : 'var(--border)', fixFg: v === 'fix' ? '#FBBF24' : 'var(--muted)',
+        onOk: () => this.setRev({ crit: { ...r.crit, [c.id]: v === 'ok' ? undefined : 'ok' } }),
+        onFix: () => this.setRev({ crit: { ...r.crit, [c.id]: v === 'fix' ? undefined : 'fix' }, open: { ...r.open, [c.id]: true } }),
+        commentOpen: open, commentClosed: !open, commentCta: v === 'fix' ? 'Explicar o ajuste neste critério' : 'Adicionar comentário',
+        placeholder: v === 'fix' ? 'O que falta neste critério?' : 'Comentário opcional',
+        comment: r.comments[c.id] || '', toggleComment: () => this.setRev({ open: { ...r.open, [c.id]: true } }),
+        onComment: (e) => this.setRev({ comments: { ...r.comments, [c.id]: e.target.value } }) };
+    });
+
+    const decision = raw.decision ? {
+      label: raw.decision.kind === 'aprovada' ? 'Entrega aprovada' : 'Correção solicitada', by: REVIEWER, when: raw.decision.when, text: raw.decision.text,
+      crit: CRITS.map((c) => ({ title: c.title, label: raw.decision.crit[c.id] === 'fix' ? 'Precisa de ajuste' : 'Atendeu', color: raw.decision.crit[c.id] === 'fix' ? '#FBBF24' : '#4ADE80' })),
+      note: raw.decision.kind === 'aprovada' ? 'Decisão final. O aluno já foi notificado.' : 'Aguardando reenvio do aluno. A próxima versão aparecerá aqui como reentrega.'
+    } : null;
+
+    const q2 = this.queue(); const qi = q2.findIndex((s) => s.id === raw.id);
+    const prev = q2[qi - 1], next = q2[qi + 1];
+    const np = this.nextPending(raw.id);
+
+    let confirm = null;
+    if (S.modal === 'confirm') {
+      const ap = S.modalData === 'aprovada';
+      const blocks = [];
+      if (ap) { if (r.general.trim()) blocks.push({ label: 'Comentário', text: r.general }); if (r.suggestion.trim()) blocks.push({ label: 'Sugestão opcional', text: r.suggestion }); }
+      else { blocks.push({ label: 'Orientação', text: r.general }); blocks.push({ label: 'Como reenviar', text: r.resend }); if (r.suggestion.trim()) blocks.push({ label: 'Sugestão opcional', text: r.suggestion }); }
+      confirm = { title: ap ? 'Entrega aprovada' : 'Ajustes solicitados', color: ap ? '#4ADE80' : '#FBBF24', cta: ap ? 'Aprovar e notificar' : 'Enviar ajustes', blocks,
+        crit: CRITS.map((c) => { const v = ap ? (r.crit[c.id] || 'ok') : (r.crit[c.id] || 'ok'); return { title: c.title, label: v === 'fix' ? 'Precisa de ajuste' : 'Atendeu', color: v === 'fix' ? '#FBBF24' : '#4ADE80', comment: r.comments[c.id] || '' }; }) };
+    }
+
+    const isReview = S.view === 'review';
+    return {
+      stats, progress, summary, rows, noRows: rows.length === 0, rowPad: dense ? '10px' : '16px',
+      filterLabel: rows.length + ' de ' + st.length + ' alunos · ' + fdef[1].toLowerCase(),
+      search: S.search, turma: S.turma, prazoFilter: S.prazoFilter, navOpen: S.navOpen ? 'true' : 'false',
+      onSearch: (e) => this.setState({ search: e.target.value }),
+      onTurma: (e) => this.setState({ turma: e.target.value }),
+      onPrazo: (e) => this.setState({ prazoFilter: e.target.value }),
+      clearFilters: (e) => { e && e.preventDefault(); this.setState({ filter: 'all', prazoFilter: 'all', search: '' }); },
+      toggleNav: () => this.setState({ navOpen: !S.navOpen }),
+      isTable: !isReview, isReview,
+      goTable: (e) => { e && e.preventDefault && e.preventDefault(); this.guard(() => this.setState({ view: 'table', sent: null, modal: null, navOpen: false })); },
+      startQueue: () => { const n = this.nextPending(); if (n) this.open(n.id); },
+      nextPending: np ? { name: np.name.split(' ')[0] } : null,
+      queueDone: !np,
+      reviewNextPending: () => np && this.open(np.id),
+      cur, deliverables,
+      queuePos: qi >= 0 ? (qi + 1) + ' / ' + q2.length : '',
+      prevName: prev ? prev.name.split(' ')[0] : 'Anterior', nextName: next ? next.name.split(' ')[0] : 'Próximo',
+      noPrev: !prev, noNext: !next, prevOpacity: prev ? 1 : .4, nextOpacity: next ? 1 : .4,
+      goPrev: () => prev && this.guard(() => this.open(prev.id)),
+      goNext: () => next && this.guard(() => this.open(next.id)),
+      panelSent: !!S.sent, panelLocked: !S.sent && !!raw.decision, panelEdit: !S.sent && !raw.decision,
+      sentInfo: S.sent === 'aprovada'
+        ? { title: 'Entrega de ' + cur.first + ' aprovada', body: 'Todos os critérios foram registrados como atendidos e o aluno foi notificado.' }
+        : { title: 'Ajustes enviados a ' + cur.first, body: 'A entrega volta para a fila quando o aluno reenviar uma nova versão.' },
+      decision, crits, rev: r, hasFix,
+      critCount: (okCount + fixCount) + '/' + CRITS.length + ' critérios marcados',
+      generalLabel: hasFix ? 'Orientação para o aluno' : 'Feedback geral',
+      generalHint: hasFix ? 'obrigatório' : 'opcional na aprovação',
+      generalHintColor: hasFix ? 'var(--color-warning)' : 'var(--muted)',
+      generalPlaceholder: hasFix ? 'O que precisa mudar, com um exemplo concreto.' : 'Reconheça uma boa decisão, ou deixe vazio para aprovar sem observações.',
+      generalBorder: S.errors.general ? 'var(--color-error)' : 'var(--border)',
+      resendBorder: S.errors.resend ? 'var(--color-error)' : 'var(--border)',
+      errors: S.errors,
+      onGeneral: (e) => this.setRev({ general: e.target.value }),
+      onResend: (e) => this.setRev({ resend: e.target.value }),
+      onSuggestion: (e) => this.setRev({ suggestion: e.target.value }),
+      approveBg: hasFix ? 'rgb(255 255 255 / 6%)' : 'var(--accent)', approveFg: hasFix ? 'rgb(255 255 255 / 40%)' : '#fff', approveCursor: hasFix ? 'not-allowed' : 'pointer',
+      actionHint: hasFix ? 'Há critérios marcados como ajuste. Para aprovar, desmarque-os ou solicite ajustes.'
+        : okCount === 0 ? 'Aprovar sem marcar critérios registra todos como atendidos. Comentário não é obrigatório.'
+        : 'Critérios não marcados serão registrados como atendidos.',
+      draftStatus: r.dirty ? 'alterações não salvas' : r.savedAt ? 'rascunho salvo às ' + r.savedAt : '',
+      saveDraft: () => this.saveDraft(),
+      onApprove: () => { if (!hasFix) this.setState({ modal: 'confirm', modalData: 'aprovada' }); },
+      onRequest: () => { const e = this.validateRequest(); if (Object.keys(e).length) this.setState({ errors: e }); else this.setState({ modal: 'confirm', modalData: 'correcao' }); },
+      modalConfirm: S.modal === 'confirm', modalLeave: S.modal === 'leave', modalRemind: S.modal === 'remind',
+      confirm: confirm || { crit: [], blocks: [] },
+      confirmSend: () => this.confirmSend(),
+      closeModal: () => this.setState({ modal: null, pending: null }),
+      leaveSave: () => { const fn = S.pending; this.saveDraft(); this.setState({ modal: null, pending: null }, () => fn && fn()); },
+      leaveDiscard: () => { const fn = S.pending; const id = S.activeId; this.setState((s) => ({ reviews: { ...s.reviews, [id]: blankRev() }, modal: null, pending: null }), () => fn && fn()); },
+      remind: S.remind || { first: '', text: '' },
+      onRemindText: (e) => this.setState({ remind: { ...S.remind, text: e.target.value } }),
+      copyRemind: () => { try { navigator.clipboard.writeText(S.remind.text); } catch (e) {} this.setState({ modal: null }); this.showToast('Mensagem copiada. Cole no WhatsApp de ' + S.remind.first + '.'); },
+      toast: S.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

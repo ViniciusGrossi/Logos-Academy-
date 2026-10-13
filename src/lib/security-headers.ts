@@ -8,7 +8,7 @@ export function applySecurityHeaders(headers: Headers, production: boolean): voi
     "frame-ancestors 'none'",
     "object-src 'none'",
     "frame-src https://www.youtube-nocookie.com",
-    "img-src 'self' data: blob:",
+    `img-src 'self' data: blob: ${ACADEMY_SUPABASE_ORIGIN} https://i.ytimg.com`,
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",
     `script-src 'self' 'unsafe-inline'${production ? "" : " 'unsafe-eval'"}`,

@@ -6,6 +6,6 @@ type Context = { params: Promise<{ resourceId: string }> };
 export async function GET(request: Request, context: Context) {
   return validationBoundary(async () => {
     const { resourceId } = LibraryResourcePathSchema.parse(await context.params);
-    return admissionsController(request, "student_library_detail", { p_resource_id: resourceId }, true);
+    return admissionsController(request, "student_library_detail", { p_resource_id: resourceId }, true, (released, service, actor) => service.resolveAtlasAssets(actor, released, resourceId, "resource"));
   });
 }

@@ -293,6 +293,8 @@ export interface AdminAtlasListQuery extends PageQuery {
 }
 
 export interface AdminAtlasCreateInput { kind: AtlasItemKind; title: string }
+export interface AdminAtlasLessonOption { id: UUID; title: string; position: number; cycleId: UUID; cycleTitle: string; cyclePosition: number; curriculumId: UUID }
+export interface AdminAtlasOptions { lessons: Page<AdminAtlasLessonOption>; counts: { draft: number; published: number; archived: number; concept: number; prompt: number; design_system: number } }
 export interface AdminAtlasDraftCommon {
   title: string;
   slug: string;
@@ -877,6 +879,7 @@ export interface ApiContracts {
     Page<AdminStudentAttendanceEntry>
   >;
   "GET /api/admin/atlas": Endpoint<AdminAtlasListQuery, Page<AdminAtlasListItem>>;
+  "GET /api/admin/atlas/options": Endpoint<PageQuery, AdminAtlasOptions>;
   "POST /api/admin/atlas": Endpoint<AdminAtlasCreateInput, AdminAtlasDetail>;
   "GET /api/admin/atlas/:itemId": Endpoint<{ itemId: UUID }, AdminAtlasDetail>;
   "PATCH /api/admin/atlas/:itemId": Endpoint<

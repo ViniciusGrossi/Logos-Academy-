@@ -29,6 +29,7 @@ import {
   explorerActivitySeeds,
 } from "./academy.mock";
 import { getDemoRole } from "@/src/lib/demo-mode";
+import { atlasCmsDemo } from "./atlas-cms.mock";
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 type JsonObject = Record<string, unknown>;
@@ -1018,6 +1019,7 @@ export async function demoApi<T>(
 ): Promise<T> {
   const requestUrl = new URL(url, "http://demo.local");
   const pathname = requestUrl.pathname;
+  if (pathname.startsWith("/api/admin/atlas")) return atlasCmsDemo(requestUrl, method, body) as T;
   const isFreshStudent = getDemoRole() === "student";
   if (isFreshStudent && pathname.startsWith("/api/admin")) throw new Error("Esta área é exclusiva da gestão.");
   const profile = isFreshStudent ? studentProfile : adminProfile;

@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = logos_academy, extensions;
-select plan(40);
+select plan(51);
 
 -- ---------------------------------------------------------------------------
 -- Fixture: 2 tenants. Tenant A tem currículo ativo + rascunho, 1 turma, 1
@@ -140,6 +140,15 @@ select is(
   2,
   'fila inicial contém as duas faltas sem reposição'
 );
+-- Page size one must traverse every pending absence without skipping the tail.
+create temp table makeup_pages(position integer primary key, payload jsonb);
+insert into makeup_pages values(1,logos_academy.admin_pending_makeups_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,null,null,null,1));
+insert into makeup_pages select 2,logos_academy.admin_pending_makeups_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,null,null,payload->>'nextCursor',1) from makeup_pages where position=1;
+select is((select sum(jsonb_array_length(payload->'items'))::integer from makeup_pages),2,'size-one makeup pages return both absences');
+select is((select count(distinct item->>'attendanceId')::integer from makeup_pages cross join lateral jsonb_array_elements(payload->'items') item),2,'makeup pages do not duplicate absences');
+select results_eq($$select item->>'attendanceId' from makeup_pages cross join lateral jsonb_array_elements(payload->'items') item order by position$$,
+  $$select ar.id::text from logos_academy.attendance_records ar join logos_academy.sessions s on s.tenant_id=ar.tenant_id and s.id=ar.session_id where ar.tenant_id=md5('ops51-tenant-a')::uuid and ar.status in('absent','excused_absence') and ar.deleted_at is null order by s.starts_at,ar.id$$,'makeup cursor preserves every ordered absence');
+select ok((select payload->>'nextCursor' from makeup_pages where position=2) is null,'last makeup page has no next cursor');
 select ok(
   (logos_academy.record_makeup(md5('ops51-admin-a')::uuid,
     (select id from logos_academy.attendance_records where tenant_id=md5('ops51-tenant-a')::uuid and session_id=md5('ops51-session-1')::uuid and deleted_at is null),
@@ -283,6 +292,15 @@ select is(
   3,
   'frequência do aluno lista os três encontros'
 );
+create temp table attendance_pages(position integer primary key, payload jsonb);
+insert into attendance_pages values(1,logos_academy.admin_student_attendance_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,md5('ops51-student-a1-profile')::uuid,null,'test-key',null,1));
+insert into attendance_pages select 2,logos_academy.admin_student_attendance_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,md5('ops51-student-a1-profile')::uuid,null,'test-key',payload->>'nextCursor',1) from attendance_pages where position=1;
+insert into attendance_pages select 3,logos_academy.admin_student_attendance_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,md5('ops51-student-a1-profile')::uuid,null,'test-key',payload->>'nextCursor',1) from attendance_pages where position=2;
+select is((select sum(jsonb_array_length(payload->'items'))::integer from attendance_pages),3,'size-one attendance pages return all three entries');
+select is((select count(distinct item->>'attendanceId')::integer from attendance_pages cross join lateral jsonb_array_elements(payload->'items') item),3,'attendance pages never repeat an entry');
+select results_eq($$select item->>'attendanceId' from attendance_pages cross join lateral jsonb_array_elements(payload->'items') item order by position$$,
+  $$select ar.id::text from logos_academy.attendance_records ar join logos_academy.sessions s on s.tenant_id=ar.tenant_id and s.id=ar.session_id where ar.tenant_id=md5('ops51-tenant-a')::uuid and ar.deleted_at is null order by s.starts_at,ar.created_at,ar.id$$,'attendance cursor preserves every ordered entry');
+select ok((select payload->>'nextCursor' from attendance_pages where position=3) is null,'last attendance page has no next cursor');
 select is(
   (logos_academy.admin_student_attendance_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,md5('ops51-student-a1-profile')::uuid,null,'test-key')->'items'->2->>'privateNote'),
   'nota pessoal',
@@ -354,6 +372,23 @@ select is(
   'tenant B não vê as reposições pendentes do tenant A'
 );
 
+reset role;
+-- A new immutable version shares submitted_at with another assignment. Its
+-- UUID must be the tie-breaker, without page loss or replay of the first page.
+insert into submissions(id,tenant_id,activity_assignment_id,version,is_draft,submitted_at) values
+  (md5('ops51-submission-1-v3')::uuid,md5('ops51-tenant-a')::uuid,md5('ops51-assignment-1')::uuid,3,false,'2026-09-13 10:00:00+00');
+set local role service_role;
+create temp table tied_submission_pages as
+with recursive pages(position,payload) as (
+  select 1,logos_academy.admin_student_submissions_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,md5('ops51-student-a1-profile')::uuid,'test-key',null,1)
+  union all
+  select position+1,logos_academy.admin_student_submissions_page(md5('ops51-tenant-a')::uuid,md5('ops51-admin-a')::uuid,md5('ops51-student-a1-profile')::uuid,'test-key',payload->>'nextCursor',1)
+  from pages where payload->>'nextCursor' is not null and position<10
+) select * from pages;
+select is((select count(distinct item->>'id')::integer from tied_submission_pages cross join lateral jsonb_array_elements(payload->'items') item),4,'equal timestamps still paginate all four submission IDs');
+select results_eq($$select item->>'id' from tied_submission_pages cross join lateral jsonb_array_elements(payload->'items') item order by position$$,
+  $$select id::text from logos_academy.submissions where tenant_id=md5('ops51-tenant-a')::uuid and not is_draft and deleted_at is null order by submitted_at desc,id desc$$,'submission cursor uses UUID tie-breaker without skipping or repeating versions');
+select ok((select payload->>'nextCursor' from tied_submission_pages order by position desc limit 1) is null,'final tied submission page has no next cursor');
 reset role;
 select * from finish();
 rollback;

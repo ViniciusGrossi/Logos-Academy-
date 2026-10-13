@@ -1,0 +1,103 @@
+:root {
+  /* Colors */
+  --color-ink-950: #101114;
+  --color-ink-900: #17191D;
+  --color-ink-800: #22252A;
+
+  --color-gray-600: #505761;
+  --color-gray-400: #8A919A;
+  --color-gray-200: #D5D8DC;
+  --color-gray-100: #E9EAEC;
+  --color-gray-50: #F5F6F7;
+
+  --color-white: #FFFFFF;
+
+  --color-orange-600: #E85F00;
+  --color-orange-500: #FF6B00;
+  --color-orange-400: #FF8126;
+  --color-orange-100: #FFF0E5;
+  --color-orange-50: #FFF7F1;
+
+  --color-explorer: #7C5CFC;
+  --color-explorer-soft: #EEE9FF;
+  --color-builder: #FF6B00;
+  --color-builder-soft: #FFF0E6;
+  --color-engineer: #2563EB;
+  --color-engineer-soft: #EAF1FF;
+  --color-engineer-support: #0F766E;
+  --color-professional: #343941;
+
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+  --color-info: #0891B2;
+
+  /* Theme */
+  --background: var(--color-white);
+  --foreground: var(--color-ink-950);
+  --surface: var(--color-gray-50);
+  --surface-elevated: var(--color-white);
+  --muted: var(--color-gray-600);
+  --border: var(--color-gray-100);
+  --accent: var(--color-orange-500);
+
+  /* Typography */
+  --font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+  --text-6xl: 60px;
+  --text-7xl: 72px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-soft: 0 4px 16px rgba(16, 17, 20, 0.06);
+  --shadow-elevated: 0 12px 40px rgba(16, 17, 20, 0.10);
+
+  /* Motion */
+  --motion-fast: 150ms;
+  --motion-standard: 250ms;
+  --motion-slow: 500ms;
+  --motion-emphasis: 700ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark {
+  --background: var(--color-ink-950);
+  --foreground: var(--color-white);
+  --surface: var(--color-ink-900);
+  --surface-elevated: var(--color-ink-800);
+  --muted: #B8BDC4;
+  --border: #343941;
+  --accent: var(--color-orange-500);
+}

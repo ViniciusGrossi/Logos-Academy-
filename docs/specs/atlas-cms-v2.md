@@ -13,6 +13,10 @@ depends_on: [student-knowledge-atlas]
 
 ## Aprovação
 
+Mapa Editorial (12/10): reformulação visual autorizada pelo usuário como elemento assinatura da biblioteca; percurso de 16 aulas em quatro projetos, núcleo Atlas, coleções, conexões responsivas e pulsos de energia. A navegação permanece vinculada aos IDs reais; slots sem aula não podem filtrar por IDs inventados. As conexões expressam navegação curricular, não cobertura de conteúdo publicado. Pulsos pausáveis e estáticos com movimento reduzido.
+
+Refinamento aprovado em 12/10: tags em chips removíveis, inclusão por Enter e prevenção de duplicatas; seletor de blocos com busca, grupos Texto/Visual/Processo/Sistema e miniaturas, seguindo as capturas do usuário. Preservar os 16 tipos e os contratos existentes.
+
 Direção inicial fornecida por Vinicius em 2026-09-15 e ampliada em 2026-10-05 após o uso real do Atlas. Vinicius autorizou planejar e implementar o CMS, com duas exigências centrais: corrigir o conteúdo com caracteres corrompidos e permitir que o próprio administrador publique materiais visualmente ricos sem depender de pedir alterações no código. Esta spec estende `student-knowledge-atlas` (base de leitura do aluno, migration `0048`) sem quebrar seus contratos.
 
 ## Objetivo
@@ -400,6 +404,9 @@ npx supabase test db
 
 ## Premissas e limites
 
+- Adendo de implementação (12/10): `GET /api/admin/atlas/options` entrega aulas ativas paginadas e totais globais por coleção/status, com autorização administrativa revalidada no banco. O mapa permite filtrar por coleção/aula, mas não afirma cobertura editorial por aula sem um agregado específico.
+- O histórico expõe metadados e restauração real para rascunho; o contrato não contém snapshots para comparar previews de versões antigas.
+- Referências aprovadas: `docs/design-refs/claude-admin/Atlas CMS.dc.html` e `Revisoes Admin.dc.html`. O runtime de protótipo não é incluído na aplicação.
 - Nome oficial: **Atlas**; `/glossario` só redirect.
 - CMS exclusivo para `admin`.
 - YouTube não listado é distribuição, não controle de acesso.
