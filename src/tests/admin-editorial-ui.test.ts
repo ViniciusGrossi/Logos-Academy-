@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AdminAtlasDetail, AdminAtlasOptions, Page, AdminAtlasListItem, ReviewOverview } from "@/specs/api.contracts";
 import { AtlasCmsLibrary } from "@/components/atlas/atlas-cms-library";
 import { AtlasCmsEditor } from "@/components/atlas/atlas-cms-editor";
+import { createAtlasBlock } from "@/components/atlas/atlas-block-editor";
 import { AdminReviewOverview } from "@/components/admin/admin-review-overview";
 
 const state = vi.hoisted(() => ({ mode: "loading", overview: null as ReviewOverview | null, run: vi.fn(), query: vi.fn(), classes: { loading: true, error: null as null | { message: string }, data: null as null | { items: { id: string; name: string }[] }, reload: vi.fn() } }));
@@ -18,6 +19,22 @@ beforeEach(() => { state.mode = "loading"; state.overview = null; state.run.mock
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe("Atlas administrative regions", () => {
+  it("permite duplicar o bloco selecionado e desfazer sua remoção", async () => {
+    const initial = detail.draft.contentBlocks;
+    detail.draft.contentBlocks = [createAtlasBlock("text")];
+    state.mode = "detail";
+    try {
+      render(createElement(AtlasCmsEditor, { itemId: detail.id }));
+      await waitFor(() => expect(screen.getByRole("button", { name: /01 Novo título/ })).toBeTruthy());
+      fireEvent.click(screen.getByRole("button", { name: /01 Novo título/ }));
+      fireEvent.click(screen.getByRole("button", { name: "Duplicar bloco selecionado" }));
+      expect(screen.getByText("2 blocos")).toBeTruthy();
+      fireEvent.click(screen.getByRole("button", { name: "Remover bloco" }));
+      fireEvent.click(screen.getByRole("button", { name: "Remover bloco" }));
+      fireEvent.click(await screen.findByRole("button", { name: "Desfazer remoção do bloco" }));
+      expect(screen.getByText("2 blocos")).toBeTruthy();
+    } finally { detail.draft.contentBlocks = initial; }
+  });
   it("shows a loading region while retaining the editorial toolbar", () => { render(createElement(AtlasCmsLibrary)); expect(screen.getByRole("heading", { name: "Atlas" })).toBeTruthy(); expect(screen.getByText("Buscando conteúdos editoriais.")).toBeTruthy(); });
   it("shows an actionable error without losing filters", () => { state.mode = "error"; render(createElement(AtlasCmsLibrary)); expect(screen.getByRole("alert").textContent).toContain("Falha controlada"); expect(screen.getByRole("searchbox", { name: "Buscar conteúdo" })).toBeTruthy(); });
   it("shows an empty collection without fabricating items", () => { state.mode = "empty"; render(createElement(AtlasCmsLibrary)); expect(screen.getByText("Comece criando um conceito, prompt ou sistema de design.")).toBeTruthy(); expect(screen.queryByRole("table")).toBeNull(); });
