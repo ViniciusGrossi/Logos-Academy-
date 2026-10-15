@@ -24,8 +24,9 @@ insert into submissions(id,tenant_id,activity_assignment_id,version,is_draft,sub
 select md5('mvp064-submission-'||n)::uuid,current_setting('test.mvp_tenant')::uuid,md5('mvp064-assignment-'||n)::uuid,1,false,now() from generate_series(1,16)n;
 -- Exercise the existing evidence trigger: approving project days creates four approved projects.
 update activity_assignments set status='approved' where enrollment_id=md5('mvp064-enrollment')::uuid;
-select logos_academy.admin_record_presentation(current_setting('test.mvp_tenant')::uuid,md5('mvp064-admin')::uuid,md5('mvp064-enrollment')::uuid,'demo_day',now(),null,'test-key',gen_random_uuid());
 select is((select max(position)::integer from lesson_templates where cycle_id=md5('logos-academy-explorer-v3-cycle-4')::uuid),4,'fixture is the actual v3 with local lesson positions');
+select ok((select 'presentation_incomplete'=any(blockers) from private.completion_snapshot(md5('mvp064-enrollment')::uuid)),'missing presentation blocks completion');
+select logos_academy.admin_record_presentation(current_setting('test.mvp_tenant')::uuid,md5('mvp064-admin')::uuid,md5('mvp064-enrollment')::uuid,'demo_day',now(),null,'test-key',gen_random_uuid());
 set local role service_role;
 select is((logos_academy.admin_completion_check(current_setting('test.mvp_tenant')::uuid,md5('mvp064-admin')::uuid,md5('mvp064-enrollment')::uuid)->>'eligible')::boolean,true,'v3 is eligible with all sixteen attendances, four projects, final reflection and presentation');
 reset role;
@@ -38,9 +39,6 @@ update project_records set deleted_at=null where enrollment_id=md5('mvp064-enrol
 update activity_assignments set status='submitted' where id=md5('mvp064-assignment-16')::uuid;
 select ok((select 'reflection_incomplete'=any(blockers) from private.completion_snapshot(md5('mvp064-enrollment')::uuid)),'final reflection must be approved');
 update activity_assignments set status='approved' where id=md5('mvp064-assignment-16')::uuid;
-update presentation_records set deleted_at=now() where enrollment_id=md5('mvp064-enrollment')::uuid;
-select ok((select 'presentation_incomplete'=any(blockers) from private.completion_snapshot(md5('mvp064-enrollment')::uuid)),'missing presentation blocks completion');
-update presentation_records set deleted_at=null where enrollment_id=md5('mvp064-enrollment')::uuid;
 update activity_assignments set status='revision_requested' where id=md5('mvp064-assignment-2')::uuid;
 select ok((select 'pending_revisions'=any(blockers) from private.completion_snapshot(md5('mvp064-enrollment')::uuid)),'any pending revision blocks completion');
 update activity_assignments set status='approved' where id=md5('mvp064-assignment-2')::uuid;
