@@ -19,6 +19,16 @@ function sql(statement) {
     }).trim();
   } catch { throw new Error('Isolated fixture SQL failed; provider details suppressed.'); }
 }
+// Only this disposable PostgreSQL instance uses the local Auth provider. Keep
+// the exact-origin/redirect checks, substituting deployment configuration, not
+// authorization or business rules. The guard above refuses every remote host.
+const invitationDefinition = sql("select pg_get_functiondef('logos_academy.create_invitation_link(uuid,uuid,text,text,timestamptz,text,uuid)'::regprocedure);");
+const localDefinition = invitationDefinition
+  .replaceAll('https://nqubjiosnlaatxxamiut.supabase.co/auth/v1/verify?', 'http://127.0.0.1:54321/auth/v1/verify?')
+  .replaceAll('redirect_to=https://logos-academy-three.vercel.app/ativar', 'redirect_to=http://localhost:3000/ativar')
+  .replaceAll('redirect_to=https%3A%2F%2Flogos-academy-three.vercel.app%2Fativar', 'redirect_to=http%3A%2F%2Flocalhost%3A3000%2Fativar');
+if (localDefinition === invitationDefinition || localDefinition.includes('nqubjiosnlaatxxamiut.supabase.co') || localDefinition.includes('logos-academy-three.vercel.app')) throw new Error('Local invitation provider configuration did not match the known SQL contract.');
+sql(localDefinition);
 const curriculum = JSON.parse(sql("select json_build_object('id',c.id,'tenantId',c.tenant_id) from logos_academy.curricula c join logos_academy.tenants t on t.id=c.tenant_id where t.slug='logos-academy' and t.deleted_at is null and c.version='v3' and c.status='active' and c.deleted_at is null;"));
 if (!curriculum?.id || !curriculum.tenantId) throw new Error('Operational Explorer v3 missing from isolated migrations.');
 const tenantB = randomUUID();

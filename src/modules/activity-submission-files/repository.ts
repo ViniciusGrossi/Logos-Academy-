@@ -216,7 +216,7 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
       contentType: verified.contentType, upsert: false,
     });
     if (error) throw new AppError("INTERNAL_ERROR", "Não foi possível preservar o arquivo verificado.", requestId);
-    return this.rpc(
+    try { return await this.rpc(
       "student_finalize_verified_upload",
       {
         p_tenant_id: actor.tenantId,
@@ -226,7 +226,18 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
         p_encryption_key: this.encryptionKey(),
       },
       requestId,
-    ) as Promise<UploadedFile>;
+    ) as UploadedFile; } catch (cause: unknown) {
+      // A known SQL rejection rolled its transaction back: this new copy cannot
+      // be published. Unknown transport failures may already have committed, so
+      // never delete their candidate blindly.
+      if (cause instanceof AppError && ["FORBIDDEN", "CONFLICT", "VALIDATION_ERROR", "NOT_FOUND"].includes(cause.code)) {
+        try { await this.admin.storage.from("submissions").remove([snapshotPath]); } catch { /* Reconciliation must retain unknown objects rather than delete live evidence. */ }
+        if (cause.code === "CONFLICT") {
+          try { return (await this.fileMetadata(actor, fileId, requestId)).file; } catch { /* Preserve the original typed rejection if no ready result exists. */ }
+        }
+      }
+      throw cause;
+    }
   }
   async uploadInspection(actor: StudentActor, fileId: string, requestId: string): Promise<UploadInspection> {
     const { data, error } = await this.admin.schema("logos_academy").from("uploaded_files")

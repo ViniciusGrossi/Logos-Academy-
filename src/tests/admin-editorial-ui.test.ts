@@ -68,5 +68,5 @@ describe("Reviews administrative regions", () => {
   });
   it("loads the class roster", () => { render(createElement(AdminReviewOverview)); expect(screen.getByText("Carregando revisões")).toBeTruthy(); });
   it("handles a failed class request", () => { state.classes.loading = false; state.classes.error = { message: "Falha controlada" }; render(createElement(AdminReviewOverview)); expect(screen.getByText("Falha controlada")).toBeTruthy(); expect(screen.getByRole("button", { name: "Tentar novamente" })).toBeTruthy(); });
-  it("does not invent a roster when there are no classes", () => { state.classes.loading = false; state.classes.data = { items: [] }; render(createElement(AdminReviewOverview)); expect(screen.getByText("Nenhuma turma para acompanhar")).toBeTruthy(); });
+  it("permite revisar individuais mesmo sem turmas, sem inventar roster", () => { state.classes.loading = false; state.classes.data = { items: [] }; render(createElement(AdminReviewOverview)); expect(screen.getByText("Nenhuma entrega aguardando revisão")).toBeTruthy(); expect(screen.getByRole("heading", { name: "Fila de revisões" })).toBeTruthy(); });
 });
