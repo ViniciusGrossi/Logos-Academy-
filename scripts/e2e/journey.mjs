@@ -59,11 +59,19 @@ async function browser(actor, args, stdin) {
     lastAction = { ...lastAction, failure: category };
     throw new BrowserOperationError(category);
   }
-  const parsed = JSON.parse(output.trim());
+  let parsed;
+  try { parsed = JSON.parse(output.trim()); } catch {
+    lastAction = { ...lastAction, failure: 'protocol', emptyOutput: output.trim().length === 0 };
+    throw new BrowserOperationError('protocol');
+  }
   if (!parsed.success) {
     const category = browserFailureCategory(JSON.stringify(parsed.error ?? ''));
     lastAction = { ...lastAction, failure: category };
     throw new BrowserOperationError(category);
+  }
+  if (!parsed.data || typeof parsed.data !== 'object') {
+    lastAction = { ...lastAction, failure: 'protocol', missingData: true };
+    throw new BrowserOperationError('protocol');
   }
   return parsed.data;
 }

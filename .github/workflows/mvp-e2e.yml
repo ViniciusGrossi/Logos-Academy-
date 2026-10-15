@@ -39,7 +39,9 @@ jobs:
       - name: Start disposable database, Auth and private Storage
         shell: bash
         run: |
-          if ! npx --yes supabase@2.118.0 start > "$RUNNER_TEMP/academy-supabase-private.log" 2>&1; then
+          # Keep real DB/Auth/REST/Storage/gateway, but do not spend the runner's
+          # memory on dashboards, log ingestion, pooling or unused runtimes.
+          if ! npx --yes supabase@2.118.0 start -x studio,postgres-meta,edge-runtime,logflare,vector,supavisor,realtime > "$RUNNER_TEMP/academy-supabase-private.log" 2>&1; then
             echo 'Isolated Supabase failed to start; private configuration log is not uploaded.'
             exit 1
           fi
@@ -90,6 +92,11 @@ jobs:
           path: artifacts/mvp-e2e/result.json
           if-no-files-found: warn
           retention-days: 7
+      - name: Report resource capacity without private logs
+        if: failure()
+        run: |
+          free -m
+          docker stats --no-stream --format '{{.Name}} {{.MemUsage}}'
       - name: Stop disposable resources
         if: always()
         shell: bash
