@@ -20,6 +20,16 @@ const repository = () => new ActivitySubmissionFilesRepository({} as SupabaseCli
 beforeEach(() => { vi.clearAllMocks(); state.upload.mockResolvedValue({ error: null }); state.remove.mockResolvedValue({ error: null }); state.rpc.mockResolvedValue({ data: file, error: null }); });
 afterEach(() => vi.unstubAllGlobals());
 describe("snapshot de upload no repository", () => {
+  it("envia a chave server-side exigida pela RPC de download administrativo", async () => {
+    const metadata = { storagePath: `${base}/verified/10000000-0000-4000-8000-000000000006`, filename: "evidencia.txt", contentType: "text/plain" };
+    state.rpc.mockImplementation(async (_name: string, input: Record<string, unknown>) => input.p_encryption_key === "test-key"
+      ? { data: metadata, error: null }
+      : { data: null, error: { code: "PGRST202" } });
+    await expect(repository().adminFileMetadata(actor, fileId, "req")).resolves.toEqual(metadata);
+    expect(state.rpc).toHaveBeenCalledWith("admin_file_download_target", {
+      p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_file_id: fileId, p_encryption_key: "test-key",
+    });
+  });
   it("grava os bytes inspecionados em caminho novo sem permitir overwrite", async () => {
     await expect(repository().finalize(actor, fileId, "req", verified)).resolves.toEqual(file);
     const [path, bytes, options] = state.upload.mock.calls[0];

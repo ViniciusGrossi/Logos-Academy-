@@ -308,6 +308,7 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
         p_tenant_id: actor.tenantId,
         p_actor_user_id: actor.userId,
         p_file_id: fileId,
+        p_encryption_key: this.encryptionKey(),
       },
       requestId,
     )) as Record<string, unknown>;
