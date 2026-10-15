@@ -19,6 +19,7 @@ O modo local exige `CI=true`, `ACADEMY_E2E=isolated`, `ACADEMY_E2E_LOCAL=true`, 
 | Individual | Calendário próprio de 16 encontros e contexto sem turma. IDs e ordem vêm das APIs reais. |
 | Evidência | Primeira atividade preenchida no browser; arquivo PNG real pelo input nativo, Storage e finalize; rascunho e envio pelos botões. |
 | Revisão | Rubrica real no browser, pedido de correção, reenvio v2 e aprovação sem observações. Histórico mantém v1/v2. |
+| CMS Atlas | Criação e publicação pela UI, imagem real em Storage privado, leitura autorizada do aluno, blocos ocultos excluídos, relógio obsoleto sem escrita, restauração de payload distinto preservando o publicado e arquivamento/histórico por APIs reais. A edição completa de presets e o renderer estudantil ainda exigem prova visual própria. |
 | Jornada longa | APIs reais na sessão do browser liberam as demais 15 aulas, enviam os requisitos canônicos e aprovam os quatro Project Days. Arquivos adicionais atravessam PUT/finalize reais. |
 | Frequência | Uma falta preservada, conclusão negada, reposição separada, apresentação e conclusão derivada sem flags manuais. |
 | Isolamento | Aluno colega do mesmo tenant e admin de outro tenant não acessam atividade/arquivo do aluno individual. Aluno não acessa API administrativa. |
@@ -32,6 +33,8 @@ Não há `route.fulfill`, substituição de fetch, fake Auth ou RPC de conclusã
 O único artifact é `artifacts/mvp-e2e/result.json`: nomes fixos de etapas, status e descrição genérica de falha. Não são publicados stdout/stderr do browser, logs do Next, tokens, senhas, cookies, links de ativação ou URLs assinadas. Credenciais efêmeras ficam em arquivo de modo `0600` no diretório temporário do runner, fora do checkout. Chaves exportadas pelo CLI são mascaradas antes de entrar em `GITHUB_ENV`.
 
 Se um oracle falhar, o processo termina com exit code 1; não há skip para transformar comportamento inconclusivo em sucesso. O nome da etapa falha delimita a investigação sem expor dados. É possível aumentar observabilidade de forma revisada, nunca publicar logs privados completos.
+
+O resultado exige os nove checkpoints nomeados no registro do driver, sem duplicatas ou omissões. Acrescentar o CMS não substitui os oito checkpoints originais.
 
 ## Limites que não devem ser confundidos com aceite completo
 

@@ -5,10 +5,18 @@ import { readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import { requireIsolatedEnvironment } from './isolation.mjs';
+import { atlasJourney } from './atlas-journey.mjs';
 
 const { baseUrl } = requireIsolatedEnvironment();
 const fixture = JSON.parse(readFileSync(process.env.ACADEMY_E2E_FIXTURE, 'utf8'));
 const results = [];
+const requiredCheckpoints = [
+  'real-admin-login-and-tenant-boundary', 'six-active-class-students-and-capacity',
+  'individual-invitation-activation-and-calendar', 'unreleased-content-stays-hidden',
+  'ui-upload-draft-submit-correction-resubmit-approval', 'atlas-cms-publish-read-restore-archive',
+  'sixteen-lessons-four-projects-and-absence-blocker', 'makeup-presentation-completion-and-read-only',
+  'responsive-content-and-tab-url',
+];
 let phase = 'startup';
 let lastAction = { kind: 'startup' };
 const sessions = { admin: 'academy-e2e-admin', student: 'academy-e2e-student', other: 'academy-e2e-other', peer: 'academy-e2e-peer' };
@@ -108,6 +116,7 @@ async function eventually(check, label) {
   throw new Error(label);
 }
 async function checkpoint(name, run) {
+  assertTrue(requiredCheckpoints.includes(name) && !results.some((result) => result.name === name), 'Checkpoint registry is invalid or duplicated.');
   phase = name;
   await run();
   results.push({ name, status: 'passed' });
@@ -306,6 +315,9 @@ try {
     assert.equal(activity.status, 'approved');
     assertTrue(activity.submissionHistory.items.length >= 2, 'Version history lost the original submission.');
   });
+  await checkpoint('atlas-cms-publish-read-restore-archive', async () => {
+    await atlasJourney({ browser, evaluate, success, api, denied, eventually, baseUrl, image, calendar, curriculumId: fixture.curriculum.id, assertTrue });
+  });
   await checkpoint('sixteen-lessons-four-projects-and-absence-blocker', async () => {
     for (let index = 0; index < calendar.length; index++) {
       const session = calendar[index];
@@ -396,7 +408,7 @@ try {
   console.error(`Diagnostic: ${JSON.stringify(lastAction)}`);
 } finally {
   mkdirSync('artifacts/mvp-e2e', { recursive: true });
-  writeFileSync('artifacts/mvp-e2e/result.json', JSON.stringify({ engine: 'agent-browser@0.27.2', backend: 'isolated Supabase Auth/Postgres/Storage', mocks: false, results, journeyPassed: results.length === 8 && results.every((result) => result.status === 'passed') }, null, 2));
+  writeFileSync('artifacts/mvp-e2e/result.json', JSON.stringify({ engine: 'agent-browser@0.27.2', backend: 'isolated Supabase Auth/Postgres/Storage', mocks: false, results, journeyPassed: results.length === requiredCheckpoints.length && requiredCheckpoints.every((name) => results.some((result) => result.name === name && result.status === 'passed')) }, null, 2));
   for (const actor of Object.keys(sessions)) await browser(actor, ['close']).catch(() => {});
   for (const session of allSessions) {
     await new Promise((resolve) => execFile('agent-browser', ['--session', session, 'close'], { timeout: 15000 }, () => resolve()));
