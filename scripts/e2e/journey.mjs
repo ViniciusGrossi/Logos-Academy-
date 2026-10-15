@@ -124,23 +124,30 @@ async function login(actor, credentials) {
   }
 }
 async function activate(invitation, email) {
+  let step = 'validate-link';
+  try {
   const link = new URL(invitation.activationLink);
   assert.equal(link.origin, baseUrl, 'Invitation escaped isolated application origin.');
   assertTrue(link.pathname.startsWith('/c/'), 'Invitation must use individual confirmation page.');
   await browser('student', ['close']);
+  step = 'open-confirmation';
   await browser('student', ['open', link.href]);
+  step = 'click-confirmation';
   await browser('student', ['find', 'role', 'button', 'click', '--name', 'Continuar ativação']);
-  try {
+  step = 'wait-session-email';
     await eventually(async () => evaluate('student', `document.querySelector('input[readonly][type=email]')?.value===${JSON.stringify(email)}`), 'Invitation email did not populate from real Auth session.');
-  } catch (cause) {
-    const activationUi = await evaluate('student', `(()=>{const text=document.querySelector('[role=alert]')?.textContent??'';const hash=new URLSearchParams(location.hash.slice(1));return {page:location.pathname==='/ativar'?'activation':location.pathname.startsWith('/c/')?'confirmation':location.pathname==='/login'?'login':location.pathname==='/auth/v1/verify'?'provider':'other',emailPresent:Boolean(document.querySelector('input[readonly][type=email]')),emailFilled:Boolean(document.querySelector('input[readonly][type=email]')?.value),hasAuthCookie:/sb-[^=;]*auth-token/.test(document.cookie),hasHashError:hash.has('error'),invalidLink:new URLSearchParams(location.search).get('error')==='invalid_link',alertKind:!text?'none':/inválido|expirou/i.test(text)?'invalid_invitation':/link seguro/i.test(text)?'missing_session':/fetch|network/i.test(text)?'network':'other'};})()`);
-    lastAction = { kind: 'activation', activationUi };
-    throw cause;
-  }
+  step = 'fill-password';
   await browser('student', ['find', 'label', 'Nova senha', 'fill', fixture.password, '--exact']);
   await browser('student', ['find', 'label', 'Confirmar senha', 'fill', fixture.password, '--exact']);
   await browser('student', ['find', 'role', 'button', 'click', '--name', 'Ativar meu acesso', '--exact']);
+  step = 'wait-active-enrollment';
   await eventually(async () => (await api('student', '/api/student/journey')).status === 200, 'Invitation activation did not activate the enrollment.');
+  } catch (cause) {
+    const failed = lastAction;
+    const activationUi = await evaluate('student', `(()=>{const text=document.querySelector('[role=alert]')?.textContent??'';const hash=new URLSearchParams(location.hash.slice(1));return {page:location.pathname==='/ativar'?'activation':location.pathname.startsWith('/c/')?'confirmation':location.pathname==='/login'?'login':location.pathname==='/auth/v1/verify'?'provider':'other',confirmationButton:[...document.querySelectorAll('button')].some(el=>/Continuar ativação/.test(el.textContent??'')),emailPresent:Boolean(document.querySelector('input[readonly][type=email]')),emailFilled:Boolean(document.querySelector('input[readonly][type=email]')?.value),hasAuthCookie:/sb-[^=;]*auth-token/.test(document.cookie),hasHashError:hash.has('error'),invalidLink:new URLSearchParams(location.search).get('error')==='invalid_link',alertKind:!text?'none':/inválido|expirou/i.test(text)?'invalid_invitation':/link seguro/i.test(text)?'missing_session':/fetch|network/i.test(text)?'network':'other'};})()`).catch(() => ({ unavailable: true }));
+    lastAction = { ...failed, activationStep: step, activationUi };
+    throw cause;
+  }
 }
 function invitationPayload(email, placement) {
   return { email, displayName: 'Estudante E2E Fictício', birthDate: '2010-01-15', guardian: { name: 'Responsável E2E Fictício', relationship: 'responsável', email: 'guardian@academy.test' }, consent: { termVersion: 'E2E-local-only', signedAt: new Date().toISOString().slice(0, 10), physicalCopyArchived: true }, enrollment: { curriculumId: fixture.curriculum.id, ...placement } };
