@@ -34,6 +34,8 @@ O commit `465e7dd` traz controles para a área visível antes das interações e
 
 ## Pendências de fechamento
 
+Atualização: E2E #10 parou em `click-confirmation`; até a avaliação diagnóstica do navegador do aluno ficou indisponível. O resultado não prova defeito no preenchimento do e-mail da página de ativação. `51de0c7` acrescenta validação do protocolo JSON e diagnóstico de capacidade, sem logs privados; retira somente serviços auxiliares não utilizados do Supabase local. Auth, banco, REST, gateway, e-mail e Storage reais permanecem. Nova execução pendente. Verificação visual parcial local em `mvp-admin-visual-2026-10-15.md`, sem overflow nas telas/medidas declaradas; não encerra gate visual/AA.
+
 Jornada real completa com sete ativações e quatro projetos; revisão visual/responsiva e WCAG AA nas telas alteradas; performance medida no browser; reconciliação de anexos incertos; classificação e decisão sobre o gate de tooling; revisão jurídica e aprovação operacional da minuta de privacidade; QA Mental; migrations/deploy e smoke autenticado após aprovação dos gates aplicáveis.
 
 Não houve seed/reset, criação de alunos fictícios, leitura de senhas ou descarte de dados na produção durante esta etapa.
