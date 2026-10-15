@@ -26,6 +26,7 @@ import { useMemo, useRef, useState, type CSSProperties, type PointerEvent as Rea
 import type { AttendanceStatus, EnrollmentSummary, Page, ProjectSummary, SessionSummary } from "@/specs/api.contracts";
 import { MagneticAction, StateScene } from "@/components/academy";
 import { useLiveApi } from "@/components/prototype/live-api";
+import { useAdminUrlState } from "@/components/admin/use-admin-url-state";
 import { EventCalendar } from "@/components/reui/event-calendar/event-calendar";
 import { EventCalendarContent } from "@/components/reui/event-calendar/event-calendar-content";
 import { EventCalendarNav } from "@/components/reui/event-calendar/event-calendar-nav";
@@ -125,11 +126,13 @@ function countdownCopy(target: Date, reference: Date) {
   return `em ${days} dias`;
 }
 
+const agendaTabs = ["agenda", "frequencia"] as const;
+const agendaStatuses: readonly UpcomingFilter[] = ["todos", "scheduled", "rescheduled", "completed"];
 export function StudentAgenda() {
-  const [tab, setTab] = useState<"agenda" | "frequencia">("agenda");
+  const [tab, setTab] = useAdminUrlState("tab", "agenda", agendaTabs);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [showMakeupGuide, setShowMakeupGuide] = useState(false);
-  const [upcomingFilter, setUpcomingFilter] = useState<UpcomingFilter>("todos");
+  const [upcomingFilter, setUpcomingFilter] = useAdminUrlState<UpcomingFilter>("estado", "todos", agendaStatuses);
   const [weekOffset, setWeekOffset] = useState(0);
   const calendarRef = useRef<HTMLDivElement>(null);
   const attendanceRef = useRef<HTMLElement>(null);

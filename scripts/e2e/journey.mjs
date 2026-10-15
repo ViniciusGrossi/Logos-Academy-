@@ -9,6 +9,7 @@ const { baseUrl } = requireIsolatedEnvironment();
 const fixture = JSON.parse(readFileSync(process.env.ACADEMY_E2E_FIXTURE, 'utf8'));
 const results = [];
 let phase = 'startup';
+let lastAction = { kind: 'startup' };
 const sessions = { admin: 'academy-e2e-admin', student: 'academy-e2e-student', other: 'academy-e2e-other', peer: 'academy-e2e-peer' };
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const assertTrue = (condition, label) => { if (!condition) throw new Error(label); };
@@ -16,6 +17,7 @@ const assertTrue = (condition, label) => { if (!condition) throw new Error(label
 // Never forward CLI stdout/stderr on failure: these can contain invitation or
 // signed Storage URLs. Only allowlisted, constant phase names reach artifacts.
 async function browser(actor, args, stdin) {
+  lastAction = { kind: 'browser', actor, operation: args[0], ...(args[0] === 'find' ? { locator: args[1] } : {}) };
   const child = execFile('agent-browser', ['--session', sessions[actor], '--json', ...args], { timeout: 60000, maxBuffer: 8 * 1024 * 1024 });
   if (stdin !== undefined) child.stdin.end(stdin);
   let output;
@@ -36,7 +38,10 @@ async function evaluate(actor, code) {
 }
 async function api(actor, path, method = 'GET', body) {
   assertTrue(path.startsWith('/api/') && !path.startsWith('//'), 'Only internal API paths are allowed.');
-  return evaluate(actor, `(async()=>{const response=await fetch(${JSON.stringify(path)},{method:${JSON.stringify(method)},credentials:'same-origin',headers:{'content-type':'application/json','idempotency-key':${JSON.stringify(randomUUID())}},${body === undefined ? '' : `body:${JSON.stringify(JSON.stringify(body))},`}signal:AbortSignal.timeout(20000)});const body=await response.json();return {status:response.status,body};})()`);
+  const result = await evaluate(actor, `(async()=>{const response=await fetch(${JSON.stringify(path)},{method:${JSON.stringify(method)},credentials:'same-origin',headers:{'content-type':'application/json','idempotency-key':${JSON.stringify(randomUUID())}},${body === undefined ? '' : `body:${JSON.stringify(JSON.stringify(body))},`}signal:AbortSignal.timeout(20000)});const body=await response.json();return {status:response.status,body};})()`);
+  const codes = ['UNAUTHENTICATED', 'FORBIDDEN', 'NOT_FOUND', 'VALIDATION_ERROR', 'CONFLICT', 'RATE_LIMITED', 'INTERNAL_ERROR'];
+  lastAction = { kind: 'api', actor, method, endpoint: path.split('?')[0].replace(/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/giu, ':id'), status: result?.status ?? null, code: codes.includes(result?.body?.error?.code) ? result.body.error.code : null };
+  return result;
 }
 async function success(actor, path, method, body) {
   const result = await api(actor, path, method, body);
@@ -285,9 +290,10 @@ try {
     }
   });
 } catch {
-  results.push({ name: phase, status: 'failed', reason: 'Behavioral oracle or real operation failed. Private output suppressed.' });
+  results.push({ name: phase, status: 'failed', reason: 'Behavioral oracle or real operation failed. Private output suppressed.', lastAction });
   process.exitCode = 1;
   console.error(`FAIL: ${phase}. Sensitive browser/provider output was not recorded.`);
+  console.error(`Diagnostic: ${JSON.stringify(lastAction)}`);
 } finally {
   mkdirSync('artifacts/mvp-e2e', { recursive: true });
   writeFileSync('artifacts/mvp-e2e/result.json', JSON.stringify({ engine: 'agent-browser@0.27.2', backend: 'isolated Supabase Auth/Postgres/Storage', mocks: false, results, journeyPassed: results.length === 8 && results.every((result) => result.status === 'passed') }, null, 2));
