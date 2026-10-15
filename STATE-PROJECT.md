@@ -35,6 +35,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 
 ## Em Andamento
 
+- [15/10 — E2E #14] Sete ativações reais passaram (seis coletivas + uma individual), limite de vagas e calendário/contexto individual aprovados; acesso cruzado e conteúdo não liberado negados. Upload e rascunho passaram na UI. O ensaio parou no botão de envio durante estado transitório de salvamento; `4ccfe59` aguarda controle visível/habilitado sem relaxar persistência. Restam envio/revisão, quatro projetos, reposição/conclusão, demais gates e deploy. Produção preservada.
+
 - [15/10 — evidência mais recente] E2E #10 delimita a falha em `click-confirmation`, antes de comprovar navegação para ativação; a avaliação diagnóstica da sessão do aluno também ficou indisponível. Ainda não atribuir a falha ao formulário/sessão do produto. `51de0c7` valida protocolo da ferramenta e reduz serviços auxiliares ociosos do runner, mantendo DB/Auth/REST/Storage reais. Revisão visual local isolada de Revisões/Atlas/editor/seletor documentada em `docs/qa/mvp-admin-visual-2026-10-15.md`; não substitui AA integral nem jornada real.
 
 - [15/10 — atualização da validação] CI #65 passou aplicação e banco. E2E #7 aprovou login real de dois admins, turma com 16 encontros e bloqueio cross-tenant após corrigir cliques fora da viewport no harness. Próxima falha está na avaliação da página de ativação do primeiro aluno; E2E #8 (`0836342`) acrescenta classificação privada e retry somente para navegação transitória. Não tratar F01/ativação nem a jornada completa como aprovadas. Relatórios atuais em `docs/qa/mvp-validation-2026-10-15.md` e `docs/qa/mvp-real-e2e.md`. Produção preservada.
