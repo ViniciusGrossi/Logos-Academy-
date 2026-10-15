@@ -1,0 +1,40 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+set local search_path=logos_academy,extensions;
+select plan(18);
+-- Match v3 ordering while retaining isolated seed identities.
+update lesson_templates set position=((position-1)%4)+1 where tenant_id='10000000-0000-0000-0000-000000000001';
+insert into enrollments(id,tenant_id,student_profile_id,curriculum_id,kind,status,invited_at,activated_at)
+values(md5('mvp066-individual')::uuid,'10000000-0000-0000-0000-000000000001','13000000-0000-0000-0000-000000000001','16000000-0000-0000-0000-000000000001','individual','active',now(),now());
+insert into sessions(id,tenant_id,enrollment_id,lesson_template_id,starts_at,ends_at,status)
+select md5('mvp066-session-'||n)::uuid,'10000000-0000-0000-0000-000000000001',md5('mvp066-individual')::uuid,md5('academy-a-lesson-'||n)::uuid,now()+n*interval '1 day',now()+n*interval '1 day'+interval '1 hour','scheduled' from generate_series(1,16)n;
+update sessions set starts_at=now()-interval '2 days',ends_at=now()-interval '1 day' where id=md5('mvp066-session-16')::uuid;
+set local role service_role;
+select is((logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')->'classId'),'null'::jsonb,'individual context has no invented class');
+select is(logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')->>'enrollmentId',md5('mvp066-individual')::uuid::text,'individual context identifies its enrollment');
+select is(logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')->>'studentId','13000000-0000-0000-0000-000000000001','individual context identifies student');
+select is((logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')->'session'->>'lessonPosition')::integer,16,'rescheduling preserves global curricular position');
+select is(jsonb_array_length(logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')->'enrollments'),1,'individual roster contains only its enrollment');
+select is(jsonb_array_length(logos_academy.admin_enrollment_calendar('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-individual')::uuid)->'items'),16,'individual calendar contains all sixteen meetings');
+select results_eq($$select (item->>'lessonPosition')::integer from jsonb_array_elements(logos_academy.admin_enrollment_calendar('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-individual')::uuid)->'items') item$$,$$select generate_series(1,16)$$,'calendar is pedagogical, not rescheduled chronological order');
+select is(logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('academy-a-session-1')::uuid,'test-key')->>'classId','17000000-0000-0000-0000-000000000001','collective context preserves real class');
+select is(logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('academy-a-session-1')::uuid,'test-key')->'enrollmentId','null'::jsonb,'collective context has no individual owner');
+select is(jsonb_array_length(logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('academy-a-session-1')::uuid,'test-key')->'enrollments'),1,'collective roster does not mix individual enrollment');
+select throws_ok($$select logos_academy.admin_session_context('20000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')$$,'42501','tenant admin required','actor from another tenant is rejected');
+select throws_ok($$select logos_academy.admin_enrollment_calendar('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001','28000000-0000-0000-0000-000000000001')$$,'P0002','enrollment not found','foreign enrollment is not disclosed');
+select throws_ok($$select logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',gen_random_uuid(),'test-key')$$,'P0002','session not found','missing session returns typed not found');
+reset role;
+update sessions set deleted_at=now() where id=md5('mvp066-session-16')::uuid;
+set local role service_role;
+select throws_ok($$select logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')$$,'P0002','session not found','deleted meeting is hidden');
+reset role;
+set local role authenticated;
+select throws_ok($$select logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')$$,'42501',null,'authenticated cannot call context RPC');
+select throws_ok($$select logos_academy.admin_enrollment_calendar('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-individual')::uuid)$$,'42501',null,'authenticated cannot call calendar RPC');
+reset role;
+set local role anon;
+select throws_ok($$select logos_academy.admin_session_context('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-session-16')::uuid,'test-key')$$,'42501',null,'anon cannot call context RPC');
+select throws_ok($$select logos_academy.admin_enrollment_calendar('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000001',md5('mvp066-individual')::uuid)$$,'42501',null,'anon cannot call calendar RPC');
+reset role;
+select * from finish();
+rollback;
