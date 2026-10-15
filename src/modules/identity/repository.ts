@@ -37,6 +37,18 @@ export class IdentityRepository {
     if (!data) return null;
 
     const row = IdentityRowSchema.parse(data);
+    if (!row.access_enabled) return null;
+    const { data: tenant, error: tenantError } = await this.client
+      .schema("logos_academy")
+      .from("tenants")
+      .select("id")
+      .eq("id", row.tenant_id)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (tenantError) {
+      throw new AppError("INTERNAL_ERROR", "Não foi possível resolver a sessão.", requestId);
+    }
+    if (!tenant) return null;
     const { data: membershipData, error: membershipError } = await this.client
       .schema("logos_academy")
       .from("tenant_memberships")
@@ -47,7 +59,7 @@ export class IdentityRepository {
       .maybeSingle();
 
     if (membershipError) {
-      throw new AppError("INTERNAL_ERROR", "NÃ£o foi possÃ­vel resolver a sessÃ£o.", requestId);
+      throw new AppError("INTERNAL_ERROR", "Não foi possível resolver a sessão.", requestId);
     }
 
     const membership = membershipData ? MembershipRowSchema.parse(membershipData) : null;

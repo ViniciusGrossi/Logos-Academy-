@@ -3,7 +3,7 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-import { AppError } from "@/src/lib/api-error";
+import { AppError, logOperationError } from "@/src/lib/api-error";
 import { academyActivationUrl, academyInvitationUrl, isAcademySupabaseVerificationUrl } from "@/src/lib/public-site";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
 import { mapRpcError } from "@/src/lib/supabase/rpc-error";
@@ -86,7 +86,7 @@ export class AdmissionsAdminAdapter {
   private async rpc(name: string, parameters: Record<string, unknown>, requestId: string, allowsNull = false): Promise<Record<string, unknown>> {
     const { data, error } = await this.client.schema("logos_academy" as "public").rpc(name as never, parameters as never);
     if (error || (data === null && !allowsNull) || (data !== null && !isRecord(data))) {
-      console.error(`[${requestId}] admissions rpc failed`, { rpc: name, code: error?.code, message: error?.message, details: error?.details, hint: error?.hint });
+      logOperationError("admissions.rpc", requestId, error?.code);
       if (error?.code === "PGRST202") throw new AppError("INTERNAL_ERROR", "O banco de dados ainda não recebeu a configuração de convites.", requestId);
       if (error?.code === "23505" || error?.code === "23514") throw new AppError("CONFLICT", "Não foi possível concluir porque este convite conflita com um registro existente.", requestId);
       if (error?.code === "P0002") throw new AppError("NOT_FOUND", "A turma ou o registro selecionado não está mais disponível.", requestId);
@@ -105,7 +105,7 @@ function toInviteResult(value: Record<string, string>, activationLink: string | 
 
 function invitationAuthError(error: { code?: string; message?: string } | null, requestId: string): AppError {
   const detail = `${error?.code ?? ""} ${error?.message ?? ""}`.toLowerCase();
-  console.error(`[${requestId}] student invitation auth failed`, { code: error?.code, message: error?.message });
+  logOperationError("admissions.auth", requestId, error?.code);
   if (detail.includes("redirect") || detail.includes("url is not allowed")) return new AppError("VALIDATION_ERROR", "A URL de ativação ainda não foi autorizada no Supabase. Adicione /ativar em Authentication → URL Configuration.", requestId);
   if (detail.includes("rate limit")) return new AppError("RATE_LIMITED", "O limite de geração de convites foi atingido. Aguarde alguns minutos e tente novamente.", requestId);
   if (detail.includes("already") || detail.includes("exists") || detail.includes("registered")) return new AppError("CONFLICT", "Este e-mail já possui uma conta ou convite. Use outro e-mail ou localize o aluno existente.", requestId);
