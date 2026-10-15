@@ -25,6 +25,13 @@ function service() {
 }
 
 describe("admissions-classes-calendar", () => {
+  it("associa o horário ao dia da semana mesmo começando no segundo dia configurado", async () => {
+    const created = await service().createClass(admin, { name: "Turma de horários distintos", curriculumId, schedule: {
+      ...schedule, startsOn: "2026-09-09", startsAtLocal: ["09:00", "15:00"],
+    } });
+    expect(created.sessions[0].startsAt).toBe("2026-09-09T18:00:00.000Z");
+    expect(created.sessions[1].startsAt).toBe("2026-09-14T12:00:00.000Z");
+  });
   it("projeta a matrícula atualizada como EnrollmentSummary, sem expor o retorno interno da RPC", () => {
     const enrollmentId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
     const internalResult = { id: enrollmentId, studentId, status: "active" };

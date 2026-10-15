@@ -3,6 +3,7 @@ import { execFile } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
+import sharp from 'sharp';
 import { requireIsolatedEnvironment } from './isolation.mjs';
 
 const { baseUrl } = requireIsolatedEnvironment();
@@ -96,7 +97,7 @@ async function denied(actor, path, method = 'GET', body) {
   assertTrue([401, 403, 404, 409].includes(response.status) && response.body.ok === false, 'Protected operation unexpectedly returned success or an internal error.');
   assertTrue(!JSON.stringify(response.body).includes('signedDownloadUrl'), 'Denied file response leaked a signed URL.');
 }
-const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jN1cAAAAASUVORK5CYII=', 'base64');
+const image = await sharp({ create: { width: 16, height: 16, channels: 3, background: 'orange' } }).png().toBuffer();
 async function upload(assignmentId) {
   const target = await success('student', '/api/files/upload-url', 'POST', { assignmentId, filename: 'evidencia-e2e.png', contentType: 'image/png', sizeBytes: image.length });
   const uploadOrigin = new URL(target.signedUploadUrl).origin;

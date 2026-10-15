@@ -36,8 +36,8 @@ function ClassReviewOverview() {
   const [late, setLate] = useState("all");
   const [cycle, setCycle] = useState("");
   const overview = useLiveApi<ReviewOverview>(classId ? `/api/admin/reviews/overview?${new URLSearchParams({ classId, ...(activityId ? { activityId } : {}) })}` : null);
-  useEffect(() => { if (!classId && classes.data?.items[0]) setClassId(classes.data.items[0].id); }, [classId, classes.data]);
-  useEffect(() => { if (!activityId && overview.data?.classSummary.id === classId && overview.data.selectedActivityId) setActivityId(overview.data.selectedActivityId); }, [activityId, classId, overview.data]);
+  useEffect(() => { if (!classId && classes.data?.items[0]) setClassId(classes.data.items[0].id); }, [classId, classes.data, setClassId]);
+  useEffect(() => { if (!activityId && overview.data?.classSummary.id === classId && overview.data.selectedActivityId) setActivityId(overview.data.selectedActivityId); }, [activityId, classId, overview.data, setActivityId]);
   const cycles = useMemo(() => Array.from(new Set(overview.data?.activities.map((a) => a.cyclePosition) ?? [])), [overview.data]);
   const href = (id: string) => `/admin/revisoes/${id}?${new URLSearchParams({ turma: classId, atividade: activityId })}`;
   const first = overview.data?.students.find((s) => s.status === "submitted" && s.submissionId);
