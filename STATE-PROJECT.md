@@ -114,4 +114,3 @@ _Histórico completo: `STATE-HISTORY.md`._
 - Achados para priorização, ainda não implementados: ausência de proteção de alterações não salvas; feedback de operações restrito ao formulário editável; campos editáveis durante salvamento; prontidão que mistura obrigatórios/opcionais; concorrência/remoção de uploads; navegação muito pequena e longa abertura antes da construção.
 - Demonstração mistura detalhe legado de cartaz com título de vídeo no percurso v2 e conceitos genéricos, incluindo RAG. Origem confirmada nas fixtures; não extrapolar para dados reais do Supabase.
 - Recomendações de composição e motion são propostas de revisão, não aprovação de nova direção visual nem autorização de deploy.
-
