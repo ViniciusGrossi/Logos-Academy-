@@ -137,9 +137,16 @@ async function activate(invitation, email) {
   const link = new URL(invitation.activationLink);
   assert.equal(link.origin, baseUrl, 'Invitation escaped isolated application origin.');
   assertTrue(link.pathname.startsWith('/c/'), 'Invitation must use individual confirmation page.');
+  step = 'verify-inert-preview';
+  const preview = await fetch(link.href, { headers: { 'user-agent': 'WhatsApp/2.0 Academy-isolated-test' }, redirect: 'manual', signal: AbortSignal.timeout(60000) });
+  assert.equal(preview.status, 200, 'Invitation preview must remain an inert confirmation page.');
+  const confirmationHtml = await preview.text();
+  assertTrue(confirmationHtml.includes('Continuar ativação') && !confirmationHtml.includes('/auth/v1/verify?'), 'Confirmation preview must show the action without exposing the provider token.');
   await browser('student', ['close']);
   step = 'open-confirmation';
   await browser('student', ['open', link.href]);
+  step = 'wait-confirmation';
+  await browser('student', ['wait', '#invitation-title']);
   step = 'click-confirmation';
   await browser('student', ['find', 'role', 'button', 'click', '--name', 'Continuar ativação']);
   step = 'wait-session-email';
