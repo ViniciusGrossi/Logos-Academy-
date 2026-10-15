@@ -1,10 +1,10 @@
 # Jornada real isolada do MVP
 
-Estado: harness implementado; **execução integrada no runner ainda pendente**. Os testes locais de guardrails não comprovam a jornada e não encerram F01–F14, a revisão visual humana ou o gate LGPD.
+Estado: harness executado no runner; **jornada ainda reprovada no primeiro checkpoint de login**. Auth e leituras RLS da preparação passaram, mas a UI não criou cookie de sessão. A nova execução verifica interatividade React antes do preenchimento. Guardrails não comprovam a jornada e não encerram F01–F14, a revisão visual humana ou o gate LGPD.
 
 ## Executar
 
-No GitHub Actions, executar **MVP real end-to-end** na branch que contém os reparos do MVP. O workflow também roda em PR para `main` e nas branches de integração indicadas no YAML. Não exige Docker/WSL na máquina Windows, secrets do repositório ou credenciais de produção.
+No GitHub Actions, executar **MVP real end-to-end** na branch que contém os reparos do MVP. O workflow também roda em PR para `main`. Não exige Docker/WSL na máquina Windows, secrets do repositório ou credenciais de produção.
 
 O runner Ubuntu inicia Supabase CLI `2.118.0`, Auth, PostgreSQL e Storage locais; instala `agent-browser@0.27.2` separadamente das dependências do aplicativo e abre o Next em `http://localhost:3000`.
 
@@ -35,7 +35,7 @@ Se um oracle falhar, o processo termina com exit code 1; não há skip para tran
 
 ## Limites que não devem ser confundidos com aceite completo
 
-- Este harness ainda precisa ser executado após integração das alterações de origem/CSP para CI, RPCs administrativas e inspeção de arquivos.
+- A execução completa ainda precisa passar; inicializar os serviços e validar Auth na preparação não substitui os checkpoints da jornada.
 - A primeira atividade e sua revisão usam a UI; a progressão extensa usa APIs reais e não comprova a qualidade visual de todas as 16 telas.
 - Não substitui auditoria AA, medição LCP, estados loading/empty/error de todas as páginas, CMS ou teste de carga.
 - O teste de futuro usa atividade liberada apenas para outra matrícula. A matriz completa de conceitos futuros, arquivo revogado, tenant soft-deleted e todas as mutações pós-conclusão permanece nos testes de contrato/segurança e deve ser consolidada no relatório final.

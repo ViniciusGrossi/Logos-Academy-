@@ -64,6 +64,14 @@ async function checkpoint(name, run) {
 }
 async function login(actor, credentials) {
   await browser(actor, ['open', `${baseUrl}/login`]);
+  // Next can serve the form before React hydrates. Confirm the existing focus
+  // interaction updates React state before filling controlled inputs; otherwise
+  // a pre-hydration native submit produces a misleading Auth failure.
+  await eventually(async () => {
+    await browser(actor, ['press', 'Tab']);
+    await browser(actor, ['find', 'label', 'E-mail', 'click', '--exact']);
+    return evaluate(actor, `Boolean(document.querySelector('section[data-stage="1"]'))`);
+  }, 'Login did not become interactive.');
   await browser(actor, ['find', 'label', 'E-mail', 'fill', credentials.email, '--exact']);
   await browser(actor, ['find', 'label', 'Senha', 'fill', credentials.password, '--exact']);
   await browser(actor, ['find', 'role', 'button', 'click', '--name', 'Entrar no estúdio', '--exact']);
