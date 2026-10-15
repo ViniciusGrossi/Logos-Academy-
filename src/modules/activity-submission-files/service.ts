@@ -164,11 +164,13 @@ export class ActivitySubmissionFilesService {
   ): Promise<UploadedFile> {
     const parsedFileId = parse(FilePathSchema, { fileId }, requestId).fileId;
     const target = await this.repository.uploadInspection(actor, parsedFileId, requestId);
+    if (target.state === "ready") return target.file;
     await inspectSubmissionFile(target.bytes, target, requestId);
     return this.repository.finalize(
       actor,
       parsedFileId,
       requestId,
+      target,
     );
   }
   async download(

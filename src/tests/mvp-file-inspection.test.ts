@@ -8,7 +8,7 @@ const encode = (text: string) => new TextEncoder().encode(text);
 describe("conteúdo real de anexos", () => {
   it("não finaliza o upload quando os bytes falham na inspeção", async () => {
     const bytes = encode("MZ executable");
-    const store = { uploadInspection: vi.fn().mockResolvedValue({ bytes, contentType: "application/pdf", sizeBytes: bytes.length }), finalize: vi.fn() };
+    const store = { uploadInspection: vi.fn().mockResolvedValue({ state: "pending", bytes, contentType: "application/pdf", sizeBytes: bytes.length, storagePath: "unused" }), finalize: vi.fn() };
     const service = new ActivitySubmissionFilesService(store as unknown as ActivitySubmissionFilesStore);
     const actor = { tenantId: "10000000-0000-4000-8000-000000000001", userId: "10000000-0000-4000-8000-000000000002", email: "test@example.test", role: "student" as const };
     await expect(service.finalize(actor, "10000000-0000-4000-8000-000000000003", "req")).rejects.toMatchObject({ code: "VALIDATION_ERROR" });

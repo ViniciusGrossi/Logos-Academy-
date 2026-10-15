@@ -23,17 +23,7 @@ begin
     old.status='pending' and new.status='ready'
     and current_setting('app.verified_upload_file',true) is not distinct from new.id::text
     and new.storage_path ~ ('^'||new.tenant_id::text||'/'||new.student_profile_id::text||'/'||
-      new.activity_assignment_id::text||'/'||new.id::text||'/verified/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(new.tenant_id, new.activity_assignment_id) then
-    raise exception using errcode = '42501', message = 'active enrollment required for file mutation';
-  end if;
-  if not exists (
-    select 1 from logos_academy.activity_assignments aa join logos_academy.enrollments e on e.tenant_id = aa.tenant_id and e.id = aa.enrollment_id
-    where aa.tenant_id = new.tenant_id and aa.id = new.activity_assignment_id
-      and e.student_profile_id = new.student_profile_id and aa.deleted_at is null and e.deleted_at is null
-  ) then raise exception using errcode = '23514', message = 'file student must own assignment'; end if;
-  return new;
-end;
-$$;)
+      new.activity_assignment_id::text||'/'||new.id::text||'/verified/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
   ) then raise exception using errcode='42501',message='verified file path transition required'; end if;
   if tg_op='UPDATE' and old.storage_path like '%/verified/%' and old.status='ready' and new.status<>'ready' then
     raise exception using errcode='42501',message='verified file is immutable';
