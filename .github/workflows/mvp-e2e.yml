@@ -1,0 +1,99 @@
+name: MVP real end-to-end
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [fix/mvp-completion, test/mvp-real-e2e]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mvp-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  isolated-journey:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CI: 'true'
+      ACADEMY_E2E: isolated
+      ACADEMY_E2E_LOCAL: 'true'
+      ACADEMY_E2E_BASE_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_DEMO_MODE: 'false'
+      NODE_ENV: development
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        env:
+          NODE_ENV: test
+      - name: Test destructive-operation guardrails before starting services
+        run: node --test tests/e2e/isolation.test.mjs
+      - name: Start disposable database, Auth and private Storage
+        run: npx --yes supabase@2.118.0 start
+      - name: Export masked ephemeral configuration
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { appendFileSync } from 'node:fs';
+          import { randomBytes } from 'node:crypto';
+          const status = JSON.parse(execFileSync('npx', ['--yes','supabase@2.118.0','status','--output','json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          const values = {
+            NEXT_PUBLIC_SUPABASE_URL: status.API_URL,
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: status.ANON_KEY,
+            SUPABASE_SECRET_KEY: status.SERVICE_ROLE_KEY,
+            SUPABASE_DB_URL: status.DB_URL,
+            PII_ENCRYPTION_KEY: randomBytes(32).toString('hex'),
+          };
+          for (const [name,value] of Object.entries(values)) {
+            if (typeof value !== 'string' || /[\r\n]/u.test(value)) throw new Error('Invalid isolated CLI configuration');
+            console.log(`::add-mask::${value}`);
+            appendFileSync(process.env.GITHUB_ENV, `${name}=${value}\n`);
+          }
+          NODE
+      - run: node scripts/e2e/prepare.mjs
+      - name: Install pinned browser outside application dependencies
+        run: |
+          npm install --global agent-browser@0.27.2
+          agent-browser install --with-deps
+      - name: Start real application
+        shell: bash
+        run: |
+          npm run dev -- --hostname localhost --port 3000 > "$RUNNER_TEMP/academy-next-private.log" 2>&1 &
+          echo "ACADEMY_E2E_SERVER_PID=$!" >> "$GITHUB_ENV"
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://localhost:3000/login > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          echo 'Application failed to become ready; private server log intentionally not uploaded.'
+          exit 1
+      - name: Execute unmocked browser journey
+        run: node scripts/e2e/journey.mjs
+      - name: Upload sanitized result only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvp-e2e-result
+          path: artifacts/mvp-e2e/result.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Stop disposable resources
+        if: always()
+        shell: bash
+        run: |
+          agent-browser --session academy-e2e-admin close >/dev/null 2>&1 || true
+          agent-browser --session academy-e2e-student close >/dev/null 2>&1 || true
+          agent-browser --session academy-e2e-other close >/dev/null 2>&1 || true
+          agent-browser --session academy-e2e-peer close >/dev/null 2>&1 || true
+          if [ -n "${ACADEMY_E2E_SERVER_PID:-}" ]; then kill "$ACADEMY_E2E_SERVER_PID" || true; fi
+          npx --yes supabase@2.118.0 stop --no-backup
