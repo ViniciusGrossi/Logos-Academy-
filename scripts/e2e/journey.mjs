@@ -130,7 +130,13 @@ async function activate(invitation, email) {
   await browser('student', ['close']);
   await browser('student', ['open', link.href]);
   await browser('student', ['find', 'role', 'button', 'click', '--name', 'Continuar ativação']);
-  await eventually(async () => evaluate('student', `document.querySelector('input[readonly][type=email]')?.value===${JSON.stringify(email)}`), 'Invitation email did not populate from real Auth session.');
+  try {
+    await eventually(async () => evaluate('student', `document.querySelector('input[readonly][type=email]')?.value===${JSON.stringify(email)}`), 'Invitation email did not populate from real Auth session.');
+  } catch (cause) {
+    const activationUi = await evaluate('student', `(()=>{const text=document.querySelector('[role=alert]')?.textContent??'';const hash=new URLSearchParams(location.hash.slice(1));return {page:location.pathname==='/ativar'?'activation':location.pathname.startsWith('/c/')?'confirmation':location.pathname==='/login'?'login':location.pathname==='/auth/v1/verify'?'provider':'other',emailPresent:Boolean(document.querySelector('input[readonly][type=email]')),emailFilled:Boolean(document.querySelector('input[readonly][type=email]')?.value),hasAuthCookie:/sb-[^=;]*auth-token/.test(document.cookie),hasHashError:hash.has('error'),invalidLink:new URLSearchParams(location.search).get('error')==='invalid_link',alertKind:!text?'none':/inválido|expirou/i.test(text)?'invalid_invitation':/link seguro/i.test(text)?'missing_session':/fetch|network/i.test(text)?'network':'other'};})()`);
+    lastAction = { kind: 'activation', activationUi };
+    throw cause;
+  }
   await browser('student', ['find', 'label', 'Nova senha', 'fill', fixture.password, '--exact']);
   await browser('student', ['find', 'label', 'Confirmar senha', 'fill', fixture.password, '--exact']);
   await browser('student', ['find', 'role', 'button', 'click', '--name', 'Ativar meu acesso', '--exact']);
