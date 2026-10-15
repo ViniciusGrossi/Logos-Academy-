@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { AdminDashboard } from "@/components/prototype/admin-dashboard";
+import { AdminDashboard } from "@/components/admin/admin-dashboard";
 import { AppShell } from "@/components/prototype/app-shell";
 import { LoadingState } from "@/components/prototype/state-lab";
 
