@@ -192,10 +192,10 @@ async function invite(placement) {
   await activate(invitation, email);
   return { ...invitation, email };
 }
-async function denied(actor, path, method = 'GET', body) {
+async function denied(actor, path, method = 'GET', body, expectedStatuses = [401, 403, 404]) {
   const response = await api(actor, path, method, body);
-  assertTrue([401, 403, 404, 409].includes(response.status) && response.body.ok === false, 'Protected operation unexpectedly returned success or an internal error.');
-  assertTrue(!JSON.stringify(response.body).includes('signedDownloadUrl'), 'Denied file response leaked a signed URL.');
+  assertTrue(expectedStatuses.includes(response.status) && response.body.ok === false, 'Protected operation unexpectedly returned success, a conflict or an internal error.');
+  assertTrue(!/"(?:signedDownloadUrl|signedUploadUrl|readUrl|resolvedAssets)"\s*:/.test(JSON.stringify(response.body)), 'Denied file response leaked a signed URL or asset metadata.');
 }
 const image = await sharp({ create: { width: 16, height: 16, channels: 3, background: 'orange' } }).png().toBuffer();
 async function verifyEvidenceDownload(actor, fileId) {
@@ -352,7 +352,7 @@ try {
     assert.equal(completion.reflectionComplete, true);
     assert.equal(completion.attendanceComplete, false);
     assert.equal(completion.eligible, false);
-    await denied('admin', `/api/admin/enrollments/${student.enrollmentId}/complete`, 'POST', {});
+    await denied('admin', `/api/admin/enrollments/${student.enrollmentId}/complete`, 'POST', {}, [409]);
   });
   await checkpoint('makeup-presentation-completion-and-read-only', async () => {
     assertTrue(Boolean(absentRecord?.attendanceId), 'Absent attendance record missing.');
