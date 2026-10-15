@@ -29,7 +29,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # agent-browser@0.27.2 declares Node >=24; the application is also
+          # validated on this runtime locally. Keep the browser runner supported.
+          node-version: 24
           cache: npm
       - run: npm ci
         env:

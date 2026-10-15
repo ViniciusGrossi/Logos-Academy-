@@ -365,7 +365,15 @@ try {
       await eventually(async () => evaluate('admin', `document.querySelector('[role=tab][aria-selected=true]')?.textContent===${JSON.stringify(selected)}`), 'Tab selection did not survive refresh.');
     }
   });
-} catch {
+} catch (cause) {
+  // Stack messages may include provider/DOM data. Retain only our own source
+  // line numbers and a closed set of error types, never the message or stack.
+  const errorType = cause instanceof BrowserOperationError ? `browser-${cause.category}`
+    : cause instanceof TypeError ? 'type' : cause instanceof SyntaxError ? 'syntax'
+      : cause instanceof ReferenceError ? 'reference' : 'oracle-or-operation';
+  const harnessLines = cause instanceof Error
+    ? [...(cause.stack ?? '').matchAll(/journey\.mjs:(\d+):\d+/g)].map((match) => Number(match[1])).slice(0, 5) : [];
+  lastAction = { ...lastAction, errorType, harnessLines };
   results.push({ name: phase, status: 'failed', reason: 'Behavioral oracle or real operation failed. Private output suppressed.', lastAction });
   process.exitCode = 1;
   console.error(`FAIL: ${phase}. Sensitive browser/provider output was not recorded.`);
