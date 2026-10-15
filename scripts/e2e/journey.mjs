@@ -37,8 +37,11 @@ async function browser(actor, args, stdin) {
   if (args[0] === 'find' && args[1] === 'role' && ['click', 'focus'].includes(args[3])) {
     const name = args[args.indexOf('--name') + 1];
     const exact = args.includes('--exact');
-    const selector = await evaluate(actor, `(()=>{const role=${JSON.stringify(args[2])};const name=${JSON.stringify(name)};const elements=[...document.querySelectorAll(role==='button'?'button,[role=button]':'[role='+role+']')];const element=elements.find(el=>{const text=(el.getAttribute('aria-label')??el.textContent??'').replace(/\\s+/g,' ').trim();return el.getClientRects().length&&(${exact ? 'text===name' : 'text.includes(name)'});});if(!element)return null;document.querySelector('[data-e2e-action]')?.removeAttribute('data-e2e-action');element.setAttribute('data-e2e-action','current');element.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return '[data-e2e-action=current]';})()`);
-    assertTrue(Boolean(selector), 'Semantic interaction target was not found.');
+    let selector;
+    await eventually(async () => {
+      selector = await evaluate(actor, `(()=>{const role=${JSON.stringify(args[2])};const name=${JSON.stringify(name)};const elements=[...document.querySelectorAll(role==='button'?'button,[role=button]':'[role='+role+']')];const element=elements.find(el=>{const text=(el.getAttribute('aria-label')??el.textContent??'').replace(/\\s+/g,' ').trim();return el.getClientRects().length&&!el.matches(':disabled')&&(${exact ? 'text===name' : 'text.includes(name)'});});if(!element)return null;document.querySelector('[data-e2e-action]')?.removeAttribute('data-e2e-action');element.setAttribute('data-e2e-action','current');element.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return '[data-e2e-action=current]';})()`);
+      return Boolean(selector);
+    }, 'Semantic interaction target did not become visible and enabled.');
     args = [args[3], selector];
   } else if (args[0] === 'click') {
     await browser(actor, ['scrollintoview', args[1]]);
