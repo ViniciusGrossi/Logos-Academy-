@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
@@ -198,6 +198,14 @@ async function denied(actor, path, method = 'GET', body) {
   assertTrue(!JSON.stringify(response.body).includes('signedDownloadUrl'), 'Denied file response leaked a signed URL.');
 }
 const image = await sharp({ create: { width: 16, height: 16, channels: 3, background: 'orange' } }).png().toBuffer();
+async function verifyEvidenceDownload(actor, fileId) {
+  const target = await success(actor, `/api/files/${fileId}/download-url`);
+  assert.equal(new URL(target.signedDownloadUrl).origin, new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin);
+  const file = await evaluate(actor, `(async()=>{const response=await fetch(${JSON.stringify(target.signedDownloadUrl)},{signal:AbortSignal.timeout(20000)});const bytes=await response.arrayBuffer();const digest=await crypto.subtle.digest('SHA-256',bytes);return {status:response.status,size:bytes.byteLength,sha256:[...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('')};})()`);
+  assert.equal(file.status, 200);
+  assert.equal(file.size, image.length);
+  assert.equal(file.sha256, createHash('sha256').update(image).digest('hex'), 'Downloaded evidence differs from the bytes uploaded through the UI.');
+}
 async function upload(assignmentId) {
   const target = await success('student', '/api/files/upload-url', 'POST', { assignmentId, filename: 'evidencia-e2e.png', contentType: 'image/png', sizeBytes: image.length });
   const uploadOrigin = new URL(target.signedUploadUrl).origin;
@@ -300,7 +308,8 @@ try {
     const submission = await fillActivityUi(activity, imagePath);
     const fileId = submission.items.find((item) => item.fileId)?.fileId;
     assertTrue(Boolean(fileId), 'UI submission did not retain real uploaded file.');
-    await success('admin', `/api/files/${fileId}/download-url`);
+    await verifyEvidenceDownload('admin', fileId);
+    await verifyEvidenceDownload('student', fileId);
     await denied('other', `/api/files/${fileId}/download-url`);
     await denied('peer', `/api/files/${fileId}/download-url`);
     await denied('peer', `/api/student/activities/${firstAssignment}`);
