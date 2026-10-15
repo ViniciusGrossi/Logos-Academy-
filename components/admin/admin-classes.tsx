@@ -12,6 +12,11 @@ import { useAdminClass, useAdminClasses } from "./admin-data";
 import { CreateClassSheet } from "./admin-operations-sheets";
 import { classStatusLabels, sessionStatusLabels } from "./admin-utils";
 import styles from "./admin-experience.module.css";
+import { useAdminUrlState } from "./use-admin-url-state";
+import { AdminPagination } from "./admin-pagination";
+
+const classTabs = ["overview", "students", "sessions"] as const;
+const classStatuses = ["all", "planned", "active", "completed", "cancelled"] as const;
 
 function classTone(status: ClassSummary["status"]): "success" | "warning" | "neutral" | "danger" {
   if (status === "active") return "success";
@@ -21,8 +26,9 @@ function classTone(status: ClassSummary["status"]): "success" | "warning" | "neu
 }
 
 export function AdminClasses() {
-  const [status, setStatus] = useState<ClassSummary["status"] | "all">("all");
-  const { data, error, loading, reload } = useAdminClasses(status);
+  const [status, setStatus] = useAdminUrlState<ClassSummary["status"] | "all">("status", "all", classStatuses);
+  const pagination = useAdminClasses(status);
+  const { data, error, loading, reload } = pagination;
   const classes = data?.items ?? [];
   const active = classes.filter((item) => item.status === "active").length;
   const occupied = classes.reduce((total, item) => total + item.activeStudentCount, 0);
@@ -52,11 +58,13 @@ export function AdminClasses() {
           <span className={styles.rowSignals}><StatusBadge tone={classTone(item.status)}>{classStatusLabels[item.status]}</StatusBadge><ArrowUpRight className={styles.rowArrow} aria-hidden="true" /></span>
         </Link>} />
       </SpotlightCard>}
+    <AdminPagination {...pagination} />
   </div>;
 }
 
 export function AdminClassDetail({ classId }: { classId: string }) {
   const { data, error, loading, reload } = useAdminClass(classId);
+  const [tab, setTab] = useAdminUrlState("tab", "overview", classTabs);
   if (loading) return <StateScene state="loading" title="Abrindo estúdio da turma" description="Reunindo alunos e os 16 encontros presenciais." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
   if (!data) return <StateScene state="empty" title="Turma não encontrada" description="O grupo pode não estar disponível neste tenant." />;
@@ -71,7 +79,7 @@ export function AdminClassDetail({ classId }: { classId: string }) {
       { id: "sessions", label: "Encontros concluídos", value: `${completedSessions}/16`, detail: "100% exigidos" },
       { id: "next", label: "Próximo encontro", value: nextSessionLabel(data.sessions), detail: "aula presencial" },
     ]} />
-    <Tabs defaultValue="overview" className={styles.tabShell}>
+    <Tabs value={tab} onValueChange={(value) => setTab(value as typeof tab)} className={styles.tabShell}>
       <TabsList variant="line" className={styles.tabsList} aria-label="Seções da turma">
         <TabsTrigger className={styles.tabTrigger} value="overview">Visão geral</TabsTrigger>
         <TabsTrigger className={styles.tabTrigger} value="students">Alunos</TabsTrigger>

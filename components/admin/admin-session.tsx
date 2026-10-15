@@ -8,17 +8,23 @@ import { MagneticAction, MetricStrip, SpotlightCard, StateScene, StatusBadge } f
 import { apiMutation, useLiveApi } from "@/components/prototype/live-api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
-import { useAdminClass } from "./admin-data";
+import { useAdminSession } from "./admin-data";
+import { useAdminUrlState } from "./use-admin-url-state";
 import { activeEnrollments, attendanceLabels, sessionStatusLabels, toIsoDateTime, toLocalDateTime } from "./admin-utils";
 import styles from "./admin-experience.module.css";
 
 type AttendanceDraft = Record<string, { status: AttendanceStatus; privateNote: string }>;
 
-export function AdminSession({ sessionId, classId }: { sessionId: string; classId: string | null }) {
-  const detail = useAdminClass(classId ?? undefined);
-  const savedAttendance = useLiveApi<readonly AttendanceEntry[]>(classId ? `/api/admin/sessions/${sessionId}/attendance` : null);
+const sessionTabs = ["attendance", "schedule", "release"] as const;
+
+export function AdminSession({ sessionId }: { sessionId: string; classId?: string | null }) {
+  const detail = useAdminSession(sessionId);
+  const [tab, setTab] = useAdminUrlState("tab", "attendance", sessionTabs);
+  const savedAttendance = useLiveApi<readonly AttendanceEntry[]>(`/api/admin/sessions/${sessionId}/attendance`);
   const enrollments = useMemo(() => activeEnrollments(detail.data?.enrollments ?? []), [detail.data?.enrollments]);
-  const session = detail.data?.sessions.find((item) => item.id === sessionId);
+  const session = detail.data?.session;
+  const classId = detail.data?.classId;
+  const backHref = classId ? `/admin/turmas/${classId}` : detail.data?.studentId ? `/admin/alunos/${detail.data.studentId}` : "/admin/alunos";
   const [attendance, setAttendance] = useState<AttendanceDraft>({});
 
   useEffect(() => {
@@ -30,24 +36,23 @@ export function AdminSession({ sessionId, classId }: { sessionId: string; classI
     })));
   }, [enrollments, savedAttendance.data, savedAttendance.loading]);
 
-  if (!classId) return <StateScene state="error" title="Turma não informada" description="Abra o encontro a partir do calendário da turma para preservar o contexto coletivo." action={<Link className={styles.secondaryAction} href="/admin/turmas">Voltar às turmas</Link>} />;
   if (detail.loading || savedAttendance.loading) return <StateScene state="loading" title="Preparando o encontro" description="Organizando aula, chamada e atividade da turma." />;
   if (detail.error || savedAttendance.error) return <StateScene state="error" description={detail.error?.message ?? savedAttendance.error?.message} action={<button className={styles.secondaryAction} onClick={() => { void detail.reload(); void savedAttendance.reload(); }}>Tentar novamente</button>} />;
-  if (!detail.data || !session) return <StateScene state="empty" title="Encontro não encontrado" description="Ele pode ter sido reagendado ou removido do calendário desta turma." action={<Link className={styles.secondaryAction} href={`/admin/turmas/${classId}`}>Abrir turma</Link>} />;
+  if (!detail.data || !session) return <StateScene state="empty" title="Encontro não encontrado" description="O encontro não está disponível neste percurso." action={<Link className={styles.secondaryAction} href={backHref}>Voltar ao acompanhamento</Link>} />;
 
   const absences = Object.values(attendance).filter((entry) => entry.status !== "present").length;
   return <div className={styles.stack}>
-    <Link className={styles.backLink} href={`/admin/turmas/${classId}`}><ArrowLeft className={styles.icon} aria-hidden="true" /> Voltar à turma</Link>
+    <Link className={styles.backLink} href={backHref}><ArrowLeft className={styles.icon} aria-hidden="true" /> {classId ? "Voltar à turma" : "Voltar ao aluno"}</Link>
     <header className={styles.sessionHero}>
       <div><span className={styles.sessionNumber}>Encontro {String(session.lessonPosition).padStart(2, "0")} · presencial</span><h1>{session.lessonTitle}</h1><p>A plataforma organiza presença, continuidade e liberação de atividade. A experiência principal continua acontecendo em sala.</p></div>
       <div className={styles.sessionDate}><strong>{formatWeekday(session.startsAt)}</strong><span>{formatDateTime(session.startsAt)}</span><StatusBadge tone={session.status === "completed" ? "success" : session.status === "cancelled" ? "danger" : session.status === "rescheduled" ? "warning" : "neutral"}>{sessionStatusLabels[session.status]}</StatusBadge></div>
     </header>
     <MetricStrip metrics={[
-      { id: "students", label: "Alunos na chamada", value: String(enrollments.length), detail: "máximo de seis" },
+      { id: "students", label: "Alunos na chamada", value: String(enrollments.length), detail: classId ? "máximo de seis" : "percurso individual" },
       { id: "present", label: "Presenças marcadas", value: String(enrollments.length - absences), detail: "para esta chamada" },
       { id: "makeup", label: "Exigem reposição", value: String(absences), detail: "100% para concluir", emphasis: absences > 0 },
     ]} />
-    <Tabs defaultValue="attendance" className={styles.tabShell}>
+    <Tabs value={tab} onValueChange={(value) => setTab(value as typeof tab)} className={styles.tabShell}>
       <TabsList variant="line" className={styles.tabsList} aria-label="Operações do encontro">
         <TabsTrigger className={styles.tabTrigger} value="attendance">Frequência</TabsTrigger>
         <TabsTrigger className={styles.tabTrigger} value="schedule">Ajustar encontro</TabsTrigger>
