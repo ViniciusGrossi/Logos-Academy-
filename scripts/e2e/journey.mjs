@@ -14,6 +14,16 @@ let lastAction = { kind: 'startup' };
 const sessions = { admin: 'academy-e2e-admin', student: 'academy-e2e-student', other: 'academy-e2e-other', peer: 'academy-e2e-peer' };
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const assertTrue = (condition, label) => { if (!condition) throw new Error(label); };
+function browserFailureCategory(value) {
+  if (/execution context.*destroyed|cannot find context|navigation|detached frame|target.*navigat/i.test(value)) return 'navigation';
+  if (/timeout|timed out/i.test(value)) return 'timeout';
+  if (/locator|element.*not found|no element|strict mode/i.test(value)) return 'locator';
+  if (/syntaxerror|referenceerror|typeerror|evaluation error/i.test(value)) return 'javascript';
+  return 'unknown';
+}
+class BrowserOperationError extends Error {
+  constructor(category) { super('Browser operation failed; private details suppressed.'); this.category = category; }
+}
 
 // Never forward CLI stdout/stderr on failure: these can contain invitation or
 // signed Storage URLs. Only allowlisted, constant phase names reach artifacts.
@@ -35,16 +45,26 @@ async function browser(actor, args, stdin) {
   const child = execFile('agent-browser', ['--session', sessions[actor], '--json', ...args], { timeout: 60000, maxBuffer: 8 * 1024 * 1024 });
   if (stdin !== undefined) child.stdin.end(stdin);
   let output;
+  let privateError = '';
+  child.stderr.on('data', (chunk) => { privateError = (privateError + chunk).slice(-32768); });
   try {
     output = await new Promise((resolve, reject) => {
       let value = '';
       child.stdout.on('data', (chunk) => { value += chunk; });
       child.once('error', reject);
-      child.once('close', (code) => code === 0 ? resolve(value) : reject(new Error('Browser command failed')));
+      child.once('close', (code) => code === 0 ? resolve(value) : reject(new BrowserOperationError(browserFailureCategory(privateError + value))));
     });
-  } catch { throw new Error('Browser command failed; sensitive output suppressed.'); }
+  } catch (cause) {
+    const category = cause instanceof BrowserOperationError ? cause.category : browserFailureCategory(privateError);
+    lastAction = { ...lastAction, failure: category };
+    throw new BrowserOperationError(category);
+  }
   const parsed = JSON.parse(output.trim());
-  if (!parsed.success) throw new Error('Browser operation rejected; sensitive output suppressed.');
+  if (!parsed.success) {
+    const category = browserFailureCategory(JSON.stringify(parsed.error ?? ''));
+    lastAction = { ...lastAction, failure: category };
+    throw new BrowserOperationError(category);
+  }
   return parsed.data;
 }
 async function evaluate(actor, code) {
@@ -64,7 +84,12 @@ async function success(actor, path, method, body) {
 }
 async function eventually(check, label) {
   for (let attempt = 0; attempt < 40; attempt++) {
-    if (await check()) return;
+    try { if (await check()) return; } catch (cause) {
+      // A real Auth redirect can replace the page between polls. Retry only
+      // that transient browser condition; API/validation/assertion failures
+      // remain immediate failures, never converted to a successful oracle.
+      if (!(cause instanceof BrowserOperationError) || cause.category !== 'navigation') throw cause;
+    }
     await delay(500);
   }
   throw new Error(label);
