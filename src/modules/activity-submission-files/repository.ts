@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { z } from "zod";
 
 import { AppError } from "@/src/lib/api-error";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
@@ -36,6 +37,7 @@ export type AdminFileTarget = Readonly<{
   contentType: string;
 }>;
 export interface ActivitySubmissionFilesStore {
+  uploadInspection(actor: StudentActor, fileId: string, requestId: string): Promise<{ bytes: Uint8Array; contentType: string; sizeBytes: number }>;
   getProfile(
     actor: StudentActor,
     requestId: string,
@@ -213,6 +215,42 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
       },
       requestId,
     ) as Promise<UploadedFile>;
+  }
+  async uploadInspection(actor: StudentActor, fileId: string, requestId: string): Promise<{ bytes: Uint8Array; contentType: string; sizeBytes: number }> {
+    const { data, error } = await this.admin.schema("logos_academy").from("uploaded_files")
+      .select("storage_path, student_profile_id, activity_assignment_id, content_type, size_bytes")
+      .eq("id", fileId).eq("tenant_id", actor.tenantId).eq("uploaded_by_user_id", actor.userId)
+      .in("status", ["pending", "ready"]).is("deleted_at", null).maybeSingle();
+    if (error || !data) throw new AppError("FORBIDDEN", "Arquivo indisponível.", requestId);
+    const parsed = z.object({
+      storage_path: z.string(), student_profile_id: z.string().uuid(), activity_assignment_id: z.string().uuid(),
+      content_type: z.string(), size_bytes: z.number().int().min(1).max(20 * 1024 * 1024),
+    }).safeParse(data);
+    if (!parsed.success) throw new AppError("INTERNAL_ERROR", "Metadados de arquivo inválidos.", requestId);
+    const target = parsed.data;
+    if (target.storage_path !== `${actor.tenantId}/${target.student_profile_id}/${target.activity_assignment_id}/${fileId}`) {
+      throw new AppError("FORBIDDEN", "Arquivo indisponível.", requestId);
+    }
+    const { data: signed, error: signedError } = await this.admin.storage.from("submissions").createSignedUrl(target.storage_path, 30);
+    if (signedError || !signed) throw new AppError("INTERNAL_ERROR", "Não foi possível verificar o arquivo.", requestId);
+    const response = await fetch(signed.signedUrl, { signal: AbortSignal.timeout(10_000), redirect: "error", cache: "no-store" });
+    if (!response.ok || !response.body) throw new AppError("INTERNAL_ERROR", "Não foi possível verificar o arquivo.", requestId);
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > target.size_bytes) throw new AppError("VALIDATION_ERROR", "Arquivo excede o tamanho autorizado.", requestId);
+        chunks.push(value);
+      }
+    } finally { await reader.cancel(); }
+    const bytes = new Uint8Array(size);
+    let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+    return { bytes, contentType: target.content_type, sizeBytes: target.size_bytes };
   }
   async fileMetadata(
     actor: StudentActor,

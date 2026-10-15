@@ -5,6 +5,7 @@ import type {
   UploadedFile,
 } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
+import { inspectSubmissionFile } from "@/src/modules/activity-submission-files/inspection";
 import {
   ActivityDetailQuerySchema,
   DraftInputSchema,
@@ -161,9 +162,12 @@ export class ActivitySubmissionFilesService {
     fileId: unknown,
     requestId: string,
   ): Promise<UploadedFile> {
+    const parsedFileId = parse(FilePathSchema, { fileId }, requestId).fileId;
+    const target = await this.repository.uploadInspection(actor, parsedFileId, requestId);
+    await inspectSubmissionFile(target.bytes, target, requestId);
     return this.repository.finalize(
       actor,
-      parse(FilePathSchema, { fileId }, requestId).fileId,
+      parsedFileId,
       requestId,
     );
   }
