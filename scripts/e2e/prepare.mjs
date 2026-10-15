@@ -46,6 +46,19 @@ for (const [name, tenantId] of [['admin', curriculum.tenantId], ['otherAdmin', t
   if (!/^[0-9a-f-]{36}$/iu.test(authUser.id)) throw new Error('Invalid local Auth identifier.');
   const userId = randomUUID();
   sql(`begin; insert into logos_academy.users(id,tenant_id,auth_user_id,email_encrypted,display_name) values('${userId}','${tenantId}','${authUser.id}',extensions.pgp_sym_encrypt(${sqlLiteral(email)},${sqlLiteral(encryptionKey)}),'E2E ${name}'); insert into logos_academy.tenant_memberships(id,tenant_id,user_id,role) values('${randomUUID()}','${tenantId}','${userId}','admin'); commit;`);
+  // Diagnose fixture/RLS independently; this does not replace the later UI login.
+  const probe = await fetch(`${environment.supabaseUrl}/auth/v1/token?grant_type=password`, {
+    method: 'POST', headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }), signal: AbortSignal.timeout(15000),
+  });
+  if (!probe.ok) throw new Error('Isolated fixture could not authenticate with the real provider.');
+  const session = await probe.json();
+  for (const [table, filter] of [['users', `auth_user_id=eq.${authUser.id}`], ['tenants', `id=eq.${tenantId}`], ['tenant_memberships', `user_id=eq.${userId}`]]) {
+    const visible = await fetch(`${environment.supabaseUrl}/rest/v1/${table}?select=id&${filter}`, {
+      headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${session.access_token}`, 'Accept-Profile': 'logos_academy' }, signal: AbortSignal.timeout(15000),
+    });
+    if (!visible.ok || (await visible.json()).length !== 1) throw new Error(`Isolated authenticated fixture cannot read its own ${table} record.`);
+  }
   actors[name] = { email, password };
 }
 const directory = mkdtempSync(join(tmpdir(), 'academy-e2e-'));

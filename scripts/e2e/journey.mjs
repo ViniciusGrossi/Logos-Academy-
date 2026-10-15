@@ -67,7 +67,14 @@ async function login(actor, credentials) {
   await browser(actor, ['find', 'label', 'E-mail', 'fill', credentials.email, '--exact']);
   await browser(actor, ['find', 'label', 'Senha', 'fill', credentials.password, '--exact']);
   await browser(actor, ['find', 'role', 'button', 'click', '--name', 'Entrar no estúdio', '--exact']);
-  await eventually(async () => (await api(actor, '/api/me')).status === 200, 'Real Auth login did not establish an application session.');
+  try {
+    await eventually(async () => (await api(actor, '/api/me')).status === 200, 'Real Auth login did not establish an application session.');
+  } catch {
+    const failed = lastAction;
+    const authUi = await evaluate(actor, `(()=>{const text=document.querySelector('[role=alert]')?.textContent??'';return {loginPage:location.pathname==='/login',hasAuthCookie:/sb-[^=;]*auth-token/.test(document.cookie),emailFilled:Boolean(document.querySelector('input[type=email]')?.value),passwordFilled:Boolean(document.querySelector('input[autocomplete=current-password]')?.value),alertKind:!text?'none':/credencial|invalid.*login|senha.*incorret/i.test(text)?'credentials':/fetch|network|conexão/i.test(text)?'network':/configura|Zod|environment/i.test(text)?'configuration':'other'};})()`);
+    lastAction = { ...failed, authUi };
+    throw new Error('Real UI login failed; only boolean diagnostics retained.');
+  }
 }
 async function activate(invitation, email) {
   const link = new URL(invitation.activationLink);
