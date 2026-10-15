@@ -6,6 +6,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import type { ProjectDetail, ProjectSummary } from "@/specs/api.contracts";
 import { MagneticAction } from "@/components/academy";
 import { useLiveApi } from "./live-api";
+import { useAdminPagination } from "@/components/admin/use-admin-pagination";
 import { EmptyState, ErrorState, LoadingState } from "./state-lab";
 import styles from "./project-portal.module.css";
 
@@ -57,7 +58,7 @@ export function ProjectPortal() {
   const enrollmentId = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).get("enrollmentId");
   const query = enrollmentId ? `?enrollmentId=${enrollmentId}` : "";
   const { data, error, loading, reload } = useLiveApi<readonly ProjectSummary[]>(`/api/student/projects${query}`);
-  const portfolio = useLiveApi<{ items: readonly ProjectDetail[] }>(`/api/student/portfolio${query}`);
+  const portfolio = useAdminPagination<ProjectDetail>(`/api/student/portfolio${query}`);
 
   if (loading || portfolio.loading) return <LoadingState layout="projects" />;
   if (error || portfolio.error) return <ErrorState layout="projects" retry={() => { void reload(); void portfolio.reload(); }} message={error?.message ?? portfolio.error?.message ?? "Erro"} />;
@@ -164,6 +165,7 @@ export function ProjectPortal() {
     <section className={styles.archive} aria-labelledby="archive-title">
       <div className={styles.sectionHeading}><div><span>Arquivo de evidências</span><h2 id="archive-title">Projetos preservados</h2></div><FolderKanban /></div>
       {approved.length ? <div className={styles.archiveList}>{approved.map((project) => <Link href={`/projetos/${project.id}`} key={project.id}><span className={styles.archiveSeal}><Check /></span><span><small>Ciclo {String(project.cyclePosition).padStart(2, "0")} · coleção privada</small><strong>{project.title}</strong><em>{project.activities.length} evidência(s) preservada(s)</em></span><ArrowRight /></Link>)}</div> : <div className={styles.emptyArchive}><span>00</span><div><strong>O arquivo ainda está aberto.</strong><p>Quando um projeto for aprovado, ele aparecerá aqui como parte permanente da sua coleção.</p></div></div>}
+      {(portfolio.hasPrevious || portfolio.hasNext) && <nav className="mt-4 flex flex-wrap items-center gap-4" aria-label="Paginação do portfólio"><button type="button" className={styles.primaryAction} disabled={!portfolio.hasPrevious || portfolio.loading} onClick={portfolio.previousPage}>Página anterior</button><span role="status">Página {portfolio.page}</span><button type="button" className={styles.primaryAction} disabled={!portfolio.hasNext || portfolio.loading} onClick={portfolio.nextPage}>Próxima página</button></nav>}
     </section>
   </div>;
 }

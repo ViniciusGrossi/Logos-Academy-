@@ -19,6 +19,18 @@ beforeEach(() => { state.mode = "loading"; state.overview = null; state.run.mock
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe("Atlas administrative regions", () => {
+  it("restaura filtros editoriais pela URL e pelo histórico", async () => {
+    window.history.replaceState(null, "", "/admin/atlas?colecao=prompt&busca=interface");
+    state.mode = "empty";
+    render(createElement(AtlasCmsLibrary));
+    expect((screen.getByRole("searchbox", { name: "Buscar conteúdo" }) as HTMLInputElement).value).toBe("interface");
+    fireEvent.click(screen.getByRole("tab", { name: "Conceitos" }));
+    expect(new URLSearchParams(window.location.search).get("colecao")).toBe("concept");
+    window.history.replaceState(null, "", "/admin/atlas?colecao=prompt&busca=outra");
+    fireEvent(window, new PopStateEvent("popstate"));
+    expect((screen.getByRole("searchbox", { name: "Buscar conteúdo" }) as HTMLInputElement).value).toBe("outra");
+    window.history.replaceState(null, "", "/admin/atlas");
+  });
   it("permite duplicar o bloco selecionado e desfazer sua remoção", async () => {
     const initial = detail.draft.contentBlocks;
     detail.draft.contentBlocks = [createAtlasBlock("text")];

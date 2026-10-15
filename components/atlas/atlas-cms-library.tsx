@@ -7,13 +7,20 @@ import type { AdminAtlasDetail, AdminAtlasListItem, AtlasItemKind, Page } from "
 import { AdminEditorialHeader, AnimatedCollectionTabs, EditorialConfirmation, EditorialRegionState, StatusCounterStrip } from "@/src/components/ui-shared/admin-editorial";
 import { useAtlasMutation, useAtlasOptions, useAtlasQuery } from "@/src/hooks/use-atlas-cms";
 import { AtlasEditorialMap } from "./atlas-editorial-map";
+import { useAdminUrlState } from "@/components/admin/use-admin-url-state";
 import styles from "./atlas-cms.module.css";
 
 export const atlasKindLabels = { concept: "Conceito", prompt: "Prompt", design_system: "Sistema de Design" };
 export const atlasStatusLabels = { draft: "Rascunho", published: "Publicado", archived: "Arquivado" };
+const collectionFilters = ["", "concept", "prompt", "design_system"] as const;
+const publicationFilters = ["", "draft", "published", "archived"] as const;
 export function AtlasCmsLibrary() {
   const router = useRouter();
-  const [kind, setKind] = useState(""); const [status, setStatus] = useState(""); const [search, setSearch] = useState(""); const [lesson, setLesson] = useState(""); const [cursor, setCursor] = useState<string | null>(null); const [previous, setPrevious] = useState<(string | null)[]>([]);
+  const [kind, setKind] = useAdminUrlState<string>("colecao", "", collectionFilters);
+  const [status, setStatus] = useAdminUrlState<string>("estado", "", publicationFilters);
+  const [search, setSearch] = useAdminUrlState<string>("busca", "");
+  const [lesson, setLesson] = useAdminUrlState<string>("aula", "");
+  const [cursor, setCursor] = useState<string | null>(null); const [previous, setPrevious] = useState<(string | null)[]>([]);
   const [selected, setSelected] = useState<string | null>(null); const [create, setCreate] = useState(false); const [title, setTitle] = useState(""); const [newKind, setNewKind] = useState<AtlasItemKind>("concept");
   const [debounced, setDebounced] = useState(search);
   useEffect(() => { const timer = setTimeout(() => setDebounced(search), 300); return () => clearTimeout(timer); }, [search]);
