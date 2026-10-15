@@ -1,10 +1,10 @@
 ---
 title: "Logos Academy Platform — State of Project"
-date: 2026-10-13
+date: 2026-10-15
 fase_atual: "10"
-etapa_atual: "Auditoria e conclusão integral do MVP autorizadas; produção anterior preservada"
+etapa_atual: "Reparos MVP integrados na branch; CI e jornada real isolada em validação"
 produto_tipo: "saas-premium"
-proximo_passo: "Fechar lacunas F01-F14 e specs posteriores; E2E isolado real e smoke autenticado; revisão jurídica LGPD"
+proximo_passo: "Validar PR #3: pgTAP completo, E2E real, revisão visual e dependências; preservar produção e obter aprovação LGPD"
 fases_skipped: []
 gates:
   fase_1: pass
@@ -34,6 +34,8 @@ tags: [status, roadmap, logos-academy, plataforma-estudantil]
 > Compactado por `state-compact.js` em 2026-10-02. O STATE guarda só o presente; o histórico integral está em `STATE-HISTORY.md`.
 
 ## Em Andamento
+
+- [ ] **Reparos de 15/10 — PR #3 em rascunho**: conclusão v3, guards de tenant excluído, contexto/calendário individual, busca sem acento/tags, confirmação de consentimento/cancelamento, matrícula adicional, dashboard real, paginação e URL, duplicação/undo no CMS e fila individual implementados. Anexos inspecionados e publicados em snapshot imutável; retry e descarte de cópia rejeitada testados. CI #58: aplicação/lint/build aprovados; pgTAP 064–068 passaram, 069 parou na expressão de comparação do teste (corrigida). Último push `a889c45` inclui harness Auth/Storage/browser real isolado; execução ainda pendente. Nenhuma migration remota nova nem deploy deste lote.
 
 - [ ] **`mvp-completion`**: usuário autorizou concluir o MVP inteiro em 13/10. Escopo: F01-F14 e specs posteriores aprovadas, sem pós-MVP novo. Flags/gates herdados não provam conclusão. Auditoria de requisitos e segurança em andamento; teste local real será executado no runner isolado do GitHub (sem mocks na produção). Navegador `academy-mvp-admin` aberto para login manual seguro; nenhum reset de senha de admin.
 - [x] **`admin-interface-deploy`**: PR #2 integrado por squash `589b77d`; produção Vercel `dpl_12WUzped3votALdMERJfb82QLDUx` READY no domínio canônico. CI #54 e CI da main verdes: 183 testes da aplicação e 390 pgTAP. Finalize idempotente e paginação administrativa aplicados por migrations incrementais; ACL backend-only das quatro funções confirmada. Smoke: login 200 em 0,735 s, páginas admin 307 para login, APIs 401 sem sessão, CSP/HSTS presentes e console do login limpo. Sem resets/seeds ou novas contas remotas. Rollback em `docs/deploy/2026-10-12-functions-rollback.sql` e deployment anterior preservado. Ensaio autenticado real ainda pendente.
@@ -100,8 +102,7 @@ _Histórico completo: `STATE-HISTORY.md`._
 
 ## Workers Ativos
 
-- `mvp_requirements_audit`: auditoria read-only PRD/specs/código/testes e matriz de aceite.
-- `deployment_security_review`: auditoria read-only auth/RLS/Storage/LGPD e dependências.
+- Nenhum worker ativo. Entregas de banco, frontend e harness integradas; revisões estáticas concluídas, validação runtime continua pelo orquestrador.
 
 ## Sync Requests Pendentes
 
