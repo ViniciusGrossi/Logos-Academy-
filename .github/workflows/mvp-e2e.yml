@@ -107,5 +107,8 @@ jobs:
           agent-browser --session academy-e2e-student close >/dev/null 2>&1 || true
           agent-browser --session academy-e2e-other close >/dev/null 2>&1 || true
           agent-browser --session academy-e2e-peer close >/dev/null 2>&1 || true
+          for index in $(seq 1 7); do
+            agent-browser --session "academy-e2e-student-$index" close >/dev/null 2>&1 || true
+          done
           if [ -n "${ACADEMY_E2E_SERVER_PID:-}" ]; then kill "$ACADEMY_E2E_SERVER_PID" || true; fi
           npx --yes supabase@2.118.0 stop --no-backup

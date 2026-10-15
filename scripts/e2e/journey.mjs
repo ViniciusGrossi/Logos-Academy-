@@ -12,6 +12,8 @@ const results = [];
 let phase = 'startup';
 let lastAction = { kind: 'startup' };
 const sessions = { admin: 'academy-e2e-admin', student: 'academy-e2e-student', other: 'academy-e2e-other', peer: 'academy-e2e-peer' };
+const allSessions = new Set(Object.values(sessions));
+let activationSession = 0;
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const assertTrue = (condition, label) => { if (!condition) throw new Error(label); };
 function browserFailureCategory(value) {
@@ -142,7 +144,11 @@ async function activate(invitation, email) {
   assert.equal(preview.status, 200, 'Invitation preview must remain an inert confirmation page.');
   const confirmationHtml = await preview.text();
   assertTrue(confirmationHtml.includes('Continuar ativação') && !confirmationHtml.includes('/auth/v1/verify?'), 'Confirmation preview must show the action without exposing the provider token.');
-  await browser('student', ['close']);
+  // Never reopen the IPC identity of a just-closed native daemon. Each pupil
+  // gets a fresh browser session, preserving genuine cookie isolation.
+  if (activationSession > 0) await browser('student', ['close']);
+  sessions.student = `academy-e2e-student-${++activationSession}`;
+  allSessions.add(sessions.student);
   step = 'open-confirmation';
   await browser('student', ['open', link.href]);
   step = 'wait-confirmation';
@@ -159,7 +165,7 @@ async function activate(invitation, email) {
   await eventually(async () => (await api('student', '/api/student/journey')).status === 200, 'Invitation activation did not activate the enrollment.');
   } catch (cause) {
     const failed = lastAction;
-    const activationUi = await evaluate('student', `(()=>{const text=document.querySelector('[role=alert]')?.textContent??'';const hash=new URLSearchParams(location.hash.slice(1));return {page:location.pathname==='/ativar'?'activation':location.pathname.startsWith('/c/')?'confirmation':location.pathname==='/login'?'login':location.pathname==='/auth/v1/verify'?'provider':'other',confirmationButton:[...document.querySelectorAll('button')].some(el=>/Continuar ativação/.test(el.textContent??'')),emailPresent:Boolean(document.querySelector('input[readonly][type=email]')),emailFilled:Boolean(document.querySelector('input[readonly][type=email]')?.value),hasAuthCookie:/sb-[^=;]*auth-token/.test(document.cookie),hasHashError:hash.has('error'),invalidLink:new URLSearchParams(location.search).get('error')==='invalid_link',alertKind:!text?'none':/inválido|expirou/i.test(text)?'invalid_invitation':/link seguro/i.test(text)?'missing_session':/fetch|network/i.test(text)?'network':'other'};})()`).catch(() => ({ unavailable: true }));
+    const activationUi = await evaluate('student', `(()=>{const text=document.querySelector('[role=alert]')?.textContent??'';const hash=new URLSearchParams(location.hash.slice(1));return {protocol:location.protocol,ready:document.readyState,hasTitle:Boolean(document.getElementById('invitation-title')),page:location.pathname==='/ativar'?'activation':location.pathname.startsWith('/c/')?'confirmation':location.pathname==='/login'?'login':location.pathname==='/auth/v1/verify'?'provider':'other',confirmationButton:[...document.querySelectorAll('button')].some(el=>/Continuar ativação/.test(el.textContent??'')),emailPresent:Boolean(document.querySelector('input[readonly][type=email]')),emailFilled:Boolean(document.querySelector('input[readonly][type=email]')?.value),hasHashError:hash.has('error'),invalidLink:new URLSearchParams(location.search).get('error')==='invalid_link',alertKind:!text?'none':/inválido|expirou/i.test(text)?'invalid_invitation':/link seguro/i.test(text)?'missing_session':/fetch|network/i.test(text)?'network':'other'};})()`).catch((error) => ({ unavailable: true, category: error instanceof BrowserOperationError ? error.category : error instanceof TypeError ? 'type' : 'other' }));
     lastAction = { ...failed, activationStep: step, activationUi };
     throw cause;
   }
@@ -389,5 +395,8 @@ try {
   mkdirSync('artifacts/mvp-e2e', { recursive: true });
   writeFileSync('artifacts/mvp-e2e/result.json', JSON.stringify({ engine: 'agent-browser@0.27.2', backend: 'isolated Supabase Auth/Postgres/Storage', mocks: false, results, journeyPassed: results.length === 8 && results.every((result) => result.status === 'passed') }, null, 2));
   for (const actor of Object.keys(sessions)) await browser(actor, ['close']).catch(() => {});
+  for (const session of allSessions) {
+    await new Promise((resolve) => execFile('agent-browser', ['--session', session, 'close'], { timeout: 15000 }, () => resolve()));
+  }
   unlinkSync(imagePath);
 }
