@@ -28,7 +28,9 @@ Mitigação observada: não está na árvore de produção; tooling só deve pro
 
 Os runners iniciaram PostgreSQL, Auth, Storage e Next reais; fixtures ficam exclusivamente locais. A instalação multiplataforma foi corrigida regenerando o lockfile a partir de manifesto em diretório vazio; `npm ci` limpo e dry-run com npm 10/Linux aprovados depois disso.
 
-As primeiras execuções do navegador falharam no login administrativo, com `GET /api/me` retornando 401. Esse resultado não comprova defeito no cadastro nem sucesso do convite. O prepare passou a verificar Auth e leituras RLS reais antes da interface; o diagnóstico do navegador registra apenas booleanos/categorias, nunca senhas/tokens/cookies/links. A causa do 401 ainda não foi comprovada. O fluxo restante não pode ser marcado aprovado enquanto essa etapa falha.
+As primeiras execuções do navegador falharam no login administrativo, com `GET /api/me` retornando 401. O prepare comprovou Auth e leituras RLS reais. A execução #6 delimitou: formulário válido, nenhum evento submit, nenhuma requisição de login e nenhum estado pending. Reprodução local isolada confirmou que o botão estava abaixo da viewport: o clique CDP atingiu HTML fora da tela. Após `scrollintoview`, um clique genuíno atingiu BUTTON e disparou submit/pending. Não foi necessário alterar autenticação ou contornar a interface.
+
+O commit `465e7dd` traz controles para a área visível antes das interações e corrige o uso de focus na ferramenta. O ensaio #7 **aprovou login real dos dois administradores, criação de turma com 16 encontros e negação cross-tenant**. Parou na ativação do primeiro aluno, durante avaliação no browser; a causa ainda não está comprovada. `0836342` classifica falhas sem vazar saída privada e permite repetir somente avaliação interrompida por navegação transitória. Isso não comprova o sucesso do convite nem o restante da jornada. Diagnósticos registram apenas booleanos/categorias e endpoints fixos, nunca senhas/tokens/cookies/links.
 
 ## Pendências de fechamento
 

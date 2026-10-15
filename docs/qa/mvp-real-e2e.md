@@ -1,6 +1,6 @@
 # Jornada real isolada do MVP
 
-Estado: harness executado no runner; **jornada ainda reprovada no primeiro checkpoint de login**. Auth e leituras RLS da preparação passaram, mas a UI não criou cookie de sessão. A nova execução verifica interatividade React antes do preenchimento. Guardrails não comprovam a jornada e não encerram F01–F14, a revisão visual humana ou o gate LGPD.
+Estado: harness executado no runner; **jornada ainda não aprovada**. Auth e leituras RLS da preparação passaram. O diagnóstico #6 e reprodução local identificaram cliques CDP fora da viewport sem submit; o commit `465e7dd` corrigiu isso. O ensaio #7 aprovou login real, criação da turma e negação cross-tenant; falhou ao avaliar a página de ativação do primeiro aluno. `0836342` acrescenta classificação privada e retry limitado a navegação transitória. Guardrails não comprovam a jornada e não encerram F01–F14, a revisão visual humana ou o gate LGPD.
 
 ## Executar
 
