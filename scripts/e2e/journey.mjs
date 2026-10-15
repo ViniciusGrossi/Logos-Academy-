@@ -18,6 +18,19 @@ const assertTrue = (condition, label) => { if (!condition) throw new Error(label
 // Never forward CLI stdout/stderr on failure: these can contain invitation or
 // signed Storage URLs. Only allowlisted, constant phase names reach artifacts.
 async function browser(actor, args, stdin) {
+  // agent-browser 0.27.2's CDP click does not scroll semantic targets into
+  // view: an offscreen button can report success while clicking the HTML root.
+  // Resolve only the roles used here, scroll the real control, then retain a
+  // genuine pointer/keyboard action (never invoke element.click()/submit()).
+  if (args[0] === 'find' && args[1] === 'role' && ['click', 'focus'].includes(args[3])) {
+    const name = args[args.indexOf('--name') + 1];
+    const exact = args.includes('--exact');
+    const selector = await evaluate(actor, `(()=>{const role=${JSON.stringify(args[2])};const name=${JSON.stringify(name)};const elements=[...document.querySelectorAll(role==='button'?'button,[role=button]':'[role='+role+']')];const element=elements.find(el=>{const text=(el.getAttribute('aria-label')??el.textContent??'').replace(/\\s+/g,' ').trim();return el.getClientRects().length&&(${exact ? 'text===name' : 'text.includes(name)'});});if(!element)return null;document.querySelector('[data-e2e-action]')?.removeAttribute('data-e2e-action');element.setAttribute('data-e2e-action','current');element.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return '[data-e2e-action=current]';})()`);
+    assertTrue(Boolean(selector), 'Semantic interaction target was not found.');
+    args = [args[3], selector];
+  } else if (args[0] === 'click') {
+    await browser(actor, ['scrollintoview', args[1]]);
+  }
   lastAction = { kind: 'browser', actor, operation: args[0], ...(args[0] === 'find' ? { locator: args[1] } : {}) };
   const child = execFile('agent-browser', ['--session', sessions[actor], '--json', ...args], { timeout: 60000, maxBuffer: 8 * 1024 * 1024 });
   if (stdin !== undefined) child.stdin.end(stdin);
