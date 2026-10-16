@@ -48,9 +48,44 @@ jobs:
             echo 'SUPABASE_DB_URL is not configured for the production environment.' >&2
             exit 1
           fi
-      - name: Show migration plan without credentials
-        run: npx --yes supabase@2.118.0 migration list --db-url "$SUPABASE_DB_URL"
-      - name: Apply versioned migrations
-        run: npx --yes supabase@2.118.0 db push --db-url "$SUPABASE_DB_URL" --include-all --yes
-      - name: Prove local and remote migration history converge
-        run: npx --yes supabase@2.118.0 migration list --db-url "$SUPABASE_DB_URL"
+      - name: Apply only Academy migrations and record them atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          apply_migration() {
+            local version="$1"
+            local name="$2"
+            local file="supabase/migrations/${version}_${name}.sql"
+            local applied
+
+            applied="$(psql "$SUPABASE_DB_URL" -Atq -v ON_ERROR_STOP=1 \
+              -c "select exists (select 1 from supabase_migrations.schema_migrations where version = '${version}');")"
+            if [ "$applied" = "t" ]; then
+              echo "Migration ${version} already recorded; skipping."
+              return
+            fi
+
+            test -f "$file"
+            echo "Applying Academy migration ${version}_${name}.sql"
+            sed "s/^commit;[[:space:]]*$/insert into supabase_migrations.schema_migrations (version, name, statements, created_by) values ('${version}', '${name}', array['GitHub Actions Academy release'], 'github-actions') on conflict (version) do nothing;\\ncommit;/" "$file" \
+              | psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1
+          }
+
+          apply_migration 20261013040227 mvp_completion_terminal_lesson
+          apply_migration 20261013040230 mvp_soft_deleted_tenant_guards
+          apply_migration 20261013040234 mvp_admin_individual_session_context
+          apply_migration 20261015044528 mvp_atlas_accent_tag_search
+          apply_migration 20261015045518 mvp_verified_upload_snapshot
+          apply_migration 20261015050531 mvp_dashboard_global_lesson_order
+          apply_migration 20261015221636 atlas_asset_owner_fail_closed
+          apply_migration 20261016052000 portfolio_two_field_cursor
+      - name: Prove all Academy versions are recorded remotely
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected=(20261013040227 20261013040230 20261013040234 20261015044528 20261015045518 20261015050531 20261015221636 20261016052000)
+          for version in "${expected[@]}"; do
+            found="$(psql "$SUPABASE_DB_URL" -Atq -v ON_ERROR_STOP=1 -c "select exists (select 1 from supabase_migrations.schema_migrations where version = '${version}');")"
+            test "$found" = "t"
+          done
