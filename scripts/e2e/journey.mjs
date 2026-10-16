@@ -355,7 +355,13 @@ try {
     assert.equal(completion.reflectionComplete, true);
     assert.equal(completion.attendanceComplete, false);
     assert.equal(completion.eligible, false);
-    await denied('admin', `/api/admin/enrollments/${student.enrollmentId}/complete`, 'POST', {}, [409]);
+    const blockedCompletion = await success('admin', `/api/admin/enrollments/${student.enrollmentId}/complete`, 'POST', {});
+    assert.equal(blockedCompletion.eligible, false);
+    assertTrue(blockedCompletion.blockers.includes('attendance_incomplete'), 'Unresolved absence did not remain a completion blocker.');
+    const unchangedCompletion = await success('admin', `/api/admin/enrollments/${student.enrollmentId}/completion`);
+    assert.equal(unchangedCompletion.eligible, false);
+    const unchangedStudent = await success('admin', `/api/admin/students/${student.studentId}`);
+    assert.equal(unchangedStudent.enrollments.find((enrollment) => enrollment.id === student.enrollmentId)?.status, 'active');
   });
   await checkpoint('makeup-presentation-completion-and-read-only', async () => {
     assertTrue(Boolean(absentRecord?.attendanceId), 'Absent attendance record missing.');
