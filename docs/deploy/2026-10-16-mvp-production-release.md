@@ -12,7 +12,7 @@
 
 No repositório GitHub, criar/abrir o ambiente **production**, protegê-lo com aprovação do responsável e cadastrar apenas o secret `SUPABASE_DB_URL`: a URI de conexão direta do banco do projeto `nqubjiosnlaatxxamiut`. Não registrar a URI em issues, arquivos locais ou chat.
 
-Após isso, no branch `fix/mvp-completion`, executar **Actions → Production database release → Run workflow**, informar `APPLY` e aguardar as três provas: validação da aplicação, `db push` e histórico convergente. Só então mesclar o PR e confirmar que a Vercel concluiu o deploy de produção.
+O GitHub só disponibiliza um workflow manual depois que ele está na branch padrão. Portanto, antes da migração, publicar somente o workflow `Production database release` na `main` (em PR técnico separado, sem código da aplicação). Depois, em **Actions → Production database release → Run workflow**, selecionar o ref `fix/mvp-completion`, informar `APPLY` e aguardar as três provas: validação da aplicação, `db push` e histórico convergente. Só então mesclar o PR do MVP e confirmar que a Vercel concluiu o deploy de produção.
 
 ## Gates que não podem ser automatizados
 
