@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { z } from "zod";
 
 import { AppError } from "@/src/lib/api-error";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
@@ -35,7 +36,10 @@ export type AdminFileTarget = Readonly<{
   filename: string;
   contentType: string;
 }>;
+export type PendingUploadInspection = Readonly<{ state: "pending"; bytes: Uint8Array; contentType: string; sizeBytes: number; storagePath: string }>;
+export type UploadInspection = PendingUploadInspection | Readonly<{ state: "ready"; file: UploadedFile }>;
 export interface ActivitySubmissionFilesStore {
+  uploadInspection(actor: StudentActor, fileId: string, requestId: string): Promise<UploadInspection>;
   getProfile(
     actor: StudentActor,
     requestId: string,
@@ -71,6 +75,7 @@ export interface ActivitySubmissionFilesStore {
     actor: StudentActor,
     fileId: string,
     requestId: string,
+    verified: PendingUploadInspection,
   ): Promise<UploadedFile>;
   fileMetadata(
     actor: StudentActor,
@@ -202,17 +207,79 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
     actor: StudentActor,
     fileId: string,
     requestId: string,
+    verified: PendingUploadInspection,
   ): Promise<UploadedFile> {
-    return this.rpc(
-      "student_finalize_upload",
+    // The client can still overwrite its original pending object. Publish only
+    // these inspected bytes to a new path which no client-owned row references.
+    const snapshotPath = `${verified.storagePath}/verified/${crypto.randomUUID()}`;
+    const { error } = await this.admin.storage.from("submissions").upload(snapshotPath, verified.bytes, {
+      contentType: verified.contentType, upsert: false,
+    });
+    if (error) throw new AppError("INTERNAL_ERROR", "Não foi possível preservar o arquivo verificado.", requestId);
+    try { return await this.rpc(
+      "student_finalize_verified_upload",
       {
         p_tenant_id: actor.tenantId,
         p_actor_user_id: actor.userId,
         p_file_id: fileId,
+        p_verified_storage_path: snapshotPath,
         p_encryption_key: this.encryptionKey(),
       },
       requestId,
-    ) as Promise<UploadedFile>;
+    ) as UploadedFile; } catch (cause: unknown) {
+      // A known SQL rejection rolled its transaction back: this new copy cannot
+      // be published. Unknown transport failures may already have committed, so
+      // never delete their candidate blindly.
+      if (cause instanceof AppError && ["FORBIDDEN", "CONFLICT", "VALIDATION_ERROR", "NOT_FOUND"].includes(cause.code)) {
+        try { await this.admin.storage.from("submissions").remove([snapshotPath]); } catch { /* Reconciliation must retain unknown objects rather than delete live evidence. */ }
+        if (cause.code === "CONFLICT") {
+          try { return (await this.fileMetadata(actor, fileId, requestId)).file; } catch { /* Preserve the original typed rejection if no ready result exists. */ }
+        }
+      }
+      throw cause;
+    }
+  }
+  async uploadInspection(actor: StudentActor, fileId: string, requestId: string): Promise<UploadInspection> {
+    const { data, error } = await this.admin.schema("logos_academy").from("uploaded_files")
+      .select("storage_path, student_profile_id, activity_assignment_id, content_type, size_bytes, status")
+      .eq("id", fileId).eq("tenant_id", actor.tenantId).eq("uploaded_by_user_id", actor.userId)
+      .in("status", ["pending", "ready"]).is("deleted_at", null).maybeSingle();
+    if (error || !data) throw new AppError("FORBIDDEN", "Arquivo indisponível.", requestId);
+    const parsed = z.object({
+      storage_path: z.string(), student_profile_id: z.string().uuid(), activity_assignment_id: z.string().uuid(),
+      content_type: z.string(), size_bytes: z.number().int().min(1).max(20 * 1024 * 1024),
+      status: z.enum(["pending", "ready"]),
+    }).safeParse(data);
+    if (!parsed.success) throw new AppError("INTERNAL_ERROR", "Metadados de arquivo inválidos.", requestId);
+    const target = parsed.data;
+    const base = `${actor.tenantId}/${target.student_profile_id}/${target.activity_assignment_id}/${fileId}`;
+    if (target.status === "ready" && target.storage_path.startsWith(`${base}/verified/`)
+      && z.string().uuid().safeParse(target.storage_path.slice(`${base}/verified/`.length)).success) {
+      return { state: "ready", file: (await this.fileMetadata(actor, fileId, requestId)).file };
+    }
+    if (target.status !== "pending" || target.storage_path !== base) {
+      throw new AppError("FORBIDDEN", "Arquivo indisponível.", requestId);
+    }
+    const { data: signed, error: signedError } = await this.admin.storage.from("submissions").createSignedUrl(target.storage_path, 30);
+    if (signedError || !signed) throw new AppError("INTERNAL_ERROR", "Não foi possível verificar o arquivo.", requestId);
+    const response = await fetch(signed.signedUrl, { signal: AbortSignal.timeout(10_000), redirect: "error", cache: "no-store" });
+    if (!response.ok || !response.body) throw new AppError("INTERNAL_ERROR", "Não foi possível verificar o arquivo.", requestId);
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > target.size_bytes) throw new AppError("VALIDATION_ERROR", "Arquivo excede o tamanho autorizado.", requestId);
+        chunks.push(value);
+      }
+    } finally { await reader.cancel(); }
+    const bytes = new Uint8Array(size);
+    let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+    return { state: "pending", bytes, contentType: target.content_type, sizeBytes: target.size_bytes, storagePath: base };
   }
   async fileMetadata(
     actor: StudentActor,
@@ -241,6 +308,7 @@ export class ActivitySubmissionFilesRepository implements ActivitySubmissionFile
         p_tenant_id: actor.tenantId,
         p_actor_user_id: actor.userId,
         p_file_id: fileId,
+        p_encryption_key: this.encryptionKey(),
       },
       requestId,
     )) as Record<string, unknown>;

@@ -3,7 +3,7 @@ import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
-import type { AdminStudentAttendanceEntry, CurriculumOption, Page, PendingMakeup } from "@/specs/api.contracts";
+import type { AdminSessionContext, AdminStudentAttendanceEntry, CurriculumOption, Page, PendingMakeup, SessionSummary } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
 import { getAdminSupabaseEnv } from "@/src/lib/supabase/env";
 import { mapRpcError } from "@/src/lib/supabase/rpc-error";
@@ -12,6 +12,8 @@ import type { MakeupsQuery, StudentAttendanceQuery } from "@/src/modules/admin-o
 export type AdminActor = Readonly<{ tenantId: string; userId: string }>;
 
 export interface AdminOperationsStore {
+  sessionContext(actor: AdminActor, sessionId: string, requestId: string): Promise<AdminSessionContext>;
+  enrollmentCalendar(actor: AdminActor, enrollmentId: string, requestId: string): Promise<readonly SessionSummary[]>;
   pendingMakeups(actor: AdminActor, query: MakeupsQuery, requestId: string): Promise<Page<PendingMakeup>>;
   activeCurricula(actor: AdminActor, requestId: string): Promise<readonly CurriculumOption[]>;
   studentAttendance(actor: AdminActor, query: StudentAttendanceQuery, requestId: string): Promise<Page<AdminStudentAttendanceEntry>>;
@@ -25,6 +27,21 @@ const SessionSummarySchema = z.object({
   endsAt: z.string(),
   status: z.enum(["scheduled", "completed", "rescheduled", "cancelled"]),
 });
+
+const EnrollmentSummarySchema = z.object({
+  id: z.string().uuid(), studentId: z.string().uuid(), studentName: z.string(), curriculumName: z.string(),
+  kind: z.enum(["class", "individual"]), classId: z.string().uuid().nullable(),
+  status: z.enum(["invited", "active", "paused", "completed", "cancelled"]),
+  activatedAt: z.string().nullable(), completedAt: z.string().nullable(),
+});
+const SessionContextSchema = z.object({
+  session: SessionSummarySchema, classId: z.string().uuid().nullable(),
+  enrollmentId: z.string().uuid().nullable(), studentId: z.string().uuid().nullable(),
+  enrollments: z.array(EnrollmentSummarySchema),
+}).refine((value) => value.classId !== null
+  ? value.enrollmentId === null && value.studentId === null
+  : value.enrollmentId !== null && value.studentId !== null);
+const CalendarResultSchema = z.object({ items: z.array(SessionSummarySchema) });
 
 const PendingMakeupSchema = z.object({
   attendanceId: z.string().uuid(),
@@ -74,6 +91,25 @@ export class AdminOperationsRepository implements AdminOperationsStore {
     this.client = createClient(this.env.NEXT_PUBLIC_SUPABASE_URL, this.env.SUPABASE_SECRET_KEY, {
       auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
     });
+  }
+
+  async sessionContext(actor: AdminActor, sessionId: string, requestId: string): Promise<AdminSessionContext> {
+    const data = await this.rpc("admin_session_context", {
+      p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId,
+      p_session_id: sessionId, p_encryption_key: this.env.PII_ENCRYPTION_KEY,
+    }, requestId);
+    const parsed = SessionContextSchema.safeParse(data);
+    if (!parsed.success) throw new AppError("INTERNAL_ERROR", "Contexto do encontro inválido.", requestId);
+    return parsed.data;
+  }
+
+  async enrollmentCalendar(actor: AdminActor, enrollmentId: string, requestId: string): Promise<readonly SessionSummary[]> {
+    const data = await this.rpc("admin_enrollment_calendar", {
+      p_tenant_id: actor.tenantId, p_actor_user_id: actor.userId, p_enrollment_id: enrollmentId,
+    }, requestId);
+    const parsed = CalendarResultSchema.safeParse(data);
+    if (!parsed.success) throw new AppError("INTERNAL_ERROR", "Calendário da matrícula inválido.", requestId);
+    return parsed.data.items;
   }
 
   async pendingMakeups(actor: AdminActor, query: MakeupsQuery, requestId: string): Promise<Page<PendingMakeup>> {

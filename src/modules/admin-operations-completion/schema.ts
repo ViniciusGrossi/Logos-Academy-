@@ -16,6 +16,8 @@ export const MakeupsQuerySchema = z.object({
 export const CurriculaQuerySchema = z.object({}).strict();
 
 export const StudentPathSchema = z.object({ studentId: Uuid }).strict();
+export const SessionPathSchema = z.object({ sessionId: Uuid }).strict();
+export const EnrollmentPathSchema = z.object({ enrollmentId: Uuid }).strict();
 
 /** SR-A6 (Release 2): aba Frequência da ficha do aluno. */
 export const StudentAttendanceQuerySchema = StudentPathSchema.extend({

@@ -2,9 +2,11 @@
 
 import { CalendarClock, CheckCircle2, Wrench } from "lucide-react";
 import { type FormEvent, useState } from "react";
-import type { Page, PendingMakeup } from "@/specs/api.contracts";
+import type { PendingMakeup } from "@/specs/api.contracts";
 import { MagneticAction, PageHeader, StateScene, StatusBadge } from "@/components/academy";
-import { apiMutation, useLiveApi } from "@/components/prototype/live-api";
+import { apiMutation } from "@/components/prototype/live-api";
+import { useAdminPagination } from "./use-admin-pagination";
+import { AdminPagination } from "./admin-pagination";
 import styles from "./admin-experience.module.css";
 
 function dateTimeLocal(value: string) {
@@ -18,7 +20,8 @@ function formatSession(value: PendingMakeup["session"]) {
 }
 
 export function AdminMakeups() {
-  const { data, error, loading, reload } = useLiveApi<Page<PendingMakeup>>("/api/admin/makeups?limit=30");
+  const pagination = useAdminPagination<PendingMakeup>("/api/admin/makeups?limit=30");
+  const { data, error, loading, reload } = pagination;
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -57,6 +60,7 @@ export function AdminMakeups() {
         </form>
       </article>)}</div>
     </section>}
+    <AdminPagination {...pagination} />
     <section className={styles.paper}><div className={styles.paperHeader}><div><h2>Como a rota funciona</h2><p>A reposição não substitui nem mascara a falta: ela a complementa com uma evidência de recomposição.</p></div><CalendarClock aria-hidden="true" /></div></section>
   </div>;
 }

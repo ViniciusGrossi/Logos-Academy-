@@ -1,10 +1,20 @@
-import type { AdminStudentAttendanceEntry, CurriculumOption, Page, PendingMakeup } from "@/specs/api.contracts";
+import type { AdminSessionContext, AdminStudentAttendanceEntry, CurriculumOption, Page, PendingMakeup, SessionSummary } from "@/specs/api.contracts";
 import { AppError } from "@/src/lib/api-error";
-import { MakeupsQuerySchema, StudentAttendanceQuerySchema } from "@/src/modules/admin-operations-completion/schema";
+import { EnrollmentPathSchema, MakeupsQuerySchema, SessionPathSchema, StudentAttendanceQuerySchema } from "@/src/modules/admin-operations-completion/schema";
 import type { AdminActor, AdminOperationsStore } from "@/src/modules/admin-operations-completion/repository";
 
 export class AdminOperationsService {
   constructor(private readonly repository: AdminOperationsStore) {}
+
+  async sessionContext(actor: AdminActor, input: unknown, requestId: string): Promise<AdminSessionContext> {
+    const { sessionId } = parse(SessionPathSchema, input, requestId);
+    return this.repository.sessionContext(actor, sessionId, requestId);
+  }
+
+  async enrollmentCalendar(actor: AdminActor, input: unknown, requestId: string): Promise<readonly SessionSummary[]> {
+    const { enrollmentId } = parse(EnrollmentPathSchema, input, requestId);
+    return this.repository.enrollmentCalendar(actor, enrollmentId, requestId);
+  }
 
   /** SR-A2 */
   async pendingMakeups(actor: AdminActor, query: unknown, requestId: string): Promise<Page<PendingMakeup>> {

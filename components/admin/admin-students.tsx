@@ -11,8 +11,11 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademySelect } from "./academy-select";
 import { AdminInviteStudent } from "./admin-invite-student";
-import { useAdminStudent, useAdminStudentAttendance, useAdminStudentSubmissions, useAdminStudents, useEnrollmentCompletion } from "./admin-data";
+import { useAdminStudent, useAdminStudentAttendance, useAdminStudentSubmissions, useAdminStudents, useEnrollmentCompletion, useAdminEnrollmentCalendar } from "./admin-data";
 import { hasStudentRisk, matchesRisk, type RiskFilter } from "./admin-utils";
+import { useAdminUrlState } from "./use-admin-url-state";
+import { AdminPagination } from "./admin-pagination";
+import { AdminEnrollmentSheet } from "./admin-enrollment-sheet";
 import styles from "./admin-experience.module.css";
 
 function studentTone(student: StudentSummary): "warning" | "success" {
@@ -30,13 +33,16 @@ const studentDetailTabs = [
 ] as const;
 
 type StudentDetailTab = (typeof studentDetailTabs)[number]["value"];
+const studentTabValues = studentDetailTabs.map((tab) => tab.value);
+const studentRiskValues: readonly RiskFilter[] = ["all", "attention", "clear"];
 
 export function AdminStudents() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useAdminUrlState<string>("search", "");
   const [inviteOpen, setInviteOpen] = useState(false);
   const deferredSearch = useDeferredValue(search);
-  const [risk, setRisk] = useState<RiskFilter>("all");
-  const { data, error, loading, reload } = useAdminStudents(deferredSearch);
+  const [risk, setRisk] = useAdminUrlState<RiskFilter>("risk", "all", studentRiskValues);
+  const studentPage = useAdminStudents(deferredSearch);
+  const { data, error, loading, reload } = studentPage;
   const students = useMemo(() => (data?.items ?? []).filter((student) => matchesRisk(student, risk)), [data, risk]);
   const attention = data?.items.filter(hasStudentRisk).length ?? 0;
 
@@ -55,7 +61,7 @@ export function AdminStudents() {
         action={<MagneticAction><button type="button" className={styles.toolbarAction} onClick={() => setInviteOpen(true)}><UserRoundPlus size={17} aria-hidden="true" /> Convidar aluno</button></MagneticAction>}
       />
       <MetricStrip metrics={[
-        { id: "visible", label: "Alunos encontrados", value: String(data?.items.length ?? 0), detail: "na consulta atual" },
+        { id: "visible", label: "Alunos nesta página", value: String(data?.items.length ?? 0), detail: "percorra todas as páginas" },
         { id: "attention", label: "Pedem atenção", value: String(attention), detail: "atividade ou reposição", emphasis: attention > 0 },
         { id: "clear", label: "Sem pendências", value: String((data?.items.length ?? 0) - attention), detail: "ritmo preservado" },
       ]} />
@@ -99,6 +105,7 @@ export function AdminStudents() {
           )} />
         </SpotlightCard>
       )}
+      <AdminPagination {...studentPage} />
       <AdminInviteStudent open={inviteOpen} onOpenChange={setInviteOpen} onCreated={reload} />
     </div>
   );
@@ -106,7 +113,7 @@ export function AdminStudents() {
 
 export function AdminStudentDetail({ studentId }: { studentId: string }) {
   const { data, error, loading, reload } = useAdminStudent(studentId);
-  const [activeTab, setActiveTab] = useState<StudentDetailTab>("overview");
+  const [activeTab, setActiveTab] = useAdminUrlState<StudentDetailTab>("tab", "overview", studentTabValues);
   const reduceMotion = useReducedMotion();
   if (loading) return <StateScene state="loading" title="Abrindo prontuário pedagógico" description="Reunindo matrícula, projetos e consentimento." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
@@ -122,7 +129,7 @@ export function AdminStudentDetail({ studentId }: { studentId: string }) {
         title={student.displayName}
         description={`${student.email} · acompanhamento individual dentro da Logos Academy.`}
         marker={`ID ${student.id.slice(0, 8)}`}
-        action={<StatusBadge tone={studentTone(student)}>{hasStudentRisk(student) ? "Pede atenção" : "Em dia"}</StatusBadge>}
+        action={<div className={styles.formActions}><StatusBadge tone={studentTone(student)}>{hasStudentRisk(student) ? "Pede atenção" : "Em dia"}</StatusBadge><AdminEnrollmentSheet studentId={student.id} studentName={student.displayName} afterSave={reload} /></div>}
       />
       <MetricStrip metrics={[
         { id: "enrollments", label: "Matrículas ativas", value: String(student.activeEnrollmentCount), detail: "turma ou individual" },
@@ -160,7 +167,12 @@ export function AdminStudentDetail({ studentId }: { studentId: string }) {
 }
 
 function StudentSubmissions({ studentId }: { studentId: string }) {
-  const { data, error, loading, reload } = useAdminStudentSubmissions(studentId);
+  const pagination = useAdminStudentSubmissions(studentId);
+  return <><StudentSubmissionsPage query={pagination} /><AdminPagination {...pagination} /></>;
+}
+
+function StudentSubmissionsPage({ query }: { query: ReturnType<typeof useAdminStudentSubmissions> }) {
+  const { data, error, loading, reload } = query;
   if (loading) return <StateScene state="loading" title="Lendo entregas" description="Carregando versões, atividade e estado de revisão." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
   const items = data?.items ?? [];
@@ -169,7 +181,12 @@ function StudentSubmissions({ studentId }: { studentId: string }) {
 }
 
 function StudentAttendance({ studentId }: { studentId: string }) {
-  const { data, error, loading, reload } = useAdminStudentAttendance(studentId);
+  const pagination = useAdminStudentAttendance(studentId);
+  return <><StudentAttendancePage query={pagination} /><AdminPagination {...pagination} /></>;
+}
+
+function StudentAttendancePage({ query }: { query: ReturnType<typeof useAdminStudentAttendance> }) {
+  const { data, error, loading, reload } = query;
   if (loading) return <StateScene state="loading" title="Lendo frequência" description="Reunindo encontro original, status e eventual reposição." />;
   if (error) return <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} />;
   const items = data?.items ?? [];
@@ -207,10 +224,30 @@ function EnrollmentList({ enrollments, reload }: { enrollments: readonly Enrollm
 
 function EnrollmentLifecycle({ enrollment, reload }: { enrollment: EnrollmentSummary; reload: () => Promise<void> }) {
   const [pending, setPending] = useState(false); const [notice, setNotice] = useState<string | null>(null); const [check, setCheck] = useState<CompletionCheck | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
   async function changeStatus(status: "active" | "paused" | "cancelled") { setPending(true); setNotice(null); try { await apiMutation(`/api/admin/enrollments/${enrollment.id}`, "PATCH", { status }); await reload(); setNotice("Status da matrícula atualizado."); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível atualizar a matrícula."); } finally { setPending(false); } }
   async function inspectCompletion() { setPending(true); setNotice(null); try { setCheck(await apiQuery<CompletionCheck>(`/api/admin/enrollments/${enrollment.id}/completion`)); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível conferir a conclusão."); } finally { setPending(false); } }
   async function complete() { setPending(true); setNotice(null); try { await apiMutation(`/api/admin/enrollments/${enrollment.id}/complete`, "POST", {}); await reload(); setNotice("Matrícula concluída."); } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível concluir a matrícula."); } finally { setPending(false); } }
-  return <article className={styles.attendanceRow}><div className={styles.rowIdentity}><span className={styles.avatar}>{enrollment.kind === "class" ? "T" : "I"}</span><span className={styles.rowCopy}><strong>{enrollment.curriculumName}</strong><small>{enrollment.kind === "class" ? "Turma" : "Individual"} · {enrollment.completedAt ? `concluída em ${formatDate(enrollment.completedAt)}` : "percurso em andamento"}</small></span></div><div className={styles.formActions}><StatusBadge tone={enrollment.status === "active" ? "success" : enrollment.status === "paused" ? "warning" : "neutral"}>{enrollment.status}</StatusBadge>{enrollment.status !== "completed" && <><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void changeStatus(enrollment.status === "paused" ? "active" : "paused")}>{enrollment.status === "paused" ? "Reativar" : "Pausar"}</button><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void inspectCompletion()}>Conferir conclusão</button></>} </div>{check && <div className={check.eligible ? styles.notice : styles.warning}><strong>{check.eligible ? "Pronta para conclusão" : "Conclusão bloqueada"}</strong><p>{check.blockers.length ? check.blockers.join(" · ") : "Todos os requisitos foram atendidos."}</p>{check.eligible && <button type="button" className={styles.toolbarAction} disabled={pending} onClick={() => void complete()}>Concluir matrícula</button>}</div>}{notice && <p className={styles.notice} role="status">{notice}</p>}</article>;
+  const mutable = enrollment.status !== "completed" && enrollment.status !== "cancelled";
+  return <article className={styles.attendanceRow}>
+    <div className={styles.rowIdentity}><span className={styles.avatar}>{enrollment.kind === "class" ? "T" : "I"}</span><span className={styles.rowCopy}><strong>{enrollment.curriculumName}</strong><small>{enrollment.kind === "class" ? "Turma" : "Individual"} · {enrollment.completedAt ? `concluída em ${formatDate(enrollment.completedAt)}` : "percurso em andamento"}</small></span></div>
+    <div className={styles.formActions}>
+      <StatusBadge tone={enrollment.status === "active" ? "success" : enrollment.status === "paused" ? "warning" : "neutral"}>{enrollment.status}</StatusBadge>
+      {enrollment.kind === "individual" && <IndividualCalendar enrollmentId={enrollment.id} />}
+      {mutable && <><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void changeStatus(enrollment.status === "paused" ? "active" : "paused")}>{enrollment.status === "paused" ? "Reativar" : "Pausar"}</button><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => void inspectCompletion()}>Conferir conclusão</button><button type="button" className={styles.dangerAction} disabled={pending} onClick={() => setCancelOpen(true)}>Cancelar matrícula</button></>}
+    </div>
+    {cancelOpen && <div className={styles.warning} role="group" aria-label="Confirmar cancelamento da matrícula"><strong>Cancelar esta matrícula?</strong><p>O histórico será preservado e o percurso deixará de estar ativo.</p><div className={styles.formActions}><button type="button" className={styles.secondaryAction} disabled={pending} onClick={() => setCancelOpen(false)}>Manter matrícula</button><button type="button" className={styles.dangerAction} disabled={pending} onClick={() => { setCancelOpen(false); void changeStatus("cancelled"); }}>Confirmar cancelamento</button></div></div>}
+    {check && <div className={check.eligible ? styles.notice : styles.warning}><strong>{check.eligible ? "Pronta para conclusão" : "Conclusão bloqueada"}</strong><p>{check.blockers.length ? check.blockers.join(" · ") : "Todos os requisitos foram atendidos."}</p>{check.eligible && mutable && <button type="button" className={styles.toolbarAction} disabled={pending} onClick={() => void complete()}>Concluir matrícula</button>}</div>}
+    {notice && <p className={styles.notice} role="status">{notice}</p>}
+  </article>;
+}
+
+function IndividualCalendar({ enrollmentId }: { enrollmentId: string }) {
+  const [open, setOpen] = useState(false);
+  const { data, loading, error, reload } = useAdminEnrollmentCalendar(open ? enrollmentId : undefined);
+  return <><button type="button" className={styles.secondaryAction} onClick={() => setOpen(true)}>Calendário individual</button><Sheet open={open} onOpenChange={setOpen}><SheetContent className={`${styles.paperBody} overflow-y-auto`}><SheetHeader><SheetTitle>Calendário individual</SheetTitle><SheetDescription>Os encontros pertencem somente a esta matrícula.</SheetDescription></SheetHeader>
+    {loading ? <StateScene state="loading" title="Lendo encontros" /> : error ? <StateScene state="error" description={error.message} action={<button className={styles.secondaryAction} onClick={() => void reload()}>Tentar novamente</button>} /> : !data?.length ? <StateScene state="empty" title="Nenhum encontro agendado" /> : <div className={styles.timeline}>{data.map((session) => <Link className={styles.timelineRow} key={session.id} href={`/admin/encontros/${session.id}`}><span className={styles.timelineIndex}>{String(session.lessonPosition).padStart(2, "0")}</span><span className={styles.timelineCopy}><strong>{session.lessonTitle}</strong><small>{formatDate(session.startsAt)}</small></span></Link>)}</div>}
+  </SheetContent></Sheet></>;
 }
 
 function ProjectList({ projects }: { projects: readonly ProjectSummary[] }) {
@@ -222,14 +259,16 @@ function ConsentPanel({ studentId, guardian, consent, reload }: { studentId: str
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [revocationReason, setRevocationReason] = useState("");
+  const [physicalCopyArchived, setPhysicalCopyArchived] = useState(false);
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setPending(true); setNotice(null);
     const form = new FormData(event.currentTarget);
     try {
+      if (!physicalCopyArchived) throw new Error("Confirme que a via física assinada está arquivada.");
       await apiMutation<ConsentRecord>(`/api/admin/students/${studentId}/consent`, "PUT", {
         guardian: { name: String(form.get("name")), relationship: String(form.get("relationship")), email: String(form.get("email")) || undefined, phone: String(form.get("phone")) || undefined },
-        termVersion: String(form.get("termVersion")), signedAt: String(form.get("signedAt")), physicalCopyArchived: true,
+        termVersion: String(form.get("termVersion")), signedAt: String(form.get("signedAt")), physicalCopyArchived,
       });
       setNotice("Consentimento e responsável atualizados."); await reload();
     } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Não foi possível atualizar o consentimento."); }
@@ -255,7 +294,7 @@ function ConsentPanel({ studentId, guardian, consent, reload }: { studentId: str
           <Field label="Versão do termo" name="termVersion" defaultValue={consent.termVersion} required />
           <Field label="Data da assinatura" name="signedAt" type="date" defaultValue={consent.signedAt ?? ""} required />
         </div>
-        <p className={styles.notice}>Ao salvar, você confirma que a via física assinada está arquivada.</p>
+        <label className={styles.choice}><input type="checkbox" checked={physicalCopyArchived} onChange={(event) => setPhysicalCopyArchived(event.target.checked)} disabled={pending} required /> Confirmo que a via física assinada está arquivada.</label>
         {notice && <p className={styles.notice} role="status">{notice}</p>}
         <div className={styles.formActions}><MagneticAction><button className={styles.toolbarAction} disabled={pending}>{pending ? "Salvando…" : "Salvar registro"}</button></MagneticAction></div>
       </form>

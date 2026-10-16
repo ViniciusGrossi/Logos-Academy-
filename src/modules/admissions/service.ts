@@ -89,7 +89,7 @@ function parse<T>(schema: { safeParse(value: unknown): { success: true; data: T 
 
 function sessionsFor(schedule: ScheduleInput): readonly SessionSummary[] {
   const dates = eachMeetingDate(schedule.startsOn, schedule.weekdays, 16);
-  return dates.map((date, index) => { const start = localToUtc(date, schedule.startsAtLocal[index % 2], schedule.timezone); const end = new Date(start.getTime() + schedule.durationMinutes * 60_000); return { id: crypto.randomUUID(), lessonPosition: index + 1, lessonTitle: `Aula ${index + 1}`, startsAt: start.toISOString(), endsAt: end.toISOString(), status: "scheduled" }; });
+  return dates.map((date, index) => { const weekday = new Date(`${date}T00:00:00.000Z`).getUTCDay(); const time = schedule.startsAtLocal[weekday === schedule.weekdays[0] ? 0 : 1]; const start = localToUtc(date, time, schedule.timezone); const end = new Date(start.getTime() + schedule.durationMinutes * 60_000); return { id: crypto.randomUUID(), lessonPosition: index + 1, lessonTitle: `Aula ${index + 1}`, startsAt: start.toISOString(), endsAt: end.toISOString(), status: "scheduled" }; });
 }
 
 function eachMeetingDate(startsOn: string, weekdays: readonly [number, number], count: number): string[] { const cursor = new Date(`${startsOn}T00:00:00.000Z`); const dates: string[] = []; while (dates.length < count) { if (weekdays.includes(cursor.getUTCDay())) dates.push(cursor.toISOString().slice(0, 10)); cursor.setUTCDate(cursor.getUTCDate() + 1); } return dates; }

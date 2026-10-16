@@ -1,0 +1,42 @@
+# Descritor somente para auditar a configuração do projeto Supabase compartilhado.
+# Nunca execute `config push` com o config.toml raiz contra produção: ele é o
+# ambiente isolado da Academy usado pelo CI e deliberadamente não conhece schemas
+# de outros produtos Logos.
+project_id = "logos-academy-platform"
+
+[api]
+enabled = true
+schemas = ["graphql_public", "concurso", "DM AI", "Logus_Tech_Oficinas", "logos_polis", "DM AI_bronze", "DM AI_gold_cs", "DM AI_gold_pricing", "DM AI_gold_sales", "DM AI_silver", "logos_platform", "padaria", "paideia", "delphi", "public", "gold", "Projeto-Brasil-IA", "silver", "bronze", "iris", "iris_private", "logos_academy"]
+extra_search_path = ["extensions", "Logus_Tech_Oficinas", "concurso", "DM AI", "logos_polis", "padaria", "delphi", "gold", "bronze", "silver", "Projeto-Brasil-IA"]
+
+[db]
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "https://logos-academy-three.vercel.app"
+additional_redirect_urls = [
+  "https://063a2c9c-f50c-4107-9459-9e2be79c6077.lovableproject.com/**",
+  "https://id-preview--063a2c9c-f50c-4107-9459-9e2be79c6077.lovable.app/**",
+  "http://localhost:3000/**",
+  "http://127.0.0.1:3000/**",
+  "https://logos-academy-three.vercel.app/ativar",
+]
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[storage.buckets.submissions]
+public = false
+file_size_limit = "20MiB"
+allowed_mime_types = [
+  "application/pdf",
+  "text/plain",
+  "text/markdown",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]

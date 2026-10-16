@@ -29,6 +29,7 @@ const pedagogy = {
 } as const;
 
 class Store implements ActivitySubmissionFilesStore {
+  async uploadInspection(): Promise<never> { throw new Error("not used"); }
   async getProfile() {
     return { id: actor.userId, displayName: "Aluno", githubUsername: null };
   }

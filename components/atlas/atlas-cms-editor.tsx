@@ -6,6 +6,7 @@ import type { AdminAtlasDetail, AdminAtlasDraftInput, AdminAtlasRevisionListItem
 import { AtlasItemRenderer } from "./atlas-item-renderer";
 import { AtlasTagsField, AtlasBlockPicker } from "./atlas-editor-controls";
 import { AtlasBlockEditor, blockLabels, createAtlasBlock, EditorField } from "./atlas-block-editor";
+import { duplicateAtlasBlock, restoreRemovedBlock } from "./atlas-block-operations";
 import { atlasKindLabels, atlasStatusLabels } from "./atlas-cms-library";
 import { EditorialConfirmation, EditorialRegionState, AnimatedCollectionTabs } from "@/src/components/ui-shared/admin-editorial";
 import { useAtlasAssetUpload, useAtlasMutation, useAtlasOptions, useAtlasQuery } from "@/src/hooks/use-atlas-cms";
@@ -20,6 +21,7 @@ export function AtlasCmsEditor({ itemId }: { itemId: string }) {
   const [detail, setDetail] = useState<AdminAtlasDetail | null>(null); const [draft, setDraft] = useState<AdminAtlasDraftInput | null>(null);
   const [selected, setSelected] = useState("metadata"); const [panel, setPanel] = useState("properties"); const [add, setAdd] = useState(false); const [history, setHistory] = useState(false); const [assets, setAssets] = useState(false);
   const [confirm, setConfirm] = useState<Confirmation>(null); const [notice, setNotice] = useState(""); const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [removed, setRemoved] = useState<{ block: AtlasContentBlock; index: number } | null>(null);
   const [width, setWidth] = useState(768); const [previewDark, setPreviewDark] = useState(false); const [fullPreview, setFullPreview] = useState(false); const [publishedPreview, setPublishedPreview] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (source.data) { setDetail(source.data); setDraft(structuredClone(source.data.draft)); } }, [source.data]);
@@ -35,7 +37,7 @@ export function AtlasCmsEditor({ itemId }: { itemId: string }) {
   const current = withDraft(detail, draft); const publication = publicationErrors(current); const pendingCount = Object.values(publication).flat().length;
   const block = draft.contentBlocks.find((b) => b.id === selected);
   const viewed = publishedPreview && detail.published ? detail.published : draft;
-  function adopt(next: AdminAtlasDetail) { setDetail(next); setDraft(structuredClone(next.draft)); setErrors({}); }
+  function adopt(next: AdminAtlasDetail) { setDetail(next); setDraft(structuredClone(next.draft)); setErrors({}); setRemoved(null); }
   function updateBlock(next: AtlasContentBlock) { setDraft((previous) => previous ? { ...previous, contentBlocks: previous.contentBlocks.map((b) => b.id === next.id ? next : b) } : previous); }
   function reorder(index: number, delta: number) { if (!draft) return; const blocks = [...draft.contentBlocks]; const next = index + delta; if (next < 0 || next >= blocks.length) return; [blocks[index], blocks[next]] = [blocks[next], blocks[index]]; setDraft({ ...draft, contentBlocks: blocks }); }
   async function save(): Promise<AdminAtlasDetail | null> {
@@ -46,7 +48,7 @@ export function AtlasCmsEditor({ itemId }: { itemId: string }) {
   }
   async function execute() {
     if (!detail || !draft || !confirm) return;
-    if (confirm.type === "remove") { setDraft({ ...draft, contentBlocks: draft.contentBlocks.filter((b) => b.id !== confirm.blockId) }); setSelected("metadata"); setConfirm(null); return; }
+    if (confirm.type === "remove") { const index = draft.contentBlocks.findIndex((b) => b.id === confirm.blockId); if (index >= 0) setRemoved({ block: structuredClone(draft.contentBlocks[index]), index }); setDraft({ ...draft, contentBlocks: draft.contentBlocks.filter((b) => b.id !== confirm.blockId) }); setSelected("metadata"); setConfirm(null); return; }
     if (confirm.type === "leave") { setConfirm(null); window.location.assign("/admin/atlas"); return; }
     try {
       let next: AdminAtlasDetail;
@@ -61,10 +63,24 @@ export function AtlasCmsEditor({ itemId }: { itemId: string }) {
     } catch { /* mutation exposes the action error without discarding local edits */ }
   }
   function addBlock(type: AtlasContentBlock["type"]) { const next = createAtlasBlock(type); setDraft({ ...draft!, contentBlocks: [...draft!.contentBlocks, next] }); setSelected(next.id); setPanel("properties"); setAdd(false); }
+  function duplicateSelected() {
+    if (!draft || !block || mutation.pending) return;
+    const blocks = duplicateAtlasBlock(draft.contentBlocks, block.id);
+    const index = blocks.findIndex((entry) => entry.id === block.id);
+    setDraft({ ...draft, contentBlocks: blocks });
+    setSelected(blocks[index + 1]?.id ?? block.id);
+    setNotice("Bloco duplicado. Edite a cópia sem alterar o original.");
+  }
+  function undoRemove() {
+    if (!draft || !removed || mutation.pending || draft.contentBlocks.length >= 100) return;
+    setDraft({ ...draft, contentBlocks: restoreRemovedBlock(draft.contentBlocks, removed) });
+    setSelected(removed.block.id); setRemoved(null); setNotice("Remoção desfeita. As demais alterações foram preservadas.");
+  }
   const preview = <div className={styles.previewPaper} data-dark={previewDark} style={{ "--atlas-preview-width": `${width}px` } as React.CSSProperties}><div className={styles.previewIntro}><span>{atlasKindLabels[viewed.kind]}</span><h1>{viewed.title || "Título do conteúdo"}</h1><p>{viewed.summary}</p>{viewed.video && <div className={styles.videoCard}><strong>{viewed.video.title}</strong><span>Vídeo · {viewed.video.durationMinutes} min</span><a href={`https://www.youtube.com/watch?v=${viewed.video.youtubeId}`} target="_blank" rel="noopener noreferrer">Abrir vídeo</a><details><summary>Transcrição</summary><p>{viewed.video.transcript ?? "Adicione a transcrição."}</p></details></div>}</div><AtlasItemRenderer contentBlocks={viewed.contentBlocks} artifact={viewed.artifact} resolvedAssets={detail.resolvedAssets} mode={publishedPreview ? "reader" : "preview"} selectedBlockId={selected} onSelectBlock={publishedPreview ? undefined : (id) => { setSelected(id); setPanel("properties"); }} /></div>;
   return <div className={styles.editor}>
     <header className={styles.editorTop}><button className={styles.back} onClick={() => dirty ? setConfirm({ type: "leave" }) : window.location.assign("/admin/atlas")}><ArrowLeft />Atlas</button><span className={styles.editorKind}>{atlasKindLabels[draft.kind]}</span><strong className={styles.editorTitle}>{draft.title || "Novo conteúdo"}</strong><span className={styles.status} data-status={detail.status}>{atlasStatusLabels[detail.status]}</span><span className={styles.savedSignal} aria-live="polite">{dirty ? "Alterações não salvas" : detail.draftUpdatedAt ? `Salvo ${new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date(detail.draftUpdatedAt))}` : "Rascunho inicial"}</span><div className={styles.editorActions}><button className={styles.secondary} onClick={() => setHistory(true)}><History />Histórico</button><button className={styles.secondary} onClick={() => setAssets(true)}><Upload />Assets</button><button className={styles.secondary} onClick={() => void save()} disabled={mutation.pending}><Save />Salvar rascunho</button><button className={styles.primary} disabled={mutation.pending} onClick={() => { mutation.clearError(); setConfirm({ type: "publish" }); }}>Publicar{pendingCount > 0 ? ` · ${pendingCount}` : ""}</button></div></header>
     {(notice || mutation.error) && <div className={mutation.error ? styles.error : styles.notice} role={mutation.error ? "alert" : "status"}>{mutation.error ?? notice}{mutation.error?.includes("outra sessão") && <button onClick={() => { if (!dirty || window.confirm("Recarregar descartará as alterações locais. Continuar?")) void source.reload(); }}>Recarregar conteúdo</button>}</div>}
+    {(block || removed) && <div className={styles.editorActions} aria-label="Ações do bloco selecionado">{block && <button type="button" className={styles.secondary} disabled={mutation.pending || draft.contentBlocks.length >= 100} onClick={duplicateSelected}>Duplicar bloco selecionado</button>}{removed && <button type="button" className={styles.secondary} disabled={mutation.pending || draft.contentBlocks.length >= 100} onClick={undoRemove}>Desfazer remoção do bloco</button>}</div>}
     <div className={styles.mobileEditorTabs}><AnimatedCollectionTabs value={panel} onChange={setPanel} items={[{ id: "structure", label: "Estrutura", panelId: "atlas-structure" }, { id: "properties", label: "Propriedades", panelId: "atlas-properties" }, { id: "preview", label: "Preview", panelId: "atlas-preview" }]} /></div>
     <div className={styles.editorGrid} data-panel={panel}>
 <aside className={styles.structure} id="atlas-structure" aria-label="Estrutura"><header><span className={styles.eyebrow}>Estrutura</span><small>{draft.contentBlocks.length} blocos</small></header><button className={styles.metadataNode} disabled={mutation.pending} aria-pressed={selected === "metadata"} onClick={() => { setSelected("metadata"); setPanel("properties"); }}><strong>Metadados do conteúdo</strong><small>{Object.entries(publication).filter(([key]) => !key.startsWith("contentBlocks")).length} pendências</small></button><ol>{draft.contentBlocks.map((b, index) => <li key={b.id} data-selected={selected === b.id} data-hidden={!b.isVisible}><button className={styles.structureNode} disabled={mutation.pending} onClick={() => { setSelected(b.id); setPanel("properties"); }}><span>{String(index + 1).padStart(2, "0")}</span><strong>{"heading" in b ? b.heading : blockLabels[b.type]}</strong><small>{blockLabels[b.type]}{!b.isVisible ? " · oculto" : ""}</small></button><div className={styles.blockActions}><button title="Mover para cima" aria-label={`Mover bloco ${index + 1} para cima`} disabled={index === 0 || mutation.pending} onClick={() => reorder(index, -1)}><ArrowUp /></button><button title="Mover para baixo" aria-label={`Mover bloco ${index + 1} para baixo`} disabled={index === draft.contentBlocks.length - 1 || mutation.pending} onClick={() => reorder(index, 1)}><ArrowDown /></button></div></li>)}</ol><button className={styles.addBlock} disabled={mutation.pending || draft.contentBlocks.length >= 100} onClick={() => setAdd(true)}><Plus />Adicionar bloco</button><button className={styles.archiveButton} disabled={detail.status === "archived" || mutation.pending} onClick={() => { mutation.clearError(); setConfirm({ type: "archive" }); }}>Arquivar conteúdo</button></aside>
