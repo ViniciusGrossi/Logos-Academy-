@@ -330,10 +330,13 @@ try {
   await checkpoint('sixteen-lessons-four-projects-and-absence-blocker', async () => {
     for (let index = 0; index < calendar.length; index++) {
       const session = calendar[index];
+      const release = index === 0
+        ? { assignmentIds: [firstAssignment] }
+        : await success('admin', `/api/admin/sessions/${session.id}/release`, 'POST', { target: { kind: 'all_active_enrollments' }, dueAt: new Date(Date.now() + 86400000).toISOString() });
+      await success('admin', `/api/admin/sessions/${session.id}`, 'PATCH', { status: 'completed' });
       const attendance = await success('admin', `/api/admin/sessions/${session.id}/attendance`, 'PUT', { entries: [{ enrollmentId: student.enrollmentId, status: index === 3 ? 'absent' : 'present', privateNote: 'E2E nota privada não visível ao aluno' }] });
       if (index === 3) absentRecord = attendance.find((item) => item.enrollmentId === student.enrollmentId);
       if (index === 0) continue;
-      const release = await success('admin', `/api/admin/sessions/${session.id}/release`, 'POST', { target: { kind: 'all_active_enrollments' }, dueAt: new Date(Date.now() + 86400000).toISOString() });
       const assignmentId = release.assignmentIds[0];
       const activity = await success('student', `/api/student/activities/${assignmentId}`);
       const items = [];
