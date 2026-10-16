@@ -3,7 +3,7 @@
 ## Estado verificado
 
 - A URL pública padrão do Supabase Auth foi corrigida para `https://logos-academy-three.vercel.app`.
-- O diff posterior não possui atualizações pendentes; sete propriedades remotas de outros serviços permanecem explicitamente preservadas.
+- O diff posterior não possui atualizações pendentes quando comparado pelo descritor de produção em `ops/supabase-production/`; sete propriedades remotas de outros serviços permanecem explicitamente preservadas. O `supabase/config.toml` raiz continua deliberadamente reduzido para o banco isolado da Academy no CI.
 - Há oito migrations Academy pendentes no projeto remoto, de `20261013040227` até `20261016052000`. Elas já possuem contratos pgTAP executados no ambiente isolado do CI.
 - O repositório agora contém uma release manual, concorrente e auditável em `.github/workflows/production-database.yml`. Ela valida lint, testes e build antes de executar `supabase db push --include-all` e comprova a convergência do histórico.
 - O relatório Lighthouse reproduzível está em `.github/workflows/production-web-audit.yml`; a tentativa local não foi aceita como métrica porque o cache do npm estava comprometido e o PageSpeed respondeu com limitação de taxa.
