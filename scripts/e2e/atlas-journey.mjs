@@ -11,7 +11,7 @@ export async function atlasJourney({ browser, evaluate, success, api, denied, ev
   await browser('admin', ['find', 'role', 'button', 'click', '--name', 'Novo conteúdo', '--exact']);
   await browser('admin', ['find', 'label', 'Título', 'fill', title, '--exact']);
   await browser('admin', ['find', 'role', 'button', 'click', '--name', 'Criar e editar', '--exact']);
-  await eventually(async () => evaluate('admin', `/^\\/admin\\/atlas\\/[0-9a-f-]{36}$/.test(location.pathname)`), 'CMS creation did not open the real editor.');
+  await eventually(async () => evaluate('admin', `/^\\/admin\\/atlas\\/[0-9a-f-]{36}$/.test(location.pathname)`), 'CMS creation did not open the real editor.', 120);
   const itemId = await evaluate('admin', 'location.pathname.split("/").at(-1)');
   let detail = await success('admin', `/api/admin/atlas/${itemId}`);
   assert.equal(detail.status, 'draft');

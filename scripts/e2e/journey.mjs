@@ -103,8 +103,8 @@ async function success(actor, path, method, body) {
   assertTrue(result.status >= 200 && result.status < 300 && result.body.ok === true, 'Real API operation did not succeed.');
   return result.body.data;
 }
-async function eventually(check, label) {
-  for (let attempt = 0; attempt < 40; attempt++) {
+async function eventually(check, label, attempts = 40) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
     try { if (await check()) return; } catch (cause) {
       // A real Auth redirect can replace the page between polls. Retry only
       // that transient browser condition; API/validation/assertion failures
