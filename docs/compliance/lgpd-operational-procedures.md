@@ -9,7 +9,7 @@ Vinicius é o responsável operacional proposto. Deve confirmar quem representa 
 | Gate | Evidência necessária | Estado |
 |---|---|---|
 | Revisão jurídica | Documento revisado, identidade do revisor, data e versão | Pendente |
-| Aprovação operacional | Aceite explícito de Vinicius da versão revisada | Pendente |
+| Aprovação operacional | Aceite explícito de Vinicius registrado na conversa em 16/10/2026, condicionado às pendências jurídica e técnica abaixo | Aprovado pelo responsável do produto |
 | Ensaio técnico | Exportação, revogação e descarte verificados em ambiente isolado | Pendente |
 
 ## Dados e finalidade operacional

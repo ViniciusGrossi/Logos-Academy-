@@ -1,0 +1,26 @@
+name: Production web audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "URL pública que será auditada."
+        required: true
+        default: "https://logos-academy-three.vercel.app/login"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit the public login route
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: ${{ inputs.url }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
