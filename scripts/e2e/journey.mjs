@@ -91,6 +91,14 @@ async function browser(actor, args, stdin) {
 async function evaluate(actor, code) {
   return (await browser(actor, ['eval', '--stdin'], code)).result;
 }
+async function openWithRetry(actor, url) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try { return await browser(actor, ['open', url]); } catch (cause) {
+      if (!(cause instanceof BrowserOperationError) || !['navigation', 'timeout'].includes(cause.category) || attempt === 2) throw cause;
+      await delay(750);
+    }
+  }
+}
 async function api(actor, path, method = 'GET', body) {
   assertTrue(path.startsWith('/api/') && !path.startsWith('//'), 'Only internal API paths are allowed.');
   const result = await evaluate(actor, `(async()=>{const response=await fetch(${JSON.stringify(path)},{method:${JSON.stringify(method)},credentials:'same-origin',headers:{'content-type':'application/json','idempotency-key':${JSON.stringify(randomUUID())}},${body === undefined ? '' : `body:${JSON.stringify(JSON.stringify(body))},`}signal:AbortSignal.timeout(20000)});const body=await response.json();return {status:response.status,body};})()`);
@@ -394,7 +402,7 @@ try {
   await checkpoint('responsive-content-and-tab-url', async () => {
     for (const width of [375, 768, 1440]) {
       await browser('admin', ['set', 'viewport', String(width), '900']);
-      await browser('admin', ['open', `${baseUrl}/admin/alunos/${student.studentId}?tab=formacao`]);
+      await openWithRetry('admin', `${baseUrl}/admin/alunos/${student.studentId}?tab=formacao`);
       await eventually(async () => evaluate('admin', `Boolean(document.querySelector('[role=tablist]'))`), 'Administrative tabs failed to render.');
       assertTrue(await evaluate('admin', 'document.documentElement.scrollWidth<=innerWidth+1'), 'Viewport has horizontal overflow.');
       const before = await evaluate('admin', 'location.search');
