@@ -3,8 +3,20 @@ create extension if not exists pgtap with schema extensions;
 set local search_path=logos_academy,extensions;
 select plan(4);
 select set_config('app.project_evidence','on',true);
+insert into activity_assignments(id,tenant_id,enrollment_id,session_id,activity_template_id,status,released_at)
+select md5('071-assignment-'||n)::uuid,'10000000-0000-0000-0000-000000000001','18000000-0000-0000-0000-000000000001',md5('academy-a-session-'||n)::uuid,md5('academy-a-activity-'||n)::uuid,'approved',now()
+from unnest(array[5,9,13]) n;
+insert into submissions(id,tenant_id,activity_assignment_id,version,is_draft,submitted_at)
+select md5('071-submission-'||n)::uuid,'10000000-0000-0000-0000-000000000001',md5('071-assignment-'||n)::uuid,1,false,now()
+from unnest(array[5,9,13]) n;
+update activity_assignments set status='approved' where id='1a000000-0000-0000-0000-000000000001';
 update project_records
-set status='approved',approved_submission_id='1b000000-0000-0000-0000-000000000001',approved_at=now()-make_interval(secs:=extract(epoch from created_at)::integer)
+set status='approved',approved_submission_id=case cycle_id
+  when md5('academy-a-cycle-1')::uuid then '1b000000-0000-0000-0000-000000000001'::uuid
+  when md5('academy-a-cycle-2')::uuid then md5('071-submission-5')::uuid
+  when md5('academy-a-cycle-3')::uuid then md5('071-submission-9')::uuid
+  when md5('academy-a-cycle-4')::uuid then md5('071-submission-13')::uuid end,
+approved_at=now()-make_interval(secs:=extract(epoch from created_at)::integer)
 where tenant_id='10000000-0000-0000-0000-000000000001' and enrollment_id='18000000-0000-0000-0000-000000000001';
 select is(
   (select jsonb_array_length(page->'items') from (select logos_academy.student_portfolio_page('10000000-0000-0000-0000-000000000001','11000000-0000-0000-0000-000000000002','18000000-0000-0000-0000-000000000001',null,2) page) q),
