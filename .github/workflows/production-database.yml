@@ -1,0 +1,56 @@
+name: Production database release
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Digite APPLY para confirmar a aplicação das migrations em produção."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: logos-academy-production-database
+  cancel-in-progress: false
+
+jobs:
+  validate-and-migrate:
+    if: inputs.confirm == 'APPLY'
+    name: Validate and migrate production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate application contracts before schema change
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-publishable-key
+          SUPABASE_SECRET_KEY: ci-secret-key
+          PII_ENCRYPTION_KEY: ci-encryption-key
+          NEXT_PUBLIC_DEMO_MODE: "false"
+        run: |
+          npm run lint
+          npm test
+          npm run build
+      - name: Refuse an empty production connection
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo 'SUPABASE_DB_URL is not configured for the production environment.' >&2
+            exit 1
+          fi
+      - name: Show migration plan without credentials
+        run: npx --yes supabase@2.118.0 migration list --db-url "$SUPABASE_DB_URL"
+      - name: Apply versioned migrations
+        run: npx --yes supabase@2.118.0 db push --db-url "$SUPABASE_DB_URL" --include-all --yes
+      - name: Prove local and remote migration history converge
+        run: npx --yes supabase@2.118.0 migration list --db-url "$SUPABASE_DB_URL"
